@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/OuterCore/ECS/Component.hpp"
+#include "Math/Common/Logarithms.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Matrix/Matrix3.hpp"
 #include "Math/Vector/Vector.hpp"
@@ -193,6 +194,21 @@ struct IOperationDimensional : IDimensional
 {
 };
 
+template <std::size_t N> struct FixedString
+{
+    char Data[N];
+
+    constexpr FixedString(const char (&string)[N])
+    {
+        std::copy_n(string, N, Data);
+    }
+
+    constexpr operator std::string_view() const
+    {
+        return {Data, N - 1};
+    }
+};
+
 template <template <int> typename Derived, int Exp> struct Dimensional : IDimensional
 {
     static constexpr int Exponent = Exp;
@@ -201,7 +217,7 @@ template <template <int> typename Derived, int Exp> struct Dimensional : IDimens
 };
 
 //TODO- use specializations to make this less of a mess
-template <typename A, typename B> struct OperationDimensional;
+template <typename A, typename B, FixedString Name = ""> struct OperationDimensional;
 
 template <typename T>
 concept IsOperation = std::derived_from<T, IOperationDimensional>;
@@ -299,7 +315,7 @@ template <IsOperation LeftOp, IsOperation RightOp> struct OperationNormalization
                 std::conditional_t<E4, C4, std::conditional_t<E5, C5, std::conditional_t<E6, C6, C7>>>>>>;
 };
 
-template <typename A, typename B> struct OperationDimensional : IOperationDimensional
+template <typename A, typename B, FixedString Name> struct OperationDimensional : IOperationDimensional
 {
     using Left = A::Normalized;
     using Right = B::Normalized;
@@ -308,32 +324,38 @@ template <typename A, typename B> struct OperationDimensional : IOperationDimens
 
     static std::ostream& Print(std::ostream& os)
     {
-        if (Left::Exponent < 0 && Right::Exponent < 0)
+        if constexpr (Name.Data[0] != '\0')
+        {
+            os << std::string_view(Name);
+            return os;
+        }
+
+        if (Normalized::Left::Exponent < 0 && Normalized::Right::Exponent < 0)
         {
             os << "1/(";
-            Left::template WithExponent<-Left::Exponent>::Print(os);
-            Right::template WithExponent<-Right::Exponent>::Print(os);
+            Normalized::Left::template WithExponent<-Normalized::Left::Exponent>::Print(os);
+            Normalized::Right::template WithExponent<-Normalized::Right::Exponent>::Print(os);
             os << ")";
         }
 
-        if (Left::Exponent < 0 && Right::Exponent > 0)
+        if (Normalized::Left::Exponent < 0 && Normalized::Right::Exponent > 0)
         {
-            Right::Print(os);
+            Normalized::Right::Print(os);
             os << "/";
-            Left::template WithExponent<-Left::Exponent>::Print(os);
+            Normalized::Left::template WithExponent<-Normalized::Left::Exponent>::Print(os);
         }
 
-        if (Left::Exponent > 0 && Right::Exponent < 0)
+        if (Normalized::Left::Exponent > 0 && Normalized::Right::Exponent < 0)
         {
-            Left::Print(os);
+            Normalized::Left::Print(os);
             os << "/";
-            Right::template WithExponent<-Right::Exponent>::Print(os);
+            Normalized::Right::template WithExponent<-Normalized::Right::Exponent>::Print(os);
         }
 
-        if (Left::Exponent > 0 && Right::Exponent > 0)
+        if (Normalized::Left::Exponent > 0 && Normalized::Right::Exponent > 0)
         {
-            Left::Print(os);
-            Right::Print(os);
+            Normalized::Left::Print(os);
+            Normalized::Right::Print(os);
         }
 
         return os;
@@ -425,9 +447,15 @@ struct Dimension
     friend std::ostream& operator<<(std::ostream& os, Dimension dimension)
     {
         os << dimension.Value << ' ';
-        return D::Normalized::Print(os);
+        return D::Print(os);
     }
 };
 
-inline void Test() {}
+inline void Test()
+{
+
+    using Acceleration = OperationDimensional<OperationDimensional<Length<1>, Time<-1>>, Time<-1>>;
+    using Newton = OperationDimensional<Mass<1>, Acceleration>;
+    N::U::Log::Info(Dimension<float, Newton>{5});
+}
 } // namespace Sketch
