@@ -67,12 +67,15 @@ template <IsOperation Operation, IsTerm Term> struct OperationNormalization<Oper
     using Right = Operation::Right;
 
     using MergeRight = OperationDimensional<Left, AddTerms<Right, Term>>;
-
     using MergeLeft = OperationDimensional<AddTerms<Left, Term>, Right>;
+    using ZeroExpMerge = OperationDimensional<Left, Right>;
 
   public:
-    using Type = std::conditional_t<SameTerm<Right, Term>, MergeRight,
-        std::conditional_t<SameTerm<Left, Term>, MergeLeft, OperationDimensional<Operation, Term>>>;
+    using Type = std::conditional_t<SameTerm<Right, Term>,
+        std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeRight>,
+        std::conditional_t<SameTerm<Left, Term>,
+            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeLeft>,
+            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, OperationDimensional<Term, Operation>>>>;
 };
 
 // Term * Operation
@@ -83,12 +86,15 @@ template <IsTerm Term, IsOperation Operation> struct OperationNormalization<Term
     using Right = Operation::Right;
 
     using MergeRight = OperationDimensional<Left, AddTerms<Right, Term>>;
-
     using MergeLeft = OperationDimensional<AddTerms<Term, Left>, Right>;
+    using ZeroExpMerge = OperationDimensional<Left, Right>;
 
   public:
-    using Type = std::conditional_t<SameTerm<Right, Term>, MergeRight,
-        std::conditional_t<SameTerm<Left, Term>, MergeLeft, OperationDimensional<Term, Operation>>>;
+    using Type = std::conditional_t<SameTerm<Right, Term>,
+        std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeRight>,
+        std::conditional_t<SameTerm<Left, Term>,
+            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeLeft>,
+            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, OperationDimensional<Term, Operation>>>>;
 };
 
 // Operation * Operation

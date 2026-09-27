@@ -160,26 +160,14 @@ template <unsigned int... Dimensions> struct Tensor
 
 inline void Test()
 {
-    //TODO- found bug, if exponent is 0 in an operation, it doesn't remove it, ex: lien 166-172.
-    // as u can see, they should be addable.
-
-    N::M::Dimension<float, N::M::Length<-1>> l1;
-    N::M::Dimension<float, N::M::OperationDimensional<N::M::Mass<1>, N::M::Length<-1>>> m1;
-    N::M::Dimension<float, N::M::Mass<-1>> m2;
-
-    auto m3 = m1 * m2;
-
-    N::U::Log::Info(l1 + m3);
-
     N::M::Dimension<float, N::M::Mass<1>> m = 0.30f * N::Units::Kilogram;
     N::M::Dimension<N::M::Vector<2>, N::M::Newton> f1 = N::M::Vector<2>::FromPolar({N::M::Rad(-20), 5});
     N::M::Dimension<N::M::Vector<2>, N::M::Newton> f2 = N::M::Vector<2>::FromPolar({N::M::Rad(60), 8});
 
     auto netF = f1 + f2;
-
     auto accel = netF / m;
 
-    // N::U::Log::Info(netF / m);
-    // N::U::Log::Info((netF / m)().ToPolar());
+    N::U::Log::Info(netF / m);
+    N::U::Log::Info((netF / m)().ToPolar());
 }
 } // namespace Sketch
