@@ -1,10 +1,13 @@
 #pragma once
+
 namespace N::M
 {
 
+/** @brief Converts an integer exponent to its Unicode superscript representation. */
 inline std::string Superscript(int exponent)
 {
     static constexpr std::string_view Digits[] = {"⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
+
     if (exponent == 1)
     {
         return "";
@@ -32,10 +35,13 @@ struct IDimensional
 {
 };
 
+/** @brief Provides the common compile-time interface for a dimensional type. */
 template <template <int> typename Derived, int Exp> struct Dimensional : IDimensional
 {
     static constexpr int Exponent = Exp;
+
     template <int E> using WithExponent = Derived<E>;
+
     using Normalized = Derived<Exp>;
 };
 
@@ -46,6 +52,7 @@ template <int Exp> struct Time : Dimensional<Time, Exp>
         return os << "s" << Superscript(Exp);
     }
 };
+
 template <int Exp> struct Length : Dimensional<Length, Exp>
 {
     static std::ostream& Print(std::ostream& os)
@@ -53,6 +60,7 @@ template <int Exp> struct Length : Dimensional<Length, Exp>
         return os << "m" << Superscript(Exp);
     }
 };
+
 template <int Exp> struct Mass : Dimensional<Mass, Exp>
 {
     static std::ostream& Print(std::ostream& os)
@@ -60,4 +68,5 @@ template <int Exp> struct Mass : Dimensional<Mass, Exp>
         return os << "kg" << Superscript(Exp);
     }
 };
+
 } // namespace N::M

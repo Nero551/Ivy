@@ -1,4 +1,5 @@
 #pragma once
+
 #include "FundamentalDimensionals.hpp"
 
 namespace N::M
@@ -24,107 +25,120 @@ template <std::size_t N> struct FixedString
 };
 
 template <typename A, typename B, FixedString Name = "">
-requires(std::derived_from<A, IDimensional> && std::derived_from<B, IDimensional>)
+requires std::derived_from<A, IDimensional> && std::derived_from<B, IDimensional>
 struct OperationDimensional;
 
 template <typename T>
 concept IsOperation = std::derived_from<T, IOperationDimensional>;
+
 template <typename T>
 concept IsTerm = !IsOperation<T>;
+
+template <typename A, typename B>
+inline constexpr bool SameTerm =
+    std::same_as<typename A::template WithExponent<1>, typename B::template WithExponent<1>>;
+
+template <typename A, typename B> using AddTerms = A::template WithExponent<A::Exponent + B::Exponent>;
+
+// ============================================================================
+// Normalization
+// ============================================================================
 
 template <typename Left, typename Right> struct OperationNormalization
 {
     using Type = OperationDimensional<Left, Right>;
 };
 
-template <IsTerm LeftTerm, IsTerm RightTerm> struct OperationNormalization<LeftTerm, RightTerm>
+// Term * Term
+template <IsTerm Left, IsTerm Right> struct OperationNormalization<Left, Right>
 {
-    static constexpr bool Equal = std::same_as<typename LeftTerm::template WithExponent<1>,
-        typename RightTerm::template WithExponent<1>>;
-
-    using Type = std::conditional_t<Equal,
-        typename LeftTerm::template WithExponent<LeftTerm::Exponent + RightTerm::Exponent>,
-        OperationDimensional<LeftTerm, RightTerm>>;
+    using Type =
+        std::conditional_t<SameTerm<Left, Right>, AddTerms<Left, Right>, OperationDimensional<Left, Right>>;
 };
 
-template <IsOperation LeftOp, IsTerm RightTerm> struct OperationNormalization<LeftOp, RightTerm>
+// Operation * Term
+template <IsOperation Operation, IsTerm Term> struct OperationNormalization<Operation, Term>
 {
-    template <typename C, typename D>
-    static constexpr bool Equal =
-        std::same_as<typename C::template WithExponent<1>, typename D::template WithExponent<1>>;
-    template <typename C, typename D> using AddTerms = C::template WithExponent<C::Exponent + D::Exponent>;
+  private:
+    using Left = Operation::Left;
+    using Right = Operation::Right;
 
-    using C1 = OperationDimensional<typename LeftOp::Left, AddTerms<typename LeftOp::Right, RightTerm>>;
-    using C2 = OperationDimensional<AddTerms<typename LeftOp::Left, RightTerm>, typename LeftOp::Right>;
-    using C3 = OperationDimensional<LeftOp, RightTerm>;
+    using MergeRight = OperationDimensional<Left, AddTerms<Right, Term>>;
 
-    using Type = std::conditional_t<Equal<typename LeftOp::Right, RightTerm>, C1,
-        std::conditional_t<Equal<typename LeftOp::Left, RightTerm>, C2, C3>>;
+    using MergeLeft = OperationDimensional<AddTerms<Left, Term>, Right>;
+
+  public:
+    using Type = std::conditional_t<SameTerm<Right, Term>, MergeRight,
+        std::conditional_t<SameTerm<Left, Term>, MergeLeft, OperationDimensional<Operation, Term>>>;
 };
 
-template <IsTerm LeftTerm, IsOperation RightOp> struct OperationNormalization<LeftTerm, RightOp>
+// Term * Operation
+template <IsTerm Term, IsOperation Operation> struct OperationNormalization<Term, Operation>
 {
-    template <typename C, typename D>
-    static constexpr bool Equal =
-        std::same_as<typename C::template WithExponent<1>, typename D::template WithExponent<1>>;
-    template <typename C, typename D> using AddTerms = C::template WithExponent<C::Exponent + D::Exponent>;
+  private:
+    using Left = Operation::Left;
+    using Right = Operation::Right;
 
-    using C1 = OperationDimensional<typename RightOp::Left, AddTerms<typename RightOp::Right, LeftTerm>>;
-    using C2 = OperationDimensional<AddTerms<LeftTerm, typename RightOp::Left>, typename RightOp::Right>;
-    using C3 = OperationDimensional<LeftTerm, RightOp>;
+    using MergeRight = OperationDimensional<Left, AddTerms<Right, Term>>;
 
-    using Type = std::conditional_t<Equal<typename RightOp::Right, LeftTerm>, C1,
-        std::conditional_t<Equal<typename RightOp::Left, LeftTerm>, C2, C3>>;
+    using MergeLeft = OperationDimensional<AddTerms<Term, Left>, Right>;
+
+  public:
+    using Type = std::conditional_t<SameTerm<Right, Term>, MergeRight,
+        std::conditional_t<SameTerm<Left, Term>, MergeLeft, OperationDimensional<Term, Operation>>>;
 };
 
-template <IsOperation LeftOp, IsOperation RightOp> struct OperationNormalization<LeftOp, RightOp>
+// Operation * Operation
+template <IsOperation LeftOperation, IsOperation RightOperation>
+struct OperationNormalization<LeftOperation, RightOperation>
 {
-    template <typename C, typename D>
-    static constexpr bool Equal =
-        std::same_as<typename C::template WithExponent<1>, typename D::template WithExponent<1>>;
-    template <typename C, typename D> using AddTerms = C::template WithExponent<C::Exponent + D::Exponent>;
+  private:
+    using LL = LeftOperation::Left;
+    using LR = LeftOperation::Right;
+    using RL = RightOperation::Left;
+    using RR = RightOperation::Right;
 
-    static constexpr bool E1 = Equal<typename LeftOp::Left, typename RightOp::Left> &&
-        Equal<typename LeftOp::Right, typename RightOp::Right> &&
-        !Equal<typename LeftOp::Left, typename LeftOp::Right>;
+    static constexpr bool SameLeft = SameTerm<LL, RL>;
 
-    static constexpr bool E2 = Equal<typename LeftOp::Left, typename RightOp::Right> &&
-        Equal<typename LeftOp::Right, typename RightOp::Left> &&
-        !Equal<typename LeftOp::Left, typename LeftOp::Right>;
+    static constexpr bool SameRight = SameTerm<LR, RR>;
 
-    static constexpr bool E3 = Equal<typename LeftOp::Left, typename RightOp::Left>;
-    static constexpr bool E4 = Equal<typename LeftOp::Right, typename RightOp::Right>;
-    static constexpr bool E5 = Equal<typename LeftOp::Left, typename RightOp::Right>;
-    static constexpr bool E6 = Equal<typename LeftOp::Right, typename RightOp::Left>;
+    static constexpr bool CrossLeft = SameTerm<LL, RR>;
 
-    using C1 = OperationDimensional<AddTerms<typename LeftOp::Left, typename RightOp::Left>,
-        AddTerms<typename LeftOp::Right, typename RightOp::Right>>;
+    static constexpr bool CrossRight = SameTerm<LR, RL>;
 
-    using C2 = OperationDimensional<AddTerms<typename LeftOp::Left, typename RightOp::Right>,
-        AddTerms<typename LeftOp::Right, typename RightOp::Left>>;
+    static constexpr bool SameStructure = SameLeft && SameRight && !SameTerm<LL, LR>;
 
-    using C3 = OperationDimensional<AddTerms<typename LeftOp::Left, typename RightOp::Left>,
-        OperationDimensional<typename LeftOp::Right, typename RightOp::Right>>;
+    static constexpr bool CrossStructure = CrossLeft && CrossRight && !SameTerm<LL, LR>;
 
-    using C4 = OperationDimensional<OperationDimensional<typename LeftOp::Left, typename RightOp::Left>,
-        AddTerms<typename LeftOp::Right, typename RightOp::Right>>;
+    using MergeSame = OperationDimensional<AddTerms<LL, RL>, AddTerms<LR, RR>>;
 
-    using C5 = OperationDimensional<AddTerms<typename LeftOp::Left, typename RightOp::Right>,
-        OperationDimensional<typename LeftOp::Right, typename RightOp::Left>>;
+    using MergeCross = OperationDimensional<AddTerms<LL, RR>, AddTerms<LR, RL>>;
 
-    using C6 = OperationDimensional<OperationDimensional<typename LeftOp::Left, typename RightOp::Right>,
-        AddTerms<typename LeftOp::Right, typename RightOp::Left>>;
+    using LeftMergedRight = OperationDimensional<AddTerms<LL, RL>, OperationDimensional<LR, RR>>;
 
-    using C7 = OperationDimensional<LeftOp, RightOp>;
+    using RightMergedLeft = OperationDimensional<OperationDimensional<LL, RL>, AddTerms<LR, RR>>;
 
-    using Type = std::conditional_t<E1, C1,
-        std::conditional_t<E2, C2,
-            std::conditional_t<E3, C3,
-                std::conditional_t<E4, C4, std::conditional_t<E5, C5, std::conditional_t<E6, C6, C7>>>>>>;
+    using LeftCross = OperationDimensional<AddTerms<LL, RR>, OperationDimensional<LR, RL>>;
+
+    using RightCross = OperationDimensional<OperationDimensional<LL, RR>, AddTerms<LR, RL>>;
+
+  public:
+    using Type = std::conditional_t<SameStructure, MergeSame,
+        std::conditional_t<CrossStructure, MergeCross,
+            std::conditional_t<SameLeft, LeftMergedRight,
+                std::conditional_t<SameRight, RightMergedLeft,
+                    std::conditional_t<CrossLeft, LeftCross,
+                        std::conditional_t<CrossRight, RightCross,
+                            OperationDimensional<LeftOperation, RightOperation>>>>>>>;
 };
 
+// ============================================================================
+// Operation
+// ============================================================================
+
+/** @brief Represents a compound dimensional expression composed of two dimensional types. */
 template <typename A, typename B, FixedString Name>
-requires(std::derived_from<A, IDimensional> && std::derived_from<B, IDimensional>)
+requires std::derived_from<A, IDimensional> && std::derived_from<B, IDimensional>
 struct OperationDimensional : IOperationDimensional
 {
     using Left = A::Normalized;
@@ -132,51 +146,53 @@ struct OperationDimensional : IOperationDimensional
 
     using Normalized = OperationNormalization<Left, Right>::Type;
 
+    template <int> using WithExponent = OperationDimensional;
+
+    static constexpr int Exponent = 1;
+
     static std::ostream& Print(std::ostream& os)
     {
         if constexpr (Name.Data[0] != '\0')
         {
-            os << std::string_view(Name);
-            return os;
+            return os << std::string_view(Name);
         }
-        else if constexpr (!std::derived_from<Normalized, IOperationDimensional>)
+        else if constexpr (!IsOperation<Normalized>)
         {
             return Normalized::Print(os);
         }
+
+        using L = Normalized::Left;
+        using R = Normalized::Right;
+
+        if constexpr (L::Exponent < 0 && R::Exponent < 0)
+        {
+            os << "1/(";
+
+            L::template WithExponent<-L::Exponent>::Print(os);
+            R::template WithExponent<-R::Exponent>::Print(os);
+
+            return os << ")";
+        }
+        else if constexpr (L::Exponent < 0)
+        {
+            R::Print(os);
+            os << "/";
+
+            return L::template WithExponent<-L::Exponent>::Print(os);
+        }
+        else if constexpr (R::Exponent < 0)
+        {
+            L::Print(os);
+            os << "/";
+
+            return R::template WithExponent<-R::Exponent>::Print(os);
+        }
         else
         {
-            if (Normalized::Left::Exponent < 0 && Normalized::Right::Exponent < 0)
-            {
-                os << "1/(";
-                Normalized::Left::template WithExponent<-Normalized::Left::Exponent>::Print(os);
-                Normalized::Right::template WithExponent<-Normalized::Right::Exponent>::Print(os);
-                os << ")";
-            }
-
-            if (Normalized::Left::Exponent < 0 && Normalized::Right::Exponent > 0)
-            {
-                Normalized::Right::Print(os);
-                os << "/";
-                Normalized::Left::template WithExponent<-Normalized::Left::Exponent>::Print(os);
-            }
-
-            if (Normalized::Left::Exponent > 0 && Normalized::Right::Exponent < 0)
-            {
-                Normalized::Left::Print(os);
-                os << "/";
-                Normalized::Right::template WithExponent<-Normalized::Right::Exponent>::Print(os);
-            }
-
-            if (Normalized::Left::Exponent > 0 && Normalized::Right::Exponent > 0)
-            {
-                Normalized::Left::Print(os);
-                Normalized::Right::Print(os);
-            }
-
-            return os;
+            L::Print(os);
+            return R::Print(os);
         }
     }
-    template <int E> using WithExponent = OperationDimensional;
-    static constexpr int Exponent = 1;
 };
+
 } // namespace N::M
