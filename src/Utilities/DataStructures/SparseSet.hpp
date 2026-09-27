@@ -88,21 +88,13 @@ struct SparseSet
 
     T& At(const SparseIndexType index)
     {
-        if (!Contains(index))
-        {
-            Log::Fatal("SparseSet does not contain the specified sparse index.");
-        }
-
+        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]].Value;
     }
 
     const T& At(const SparseIndexType index) const
     {
-        if (!Contains(index))
-        {
-            Log::Fatal("SparseSet does not contain the specified sparse index.");
-        }
-
+        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]].Value;
     }
 
@@ -118,21 +110,13 @@ struct SparseSet
 
     Entry& AtDense(const DenseIndexType index)
     {
-        if (index >= m_Dense.size())
-        {
-            Log::Fatal("SparseSet dense index out of bounds.");
-        }
-
+        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 
     const Entry& AtDense(const DenseIndexType index) const
     {
-        if (index >= m_Dense.size())
-        {
-            Log::Fatal("SparseSet dense index out of bounds.");
-        }
-
+        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 

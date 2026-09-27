@@ -169,5 +169,6 @@ inline void Test()
 
     N::U::Log::Info(netF / m);
     N::U::Log::Info((netF / m)().ToPolar());
+    N::U::Log::Info(46 * 9.8);
 }
 } // namespace Sketch
