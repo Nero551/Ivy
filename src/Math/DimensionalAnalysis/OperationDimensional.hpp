@@ -38,6 +38,8 @@ template <typename A, typename B>
 inline constexpr bool SameTerm =
     std::same_as<typename A::template WithExponent<1>, typename B::template WithExponent<1>>;
 
+template <typename A> inline constexpr bool ZeroExponent = A::Exponent == 0;
+
 template <typename A, typename B> using AddTerms = A::template WithExponent<A::Exponent + B::Exponent>;
 
 // ============================================================================
@@ -52,8 +54,9 @@ template <typename Left, typename Right> struct OperationNormalization
 // Term * Term
 template <IsTerm Left, IsTerm Right> struct OperationNormalization<Left, Right>
 {
-    using Type =
-        std::conditional_t<SameTerm<Left, Right>, AddTerms<Left, Right>, OperationDimensional<Left, Right>>;
+    using Type = std::conditional_t<SameTerm<Left, Right>, AddTerms<Left, Right>,
+        std::conditional_t<ZeroExponent<Left>, Right,
+            std::conditional_t<ZeroExponent<Right>, Left, OperationDimensional<Left, Right>>>>;
 };
 
 // Operation * Term
