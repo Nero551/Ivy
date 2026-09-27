@@ -61,14 +61,22 @@ struct Log
     }
 
     /** @brief Validates a raw pointer and returns the dereferenced object. */
-    template <typename T>
-    static T& Require(T* rawPtr, const std::string_view nullMessage = "Attempted to deference a null pointer")
+    template <typename T, typename... Args> static T& Require(T* rawPtr, Args... args)
     {
         if (!rawPtr)
         {
-            Fatal(nullMessage);
+            Fatal(args...);
         }
         return *rawPtr;
+    }
+
+    /** @brief its assert but cleaner. */
+    template <typename... Args> static void Assert(const bool condition, Args... args)
+    {
+        if (!condition)
+        {
+            Fatal(args...);
+        }
     }
 
   private:

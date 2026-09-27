@@ -31,7 +31,7 @@ fi
 
 echo "🔧 Checking CMake..."
 
-CMAKE_VERSION="4.4.2"
+CMAKE_VERSION="4.4.3"
 
 if cmake --version 2>/dev/null | grep -q "cmake version $CMAKE_VERSION"; then
     echo "✅ CMake $CMAKE_VERSION already installed."
@@ -64,4 +64,5 @@ command -v doxygen
 
 echo "🥳 Nova Dependencies Installed!"
 
+ROOT="$(git rev-parse --show-toplevel)"
 "$ROOT/scripts/init-submodules.sh"
