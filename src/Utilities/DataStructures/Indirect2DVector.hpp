@@ -12,16 +12,14 @@ namespace N::U
  * after row/column storage is allocated, while iteration traverses only
  * active values. Erasing uses swap-and-pop, so dense indices can change.
  */
-template <typename T> struct Indirect2DVector
+template <typename T, std::unsigned_integral IndexType = unsigned int> struct Indirect2DVector
 {
-    using Index = unsigned int;
-
-    static constexpr Index InvalidIndex = std::numeric_limits<Index>::max();
+    static constexpr IndexType InvalidIndex = std::numeric_limits<IndexType>::max();
 
     struct Key
     {
-        Index A;
-        Index B;
+        IndexType A;
+        IndexType B;
     };
 
     template <bool Const> struct BasicIterator
@@ -30,7 +28,7 @@ template <typename T> struct Indirect2DVector
         using ReturnType = std::conditional_t<Const, const T, T>;
 
         IndirectVectorType* IndirectVector;
-        Index Index;
+        IndexType Index;
 
         BasicIterator& operator++()
         {
@@ -73,13 +71,13 @@ template <typename T> struct Indirect2DVector
     }
 
     /** @brief Inserts a value if the key does not exist and returns the stored value. */
-    T& Push(Index a, Index b, const T& value)
+    T& Push(IndexType a, IndexType b, const T& value)
     {
-        Index& index = ResizeLookup(a, b)[b];
+        IndexType& index = ResizeLookup(a, b)[b];
 
         if (index == InvalidIndex)
         {
-            index = static_cast<Index>(m_Data.size());
+            index = static_cast<IndexType>(m_Data.size());
             m_Data.push_back(value);
             m_Indices.push_back({a, b});
         }
@@ -87,7 +85,7 @@ template <typename T> struct Indirect2DVector
         return m_Data[index];
     }
 
-    bool Contains(const Index a, const Index b) const
+    bool Contains(const IndexType a, const IndexType b) const
     {
         if (a >= m_Lookup.size())
         {
@@ -99,7 +97,7 @@ template <typename T> struct Indirect2DVector
         return b < row.size() && row[b] != InvalidIndex;
     }
 
-    T& At(const Index a, const Index b)
+    T& At(const IndexType a, const IndexType b)
     {
         if (!Contains(a, b))
         {
@@ -109,7 +107,7 @@ template <typename T> struct Indirect2DVector
         return m_Data[m_Lookup[a][b]];
     }
 
-    const T& At(const Index a, const Index b) const
+    const T& At(const IndexType a, const IndexType b) const
     {
         if (!Contains(a, b))
         {
@@ -120,13 +118,13 @@ template <typename T> struct Indirect2DVector
     }
 
     /** @brief Constructs a value if the key does not exist and returns its iterator. */
-    template <typename... Args> Iterator Emplace(Index a, Index b, Args&&... args)
+    template <typename... Args> Iterator Emplace(IndexType a, IndexType b, Args&&... args)
     {
-        Index& index = ResizeLookup(a, b)[b];
+        IndexType& index = ResizeLookup(a, b)[b];
 
         if (index == InvalidIndex)
         {
-            index = static_cast<Index>(m_Data.size());
+            index = static_cast<IndexType>(m_Data.size());
             m_Data.emplace_back(std::forward<Args>(args)...);
             m_Indices.push_back({a, b});
         }
@@ -134,7 +132,7 @@ template <typename T> struct Indirect2DVector
         return {.IndirectVector = this, .Index = index};
     }
 
-    Iterator Find(const Index a, const Index b)
+    Iterator Find(const IndexType a, const IndexType b)
     {
         if (a >= m_Lookup.size())
         {
@@ -148,7 +146,7 @@ template <typename T> struct Indirect2DVector
             return end();
         }
 
-        const Index index = row[b];
+        const IndexType index = row[b];
 
         if (index == InvalidIndex)
         {
@@ -162,15 +160,15 @@ template <typename T> struct Indirect2DVector
      * @brief Removes a value using swap-and-pop.
      * The dense index of the last value may change as a result.
      */
-    void Erase(const Index a, const Index b)
+    void Erase(const IndexType a, const IndexType b)
     {
         if (!Contains(a, b))
         {
             return;
         }
 
-        const Index index = m_Lookup[a][b];
-        const Index lastIndex = m_Data.size() - 1;
+        const IndexType index = m_Lookup[a][b];
+        const IndexType lastIndex = m_Data.size() - 1;
 
         if (index != lastIndex)
         {
@@ -187,23 +185,23 @@ template <typename T> struct Indirect2DVector
         m_Lookup[a][b] = InvalidIndex;
     }
 
-    void Reserve(Index count)
+    void Reserve(IndexType count)
     {
         m_Data.reserve(count);
         m_Indices.reserve(count);
     }
 
-    Index Size() const
+    IndexType Size() const
     {
         return m_Data.size();
     }
 
   private:
-    std::vector<std::vector<Index>> m_Lookup{};
+    std::vector<std::vector<IndexType>> m_Lookup{};
     std::vector<T> m_Data{};
     std::vector<Key> m_Indices{};
 
-    std::vector<Index>& ResizeLookup(const Index a, const Index b)
+    std::vector<IndexType>& ResizeLookup(const IndexType a, const IndexType b)
     {
         if (m_Lookup.size() <= a)
         {

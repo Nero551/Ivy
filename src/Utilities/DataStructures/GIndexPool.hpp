@@ -1,4 +1,5 @@
 #pragma once
+#include "Utilities/Log.hpp"
 
 namespace N::U
 {
@@ -73,6 +74,15 @@ struct GIndexPool
         m_Acquired[handle.Index] = false;
         m_Generations[handle.Index] += 1;
         m_Free.push_back(handle.Index);
+    }
+
+    GenType GetGeneration(IndexType index)
+    {
+        if (!index < m_Generations.size())
+        {
+            Log::Fatal("GIndexPool: Index Out of bounds");
+        }
+        return m_Generations[index];
     }
 
     /** @brief Returns the number of currently acquired indices. */

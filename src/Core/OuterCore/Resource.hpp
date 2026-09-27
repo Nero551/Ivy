@@ -14,8 +14,6 @@ struct Resource
 {
     using Handle = U::GIndexPool<>::Handle;
 
-    Resource(std::string name) : m_Name(std::move(name)) {};
-
     virtual ~Resource() = default;
 
     Resource(const Resource&) = delete;
@@ -31,10 +29,23 @@ struct Resource
         return m_Handle;
     }
 
+    unsigned int GetResourceId() const
+    {
+        return m_Handle.Index;
+    }
+
+    unsigned int GetResourceGeneration() const
+    {
+        return m_Handle.Generation;
+    }
+
     const std::string& GetName() const
     {
         return m_Name;
     }
+
+  protected:
+    Resource(std::string name) : m_Name(std::move(name)) {}
 
   private:
     friend struct ResourceManager;

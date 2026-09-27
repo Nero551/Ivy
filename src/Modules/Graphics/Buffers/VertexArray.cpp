@@ -7,7 +7,16 @@
 
 namespace N::G
 {
-VertexArray& VertexArray::operator=(VertexArray&& Other) noexcept {}
+VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
+{
+    if (this != &other)
+    {
+        Delete();
+        m_Id = std::exchange(other.m_Id, 0);
+    }
+
+    return *this;
+}
 void VertexArray::Generate()
 {
     if (IsGenerated())

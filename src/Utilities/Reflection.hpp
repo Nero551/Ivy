@@ -36,7 +36,7 @@ template <typename T> consteval TypeId GetTypeId()
     return Hash(GetTypeName<T>());
 }
 
-struct TypeInfo final
+struct TypeInfo
 {
     std::string_view Name{};
     unsigned int Size = 0;
@@ -61,7 +61,7 @@ template <typename T> consteval TypeInfo GetTypeInfo()
     return {.Name = GetTypeName<T>(), .Size = sizeof(T), .Align = alignof(T), .Id = GetTypeId<T>()};
 }
 
-class TypeRegistry final
+class TypeRegistry
 {
   public:
     static void Register(const TypeInfo& Type)
@@ -85,7 +85,7 @@ class TypeRegistry final
     inline static std::unordered_map<TypeId, TypeInfo> Types{};
 };
 
-struct AttributeInfo final
+struct AttributeInfo
 {
     std::string_view Name{};
     unsigned int Offset = 0;
@@ -114,7 +114,7 @@ template <typename T> AttributeInfo RegisterAttribute(const std::string_view nam
     return {.Name = name, .Offset = offset, .TypeID = GetTypeId<T>()};
 }
 
-#define REGISTER_ATTRIBUTE(Type, Member)                                                                     \
-    N::Reflection::RegisterAttribute<decltype(Type::Member)>(#Member, offsetof(Type, Member))
+#define REGISTER_ATTRIBUTE(Struct, Member)                                                                   \
+    N::Reflection::RegisterAttribute<decltype(Struct::Member)>(#Member, offsetof(Struct, Member))
 
 } // namespace N::Reflection

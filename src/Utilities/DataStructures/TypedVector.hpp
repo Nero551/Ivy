@@ -12,17 +12,15 @@ namespace N::U
  * are requested. The TypeId is then used directly as the index into the dense
  * storage.
  */
-template <typename T> struct TypedVector
+template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct TypedVector
 {
-    using TypeId = unsigned int;
-
     template <bool Const> struct BasicIterator
     {
         using TypedVectorType = std::conditional_t<Const, const TypedVector, TypedVector>;
         using ReturnType = std::conditional_t<Const, const T, T>;
 
         TypedVectorType* TypedVector;
-        TypeId Index;
+        TypeIdType Index;
 
         BasicIterator& operator++()
         {
@@ -76,7 +74,7 @@ template <typename T> struct TypedVector
 
     template <typename... Args> bool Contains()
     {
-        const TypeId typeId = GetTypeId<Args...>();
+        const TypeIdType typeId = GetTypeId<Args...>();
         return typeId < m_Data.size();
     }
 
@@ -98,7 +96,7 @@ template <typename T> struct TypedVector
 
     template <typename... Args> Iterator Find()
     {
-        const TypeId typeId = GetTypeId<Args...>();
+        const TypeIdType typeId = GetTypeId<Args...>();
 
         if (typeId >= m_Data.size())
         {
@@ -111,7 +109,7 @@ template <typename T> struct TypedVector
     /** @brief Stores a value for the specified type combination if it does not exist. */
     template <typename... Args> T& Push(T& value)
     {
-        const TypeId typeId = GetTypeId<Args...>();
+        const TypeIdType typeId = GetTypeId<Args...>();
 
         if (!Contains<Args...>())
         {
@@ -134,7 +132,7 @@ template <typename T> struct TypedVector
     /** @brief Constructs a value for the specified type combination if it does not exist. */
     template <typename... Args, typename... Params> Iterator Emplace(Params&&... parameters)
     {
-        const TypeId typeId = GetTypeId<Args...>();
+        const TypeIdType typeId = GetTypeId<Args...>();
 
         if (!Contains<Args...>())
         {
@@ -149,27 +147,27 @@ template <typename T> struct TypedVector
         return {this, typeId};
     }
 
-    TypeId Size() const
+    TypeIdType Size() const
     {
         return m_Data.size();
     }
 
   private:
-    TypeId m_NextTypeId{};
+    TypeIdType m_NextTypeId{};
     std::vector<T> m_Data{};
-    std::vector<TypeId> m_TypeIds{};
-    static constexpr TypeId InvalidTypeId = std::numeric_limits<TypeId>::max();
+    std::vector<TypeIdType> m_TypeIds{};
+    static constexpr TypeIdType InvalidTypeId = std::numeric_limits<TypeIdType>::max();
 
-    template <typename... Args> TypeId GetTypeId()
+    template <typename... Args> TypeIdType GetTypeId()
     {
-        const TypeId globalId = GetGlobalTypeId<Args...>();
+        const TypeIdType globalId = GetGlobalTypeId<Args...>();
 
         if (m_TypeIds.size() <= globalId)
         {
             m_TypeIds.resize(globalId + 1, InvalidTypeId);
         }
 
-        TypeId& localId = m_TypeIds[globalId];
+        TypeIdType& localId = m_TypeIds[globalId];
 
         if (localId == InvalidTypeId)
         {
@@ -179,15 +177,15 @@ template <typename T> struct TypedVector
         return localId;
     }
 
-    template <typename... Args> static TypeId GetGlobalTypeId()
+    template <typename... Args> static TypeIdType GetGlobalTypeId()
     {
-        static const TypeId Id = GetNextGlobalTypeId();
+        static const TypeIdType Id = GetNextGlobalTypeId();
         return Id;
     }
 
-    static TypeId GetNextGlobalTypeId()
+    static TypeIdType GetNextGlobalTypeId()
     {
-        static TypeId Id{};
+        static TypeIdType Id{};
         return Id++;
     }
 };

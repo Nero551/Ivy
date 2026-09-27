@@ -1,10 +1,5 @@
 #pragma once
-#include "Core/OuterCore/ECS/Component.hpp"
-#include "Math/Common/Logarithms.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Math/Matrix/Matrix3.hpp"
-#include "Math/Vector/Vector.hpp"
-#include "Math/Vector/Vector4.hpp"
 #include "Utilities/Log.hpp"
 
 namespace Sketch
@@ -14,8 +9,6 @@ namespace Sketch
 
 //TODO- add operator<< to all custom data structures. clean up datHa structure code.
 
-//TODO- add vector operators. for vector.
-//
 //TODO- If converting a general Quaternion to a rotation quaternion proves
 // expensive in a hot path, introduce a specialized RotQuaternion (RQuaternion)
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.

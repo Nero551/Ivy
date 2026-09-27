@@ -10,16 +10,16 @@ namespace N::U
  * active entries contiguous. Erasing an entry uses swap-and-pop, so dense
  * indices can change after an erase.
  */
-template <typename T> struct SparseSet
+template <typename T, std::unsigned_integral SparseIndexType = unsigned int,
+    std::unsigned_integral DenseIndexType = unsigned int>
+struct SparseSet
 {
-    using DenseIndex = unsigned int;
-    using SparseIndex = unsigned int;
 
-    static constexpr auto InvalidSparseIndex = std::numeric_limits<SparseIndex>::max();
+    static constexpr auto InvalidSparseIndex = std::numeric_limits<SparseIndexType>::max();
 
     struct Entry
     {
-        SparseIndex SparseIndex;
+        SparseIndexType SparseIndex;
         T Value;
     };
 
@@ -29,7 +29,7 @@ template <typename T> struct SparseSet
         using EntryType = std::conditional_t<Const, const Entry, Entry>;
 
         SetType* Set;
-        DenseIndex Index;
+        DenseIndexType Index;
 
         BasicIterator& operator++()
         {
@@ -81,12 +81,12 @@ template <typename T> struct SparseSet
         return {.Set = this, .Index = Size()};
     }
 
-    bool Contains(const SparseIndex index) const
+    bool Contains(const SparseIndexType index) const
     {
         return index < m_Sparse.size() && m_Sparse[index] != InvalidSparseIndex;
     }
 
-    T& At(const SparseIndex index)
+    T& At(const SparseIndexType index)
     {
         if (!Contains(index))
         {
@@ -96,7 +96,7 @@ template <typename T> struct SparseSet
         return m_Dense[m_Sparse[index]].Value;
     }
 
-    const T& At(const SparseIndex index) const
+    const T& At(const SparseIndexType index) const
     {
         if (!Contains(index))
         {
@@ -106,17 +106,17 @@ template <typename T> struct SparseSet
         return m_Dense[m_Sparse[index]].Value;
     }
 
-    T& operator[](const SparseIndex index)
+    T& operator[](const SparseIndexType index)
     {
         return m_Dense[m_Sparse[index]].Value;
     }
 
-    const T& operator[](const SparseIndex index) const
+    const T& operator[](const SparseIndexType index) const
     {
         return m_Dense[m_Sparse[index]].Value;
     }
 
-    Entry& AtDense(const DenseIndex index)
+    Entry& AtDense(const DenseIndexType index)
     {
         if (index >= m_Dense.size())
         {
@@ -126,7 +126,7 @@ template <typename T> struct SparseSet
         return m_Dense[index];
     }
 
-    const Entry& AtDense(const DenseIndex index) const
+    const Entry& AtDense(const DenseIndexType index) const
     {
         if (index >= m_Dense.size())
         {
@@ -136,7 +136,7 @@ template <typename T> struct SparseSet
         return m_Dense[index];
     }
 
-    Iterator Find(const SparseIndex index)
+    Iterator Find(const SparseIndexType index)
     {
         if (!Contains(index))
         {
@@ -146,7 +146,7 @@ template <typename T> struct SparseSet
         return {.Set = this, .Index = m_Sparse[index]};
     }
 
-    ConstIterator Find(const SparseIndex index) const
+    ConstIterator Find(const SparseIndexType index) const
     {
         if (!Contains(index))
         {
@@ -156,19 +156,19 @@ template <typename T> struct SparseSet
         return {.Set = this, .Index = m_Sparse[index]};
     }
 
-    DenseIndex DenseIndexOf(const SparseIndex index) const
+    DenseIndexType DenseIndexOf(const SparseIndexType index) const
     {
         return m_Sparse[index];
     }
 
-    SparseIndex SparseIndexOf(const DenseIndex index) const
+    SparseIndexType SparseIndexOf(const DenseIndexType index) const
     {
         return m_Dense[index].SparseIndex;
     }
 
     /** @brief Adds a value if the sparse index is unused, otherwise returns the existing value. */
     template <typename U> requires std::constructible_from<T, U&&>
-    T& Push(const SparseIndex index, U&& value)
+    T& Push(const SparseIndexType index, U&& value)
     {
         if (!Contains(index))
         {
@@ -185,7 +185,7 @@ template <typename T> struct SparseSet
     }
 
     /** @brief Constructs a value at the sparse index if it is unused. */
-    template <typename... Args> Iterator Emplace(const SparseIndex index, Args&&... args)
+    template <typename... Args> Iterator Emplace(const SparseIndexType index, Args&&... args)
     {
         if (!Contains(index))
         {
@@ -207,14 +207,14 @@ template <typename T> struct SparseSet
      * The last entry is moved into the erased entry's position, so dense
      * indices are not stable across erases.
      */
-    bool Erase(const SparseIndex index)
+    bool Erase(const SparseIndexType index)
     {
         if (!Contains(index))
         {
             return false;
         }
 
-        const DenseIndex denseIndex = m_Sparse[index];
+        const DenseIndexType denseIndex = m_Sparse[index];
 
         if (denseIndex != m_Dense.size() - 1)
         {
@@ -231,7 +231,7 @@ template <typename T> struct SparseSet
         return true;
     }
 
-    bool EraseByDense(const DenseIndex index)
+    bool EraseByDense(const DenseIndexType index)
     {
         return Erase(m_Dense[index].SparseIndex);
     }
@@ -240,19 +240,19 @@ template <typename T> struct SparseSet
     {
         m_Dense.clear();
 
-        for (DenseIndex& index : m_Sparse)
+        for (DenseIndexType& index : m_Sparse)
         {
             index = InvalidSparseIndex;
         }
     }
 
-    void Reserve(const DenseIndex size)
+    void Reserve(const DenseIndexType size)
     {
         m_Dense.reserve(size);
         m_Sparse.reserve(size);
     }
 
-    DenseIndex Size() const
+    DenseIndexType Size() const
     {
         return m_Dense.size();
     }
@@ -264,7 +264,7 @@ template <typename T> struct SparseSet
 
   private:
     std::vector<Entry> m_Dense{};
-    std::vector<DenseIndex> m_Sparse{};
+    std::vector<DenseIndexType> m_Sparse{};
 };
 
 } // namespace N::U
