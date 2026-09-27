@@ -1,9 +1,10 @@
 #pragma once
 #include "FundamentalDimensionals.hpp"
-#include "OperationalDimensionals.hpp"
+#include "OperationDimensional.hpp"
 namespace N::M
 {
-using Velocity = DivideDimensional<Length<1>, Time<1>>;
-using Acceleration = DivideDimensional<Length<1>, Time<2>>;
+using Velocity = OperationDimensional<Length<1>, Time<-1>>;
+using Acceleration = OperationDimensional<OperationDimensional<Length<1>, Time<-1>>, Time<-1>>;
+using Newton = OperationDimensional<Mass<1>, Acceleration, "N">;
 
 } // namespace N::M
