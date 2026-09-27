@@ -37,11 +37,6 @@
 #include "Vector/Vector3.hpp"
 #include "Vector/Vector4.hpp"
 
-#include "DimensionalAnalysis/DerivedDimensionals.hpp"
-#include "DimensionalAnalysis/Dimension.hpp"
-#include "DimensionalAnalysis/FundamentalDimensionals.hpp"
-#include "DimensionalAnalysis/OperationDimensional.hpp"
-
 //TODO- optimize the math ya piece of shit
 
 /**
@@ -53,7 +48,6 @@
  *  - Complex numbers
  *  - Quaternions
  *  - Multi-variable/valued functions
- *  - Dimensional Analysis
  */
 namespace N::M
 {

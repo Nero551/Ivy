@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 /**
- * @namespace N::Units
+ * @namespace N::P::Units
  * @brief Standard International System of Units (SI) constants used throughout Nova.
  *
  * Provides constexpr scale factors for common SI units.
@@ -14,7 +14,7 @@
  * These constants provide a consistent unit convention across the engine and allow
  * values to be written explicitly in terms of physical units when useful.
  */
-namespace N::Units
+namespace N::P::Units
 {
 constexpr float Meter = 1.0f;
 constexpr float Kilometer = 1e3f * Meter;
@@ -33,4 +33,4 @@ constexpr float Minute = 60.0f * Second;
 constexpr float Hour = 60.0f * Minute;
 constexpr float Day = 24.0f * Hour;
 // constexpr float Newton = Kilogram * (Meter / M::Pow(Second, 2.0f));
-} // namespace N::Units
+} // namespace N::P::Units

@@ -21,6 +21,7 @@ add_subdirectory(src/Utilities)
 add_subdirectory(src/Modules)
 add_subdirectory(src/World)
 add_subdirectory(src/Math)
+add_subdirectory(src/Physics)
 add_subdirectory(External/tracy)
 
 target_include_directories(Nova PRIVATE

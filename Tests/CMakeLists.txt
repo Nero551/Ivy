@@ -4,6 +4,7 @@ project(UnitTests)
 file(GLOB_RECURSE ENGINE_SOURCES
         ../src/Math/*.cpp
         ../src/Utilities/*.cpp
+        ../src/Physics/*.cpp
 )
 
 file(GLOB_RECURSE TEST_SOURCES
@@ -13,6 +14,7 @@ file(GLOB_RECURSE TEST_SOURCES
 add_executable(UnitTests
         ${ENGINE_SOURCES}
         math-tests.cpp
+        physics-tests.cpp
 
 )
 

@@ -1,10 +1,10 @@
 #pragma once
-#include "Math/Common/Logarithms.hpp"
-#include "Math/DimensionalAnalysis/DerivedDimensionals.hpp"
-#include "Math/DimensionalAnalysis/Dimension.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Vector/Vector2.hpp"
-#include "Modules/Physics/Units.hpp"
+#include "Physics/DimensionalAnalysis/DerivedDimensionals.hpp"
+#include "Physics/DimensionalAnalysis/Dimension.hpp"
+#include "Physics/DimensionalAnalysis/FundamentalDimensionals.hpp"
+#include "Physics/Units.hpp"
 #include "Utilities/Log.hpp"
 
 namespace Sketch
@@ -160,9 +160,9 @@ template <unsigned int... Dimensions> struct Tensor
 
 inline void Test()
 {
-    N::M::Dimension<float, N::M::Mass<1>> m = 0.30f * N::Units::Kilogram;
-    N::M::Dimension<N::M::Vector<2>, N::M::Newton> f1 = N::M::Vector<2>::FromPolar({N::M::Rad(-20), 5});
-    N::M::Dimension<N::M::Vector<2>, N::M::Newton> f2 = N::M::Vector<2>::FromPolar({N::M::Rad(60), 8});
+    N::P::Dimension<float, N::P::Mass<1>> m = 0.30f * N::P::Units::Kilogram;
+    N::P::Dimension<N::M::Vector<2>, N::P::Newton> f1 = N::M::Vector<2>::FromPolar({N::M::Rad(-20), 5});
+    N::P::Dimension<N::M::Vector<2>, N::P::Newton> f2 = N::M::Vector<2>::FromPolar({N::M::Rad(60), 8});
 
     auto netF = f1 + f2;
     auto accel = netF / m;

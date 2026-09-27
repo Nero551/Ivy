@@ -2,7 +2,7 @@
 
 #include "FundamentalDimensionals.hpp"
 
-namespace N::M
+namespace N::P
 {
 
 struct IOperationDimensional : IDimensional
@@ -204,4 +204,4 @@ struct OperationDimensional : IOperationDimensional
     }
 };
 
-} // namespace N::M
+} // namespace N::P
