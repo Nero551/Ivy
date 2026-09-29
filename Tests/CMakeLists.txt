@@ -9,7 +9,7 @@ file(GLOB_RECURSE ENGINE_SOURCES
 )
 
 file(GLOB_RECURSE TEST_SOURCES
-        MathTests/*.cpp
+        *.cpp
 )
 
 add_executable(UnitTests

@@ -2,6 +2,6 @@
 
 #include "Core/OuterCore/Component.hpp"
 namespace N {
-struct Component : Component {
+struct Component : C::Component {
 };
 }

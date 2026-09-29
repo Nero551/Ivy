@@ -4,7 +4,8 @@
 namespace N::P
 {
 using Velocity = OperationDimensional<Length<1>, Time<-1>>;
-using Acceleration = OperationDimensional<OperationDimensional<Length<1>, Time<-1>>, Time<-1>>;
+using Acceleration = OperationDimensional<Velocity, Time<-1>>;
 using Newton = OperationDimensional<Mass<1>, Acceleration, "N">;
+using Density = OperationDimensional<Mass<1>, Length<-3>>;
 
 } // namespace N::P

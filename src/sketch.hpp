@@ -7,6 +7,8 @@
 #include "Physics/Units.hpp"
 #include "Utilities/Log.hpp"
 
+#include <bitset>
+
 namespace Sketch
 {
 //TODO- the size of transform component is whats bottlenecking.
@@ -158,17 +160,210 @@ template <unsigned int... Dimensions> struct Tensor
     }
 };
 
+using Bit = bool;
+
+inline Bit NOT(const Bit bit)
+{
+    return !bit;
+}
+inline Bit OR(const Bit bit, const Bit bit2)
+{
+    return bit || bit2;
+}
+inline Bit AND(const Bit bit, const Bit bit2)
+{
+    return bit && bit2;
+}
+inline Bit XOR(const Bit bit, const Bit bit2)
+{
+    return bit != bit2;
+}
+
+template <int Amount> struct Bits
+{
+    Bits() {}
+    template <typename... Args>
+    Bits(Args... args) requires(sizeof...(Args) == Amount && (std::convertible_to<Args, Bit> && ...))
+        : m_Bits{static_cast<Bit>(args)...}
+    {
+    }
+
+    Bit& operator()(unsigned int index)
+    {
+        return m_Bits[index];
+    }
+
+    const Bit& operator()(unsigned int index) const
+    {
+        return m_Bits[index];
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Bits& bits)
+    {
+        for (auto it = bits.m_Bits.rbegin(); it != bits.m_Bits.rend(); ++it)
+        {
+            os << *it;
+        }
+
+        return os;
+    }
+
+  private:
+    std::array<Bit, Amount> m_Bits{0};
+};
+using Byte = Bits<8>;
+
+inline Bits<2> HALFADDER(const Bit bit, const Bit bit2)
+{
+    Bit sum = XOR(bit, bit2);
+    Bit carry = AND(bit, bit2);
+    return {sum, carry};
+}
+
+inline Bits<2> FULLADDER(const Bit bit1, const Bit bit2, const Bit carry)
+{
+    Bits<2> halfAdded = HALFADDER(bit1, bit2);
+    Bits<2> halfAdded2 = HALFADDER(halfAdded(0), carry);
+
+    Bit sum = halfAdded2(0);
+    Bit carry2 = OR(halfAdded(1), halfAdded2(1));
+    return {sum, carry2};
+}
+
+inline Bits<3> FULLADDER2(const Bits<2> bits1, const Bits<2> bits2, const Bit carry)
+{
+    Bits<2> fullAdded1 = FULLADDER(bits1(0), bits2(0), carry);
+    Bits<2> fullAdded2 = FULLADDER(bits1(1), bits2(1), fullAdded1(1));
+
+    Bit sum1 = fullAdded1(0);
+    Bit sum2 = fullAdded2(0);
+    Bit carry2 = fullAdded2(1);
+
+    return {sum1, sum2, carry2};
+}
+
+inline Bits<5> FULLADDER4(const Bits<4>& bits1, const Bits<4>& bits2, const Bit carry)
+{
+    Bits<3> full2Added1 = FULLADDER2({bits1(0), bits1(1)}, {bits2(0), bits2(1)}, carry);
+    Bits<3> full2Added2 = FULLADDER2({bits1(2), bits1(3)}, {bits2(2), bits2(3)}, full2Added1(2));
+
+    Bits<2> sum1 = {full2Added1(0), full2Added1(1)};
+    Bits<2> sum2 = {full2Added2(0), full2Added2(1)};
+    Bit carry2 = full2Added2(2);
+
+    return {sum1(0), sum1(1), sum2(0), sum2(1), carry2};
+}
+
+struct ALU
+{
+    Bit Zero = 1;
+    Bit Overflow = 0;
+
+    template <int Amount> Bits<Amount> Add(const Bits<Amount>& bits1, const Bits<Amount>& bits2)
+    {
+        Bit carry = 0;
+        Bits<Amount> result;
+        Zero = 1;
+        Overflow = 0;
+
+        for (int i = 0; i < Amount; ++i)
+        {
+            Bits<2> fullAdded = FULLADDER(bits1(i), bits2(i), carry);
+            Bit sum = fullAdded(0);
+            result(i) = sum;
+            carry = fullAdded(1);
+
+            if (sum == 1)
+            {
+                Zero = 0;
+            }
+        }
+
+        if (carry == 1)
+        {
+            Overflow = 1;
+        }
+
+        return result;
+    }
+
+    template <int Amount> Bits<Amount> And(const Bits<Amount>& bits1, const Bits<Amount>& bits2)
+    {
+        Bits<Amount> result;
+
+        for (int i = 0; i < Amount; ++i)
+        {
+            result(i) = AND(bits1(i), bits2(i));
+        }
+        return result;
+    }
+    template <int Amount> Bits<Amount> Or(const Bits<Amount>& bits1, const Bits<Amount>& bits2)
+    {
+        Bits<Amount> result;
+
+        for (int i = 0; i < Amount; ++i)
+        {
+            result(i) = OR(bits1(i), bits2(i));
+        }
+        return result;
+    }
+    template <int Amount> Bits<Amount> Xor(const Bits<Amount>& bits1, const Bits<Amount>& bits2)
+    {
+        Bits<Amount> result;
+
+        for (int i = 0; i < Amount; ++i)
+        {
+            result(i) = XOR(bits1(i), bits2(i));
+        }
+        return result;
+    }
+    template <int Amount> Bits<Amount> Not(const Bits<Amount>& bits)
+    {
+        Bits<Amount> result;
+
+        for (int i = 0; i < Amount; ++i)
+        {
+            result(i) = NOT(bits(i));
+        }
+        return result;
+    }
+};
+
+struct uInt8 : Bits<8>
+{
+    using Bits::Bits;
+    uInt8(uint8_t uint8)
+    {
+        for (int i = 0; i < 8; ++i)
+        {
+            (*this)(i) = uint8 % 2;
+            uint8 /= 2;
+        }
+    }
+};
+
 inline void Test()
 {
-    N::P::Dimension<float, N::P::Mass<1>> m = 0.30f * N::P::Units::Kilogram;
-    N::P::Dimension<N::M::Vector<2>, N::P::Newton> f1 = N::M::Vector<2>::FromPolar({N::M::Rad(-20), 5});
-    N::P::Dimension<N::M::Vector<2>, N::P::Newton> f2 = N::M::Vector<2>::FromPolar({N::M::Rad(60), 8});
+    ALU alu;
 
-    auto netF = f1 + f2;
-    auto accel = netF / m;
+    uInt8 c = {34};
+    uInt8 d = {33};
 
-    N::U::Log::Info(netF / m);
-    N::U::Log::Info((netF / m)().ToPolar());
-    N::U::Log::Info(46 * 9.8);
+    N::U::Log::Info(alu.Add(c, d));
+    N::U::Log::Info(alu.Zero);
+    N::U::Log::Info(alu.Overflow);
+    // N::U::Log::Info(ADD(a, b));
+
+    // N::P::Dimension<float, N::P::Mass<1>> m = 0.30f * N::P::Units::Kilogram;
+    // N::P::Dimension<N::M::Vector<2>, N::P::Newton> f1 = N::M::Vector<2>::FromPolar({N::M::Rad(-20), 5});
+    // N::P::Dimension<N::M::Vector<2>, N::P::Newton> f2 = N::M::Vector<2>::FromPolar({N::M::Rad(60), 8});
+    //
+    // auto netF = f1 + f2;
+    // auto accel = netF / m;
+    //
+    // N::U::Log::Info(netF / m);
+    // N::U::Log::Info((netF / m)().ToPolar());
+    // N::U::Log::Info(46 * 9.8);
+    // N::U::Log::Info(450.8 / (6 * 10e24));
 }
 } // namespace Sketch

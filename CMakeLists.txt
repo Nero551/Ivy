@@ -24,6 +24,13 @@ add_subdirectory(src/Math)
 add_subdirectory(src/Physics)
 add_subdirectory(External/tracy)
 
+include(scripts/GenerateUmbrellas.cmake)
+generate_umbrella_header(Core)
+generate_umbrella_header(Math)
+generate_umbrella_header(Physics)
+generate_umbrella_header(Utilities)
+generate_nova_umbrella()
+
 target_include_directories(Nova PRIVATE
         src
 )

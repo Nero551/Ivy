@@ -202,6 +202,7 @@ template <typename Input, typename Output> struct Function
     {
         float x = 0.0f;
         //Binary search, i need a better way to calculate this. am too stupid though.
+        // use something called Newton's Method of finding roots
         while (!NearlyEquals(domainMax, domainMin))
         {
             x = (domainMin + domainMax) / 2.0f;

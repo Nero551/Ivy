@@ -1,4 +1,4 @@
-#include "Core/InnerCore/Engine.hpp"
+#include "Nova.hpp"
 #include "sketch.hpp"
 
 int main(const int argc, char* argv[])
