@@ -33,16 +33,13 @@ struct Dimension
 {
     using Dimensional = D;
 
-    template <typename P, int E> using AddExp = P::template WithExponent<P::Exponent + E>;
+    template <typename P, typename O> using AddExp = P::template WithExponent<P::Exponent + O::Exponent>;
     template <typename P> using NegateExp = P::template WithExponent<-P::Exponent>;
 
     T Value{0};
 
     constexpr Dimension() {}
     constexpr Dimension(const T& value) : Value(value) {}
-    template <typename V, typename O> constexpr Dimension(const Dimension<V, O>& other) : Value(other.Value)
-    {
-    }
 
     /** @brief Adds two dimensionally equivalent values. */
     template <typename V, typename O>
@@ -57,36 +54,13 @@ struct Dimension
     {
         return {Value - other.Value};
     }
-
-    /**
-     * @brief Multiplies values with equivalent normalized dimensions.
-     * The resulting dimensional exponent is the sum of the operand exponents.
-     */
-    template <typename V, typename O, int E>
-    constexpr Dimension<T, AddExp<D, E>> operator*(const Dimension<V, O>& other) const
-        requires(SameNormalized<D, O>)
-    {
-        return {Value * other.Value};
-    }
-
-    /**
-     * @brief Divides values with equivalent normalized dimensions.
-     * The resulting dimensional exponent is the difference of the operand exponents.
-     */
-    template <typename V, typename O, int E>
-    constexpr Dimension<T, AddExp<D, -E>> operator/(const Dimension<V, O>& other) const
-        requires(SameNormalized<D, O>)
-    {
-        return {Value / other.Value};
-    }
-
     /**
      * @brief Multiplies values with potentially different dimensions.
      * The resulting dimensions are combined and normalized at compile time.
      */
     template <typename V, typename O>
     constexpr Dimension<T, typename OperationDimensional<D, O>::Normalized> operator*(
-        Dimension<V, O>& other) const
+        const Dimension<V, O>& other) const
     {
         return {Value * other.Value};
     }
@@ -99,7 +73,7 @@ struct Dimension
      */
     template <typename V, typename O>
     constexpr Dimension<T, typename OperationDimensional<D, NegateExp<O>>::Normalized> operator/(
-        Dimension<V, O>& other) const
+        const Dimension<V, O>& other) const
     {
         return {Value / other.Value};
     }

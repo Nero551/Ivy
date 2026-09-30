@@ -359,6 +359,6 @@ inline void Test()
     N::P::Dimension<float, N::P::Force> FT = 122;
     // N::P::Dimension<float, N::P::Mass<1>> MT = FT / g;
 
-    N::U::Log::Info(FT / g);
+    N::U::Log::Info((FT / g));
 }
 } // namespace Sketch

@@ -115,10 +115,10 @@ struct OperationNormalization<LeftOperation, RightOperation>
     using RL = R::Left;
     using RR = R::Right;
 
-    static constexpr bool LLR = SameTerm<LL, R>;
-    static constexpr bool LRR = SameTerm<LR, R>;
-    static constexpr bool RLL = SameTerm<RL, L>;
-    static constexpr bool RRL = SameTerm<RR, L>;
+    static constexpr bool LLR = SameTerm<typename LL::Left, RL> && SameTerm<typename LL::Right, RR>;
+    static constexpr bool LRR = SameTerm<typename LR::Left, RL> && SameTerm<typename LR::Right, RR>;
+    static constexpr bool RLL = SameTerm<typename RL::Left, LL> && SameTerm<typename RL::Right, LR>;
+    static constexpr bool RRL = SameTerm<typename RR::Left, LL> && SameTerm<typename RR::Right, LR>;
 
     static constexpr bool LL_RL = SameTerm<LL, RL>;
     static constexpr bool LR_RR = SameTerm<LR, RR>;
@@ -134,10 +134,21 @@ struct OperationNormalization<LeftOperation, RightOperation>
     using Add_LL_RR = OperationDimensional<AddTerms<LL, RR>, OperationDimensional<LR, RL>>;
     using Add_LR_RL = OperationDimensional<OperationDimensional<LL, RR>, AddTerms<LR, RL>>;
 
-    using Add_LLR = OperationDimensional<AddTerms<LL, R>, LR>;
-    using Add_LRR = OperationDimensional<LL, AddTerms<LR, R>>;
-    using Add_RLL = OperationDimensional<AddTerms<L, RL>, RR>;
-    using Add_RRL = OperationDimensional<AddTerms<L, RR>, RL>;
+    using Add_LLR = OperationDimensional<OperationDimensional<AddTerms<typename LL::Left, typename R::Left>,
+                                             AddTerms<typename LL::Right, typename R::Right>>,
+        LR>;
+
+    using Add_LRR = OperationDimensional<LL,
+        OperationDimensional<AddTerms<typename LR::Left, typename R::Left>,
+            AddTerms<typename LR::Right, typename R::Right>>>;
+
+    using Add_RLL = OperationDimensional<OperationDimensional<AddTerms<typename L::Left, typename RL::Left>,
+                                             AddTerms<typename L::Right, typename RL::Right>>,
+        RR>;
+
+    using Add_RRL = OperationDimensional<OperationDimensional<AddTerms<typename L::Left, typename RR::Left>,
+                                             AddTerms<typename L::Right, typename RR::Right>>,
+        RL>;
 
   public:
     using Type = std::conditional_t<ZeroExponent<RL> && ZeroExponent<RR>, L,
