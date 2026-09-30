@@ -4,6 +4,15 @@
 
 namespace N::M
 {
+/**
+ *
+ * @brief Represents a fixed-size vector of floating-point components.
+ *
+ * Provides component-wise arithmetic, scalar arithmetic, vector operations,
+ * interpolation, normalization, projection, and comparison.
+ *
+ * @tparam Components The number of components in the vector.
+ */
 template <unsigned int Components> struct Vector
 {
     constexpr Vector() {}

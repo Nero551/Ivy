@@ -256,8 +256,9 @@ inline Bits<5> FULLADDER4(const Bits<4>& bits1, const Bits<4>& bits2, const Bit 
 
 struct ALU
 {
-    Bit Zero = 1;
-    Bit Overflow = 0;
+    using Flag = Bit;
+    Flag Zero = 1;
+    Flag Overflow = 0;
 
     template <int Amount> Bits<Amount> Add(const Bits<Amount>& bits1, const Bits<Amount>& bits2)
     {
@@ -354,16 +355,10 @@ inline void Test()
     N::U::Log::Info(alu.Overflow);
     // N::U::Log::Info(ADD(a, b));
 
-    // N::P::Dimension<float, N::P::Mass<1>> m = 0.30f * N::P::Units::Kilogram;
-    // N::P::Dimension<N::M::Vector<2>, N::P::Newton> f1 = N::M::Vector<2>::FromPolar({N::M::Rad(-20), 5});
-    // N::P::Dimension<N::M::Vector<2>, N::P::Newton> f2 = N::M::Vector<2>::FromPolar({N::M::Rad(60), 8});
-    //
-    // auto netF = f1 + f2;
-    // auto accel = netF / m;
-    //
-    // N::U::Log::Info(netF / m);
-    // N::U::Log::Info((netF / m)().ToPolar());
-    // N::U::Log::Info(46 * 9.8);
-    // N::U::Log::Info(450.8 / (6 * 10e24));
+    N::P::Dimension<float, N::P::Acceleration> g = 9.8f;
+    N::P::Dimension<float, N::P::Force> FT = 122;
+    // N::P::Dimension<float, N::P::Mass<1>> MT = FT / g;
+
+    N::U::Log::Info(FT / g);
 }
 } // namespace Sketch

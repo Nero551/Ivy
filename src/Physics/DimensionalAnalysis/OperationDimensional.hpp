@@ -69,13 +69,16 @@ template <IsOperation Operation, IsTerm Term> struct OperationNormalization<Oper
     using MergeRight = OperationDimensional<Left, AddTerms<Right, Term>>;
     using MergeLeft = OperationDimensional<AddTerms<Left, Term>, Right>;
     using ZeroExpMerge = OperationDimensional<Left, Right>;
+    using ZeroExpOpMerge = Term;
 
   public:
-    using Type = std::conditional_t<SameTerm<Right, Term>,
-        std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeRight>,
-        std::conditional_t<SameTerm<Left, Term>,
-            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeLeft>,
-            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, OperationDimensional<Term, Operation>>>>;
+    using Type = std::conditional_t<ZeroExponent<Left> && ZeroExponent<Right>, ZeroExpOpMerge,
+        std::conditional_t<SameTerm<Right, Term>,
+            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeRight>,
+            std::conditional_t<SameTerm<Left, Term>,
+                std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeLeft>,
+                std::conditional_t<ZeroExponent<Term>, ZeroExpMerge,
+                    OperationDimensional<Term, Operation>>>>>;
 };
 
 // Term * Operation
@@ -88,13 +91,16 @@ template <IsTerm Term, IsOperation Operation> struct OperationNormalization<Term
     using MergeRight = OperationDimensional<Left, AddTerms<Right, Term>>;
     using MergeLeft = OperationDimensional<AddTerms<Term, Left>, Right>;
     using ZeroExpMerge = OperationDimensional<Left, Right>;
+    using ZeroExpOpMerge = Term;
 
   public:
-    using Type = std::conditional_t<SameTerm<Right, Term>,
-        std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeRight>,
-        std::conditional_t<SameTerm<Left, Term>,
-            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeLeft>,
-            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, OperationDimensional<Term, Operation>>>>;
+    using Type = std::conditional_t<ZeroExponent<Left> && ZeroExponent<Right>, ZeroExpOpMerge,
+        std::conditional_t<SameTerm<Right, Term>,
+            std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeRight>,
+            std::conditional_t<SameTerm<Left, Term>,
+                std::conditional_t<ZeroExponent<Term>, ZeroExpMerge, MergeLeft>,
+                std::conditional_t<ZeroExponent<Term>, ZeroExpMerge,
+                    OperationDimensional<Term, Operation>>>>>;
 };
 
 // Operation * Operation
@@ -102,43 +108,51 @@ template <IsOperation LeftOperation, IsOperation RightOperation>
 struct OperationNormalization<LeftOperation, RightOperation>
 {
   private:
-    using LL = LeftOperation::Left;
-    using LR = LeftOperation::Right;
-    using RL = RightOperation::Left;
-    using RR = RightOperation::Right;
+    using R = RightOperation;
+    using L = LeftOperation;
+    using LL = L::Left;
+    using LR = L::Right;
+    using RL = R::Left;
+    using RR = R::Right;
 
-    static constexpr bool SameLeft = SameTerm<LL, RL>;
+    static constexpr bool LLR = SameTerm<LL, R>;
+    static constexpr bool LRR = SameTerm<LR, R>;
+    static constexpr bool RLL = SameTerm<RL, L>;
+    static constexpr bool RRL = SameTerm<RR, L>;
 
-    static constexpr bool SameRight = SameTerm<LR, RR>;
+    static constexpr bool LL_RL = SameTerm<LL, RL>;
+    static constexpr bool LR_RR = SameTerm<LR, RR>;
+    static constexpr bool LL_RR = SameTerm<LL, RR>;
+    static constexpr bool LR_RL = SameTerm<LR, RL>;
+    static constexpr bool LL_RL_LR_RR = LL_RL && LR_RR && !SameTerm<LL, LR>;
+    static constexpr bool LL_RR_LR_RL = LL_RR && LR_RL && !SameTerm<LL, LR>;
 
-    static constexpr bool CrossLeft = SameTerm<LL, RR>;
+    using Add_LL_RL_LR_RR = OperationDimensional<AddTerms<LL, RL>, AddTerms<LR, RR>>;
+    using Add_LL_RR_LR_RL = OperationDimensional<AddTerms<LL, RR>, AddTerms<LR, RL>>;
+    using Add_LL_RL = OperationDimensional<AddTerms<LL, RL>, OperationDimensional<LR, RR>>;
+    using Add_LR_RR = OperationDimensional<OperationDimensional<LL, RL>, AddTerms<LR, RR>>;
+    using Add_LL_RR = OperationDimensional<AddTerms<LL, RR>, OperationDimensional<LR, RL>>;
+    using Add_LR_RL = OperationDimensional<OperationDimensional<LL, RR>, AddTerms<LR, RL>>;
 
-    static constexpr bool CrossRight = SameTerm<LR, RL>;
-
-    static constexpr bool SameStructure = SameLeft && SameRight && !SameTerm<LL, LR>;
-
-    static constexpr bool CrossStructure = CrossLeft && CrossRight && !SameTerm<LL, LR>;
-
-    using MergeSame = OperationDimensional<AddTerms<LL, RL>, AddTerms<LR, RR>>;
-
-    using MergeCross = OperationDimensional<AddTerms<LL, RR>, AddTerms<LR, RL>>;
-
-    using LeftMergedRight = OperationDimensional<AddTerms<LL, RL>, OperationDimensional<LR, RR>>;
-
-    using RightMergedLeft = OperationDimensional<OperationDimensional<LL, RL>, AddTerms<LR, RR>>;
-
-    using LeftCross = OperationDimensional<AddTerms<LL, RR>, OperationDimensional<LR, RL>>;
-
-    using RightCross = OperationDimensional<OperationDimensional<LL, RR>, AddTerms<LR, RL>>;
+    using Add_LLR = OperationDimensional<AddTerms<LL, R>, LR>;
+    using Add_LRR = OperationDimensional<LL, AddTerms<LR, R>>;
+    using Add_RLL = OperationDimensional<AddTerms<L, RL>, RR>;
+    using Add_RRL = OperationDimensional<AddTerms<L, RR>, RL>;
 
   public:
-    using Type = std::conditional_t<SameStructure, MergeSame,
-        std::conditional_t<CrossStructure, MergeCross,
-            std::conditional_t<SameLeft, LeftMergedRight,
-                std::conditional_t<SameRight, RightMergedLeft,
-                    std::conditional_t<CrossLeft, LeftCross,
-                        std::conditional_t<CrossRight, RightCross,
-                            OperationDimensional<LeftOperation, RightOperation>>>>>>>;
+    using Type = std::conditional_t<ZeroExponent<RL> && ZeroExponent<RR>, L,
+        std::conditional_t<ZeroExponent<LL> && ZeroExponent<LR>, R,
+            std::conditional_t<RRL, Add_RRL,
+                std::conditional_t<RLL, Add_RLL,
+                    std::conditional_t<LLR, Add_LLR,
+                        std::conditional_t<LRR, Add_LRR,
+                            std::conditional_t<LL_RL_LR_RR, Add_LL_RL_LR_RR,
+                                std::conditional_t<LL_RR_LR_RL, Add_LL_RR_LR_RL,
+                                    std::conditional_t<LL_RL, Add_LL_RL,
+                                        std::conditional_t<LR_RR, Add_LR_RR,
+                                            std::conditional_t<LL_RR, Add_LR_RR,
+                                                std::conditional_t<LR_RL, Add_LR_RL,
+                                                    OperationDimensional<L, R>>>>>>>>>>>>>;
 };
 
 // ============================================================================
@@ -155,9 +169,10 @@ struct OperationDimensional : IOperationDimensional
 
     using Normalized = OperationNormalization<Left, Right>::Type;
 
-    template <int> using WithExponent = OperationDimensional;
-
     static constexpr int Exponent = 1;
+    template <int E>
+    using WithExponent = OperationDimensional<typename Left::template WithExponent<Left::Exponent * E>,
+        typename Right::template WithExponent<Right::Exponent * E>>;
 
     static std::ostream& Print(std::ostream& os)
     {

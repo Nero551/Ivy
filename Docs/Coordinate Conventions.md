@@ -1,6 +1,6 @@
 ### Coordinate Conventions
 
-Nova uses a left-handed Cartesian coordinate system:
+Nova uses a right-handed Cartesian coordinate system:
 
 - **+X** points right.
 - **+Y** points up.
