@@ -9,11 +9,11 @@ namespace N::M
  * where `m` is the magnitude, `θ` is the angle, and `u` is the normalized imaginary-axis
  * direction.
  */
-struct QPolar
+template <Scalar T> struct QPolar
 {
-    Vector<3> Axis;
-    float Angle;
-    float Magnitude;
+    Vector<3, T> Axis;
+    T Angle;
+    T Magnitude;
 
     /**
      * @brief Constructs quaternion polar coordinates and normalizes the axis.
@@ -21,7 +21,7 @@ struct QPolar
      * @param angle Quaternion polar angle in radians.
      * @param magnitude Quaternion magnitude.
      */
-    QPolar(const Vector<3> axis, const float angle, const float magnitude = 1)
+    constexpr QPolar(const Vector<3, T>& axis, const T angle, const T magnitude = 1)
         : Axis(axis.Normalized()), Angle(angle), Magnitude(magnitude)
     {
     }

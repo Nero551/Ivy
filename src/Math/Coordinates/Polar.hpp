@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Common/Trigonometry.hpp"
+#include "Math/Concepts.hpp"
 
 namespace N::M
 {
@@ -13,20 +14,20 @@ namespace N::M
  * where the magnitude represents the distance from the origin and the
  * angle represents the direction measured from the positive x-axis.
  */
-struct Polar
+template <Scalar T> struct Polar
 {
     /** @brief The angle in radians. */
-    float Angle;
+    T Angle;
 
     /** @brief The distance from the origin. */
-    float Magnitude;
+    T Magnitude;
 
     /**
      * @brief Constructs a polar coordinate.
      * @param angle The angle in radians.
      * @param magnitude The distance from the origin. Default is 1.
      */
-    Polar(const float angle, const float magnitude = 1) : Angle(angle), Magnitude(magnitude) {}
+    constexpr Polar(const T angle, const T magnitude = 1) : Angle(angle), Magnitude(magnitude) {}
 
     friend std::ostream& operator<<(std::ostream& os, const Polar& polar)
     {

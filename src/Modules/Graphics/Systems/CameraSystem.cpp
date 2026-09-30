@@ -34,7 +34,7 @@ void CameraSystem::Update(const double dt)
         cameraComponent.Pitch += yOffset;
         cameraComponent.Pitch = std::clamp(cameraComponent.Pitch, -maxPitch, maxPitch);
 
-        transform.Rotation = M::Quaternion::FromEulerXYZ({cameraComponent.Pitch, cameraComponent.Yaw, 0});
+        transform.Rotation = M::Quaternion<>::FromEulerXYZ({cameraComponent.Pitch, cameraComponent.Yaw, 0});
     }
 
     const float speed = cameraComponent.Speed * static_cast<float>(dt);

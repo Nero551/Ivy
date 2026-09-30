@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Common/Trigonometry.hpp"
+#include "Math/Concepts.hpp"
 
 namespace N::M
 {
@@ -14,11 +15,11 @@ namespace N::M
  *
  * The angles are expressed in radians.
  */
-struct Spherical
+template <Scalar T> struct Spherical
 {
-    float Elevation;
-    float Azimuth;
-    float Magnitude;
+    T Elevation;
+    T Azimuth;
+    T Magnitude;
 
     /**
      * @brief Constructs a spherical coordinate.
@@ -26,7 +27,7 @@ struct Spherical
      * @param azimuth Angle around the vertical axis, in radians.
      * @param magnitude Length of the represented vector.
      */
-    Spherical(const float elevation, const float azimuth, const float magnitude = 1)
+    constexpr Spherical(const T elevation, const T azimuth, const T magnitude = 1)
         : Elevation(elevation), Azimuth(azimuth), Magnitude(magnitude)
     {
     }

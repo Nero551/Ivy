@@ -1,6 +1,8 @@
 #pragma once
 
+#include "../Common/Comparison.hpp"
 #include "../Common/Constants.hpp"
+#include "../Common/Exponentials.hpp"
 #include "../Coordinates/Polar.hpp"
 #include "Utilities/Log.hpp"
 
@@ -19,10 +21,10 @@ namespace N::M
  * i^2 = -1
  * @endcode
  */
-struct Complex
+template <Scalar T = float> struct Complex
 {
-    float Real;
-    float Imaginary;
+    T Real;
+    T Imaginary;
 
     /** @brief Constructs a complex number with both components set to zero. */
     constexpr Complex() : Real(0), Imaginary(0) {}
@@ -32,26 +34,35 @@ struct Complex
      * @param real The real component.
      * @param imaginary The imaginary component.
      */
-    constexpr Complex(const float real, const float imaginary) : Real(real), Imaginary(imaginary) {}
+    constexpr Complex(const T real, const T imaginary) : Real(real), Imaginary(imaginary) {}
 
     /**
      * @brief Constructs a complex number from polar coordinates.
      * @param polar The magnitude and angle of the complex number.
      * @return The equivalent complex number in Cartesian form.
      */
-    static Complex FromPolar(Polar polar);
+    static constexpr Complex FromPolar(const Polar<T> polar)
+    {
+        return {polar.Magnitude * std::cos(polar.Angle), polar.Magnitude * std::sin(polar.Angle)};
+    }
 
     /**
      * @brief Returns the squared magnitude of the complex number.
      * @return The squared magnitude.
      */
-    float MagnitudeSquared() const;
+    constexpr T MagnitudeSquared() const
+    {
+        return Real * Real + Imaginary * Imaginary;
+    }
 
     /**
      * @brief Returns the magnitude (modulus) of the complex number.
      * @return The magnitude.
      */
-    float Magnitude() const;
+    constexpr T Magnitude() const
+    {
+        return Sqrt(MagnitudeSquared());
+    }
 
     /**
      * @brief Returns the argument of the complex number.
@@ -64,19 +75,28 @@ struct Complex
      *
      * @return The principal argument in radians.
      */
-    float Argument() const;
+    constexpr T Argument() const
+    {
+        return std::atan2(Imaginary, Real);
+    }
 
     /**
      * @brief Returns the complex conjugate.
      * @return The complex conjugate.
      */
-    Complex Conjugate() const;
+    constexpr Complex Conjugate() const
+    {
+        return {Real, -Imaginary};
+    }
 
     /**
      * @brief Returns the multiplicative inverse.
      * @return The multiplicative inverse.
      */
-    Complex Inverse() const;
+    constexpr Complex Inverse() const
+    {
+        return Conjugate() / MagnitudeSquared();
+    }
 
     /**
      * @brief Returns a normalized complex number.
@@ -86,7 +106,10 @@ struct Complex
      *
      * @return The normalized complex number.
      */
-    Complex Normalized() const;
+    constexpr Complex Normalized() const
+    {
+        return *this / Magnitude();
+    }
 
     /**
      * @brief Converts the complex number to polar coordinates.
@@ -96,7 +119,10 @@ struct Complex
      *
      * @return The equivalent polar representation.
      */
-    Polar ToPolar() const;
+    constexpr Polar<T> ToPolar() const
+    {
+        return {Argument(), Magnitude()};
+    }
 
     /**
      * @brief Tests whether two complex numbers are approximately equal.
@@ -105,12 +131,22 @@ struct Complex
      * @param epsilon The maximum allowed difference between components.
      * @return @c true if both components are approximately equal.
      */
-    bool NearlyEquals(const Complex& b, float epsilon = EPSILON) const;
+    constexpr bool NearlyEquals(const Complex& b, const T epsilon = static_cast<T>(EPSILON)) const
+    {
+        return M::NearlyEquals(Real, b.Real, epsilon) && M::NearlyEquals(Imaginary, b.Imaginary, epsilon);
+    }
 
-    bool operator==(const Complex& b) const;
-    bool operator!=(const Complex& b) const;
+    constexpr bool operator==(const Complex& b) const
+    {
+        return Real == b.Real && Imaginary == b.Imaginary;
+    }
 
-    float& operator()(const unsigned int index)
+    constexpr bool operator!=(const Complex& b) const
+    {
+        return !(*this == b);
+    }
+
+    constexpr T& operator()(const unsigned int index)
     {
         switch (index)
         {
@@ -123,7 +159,7 @@ struct Complex
         }
     }
 
-    const float& operator()(const unsigned int index) const
+    constexpr const T& operator()(const unsigned int index) const
     {
         switch (index)
         {
@@ -136,32 +172,129 @@ struct Complex
         }
     }
 
-    Complex operator-() const;
-    Complex operator*(const Complex& b) const;
-    Complex operator/(const Complex& b) const;
-    Complex operator+(const Complex& b) const;
-    Complex operator-(const Complex& b) const;
+    constexpr Complex operator-() const
+    {
+        return -T{1} * *this;
+    }
 
-    Complex& operator*=(const Complex& b);
-    Complex& operator/=(const Complex& b);
-    Complex& operator+=(const Complex& b);
-    Complex& operator-=(const Complex& b);
+    constexpr Complex operator*(const Complex& b) const
+    {
+        Complex result;
+        result.Real = Real * b.Real - Imaginary * b.Imaginary;
+        result.Imaginary = Real * b.Imaginary + Imaginary * b.Real;
 
-    Complex operator*(float scalar) const;
-    Complex operator/(float scalar) const;
-    Complex operator+(float scalar) const;
-    Complex operator-(float scalar) const;
+        return result;
+    }
 
-    Complex& operator*=(float scalar);
-    Complex& operator/=(float scalar);
-    Complex& operator+=(float scalar);
-    Complex& operator-=(float scalar);
+    constexpr Complex operator/(const Complex& b) const
+    {
+        return *this * b.Inverse();
+    }
 
-    friend Complex operator*(float scalar, const Complex& a);
-    friend Complex operator/(float scalar, const Complex& a);
-    friend Complex operator+(float scalar, const Complex& a);
-    friend Complex operator-(float scalar, const Complex& a);
+    constexpr Complex operator+(const Complex& b) const
+    {
+        return {Real + b.Real, Imaginary + b.Imaginary};
+    }
 
-    friend std::ostream& operator<<(std::ostream& os, const Complex& complex);
+    constexpr Complex operator-(const Complex& b) const
+    {
+        return {Real - b.Real, Imaginary - b.Imaginary};
+    }
+
+    constexpr Complex& operator*=(const Complex& b)
+    {
+        return *this = *this * b;
+    }
+
+    constexpr Complex& operator/=(const Complex& b)
+    {
+        return *this = *this / b;
+    }
+
+    constexpr Complex& operator+=(const Complex& b)
+    {
+        return *this = *this + b;
+    }
+
+    constexpr Complex& operator-=(const Complex& b)
+    {
+        return *this = *this - b;
+    }
+
+    constexpr Complex operator*(const T scalar) const
+    {
+        return {Real * scalar, Imaginary * scalar};
+    }
+
+    constexpr Complex operator/(const T scalar) const
+    {
+        return {Real / scalar, Imaginary / scalar};
+    }
+
+    constexpr Complex operator+(const T scalar) const
+    {
+        return {Real + scalar, Imaginary};
+    }
+
+    constexpr Complex operator-(const T scalar) const
+    {
+        return {Real - scalar, Imaginary};
+    }
+
+    constexpr Complex& operator*=(const T scalar)
+    {
+        return *this = *this * scalar;
+    }
+
+    constexpr Complex& operator/=(const T scalar)
+    {
+        return *this = *this / scalar;
+    }
+
+    constexpr Complex& operator+=(const T scalar)
+    {
+        return *this = *this + scalar;
+    }
+
+    constexpr Complex& operator-=(const T scalar)
+    {
+        return *this = *this - scalar;
+    }
+
+    friend constexpr Complex operator*(const T scalar, const Complex& a)
+    {
+        return a * scalar;
+    }
+
+    friend constexpr Complex operator/(const T scalar, const Complex& a)
+    {
+        return scalar * a.Inverse();
+    }
+
+    friend constexpr Complex operator+(const T scalar, const Complex& a)
+    {
+        return a + scalar;
+    }
+
+    friend constexpr Complex operator-(const T scalar, const Complex& a)
+    {
+        return {scalar - a.Real, -a.Imaginary};
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Complex& complex)
+    {
+        os << complex.Real;
+
+        if (complex.Imaginary < 0)
+        {
+            os << " - " << -complex.Imaginary << "i";
+        }
+        else
+        {
+            os << " + " << complex.Imaginary << "i";
+        }
+
+        return os;
+    }
 };
 } // namespace N::M

@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Common/Trigonometry.hpp"
+#include "Math/Concepts.hpp"
 
 namespace N::M
 {
@@ -16,12 +17,12 @@ namespace N::M
  *
  * The angles are expressed in radians.
  */
-struct HyperSpherical
+template <Scalar T> struct HyperSpherical
 {
-    float Elevation;
-    float Azimuth;
-    float HyperAngle;
-    float Magnitude;
+    T Elevation;
+    T Azimuth;
+    T HyperAngle;
+    T Magnitude;
 
     /**
      * @brief Constructs a hyperspherical coordinate.
@@ -31,8 +32,7 @@ struct HyperSpherical
      * @param hyperAngle Angle determining the fourth-dimensional component, in radians.
      * @param magnitude Length of the represented vector.
      */
-    HyperSpherical(
-        const float elevation, const float azimuth, const float hyperAngle, const float magnitude = 1)
+    constexpr HyperSpherical(const T elevation, const T azimuth, const T hyperAngle, const T magnitude = 1)
         : Elevation(elevation), Azimuth(azimuth), HyperAngle(hyperAngle), Magnitude(magnitude)
     {
     }

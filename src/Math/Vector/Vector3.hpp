@@ -98,7 +98,7 @@ template <Scalar T> struct Vector<3, T>
     constexpr Vector(const T x, const T y, const T z) : x(x), y(y), z(z) {}
 
     /** @brief Constructs a vector from spherical coordinates. */
-    static constexpr Vector FromSpherical(const Spherical& spherical)
+    static constexpr Vector FromSpherical(const Spherical<T>& spherical)
     {
         const T m = spherical.Magnitude;
 
@@ -171,7 +171,7 @@ template <Scalar T> struct Vector<3, T>
     }
 
     /** @brief Converts the vector to spherical coordinates. */
-    constexpr Spherical ToSpherical() const
+    constexpr Spherical<T> ToSpherical() const
     {
         return {Elevation(), Azimuth(), Length()};
     }

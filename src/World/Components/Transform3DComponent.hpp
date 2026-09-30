@@ -23,7 +23,7 @@ namespace N
 struct Transform3DComponent : C::Component
 {
     C::Track<M::Vector<3>> Position = M::Vector<3>::Zero();
-    C::Track<M::Quaternion> Rotation = M::Quaternion::Identity();
+    C::Track<M::Quaternion<>> Rotation = M::Quaternion<>::Identity();
     C::Track<M::Vector<3>> Scale = M::Vector<3>::One();
 
     bool InheritTransform = true;
@@ -81,7 +81,7 @@ struct Transform3DComponent : C::Component
   private:
     // TODO-this is temporary until i have a proper change detection system (reflection)
     C::Track<M::Vector<3>> GlobalPosition = M::Vector<3>::Zero();
-    C::Track<M::Quaternion> GlobalRotation = M::Quaternion::Identity();
+    C::Track<M::Quaternion<>> GlobalRotation = M::Quaternion<>::Identity();
     C::Track<M::Vector<3>> GlobalScale = M::Vector<3>::One();
     friend struct Transform3DSystem;
     friend struct G::Graphics;

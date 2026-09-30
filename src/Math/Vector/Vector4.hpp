@@ -85,7 +85,7 @@ template <Scalar T> struct Vector<4, T>
     constexpr Vector(const T x, const T y, const T z, const T w) : x(x), y(y), z(z), w(w) {}
 
     /** @brief Constructs a vector from hyperspherical coordinates. */
-    static constexpr Vector FromHyperSpherical(const HyperSpherical& hyperSpherical)
+    static constexpr Vector FromHyperSpherical(const HyperSpherical<T>& hyperSpherical)
     {
         const T m = hyperSpherical.Magnitude;
 
@@ -175,7 +175,7 @@ template <Scalar T> struct Vector<4, T>
     }
 
     /** @brief Converts the vector to hyperspherical coordinates. */
-    constexpr HyperSpherical ToHyperSpherical() const
+    constexpr HyperSpherical<T> ToHyperSpherical() const
     {
         return {Elevation(), Azimuth(), HyperAngle(), Length()};
     }

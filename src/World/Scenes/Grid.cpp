@@ -30,7 +30,7 @@ Grid::Grid()
     // M::Rad(theta)}), 0);
 }
 
-void Grid::CreateGridLine(const M::Quaternion rotation, const M::Vector<3> position)
+void Grid::CreateGridLine(const M::Quaternion<> rotation, const M::Vector<3> position)
 {
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
     auto& shader = C::Service::Get<C::ResourceManager>().Load<G::Shader>("AxisShader");
@@ -61,7 +61,7 @@ void Grid::CreateXY()
     {
         if (x != 0)
         {
-            CreateGridLine(M::Quaternion::FromEulerXYZ({M::Rad(90), 0, 0}), {x, 0, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, 0}), {x, 0, 0});
         }
     }
 
@@ -69,7 +69,7 @@ void Grid::CreateXY()
     {
         if (y != 0)
         {
-            CreateGridLine(M::Quaternion::FromEulerXYZ({0, M::Rad(90), 0}), {0, y, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0}), {0, y, 0});
         }
     }
 }
@@ -80,7 +80,7 @@ void Grid::CreateXZ()
     {
         if (x != 0)
         {
-            CreateGridLine(M::Quaternion::FromEulerXYZ({0, 0, M::Rad(90)}), {x, 0, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)}), {x, 0, 0});
         }
     }
 
@@ -88,7 +88,7 @@ void Grid::CreateXZ()
     {
         if (z != 0)
         {
-            CreateGridLine(M::Quaternion::FromEulerXYZ({M::Rad(90), 0, M::Rad(90)}), {0, 0, z});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, M::Rad(90)}), {0, 0, z});
         }
     }
 }
@@ -99,7 +99,7 @@ void Grid::CreateYZ()
     {
         if (y != 0)
         {
-            CreateGridLine(M::Quaternion::FromEulerXYZ({0, 0, 0}), {0, y, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, 0}), {0, y, 0});
         }
     }
 
@@ -107,7 +107,7 @@ void Grid::CreateYZ()
     {
         if (z != 0)
         {
-            CreateGridLine(M::Quaternion::FromEulerXYZ({M::Rad(90), 0, 0}), {0, 0, z});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, 0}), {0, 0, z});
         }
     }
 }

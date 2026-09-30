@@ -33,12 +33,12 @@ CoordinateAxesScene::CoordinateAxesScene()
 
     auto& light = world.CreateEntity<G::Light>();
     query.Pool<Transform3DComponent>().GetComponentById(light.GetId()).Rotation =
-        M::Quaternion::FromEulerXYZ(M::Vector<3>{M::Rad(32.5)});
+        M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5)});
     GetRoot().AttachChild(light);
 
     auto& light2 = world.CreateEntity<G::Light>();
     query.Pool<Transform3DComponent>().GetComponentById(light2.GetId()).Rotation =
-        M::Quaternion::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5)});
+        M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5)});
     GetRoot().AttachChild(light2);
 
     auto& shader = resourceManager.Load<G::Shader>("AxisShader");
@@ -56,7 +56,7 @@ CoordinateAxesScene::CoordinateAxesScene()
     xMaterial.Material->Shader = &shader;
 
     query.Pool<Transform3DComponent>().GetComponentById(xAxis.GetId()).Rotation =
-        M::Quaternion::FromEulerXYZ({0, M::Rad(90), 0});
+        M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0});
     query.Pool<Transform3DComponent>().GetComponentById(xAxis.GetId()).Scale = {1, 1, 200};
     xMaterial.Material->Color = M::Color::Red;
 
@@ -69,7 +69,7 @@ CoordinateAxesScene::CoordinateAxesScene()
     yMaterial.Material->Shader = &shader;
 
     query.Pool<Transform3DComponent>().GetComponentById(yAxis.GetId()).Rotation =
-        M::Quaternion::FromEulerXYZ({M::Rad(-90), 0, 0});
+        M::Quaternion<>::FromEulerXYZ({M::Rad(-90), 0, 0});
     query.Pool<Transform3DComponent>().GetComponentById(yAxis.GetId()).Scale = {1, 1, 200};
     yMaterial.Material->Color = M::Color::Green;
 

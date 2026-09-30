@@ -168,9 +168,9 @@ TEST_CASE(
 
     "Complex construction and constants")
 {
-    Complex z;
+    Complex<> z;
     REQUIRE((z.Real == 0.0f && z.Imaginary == 0.0f)); // fixed chained comparison
-    Complex z2(3.0f, 4.0f);
+    Complex<> z2(3.0f, 4.0f);
     REQUIRE(z2.Real == 3.0f);
     REQUIRE(z2.Imaginary == 4.0f);
 
@@ -181,40 +181,40 @@ TEST_CASE(
 
     "Complex arithmetic")
 {
-    Complex a(1, 2), b(3, 4);
-    REQUIRE(a + b == Complex(4, 6));
-    REQUIRE(a - b == Complex(-2, -2));
-    REQUIRE(a * b == Complex(1 * 3 - 2 * 4, 1 * 4 + 2 * 3));
+    Complex<> a(1, 2), b(3, 4);
+    REQUIRE(a + b == Complex<>(4, 6));
+    REQUIRE(a - b == Complex<>(-2, -2));
+    REQUIRE(a * b == Complex<>(1 * 3 - 2 * 4, 1 * 4 + 2 * 3));
     REQUIRE(a / b == a * b.Inverse());
-    REQUIRE(-a == Complex(-1, -2));
-    REQUIRE(a + 2.0f == Complex(3, 2));
-    REQUIRE(2.0f * a == Complex(2, 4));
-    REQUIRE(a * 2.0f == Complex(2, 4));
+    REQUIRE(-a == Complex<>(-1, -2));
+    REQUIRE(a + 2.0f == Complex<>(3, 2));
+    REQUIRE(2.0f * a == Complex<>(2, 4));
+    REQUIRE(a * 2.0f == Complex<>(2, 4));
 }
 
 TEST_CASE(
 
     "Complex magnitude, conjugate, inverse")
 {
-    Complex z(3, 4);
+    Complex<> z(3, 4);
     REQUIRE(z.MagnitudeSquared() == 25.0f);
     REQUIRE(z.Magnitude() == Approx(5.0f));
-    REQUIRE(z.Conjugate() == Complex(3, -4));
-    REQUIRE(z.Inverse() == Complex(3 / 25.0f, -4 / 25.0f));
-    REQUIRE(z.Normalized() == Complex(3 / 5.0f, 4 / 5.0f));
+    REQUIRE(z.Conjugate() == Complex<>(3, -4));
+    REQUIRE(z.Inverse() == Complex<>(3 / 25.0f, -4 / 25.0f));
+    REQUIRE(z.Normalized() == Complex<>(3 / 5.0f, 4 / 5.0f));
 }
 
 TEST_CASE(
 
     "Complex polar and argument")
 {
-    Complex z(3, 4);
+    Complex<> z(3, 4);
     float arg = z.Argument();
     REQUIRE(arg == Approx(std::atan2(4.0f, 3.0f)));
     Polar p = z.ToPolar();
     REQUIRE(p.Angle == Approx(arg));
     REQUIRE(p.Magnitude == Approx(5.0f));
-    Complex fromPolar = Complex::FromPolar(p);
+    Complex<> fromPolar = Complex<>::FromPolar(p);
     REQUIRE(fromPolar.NearlyEquals(z));
 }
 
@@ -222,24 +222,24 @@ TEST_CASE(
 
     "Complex exponentials and logarithms")
 {
-    Complex z(0, PI / 2);
-    Complex e = CExp(z);
+    Complex<> z(0, PI / 2);
+    Complex<> e = CExp(z);
     REQUIRE(e.Real == Approx(0.0f).margin(1e-6f));
     REQUIRE(e.Imaginary == Approx(1.0f));
 
-    Complex ln = CLn(z);
+    Complex<> ln = CLn(z);
     REQUIRE(ln.Real == Approx(Ln(PI / 2)));
     REQUIRE(ln.Imaginary == Approx(PI / 2));
 
-    Complex p = CPow(E, z);
+    Complex<> p = CPow(E, z);
     REQUIRE(p.Real == Approx(0.0f).margin(1e-6f));
     REQUIRE(p.Imaginary == Approx(1.0f));
 
-    Complex p2 = CPow(z, 2.0f);
+    Complex<> p2 = CPow(z, 2.0f);
     REQUIRE(p2.NearlyEquals(z * z));
 
-    Complex w(1, 1);
-    Complex p3 = CPow(z, w);
+    Complex<> w(1, 1);
+    Complex<> p3 = CPow(z, w);
     (void)p3;
 }
 
@@ -247,8 +247,8 @@ TEST_CASE(
 
     "Complex sqrt")
 {
-    Complex z(0, 1);
-    Complex sqrt = CSqrt(z);
+    Complex<> z(0, 1);
+    Complex<> sqrt = CSqrt(z);
     REQUIRE(z.NearlyEquals(sqrt * sqrt));
 }
 
@@ -299,7 +299,7 @@ TEST_CASE(
 {
     Vector<3> axis = Vector<3>(1, 1, 0).Normalized();
     QPolar qp(axis, 1.2f, 2.0f);
-    Quaternion q = Quaternion::FromQPolar(qp);
+    Quaternion<> q = Quaternion<>::FromQPolar(qp);
     QPolar back = q.ToQPolar();
     REQUIRE(back.Axis.NearlyEquals(qp.Axis));
     REQUIRE(back.Angle == Approx(qp.Angle));
@@ -643,23 +643,23 @@ TEST_CASE("Function with non‑scalar types (Vector2)")
 
 TEST_CASE("Function with Complex type")
 {
-    auto f = Function<float, Complex>([](const float t) { return Complex(t, t * t); });
+    auto f = Function<float, Complex<>>([](const float t) { return Complex<>(t, t * t); });
     SECTION("Evaluate")
     {
         auto res = f(2.0f);
-        REQUIRE(res == Complex(2.0f, 4.0f));
+        REQUIRE(res == Complex<>(2.0f, 4.0f));
     }
 
     SECTION("Arithmetic")
     {
-        auto g = Function<float, Complex>([](float t) { return Complex(1.0f, 2.0f); });
+        auto g = Function<float, Complex<>>([](float t) { return Complex<>(1.0f, 2.0f); });
         auto h = f + g;
-        REQUIRE(h(2.0f) == Complex(3.0f, 6.0f));
+        REQUIRE(h(2.0f) == Complex<>(3.0f, 6.0f));
         h = f * g;
         // (2+4i)*(1+2i) = (2 - 8) + (4+4)i = -6 + 8i
-        REQUIRE(h(2.0f) == Complex(-6.0f, 8.0f));
+        REQUIRE(h(2.0f) == Complex<>(-6.0f, 8.0f));
         h = f / g;
-        auto expected = Complex(2.0f, 4.0f) / Complex(1.0f, 2.0f);
+        auto expected = Complex<>(2.0f, 4.0f) / Complex<>(1.0f, 2.0f);
         REQUIRE(h(2.0f).NearlyEquals(expected));
     }
 }
@@ -1016,28 +1016,28 @@ TEST_CASE(
 
     "Quaternion construction and constants")
 {
-    Quaternion q;
+    Quaternion<> q;
     REQUIRE((q.w == 0 && q.x == 0 && q.y == 0 && q.z == 0)); // fixed
-    Quaternion q2(1, 2, 3, 4);
+    Quaternion<> q2(1, 2, 3, 4);
     REQUIRE(q2.w == 1);
     REQUIRE(q2.x == 2);
     REQUIRE(q2.y == 3);
     REQUIRE(q2.z == 4);
-    Quaternion id = Quaternion::Identity();
-    REQUIRE(id == Quaternion(1, 0, 0, 0));
+    Quaternion<> id = Quaternion<>::Identity();
+    REQUIRE(id == Quaternion<>(1, 0, 0, 0));
 }
 
 TEST_CASE(
 
     "Quaternion identities")
 {
-    Quaternion q(1.2f, 2.0f, -0.7f, 3.1f);
+    Quaternion<> q(1.2f, 2.0f, -0.7f, 3.1f);
 
-    REQUIRE((q * Quaternion::Identity()).NearlyEquals(q));
-    REQUIRE((Quaternion::Identity() * q).NearlyEquals(q));
+    REQUIRE((q * Quaternion<>::Identity()).NearlyEquals(q));
+    REQUIRE((Quaternion<>::Identity() * q).NearlyEquals(q));
 
-    REQUIRE((q * q.Inverse()).NearlyEquals(Quaternion::Identity()));
-    REQUIRE((q.Inverse() * q).NearlyEquals(Quaternion::Identity()));
+    REQUIRE((q * q.Inverse()).NearlyEquals(Quaternion<>::Identity()));
+    REQUIRE((q.Inverse() * q).NearlyEquals(Quaternion<>::Identity()));
 
     REQUIRE(q.Conjugate().Conjugate() == q);
 }
@@ -1046,38 +1046,38 @@ TEST_CASE(
 
     "Quaternion arithmetic")
 {
-    Quaternion q1(1, 2, 3, 4);
-    Quaternion q2(5, 6, 7, 8);
-    Quaternion sum = q1 + q2;
-    REQUIRE(sum == Quaternion(6, 8, 10, 12));
-    Quaternion diff = q1 - q2;
-    REQUIRE(diff == Quaternion(-4, -4, -4, -4));
-    Quaternion prod = q1 * q2;
+    Quaternion<> q1(1, 2, 3, 4);
+    Quaternion<> q2(5, 6, 7, 8);
+    Quaternion<> sum = q1 + q2;
+    REQUIRE(sum == Quaternion<>(6, 8, 10, 12));
+    Quaternion<> diff = q1 - q2;
+    REQUIRE(diff == Quaternion<>(-4, -4, -4, -4));
+    Quaternion<> prod = q1 * q2;
     float w = 1 * 5 - 2 * 6 - 3 * 7 - 4 * 8;
     float x = 1 * 6 + 2 * 5 + 3 * 8 - 4 * 7;
     float y = 1 * 7 - 2 * 8 + 3 * 5 + 4 * 6;
     float z = 1 * 8 + 2 * 7 - 3 * 6 + 4 * 5;
-    REQUIRE(prod == Quaternion(w, x, y, z));
-    Quaternion div = q1 / q2;
+    REQUIRE(prod == Quaternion<>(w, x, y, z));
+    Quaternion<> div = q1 / q2;
     REQUIRE((div * q2).NearlyEquals(q1));
-    Quaternion neg = -q1;
-    REQUIRE(neg == Quaternion(-1, -2, -3, -4));
-    REQUIRE(q1 * 2.0f == Quaternion(2, 4, 6, 8));
-    REQUIRE(2.0f * q1 == Quaternion(2, 4, 6, 8));
-    REQUIRE(q1 + 2.0f == Quaternion(3, 2, 3, 4));
-    REQUIRE(q1 - 2.0f == Quaternion(-1, 2, 3, 4));
+    Quaternion<> neg = -q1;
+    REQUIRE(neg == Quaternion<>(-1, -2, -3, -4));
+    REQUIRE(q1 * 2.0f == Quaternion<>(2, 4, 6, 8));
+    REQUIRE(2.0f * q1 == Quaternion<>(2, 4, 6, 8));
+    REQUIRE(q1 + 2.0f == Quaternion<>(3, 2, 3, 4));
+    REQUIRE(q1 - 2.0f == Quaternion<>(-1, 2, 3, 4));
 }
 
 TEST_CASE(
 
     "Quaternion conjugate, magnitude, inverse")
 {
-    Quaternion q(1, 2, 3, 4);
-    REQUIRE(q.Conjugate() == Quaternion(1, -2, -3, -4));
+    Quaternion<> q(1, 2, 3, 4);
+    REQUIRE(q.Conjugate() == Quaternion<>(1, -2, -3, -4));
     REQUIRE(q.MagnitudeSquared() == 1 + 4 + 9 + 16);
     REQUIRE(q.Magnitude() == Approx(std::sqrt(30.0f)));
     REQUIRE(q.Inverse() == q.Conjugate() / 30.0f);
-    Quaternion norm = q.Normalized();
+    Quaternion<> norm = q.Normalized();
     REQUIRE(norm.Magnitude() == Approx(1.0f));
 }
 
@@ -1085,8 +1085,8 @@ TEST_CASE(
 
     "Quaternion dot product")
 {
-    Quaternion a(1, 2, 3, 4);
-    Quaternion b(5, 6, 7, 8);
+    Quaternion<> a(1, 2, 3, 4);
+    Quaternion<> b(5, 6, 7, 8);
     REQUIRE(a.Dot(b) == 1 * 5 + 2 * 6 + 3 * 7 + 4 * 8);
 }
 
@@ -1094,16 +1094,16 @@ TEST_CASE(
 
     "Quaternion polar and angle/axis")
 {
-    Quaternion q = Quaternion::Identity();
+    Quaternion<> q = Quaternion<>::Identity();
     REQUIRE(q.Angle() == Approx(0.0f));
-    q = Quaternion(0, 0.707f, 0.707f, 0);
+    q = Quaternion<>(0, 0.707f, 0.707f, 0);
     float ang = q.Angle();
     REQUIRE(ang > 0);
     Vector<3> axis = q.Axis();
     REQUIRE(axis.Length() == Approx(1.0f));
     QPolar polar = q.ToQPolar();
     REQUIRE(polar.Magnitude == Approx(q.Magnitude()));
-    Quaternion q2 = Quaternion::FromQPolar(polar);
+    Quaternion<> q2 = Quaternion<>::FromQPolar(polar);
     REQUIRE(q2.NearlyEquals(q));
 }
 
@@ -1112,7 +1112,7 @@ TEST_CASE(
     "Quaternion from Euler and matrix")
 {
     Vector<3> euler(PI / 3, PI / 4, PI / 6);
-    Quaternion q = Quaternion::FromEulerXYZ(euler);
+    Quaternion<> q = Quaternion<>::FromEulerXYZ(euler);
     Matrix<3, 3> mat = q.ToMatrix4().ToMatrix3();
     Matrix<3, 3> matEuler = Matrix<3, 3>::Identity().Rotate(euler);
     REQUIRE(mat.NearlyEquals(matEuler));
@@ -1124,7 +1124,7 @@ TEST_CASE(
 
     "Quaternion transform vector")
 {
-    Quaternion q = Quaternion::FromEulerXYZ(Vector<3>(0, 0, PI / 2));
+    Quaternion<> q = Quaternion<>::FromEulerXYZ(Vector<3>(0, 0, PI / 2));
     Vector<3> v(1, 0, 0);
     Vector<3> res = q.Transform(v);
     REQUIRE(res.NearlyEquals(Vector<3>(0, 1, 0)));
@@ -1134,30 +1134,30 @@ TEST_CASE(
 
     "Quaternion exponentials and logarithms")
 {
-    Quaternion q(1.2f, 0.5f, -0.7f, 0.8f);
+    Quaternion<> q(1.2f, 0.5f, -0.7f, 0.8f);
 
-    Quaternion result = QLn(QExp(q));
+    Quaternion<> result = QLn(QExp(q));
 
     REQUIRE(result.NearlyEquals(q));
 
-    Quaternion sq = QSqrt(q);
+    Quaternion<> sq = QSqrt(q);
     REQUIRE((sq * sq).NearlyEquals(q));
 
-    Quaternion p = QPow(q, 2.0f);
+    Quaternion<> p = QPow(q, 2.0f);
     REQUIRE(p.NearlyEquals(q * q));
 
-    REQUIRE(QLn(QExp(Quaternion(0, 1, 0, 0))).NearlyEquals(Quaternion(0, 1, 0, 0)));
+    REQUIRE(QLn(QExp(Quaternion<>(0, 1, 0, 0))).NearlyEquals(Quaternion<>(0, 1, 0, 0)));
 
-    REQUIRE(QLn(QExp(Quaternion(0, -1, 0, 0))).NearlyEquals(Quaternion(0, -1, 0, 0)));
+    REQUIRE(QLn(QExp(Quaternion<>(0, -1, 0, 0))).NearlyEquals(Quaternion<>(0, -1, 0, 0)));
 }
 
 TEST_CASE(
 
     "Quaternion Exp/Ln principal branch")
 {
-    Quaternion q(1.2f, 0.5f, -0.7f, 0.8f);
+    Quaternion<> q(1.2f, 0.5f, -0.7f, 0.8f);
 
-    Quaternion result = QLn(QExp(q));
+    Quaternion<> result = QLn(QExp(q));
 
     REQUIRE(result.NearlyEquals(q));
 }
@@ -1166,9 +1166,9 @@ TEST_CASE(
 
     "Quaternion Exp/Ln wraps outside principal branch")
 {
-    Quaternion q(1.2f, 2.0f, -0.7f, 3.1f);
+    Quaternion<> q(1.2f, 2.0f, -0.7f, 3.1f);
 
-    Quaternion result = QLn(QExp(q));
+    Quaternion<> result = QLn(QExp(q));
 
     REQUIRE_FALSE(result.NearlyEquals(q));
 }

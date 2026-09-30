@@ -67,7 +67,7 @@ template <Scalar T> struct Vector<2, T>
     constexpr Vector(const T x, const T y) : x(x), y(y) {}
 
     /** @brief Constructs a vector from polar coordinates. */
-    static constexpr Vector FromPolar(const Polar& polar)
+    static constexpr Vector FromPolar(const Polar<T>& polar)
     {
         return {polar.Magnitude * std::cos(polar.Angle), polar.Magnitude * std::sin(polar.Angle)};
     }
@@ -152,7 +152,7 @@ template <Scalar T> struct Vector<2, T>
     }
 
     /** @brief Converts the vector to polar coordinates. */
-    constexpr Polar ToPolar() const
+    constexpr Polar<T> ToPolar() const
     {
         return {Angle(), Length()};
     }

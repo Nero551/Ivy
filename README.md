@@ -95,7 +95,7 @@
 ### Week 9 — August 21–28
 
 - complex arithmetic
-- quaternion arithmetic & rotation conversions
+- Quaternion<> arithmetic & rotation conversions
 - depth, stencil & blending added as per material configurations
 - per mesh face culling configurations
 - redesigned texture system
