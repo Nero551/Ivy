@@ -10,7 +10,7 @@ struct QuadraticResult
     bool HasRealSolution = true;
 };
 
-inline QuadraticResult SolveQuadratic(const float a, const float b, const float c)
+constexpr QuadraticResult SolveQuadratic(const float a, const float b, const float c)
 {
     const float d = b * b - 4.0f * a * c;
 
