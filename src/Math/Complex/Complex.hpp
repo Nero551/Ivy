@@ -155,7 +155,7 @@ template <Scalar T = float> struct Complex
         case 1:
             return Imaginary;
         default:
-            U::Log::Fatal("Complex Number doesn't have index ", index, " a + bi");
+            U::Log::Fatal("Complex Number doesn't have index ", index, " (a + bi)");
         }
     }
 
@@ -168,13 +168,13 @@ template <Scalar T = float> struct Complex
         case 1:
             return Imaginary;
         default:
-            U::Log::Fatal("Complex Number doesn't have index ", index, " ", *this);
+            U::Log::Fatal("Complex Number doesn't have index ", index, " (a + bi)");
         }
     }
 
     constexpr Complex operator-() const
     {
-        return -T{1} * *this;
+        return {-Real, -Imaginary};
     }
 
     constexpr Complex operator*(const Complex& b) const

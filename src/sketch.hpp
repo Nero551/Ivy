@@ -28,6 +28,8 @@ namespace Sketch
 
 //TODO- redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
 
+using namespace N;
+
 using Index = unsigned int;
 template <typename T, Index Size> struct Array
 {
@@ -40,7 +42,7 @@ template <typename T, Index Size> struct Array
     {
         if (!Contains(index))
         {
-            N::U::Log::Fatal("Array: Out of bounds.");
+            U::Log::Fatal("Array: Out of bounds.");
         }
         return m_Data[index];
     }
@@ -55,7 +57,7 @@ template <typename T, Index Size> struct Array
 };
 
 template <typename Input, typename Output>
-Output Summation(const int start, const int end, const N::M::Function<Input, Output>& f)
+Output Summation(const int start, const int end, const M::Function<Input, Output>& f)
     requires(std::is_arithmetic_v<Input>)
 {
     Output result{};
@@ -351,12 +353,6 @@ inline void Test()
     uInt8 d = {33};
     // N::U::Log::Info(alu.Add(c, d));
     // N::U::Log::Info(alu.Zero);
-    // N::U::Log::Info(alu.Overflow);
-
-    N::P::Dimension<float, N::P::Acceleration> g = 9.8f;
-    N::P::Dimension<float, N::P::Force> FT = 122;
-    N::P::Dimension<float, N::P::Mass<1>> MT = FT / g;
-
-    N::U::Log::Info(MT);
+    // N::U::Log::Info(alu.Overflow);P
 }
 } // namespace Sketch

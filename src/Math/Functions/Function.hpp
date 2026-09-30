@@ -46,12 +46,12 @@ template <typename Input, typename Output> struct Function
      * @return A function representing the numerical derivative.
      * @note Only available for functions with a scalar Input type.
      */
-    Function<float, Output> Differentiate(float dx = 0.001f,
+    Function Differentiate(Input dx = 0.001f,
         DifferentiationMethod method = DifferentiationMethod::Central) const requires Scalar<Input>
     {
-        return [f = *this, dx, method](const float x)
+        return [f = *this, dx, method](const Input x)
         {
-            const float h = dx * std::max(1.0f, std::abs(x));
+            const Input h = dx * std::max(1.0f, std::abs(x));
             switch (method)
             {
             case DifferentiationMethod::Central:
@@ -75,18 +75,18 @@ template <typename Input, typename Output> struct Function
      * @return The numerical derivative at x.
      * @note Only available for functions with a scalar Input type.
      */
-    Output Derivative(float x, const float dx = 0.001f,
+    Output Derivative(Input x, const Input dx = 0.001f,
         const DifferentiationMethod method = DifferentiationMethod::Central) const requires Scalar<Input>
     {
         return Differentiate(dx, method)(x);
     }
 
-    Output AverageRateOfChange(const float start, const float end) const requires Scalar<Input>
+    Output AverageRateOfChange(const Input start, const Input end) const requires Scalar<Input>
     {
         return (Evaluate(end) - Evaluate(start)) / (end - start);
     }
 
-    Output Average(const float start, const float end) const requires Scalar<Input>
+    Output Average(const Input start, const Input end) const requires Scalar<Input>
     {
         return Integrate(start, end) / (end - start);
     }
@@ -100,7 +100,7 @@ template <typename Input, typename Output> struct Function
      * @return The approximate value of the definite integral.
      * @note Only available for functions with a scalar Input type.
      */
-    Output Integral(const float lowerBound, float upperBound, const float dx = 0.001f,
+    Output Integral(const Input lowerBound, Input upperBound, const Input dx = 0.001f,
         const IntegrationMethod method = IntegrationMethod::Midpoint) const requires Scalar<Input>
     {
         return Integrate(lowerBound, dx, method)(upperBound);
@@ -114,15 +114,15 @@ template <typename Input, typename Output> struct Function
      * @return A function whose value is the integral from lowerBound to its input.
      * @note Only available for functions with a scalar Input type.
      */
-    Function<float, Output> Integrate(float lowerBound, float dx = 0.001f,
+    Function Integrate(Input lowerBound, Input dx = 0.001f,
         IntegrationMethod method = IntegrationMethod::Midpoint) const requires Scalar<Input>
     {
-        return [f = *this, lowerBound, dx, method](const float upperBound)
+        return [f = *this, lowerBound, dx, method](const Input upperBound)
         {
             Output result{};
-            for (float x = lowerBound; x < upperBound; x += dx)
+            for (Input x = lowerBound; x < upperBound; x += dx)
             {
-                const float width = std::min(dx, upperBound - x);
+                const Input width = std::min(dx, upperBound - x);
                 switch (method)
                 {
                 case IntegrationMethod::Midpoint:
@@ -152,9 +152,9 @@ template <typename Input, typename Output> struct Function
      * @return A function representing the Taylor polynomial approximation.
      * @note Only available for functions with a scalar Input type.
      */
-    Function<float, Output> Taylor(unsigned int terms, float a) const requires Scalar<Input>
+    Function<float, Output> Taylor(unsigned int terms, Input a) const requires Scalar<Input>
     {
-        return [terms, a, f = *this](const float x)
+        return [terms, a, f = *this](const Input x)
         {
             Output result{};
             Function currentFunc = f;
@@ -187,7 +187,7 @@ template <typename Input, typename Output> struct Function
      * @note Requires a scalar-to-scalar function that is monotonic over the
      * given domain.
      */
-    float InverseEvaluate(const float y, float domainMin, float domainMax) const
+    float InverseEvaluate(const Input y, Input domainMin, Input domainMax) const
         requires Scalar<Input> && Scalar<Output>
     {
         float x = 0.0f;
@@ -196,7 +196,7 @@ template <typename Input, typename Output> struct Function
         while (!NearlyEquals(domainMax, domainMin))
         {
             x = (domainMin + domainMax) / 2.0f;
-            const float value = Evaluate(x);
+            const Input value = Evaluate(x);
             if (value < y)
             {
                 domainMin = x;
@@ -216,10 +216,10 @@ template <typename Input, typename Output> struct Function
      * @return A function representing the numerical inverse.
      * @note The function must be monotonic over the given domain.
      */
-    Function<float, float> Inverse(float domainMin, float domainMax) const
+    Function<Input, Input> Inverse(Input domainMin, Input domainMax) const
         requires Scalar<Input> && Scalar<Output>
     {
-        return [f = *this, domainMin, domainMax](const float y) -> float
+        return [f = *this, domainMin, domainMax](const Input y) -> float
         { return f.InverseEvaluate(y, domainMin, domainMax); };
     }
 

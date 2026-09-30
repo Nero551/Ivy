@@ -1,9 +1,15 @@
-#include "FileSystem.hpp"
+#pragma once
+
+#include <fstream>
+#include <sstream>
+#include <string>
+
 #include "Utilities/Log.hpp"
 
-namespace N::U
+namespace N::U::FileSystem
 {
-std::string FileSystem::ReadFile(const std::string& path)
+/** @brief Reads and returns the contents of a file. */
+inline std::string ReadFile(const std::string& path)
 {
     std::ifstream file(path);
 
@@ -19,7 +25,8 @@ std::string FileSystem::ReadFile(const std::string& path)
     return buffer.str();
 }
 
-void FileSystem::WriteFile(const std::string& path, const std::string& content)
+/** @brief Writes content to a file. */
+inline void WriteFile(const std::string& path, const std::string& content)
 {
     std::ofstream file(path);
 
@@ -31,4 +38,4 @@ void FileSystem::WriteFile(const std::string& path, const std::string& content)
 
     file << content;
 }
-} // namespace N::U
+} // namespace N::U::FileSystem

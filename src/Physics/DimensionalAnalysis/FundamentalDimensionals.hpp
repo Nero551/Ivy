@@ -39,16 +39,18 @@ struct IDimensional
 template <template <int> typename Derived, int Exp> struct Dimensional : IDimensional
 {
     static constexpr int Exponent = Exp;
-    using Left = Dimensional;
-    using Right = Dimensional;
 
     template <int E> using WithExponent = Derived<E>;
 
-    using Normalized = Derived<Exp>;
     static std::ostream& Print(std::ostream& os)
     {
         return Derived<Exp>::Print(os);
     }
+
+    //these are here just so my program doesn't bomb at compile-time (see OperationDimensional.hpp for context)
+    using Left = Dimensional;
+    using Right = Dimensional;
+    using Normalized = Derived<Exp>;
 };
 
 template <int Exp> struct Time : Dimensional<Time, Exp>

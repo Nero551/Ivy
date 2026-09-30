@@ -35,11 +35,10 @@ template <typename T>
 concept IsTerm = !IsOperation<T>;
 
 template <typename A, typename B>
-inline constexpr bool SameTerm =
+constexpr bool SameTerm =
     std::same_as<typename A::template WithExponent<1>, typename B::template WithExponent<1>>;
 
-template <typename A> inline constexpr bool ZeroExponent = A::Exponent == 0;
-
+template <typename A> constexpr bool ZeroExponent = A::Exponent == 0;
 template <typename A, typename B> using AddTerms = A::template WithExponent<A::Exponent + B::Exponent>;
 
 // ============================================================================
@@ -191,6 +190,7 @@ struct OperationDimensional : IOperationDimensional
         {
             return os << std::string_view(Name);
         }
+
         else if constexpr (!IsOperation<Normalized>)
         {
             return Normalized::Print(os);

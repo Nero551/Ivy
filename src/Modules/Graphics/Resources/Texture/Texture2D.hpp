@@ -5,7 +5,7 @@
 #include "Texture.hpp"
 #include "TextureFormat.hpp"
 #include "TextureWrap.hpp"
-#include "Utilities/Image/Image.hpp"
+#include "Utilities/Image.hpp"
 
 namespace N::G
 {

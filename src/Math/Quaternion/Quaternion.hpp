@@ -30,9 +30,9 @@ namespace N::M
  */
 template <Scalar T = float> struct Quaternion
 {
-    // TODO: Investigate the principal branch of Quaternion Ln/Exp.
-    //Ln(Exp(q)) == q only when the imaginary-vector magnitude is within
-    //the principal range (< PI). Outside it, the logarithm wraps by 2*PI.
+    //TODO: Investigate the principal branch of Quaternion Ln/Exp.
+    // Ln(Exp(q)) == q only when the imaginary-vector magnitude is within
+    // the principal range (< PI). Outside it, the logarithm wraps by 2*PI.
     T w = 0;
     T x = 0;
     T y = 0;
@@ -47,9 +47,9 @@ template <Scalar T = float> struct Quaternion
      * @param qPolar Quaternion polar representation.
      * @return The corresponding quaternion.
      */
-    static constexpr Quaternion<> FromQPolar(const QPolar<T>& qPolar)
+    static constexpr Quaternion FromQPolar(const QPolar<T>& qPolar)
     {
-        Quaternion<> result;
+        Quaternion result;
         T m = qPolar.Magnitude;
         T sine = std::sin(qPolar.Angle);
         result.w = m * std::cos(qPolar.Angle);
@@ -70,11 +70,11 @@ template <Scalar T = float> struct Quaternion
      * @param mat3 Rotation matrix.
      * @return Quaternion representing the same rotation.
      */
-    static constexpr Quaternion<> FromMatrix3(const Matrix<3, 3, T>& mat3)
+    static constexpr Quaternion FromMatrix3(const Matrix<3, 3, T>& mat3)
     {
         const T trace = mat3(0, 0) + mat3(1, 1) + mat3(2, 2);
 
-        Quaternion<> rotation;
+        Quaternion rotation;
 
         if (trace > 0)
         {
@@ -127,7 +127,7 @@ template <Scalar T = float> struct Quaternion
      * @param euler Euler angles `(x, y, z)`.
      * @return Quaternion representing the composed rotation.
      */
-    static constexpr Quaternion<> FromEulerXYZ(const Vector<3, T>& euler)
+    static constexpr Quaternion FromEulerXYZ(const Vector<3, T>& euler)
     {
         Matrix<3, 3, T> rotation = Matrix<3, 3, T>::Identity();
         rotation = rotation.Rotate(euler);
@@ -135,10 +135,10 @@ template <Scalar T = float> struct Quaternion
     }
 
     /** @brief Constructs the zero quaternion. */
-    constexpr Quaternion<>() {}
+    constexpr Quaternion() {}
 
     /** @brief Constructs a quaternion with all components equal to `all`. */
-    constexpr explicit Quaternion<>(const T all) : w(all), x(all), y(all), z(all) {}
+    constexpr explicit Quaternion(const T all) : w(all), x(all), y(all), z(all) {}
 
     /**
      * @brief Constructs a quaternion from its four components.
@@ -147,15 +147,15 @@ template <Scalar T = float> struct Quaternion
      * @param y Coefficient of the `j` imaginary unit.
      * @param z Coefficient of the `k` imaginary unit.
      */
-    constexpr Quaternion<>(const T w, const T x, const T y, const T z) : w(w), x(x), y(y), z(z) {}
+    constexpr Quaternion(const T w, const T x, const T y, const T z) : w(w), x(x), y(y), z(z) {}
 
     /**
      * @brief Returns the quaternion conjugate.
      * For `q = w + xi + yj + zk`, the conjugate is `q* = w - xi - yj - zk`.
      */
-    constexpr Quaternion<> Conjugate() const
+    constexpr Quaternion Conjugate() const
     {
-        return Quaternion<>(w, -x, -y, -z);
+        return Quaternion(w, -x, -y, -z);
     }
 
     /** @brief Returns the squared magnitude: `|q|² = w² + x² + y² + z²`. */
@@ -171,19 +171,19 @@ template <Scalar T = float> struct Quaternion
     }
 
     /** @brief Returns the multiplicative inverse: `q⁻¹ = q* / |q|²`. */
-    constexpr Quaternion<> Inverse() const
+    constexpr Quaternion Inverse() const
     {
         return Conjugate() / MagnitudeSquared();
     }
 
     /** @brief Returns a normalized copy of the quaternion with magnitude one. */
-    constexpr Quaternion<> Normalized() const
+    constexpr Quaternion Normalized() const
     {
         return *this / Magnitude();
     }
 
     /** @brief Dot product of 2 quaternions. */
-    constexpr T Dot(const Quaternion<>& p) const
+    constexpr T Dot(const Quaternion& p) const
     {
         return w * p.w + x * p.x + y * p.y + z * p.z;
     }
@@ -199,9 +199,9 @@ template <Scalar T = float> struct Quaternion
      */
     constexpr Vector<3, T> Transform(const Vector<3, T>& vec3) const
     {
-        Quaternion<> p = {0, vec3.x, vec3.y, vec3.z};
-        Quaternion<> q = FromQPolar({Axis(), Angle() / T{2}, Magnitude()});
-        Quaternion<> result = q * p * q.Inverse();
+        Quaternion p = {0, vec3.x, vec3.y, vec3.z};
+        Quaternion q = FromQPolar({Axis(), Angle() / T{2}, Magnitude()});
+        Quaternion result = q * p * q.Inverse();
 
         return {result.x, result.y, result.z};
     }
@@ -209,7 +209,7 @@ template <Scalar T = float> struct Quaternion
     /** @brief Returns the quaternion polar angle `θ` from `q = cos(θ) + u sin(θ)`. */
     constexpr T Angle() const
     {
-        Quaternion<> q = Normalized();
+        Quaternion q = Normalized();
         return std::acos(q.w);
     }
 
@@ -220,7 +220,7 @@ template <Scalar T = float> struct Quaternion
      */
     constexpr Vector<3, T> Axis() const
     {
-        Quaternion<> q = Normalized();
+        Quaternion q = Normalized();
         T sine = std::sin(Angle());
         Vector<3, T> axis;
 
@@ -292,20 +292,20 @@ template <Scalar T = float> struct Quaternion
      * @param epsilon Maximum allowed component-wise difference.
      * @return True if the quaternions are approximately equal.
      */
-    constexpr bool NearlyEquals(const Quaternion<>& p, const T epsilon = static_cast<T>(EPSILON)) const
+    constexpr bool NearlyEquals(const Quaternion& p, const T epsilon = static_cast<T>(EPSILON)) const
     {
         return M::NearlyEquals(w, p.w, epsilon) && M::NearlyEquals(x, p.x, epsilon) &&
             M::NearlyEquals(y, p.y, epsilon) && M::NearlyEquals(z, p.z, epsilon);
     }
 
     /** @brief Tests exact component-wise equality. */
-    constexpr bool operator==(const Quaternion<>& p) const
+    constexpr bool operator==(const Quaternion& p) const
     {
         return w == p.w && x == p.x && y == p.y && z == p.z;
     }
 
     /** @brief Tests exact component-wise inequality. */
-    constexpr bool operator!=(const Quaternion<>& p) const
+    constexpr bool operator!=(const Quaternion& p) const
     {
         return !(*this == p);
     }
@@ -345,7 +345,7 @@ template <Scalar T = float> struct Quaternion
     }
 
     /** @brief Returns the additive inverse: `-q = -w - xi - yj - zk`. */
-    constexpr Quaternion<> operator-() const
+    constexpr Quaternion operator-() const
     {
         return {-w, -x, -y, -z};
     }
@@ -354,9 +354,9 @@ template <Scalar T = float> struct Quaternion
      * @brief Multiplies two quaternions.
      * Quaternion multiplication is non-commutative; in general, `pq != qp`.
      */
-    constexpr Quaternion<> operator*(const Quaternion<>& p) const
+    constexpr Quaternion operator*(const Quaternion& p) const
     {
-        Quaternion<> result;
+        Quaternion result;
         result.w = (w * p.w) - (x * p.x) - (y * p.y) - (z * p.z);
         result.x = (w * p.x) + (x * p.w) + (y * p.z) - (z * p.y);
         result.y = (w * p.y) - (x * p.z) + (y * p.w) + (z * p.x);
@@ -366,43 +366,43 @@ template <Scalar T = float> struct Quaternion
     }
 
     /** @brief Divides this quaternion by another: `q / p = q * p⁻¹`. */
-    constexpr Quaternion<> operator/(const Quaternion<>& p) const
+    constexpr Quaternion operator/(const Quaternion& p) const
     {
         return *this * p.Inverse();
     }
 
     /** @brief Adds two quaternions component-wise. */
-    constexpr Quaternion<> operator+(const Quaternion<>& p) const
+    constexpr Quaternion operator+(const Quaternion& p) const
     {
         return {w + p.w, x + p.x, y + p.y, z + p.z};
     }
 
     /** @brief Subtracts two quaternions component-wise. */
-    constexpr Quaternion<> operator-(const Quaternion<>& p) const
+    constexpr Quaternion operator-(const Quaternion& p) const
     {
         return *this + (-p);
     }
 
     /** @brief Multiplies this quaternion by another quaternion in-place. */
-    constexpr Quaternion<>& operator*=(const Quaternion<>& p)
+    constexpr Quaternion& operator*=(const Quaternion& p)
     {
         return *this = *this * p;
     }
 
     /** @brief Divides this quaternion by another quaternion in-place. */
-    constexpr Quaternion<>& operator/=(const Quaternion<>& p)
+    constexpr Quaternion& operator/=(const Quaternion& p)
     {
         return *this = *this / p;
     }
 
     /** @brief Adds another quaternion to this quaternion in-place. */
-    constexpr Quaternion<>& operator+=(const Quaternion<>& p)
+    constexpr Quaternion& operator+=(const Quaternion& p)
     {
         return *this = *this + p;
     }
 
     /** @brief Subtracts another quaternion from this quaternion in-place. */
-    constexpr Quaternion<>& operator-=(const Quaternion<>& p)
+    constexpr Quaternion& operator-=(const Quaternion& p)
     {
         return *this = *this - p;
     }
@@ -412,7 +412,7 @@ template <Scalar T = float> struct Quaternion
      * @param scalar Scalar multiplier.
      * @return Scaled quaternion.
      */
-    constexpr Quaternion<> operator*(const T scalar) const
+    constexpr Quaternion operator*(const T scalar) const
     {
         return {w * scalar, x * scalar, y * scalar, z * scalar};
     }
@@ -422,68 +422,68 @@ template <Scalar T = float> struct Quaternion
      * @param scalar Scalar divisor.
      * @return Scaled quaternion.
      */
-    constexpr Quaternion<> operator/(const T scalar) const
+    constexpr Quaternion operator/(const T scalar) const
     {
         return {w / scalar, x / scalar, y / scalar, z / scalar};
     }
 
     /** @brief Adds a scalar to the real component: `(w + xi + yj + zk) + s = (w + s) + xi
      * + yj + zk`. */
-    constexpr Quaternion<> operator+(const T scalar) const
+    constexpr Quaternion operator+(const T scalar) const
     {
         return {w + scalar, x, y, z};
     }
 
     /** @brief Subtracts a scalar from the real component. */
-    constexpr Quaternion<> operator-(const T scalar) const
+    constexpr Quaternion operator-(const T scalar) const
     {
         return {w - scalar, x, y, z};
     }
 
     /** @brief Multiplies this quaternion by a scalar in-place. */
-    constexpr Quaternion<>& operator*=(const T scalar)
+    constexpr Quaternion& operator*=(const T scalar)
     {
         return *this = *this * scalar;
     }
 
     /** @brief Divides this quaternion by a scalar in-place. */
-    constexpr Quaternion<>& operator/=(const T scalar)
+    constexpr Quaternion& operator/=(const T scalar)
     {
         return *this = *this / scalar;
     }
 
     /** @brief Adds a scalar to the real component in-place. */
-    constexpr Quaternion<>& operator+=(const T scalar)
+    constexpr Quaternion& operator+=(const T scalar)
     {
         return *this = *this + scalar;
     }
 
     /** @brief Subtracts a scalar from the real component in-place. */
-    constexpr Quaternion<>& operator-=(const T scalar)
+    constexpr Quaternion& operator-=(const T scalar)
     {
         return *this = *this - scalar;
     }
 
     /** @brief Multiplies a quaternion by a scalar. */
-    friend constexpr Quaternion<> operator*(const T scalar, const Quaternion<>& q)
+    friend constexpr Quaternion operator*(const T scalar, const Quaternion& q)
     {
         return q * scalar;
     }
 
     /** @brief Divides a scalar by a quaternion. */
-    friend constexpr Quaternion<> operator/(const T scalar, const Quaternion<>& q)
+    friend constexpr Quaternion operator/(const T scalar, const Quaternion& q)
     {
         return scalar * q.Inverse();
     }
 
     /** @brief Adds a scalar to a quaternion's real component. */
-    friend constexpr Quaternion<> operator+(const T scalar, const Quaternion<>& q)
+    friend constexpr Quaternion operator+(const T scalar, const Quaternion& q)
     {
         return q + scalar;
     }
 
     /** @brief Subtracts a quaternion from a scalar. */
-    friend constexpr Quaternion<> operator-(const T scalar, const Quaternion<>& q)
+    friend constexpr Quaternion operator-(const T scalar, const Quaternion& q)
     {
         return {scalar - q.w, -q.x, -q.y, -q.z};
     }
@@ -493,7 +493,7 @@ template <Scalar T = float> struct Quaternion
      *
      * For example: `1 + 2i - 3j + 4k`.
      */
-    friend std::ostream& operator<<(std::ostream& os, const Quaternion<>& q)
+    friend std::ostream& operator<<(std::ostream& os, const Quaternion& q)
     {
         os << q.w;
 
@@ -528,9 +528,9 @@ template <Scalar T = float> struct Quaternion
     }
 
     /** @brief Multiplicative identity quaternion: `1 + 0i + 0j + 0k`. */
-    static constexpr Quaternion<> Identity()
+    static constexpr Quaternion Identity()
     {
-        return Quaternion<>{1, 0, 0, 0};
+        return Quaternion{1, 0, 0, 0};
     }
 };
 } // namespace N::M

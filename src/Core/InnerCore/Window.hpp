@@ -1,7 +1,7 @@
 #pragma once
 #include <OpenGL.hpp>
 
-#include "Utilities/Image/Image.hpp"
+#include "Utilities/Image.hpp"
 
 namespace N::C
 {
