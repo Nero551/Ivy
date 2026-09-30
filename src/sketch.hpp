@@ -357,8 +357,8 @@ inline void Test()
 
     N::P::Dimension<float, N::P::Acceleration> g = 9.8f;
     N::P::Dimension<float, N::P::Force> FT = 122;
-    // N::P::Dimension<float, N::P::Mass<1>> MT = FT / g;
+    N::P::Dimension<float, N::P::Mass<1>> MT = FT / g;
 
-    N::U::Log::Info((FT / g));
+    N::U::Log::Info(MT);
 }
 } // namespace Sketch

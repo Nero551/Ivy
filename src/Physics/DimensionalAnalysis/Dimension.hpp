@@ -40,6 +40,12 @@ struct Dimension
 
     constexpr Dimension() {}
     constexpr Dimension(const T& value) : Value(value) {}
+    template <typename V, typename O>
+    constexpr Dimension(const Dimension<V, O>& other)
+        requires(SameNormalized<D, O> && std::convertible_to<V, T>)
+        : Value(other.Value)
+    {
+    }
 
     /** @brief Adds two dimensionally equivalent values. */
     template <typename V, typename O>
