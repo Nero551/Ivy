@@ -4,10 +4,11 @@
 
 namespace N::M
 {
-template <unsigned int Row, unsigned int Column> struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column>>
+template <unsigned int Row, unsigned int Column, Scalar T = float>
+struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column, T>, T>
 {
-    using BasicMatrix<Row, Column, Matrix>::BasicMatrix;
-    using BasicMatrix<Row, Column, Matrix>::operator*;
+    using BasicMatrix<Row, Column, Matrix, T>::BasicMatrix;
+    using BasicMatrix<Row, Column, Matrix, T>::operator*;
 
     /** @brief Multiplies this matrix by another matrix. */
     template <unsigned int R, unsigned int C>
@@ -69,13 +70,13 @@ template <unsigned int Row, unsigned int Column> struct Matrix : BasicMatrix<Row
     }
 
     /** @brief Returns the determinant of the matrix. */
-    constexpr float Determinant() const requires(Row == Column && Column > 1)
+    constexpr T Determinant() const requires(Row == Column && Column > 1)
     {
-        float result = 0;
+        T result = 0;
 
         for (unsigned int column = 0; column < Column; ++column)
         {
-            float cofactor = Minor(0, column).Determinant();
+            T cofactor = Minor(0, column).Determinant();
 
             if (column % 2 == 1)
             {
@@ -90,7 +91,7 @@ template <unsigned int Row, unsigned int Column> struct Matrix : BasicMatrix<Row
 
     constexpr Matrix Inverse() const requires(Row == Column && Column > 1)
     {
-        const float determinant = Determinant();
+        const T determinant = Determinant();
 
         if (M::NearlyEquals(determinant, 0))
         {
@@ -104,7 +105,7 @@ template <unsigned int Row, unsigned int Column> struct Matrix : BasicMatrix<Row
         {
             for (unsigned int column = 0; column < Column; ++column)
             {
-                float value = Minor(row, column).Determinant();
+                T value = Minor(row, column).Determinant();
 
                 if ((row + column) % 2 == 1)
                 {

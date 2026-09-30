@@ -8,10 +8,10 @@
 
 namespace N::M
 {
-template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
+template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, T>
 {
-    using BasicMatrix::BasicMatrix;
-    using BasicMatrix::operator*;
+    using BasicMatrix<3, 3, Matrix, T>::BasicMatrix;
+    using BasicMatrix<3, 3, Matrix, T>::operator*;
 
     /** @brief Applies a scale transformation. */
     constexpr Matrix Scale(const Vector<3>& scale) const
@@ -29,9 +29,9 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     }
 
     /** @brief Applies a rotation around the X axis. */
-    constexpr Matrix RotateX(const float radian) const
+    constexpr Matrix RotateX(const T radian) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(1, 1) = std::cos(radian);
         rotationMatrix(2, 1) = std::sin(radian);
@@ -42,9 +42,9 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     }
 
     /** @brief Applies a rotation around the Y axis. */
-    constexpr Matrix RotateY(const float radian) const
+    constexpr Matrix RotateY(const T radian) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(0, 0) = std::cos(radian);
         rotationMatrix(0, 2) = std::sin(radian);
@@ -55,9 +55,9 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     }
 
     /** @brief Applies a rotation around the Z axis. */
-    constexpr Matrix RotateZ(const float radian) const
+    constexpr Matrix RotateZ(const T radian) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(0, 0) = std::cos(radian);
         rotationMatrix(1, 0) = std::sin(radian);
@@ -70,7 +70,7 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     /** @brief Applies Euler rotations in XYZ order. */
     constexpr Matrix Rotate(const Vector<3>& eulerRotation) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix = rotationMatrix.RotateZ(eulerRotation(2));
         rotationMatrix = rotationMatrix.RotateY(eulerRotation(1));
@@ -80,19 +80,19 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     }
 
     /** @brief Applies a rotation around an arbitrary axis. */
-    constexpr Matrix RotateAroundAxis(const Vector<3>& axis, const float radian) const
+    constexpr Matrix RotateAroundAxis(const Vector<3>& axis, const T radian) const
     {
         const Vector<3> forward = axis.Normalized();
 
-        const float cosine = std::cos(radian);
-        const float sine = std::sin(radian);
-        const float oneMinusCosine = 1.0f - cosine;
+        const T cosine = std::cos(radian);
+        const T sine = std::sin(radian);
+        const T oneMinusCosine = 1.0f - cosine;
 
-        const float x = forward(0);
-        const float y = forward(1);
-        const float z = forward(2);
+        const T x = forward(0);
+        const T y = forward(1);
+        const T z = forward(2);
 
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(0, 0) = oneMinusCosine * x * x + cosine;
         rotationMatrix(0, 1) = oneMinusCosine * x * y - sine * z;
@@ -112,7 +112,7 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     /** @brief Applies a 2D translation using homogeneous coordinates. */
     constexpr Matrix Translate(const Vector<2>& translation) const
     {
-        Matrix translationMatrix = Identity();
+        Matrix translationMatrix = Matrix::Identity();
 
         translationMatrix(0, 2) = translation(0);
         translationMatrix(1, 2) = translation(1);
@@ -121,17 +121,17 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     }
 
     /** @brief Returns the determinant of the matrix. */
-    constexpr float Determinant() const
+    constexpr T Determinant() const
     {
-        const float a = (*this)(0, 0);
-        const float b = (*this)(0, 1);
-        const float c = (*this)(0, 2);
-        const float d = (*this)(1, 0);
-        const float e = (*this)(1, 1);
-        const float f = (*this)(1, 2);
-        const float g = (*this)(2, 0);
-        const float h = (*this)(2, 1);
-        const float i = (*this)(2, 2);
+        const T a = (*this)(0, 0);
+        const T b = (*this)(0, 1);
+        const T c = (*this)(0, 2);
+        const T d = (*this)(1, 0);
+        const T e = (*this)(1, 1);
+        const T f = (*this)(1, 2);
+        const T g = (*this)(2, 0);
+        const T h = (*this)(2, 1);
+        const T i = (*this)(2, 2);
 
         return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
     }
@@ -139,29 +139,29 @@ template <> struct Matrix<3, 3> : BasicMatrix<3, 3, Matrix<3, 3>>
     /** @brief Returns the inverse of the matrix. */
     constexpr Matrix Inverse() const
     {
-        const float a = (*this)(0, 0);
-        const float b = (*this)(0, 1);
-        const float c = (*this)(0, 2);
-        const float d = (*this)(1, 0);
-        const float e = (*this)(1, 1);
-        const float f = (*this)(1, 2);
-        const float g = (*this)(2, 0);
-        const float h = (*this)(2, 1);
-        const float i = (*this)(2, 2);
+        const T a = (*this)(0, 0);
+        const T b = (*this)(0, 1);
+        const T c = (*this)(0, 2);
+        const T d = (*this)(1, 0);
+        const T e = (*this)(1, 1);
+        const T f = (*this)(1, 2);
+        const T g = (*this)(2, 0);
+        const T h = (*this)(2, 1);
+        const T i = (*this)(2, 2);
 
-        const float A = e * i - f * h;
-        const float B = f * g - d * i;
-        const float C = d * h - e * g;
+        const T A = e * i - f * h;
+        const T B = f * g - d * i;
+        const T C = d * h - e * g;
 
-        const float determinant = a * A + b * B + c * C;
+        const T determinant = a * A + b * B + c * C;
 
         if (std::abs(determinant) < EPSILON)
         {
             U::Log::Error("Matrix is not invertible");
-            return Identity();
+            return Matrix::Identity();
         }
 
-        const float inverseDeterminant = 1.0f / determinant;
+        const T inverseDeterminant = 1.0f / determinant;
 
         Matrix result;
 

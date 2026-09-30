@@ -11,24 +11,24 @@
 namespace N::M
 {
 /**
- * @brief 4D floating-point vector.
+ * @brief 4D Ting-point vector.
  *
- * Stores four floating-point components: x, y, z, and w.
+ * Stores four Ting-point components: x, y, z, and w.
  *
  * Vector operations are component-wise unless otherwise specified.
  *
  * Vector4 can be used as a general 4D mathematical vector or as a
  * homogeneous coordinate when used with Matrix4 transformations.
  */
-template <> struct Vector<4>
+template <Scalar T> struct Vector<4, T>
 {
-    float x = 0;
-    float y = 0;
-    float z = 0;
-    float w = 0;
+    T x = 0;
+    T y = 0;
+    T z = 0;
+    T w = 0;
 
     /** @brief Returns a component by index. */
-    constexpr float& operator()(const unsigned int component)
+    constexpr T& operator()(const unsigned int component)
     {
         switch (component)
         {
@@ -46,7 +46,7 @@ template <> struct Vector<4>
     }
 
     /** @brief Returns a component by index. */
-    constexpr const float& operator()(const unsigned int component) const
+    constexpr const T& operator()(const unsigned int component) const
     {
         switch (component)
         {
@@ -79,15 +79,15 @@ template <> struct Vector<4>
     constexpr Vector() = default;
 
     /** @brief Constructs a vector with all components set to the same value. */
-    explicit constexpr Vector(const float all) : x(all), y(all), z(all), w(all) {}
+    explicit constexpr Vector(const T all) : x(all), y(all), z(all), w(all) {}
 
     /** @brief Constructs a vector from individual components. */
-    constexpr Vector(const float x, const float y, const float z, const float w) : x(x), y(y), z(z), w(w) {}
+    constexpr Vector(const T x, const T y, const T z, const T w) : x(x), y(y), z(z), w(w) {}
 
     /** @brief Constructs a vector from hyperspherical coordinates. */
     static constexpr Vector FromHyperSpherical(const HyperSpherical& hyperSpherical)
     {
-        const float m = hyperSpherical.Magnitude;
+        const T m = hyperSpherical.Magnitude;
 
         Vector result;
 
@@ -105,13 +105,13 @@ template <> struct Vector<4>
     }
 
     /** @brief Returns the squared length of the vector. */
-    constexpr float LengthSquared() const
+    constexpr T LengthSquared() const
     {
         return x * x + y * y + z * z + w * w;
     }
 
     /** @brief Returns the length of the vector. */
-    constexpr float Length() const
+    constexpr T Length() const
     {
         return std::sqrt(LengthSquared());
     }
@@ -119,7 +119,7 @@ template <> struct Vector<4>
     /** @brief Returns a normalized copy of the vector. */
     constexpr Vector Normalized() const
     {
-        const float length = Length();
+        const T length = Length();
 
         if (length == 0)
         {
@@ -130,20 +130,20 @@ template <> struct Vector<4>
     }
 
     /** @brief Returns the dot product with another vector. */
-    constexpr float Dot(const Vector& vector) const
+    constexpr T Dot(const Vector& vector) const
     {
         return x * vector.x + y * vector.y + z * vector.z + w * vector.w;
     }
 
     /** @brief Linearly interpolates between this vector and another vector. */
-    constexpr Vector Lerp(const Vector& vector, const float t) const
+    constexpr Vector Lerp(const Vector& vector, const T t) const
     {
         return {M::Lerp(x, vector.x, t), M::Lerp(y, vector.y, t), M::Lerp(z, vector.z, t),
             M::Lerp(w, vector.w, t)};
     }
 
     /** @brief Returns the distance to another vector. */
-    constexpr float Distance(const Vector& vector) const
+    constexpr T Distance(const Vector& vector) const
     {
         return (*this - vector).Length();
     }
@@ -151,25 +151,25 @@ template <> struct Vector<4>
     /** @brief Projects the vector stereographically onto a 3D space. */
     constexpr Vector<3> StereoProject() const
     {
-        const float r = Length();
+        const T r = Length();
 
         return {r * x / (r - w), r * y / (r - w), r * z / (r - w)};
     }
 
     /** @brief Returns the elevation angle of the vector. */
-    constexpr float Elevation() const
+    constexpr T Elevation() const
     {
         return std::asin(Normalized().y / std::cos(HyperAngle()));
     }
 
     /** @brief Returns the azimuth angle of the vector. */
-    constexpr float Azimuth() const
+    constexpr T Azimuth() const
     {
         return std::atan2(z, x);
     }
 
     /** @brief Returns the hyperspherical hyperangle of the vector. */
-    constexpr float HyperAngle() const
+    constexpr T HyperAngle() const
     {
         return std::asin(Normalized().w);
     }
@@ -181,7 +181,7 @@ template <> struct Vector<4>
     }
 
     /** @brief Compares the vector against another using an error tolerance. */
-    constexpr bool NearlyEquals(const Vector& vector, const float epsilon = EPSILON) const
+    constexpr bool NearlyEquals(const Vector& vector, const T epsilon = EPSILON) const
     {
         return M::NearlyEquals(x, vector.x, epsilon) && M::NearlyEquals(y, vector.y, epsilon) &&
             M::NearlyEquals(z, vector.z, epsilon) && M::NearlyEquals(w, vector.w, epsilon);
@@ -224,49 +224,49 @@ template <> struct Vector<4>
     }
 
     /** @brief Adds a scalar to every component. */
-    constexpr Vector operator+(const float scalar) const
+    constexpr Vector operator+(const T scalar) const
     {
         return {x + scalar, y + scalar, z + scalar, w + scalar};
     }
 
     /** @brief Subtracts a scalar from every component. */
-    constexpr Vector operator-(const float scalar) const
+    constexpr Vector operator-(const T scalar) const
     {
         return {x - scalar, y - scalar, z - scalar, w - scalar};
     }
 
     /** @brief Multiplies every component by a scalar. */
-    constexpr Vector operator*(const float scalar) const
+    constexpr Vector operator*(const T scalar) const
     {
         return {x * scalar, y * scalar, z * scalar, w * scalar};
     }
 
     /** @brief Divides every component by a scalar. */
-    constexpr Vector operator/(const float scalar) const
+    constexpr Vector operator/(const T scalar) const
     {
         return {x / scalar, y / scalar, z / scalar, w / scalar};
     }
 
     /** @brief Adds a scalar to every component in place. */
-    constexpr Vector& operator+=(const float scalar)
+    constexpr Vector& operator+=(const T scalar)
     {
         return *this = *this + scalar;
     }
 
     /** @brief Subtracts a scalar from every component in place. */
-    constexpr Vector& operator-=(const float scalar)
+    constexpr Vector& operator-=(const T scalar)
     {
         return *this = *this - scalar;
     }
 
     /** @brief Multiplies every component by a scalar in place. */
-    constexpr Vector& operator*=(const float scalar)
+    constexpr Vector& operator*=(const T scalar)
     {
         return *this = *this * scalar;
     }
 
     /** @brief Divides every component by a scalar in place. */
-    constexpr Vector& operator/=(const float scalar)
+    constexpr Vector& operator/=(const T scalar)
     {
         return *this = *this / scalar;
     }
@@ -290,25 +290,25 @@ template <> struct Vector<4>
     }
 
     /** @brief Adds a scalar to every component. */
-    friend constexpr Vector operator+(const float scalar, const Vector& vector)
+    friend constexpr Vector operator+(const T scalar, const Vector& vector)
     {
         return vector + scalar;
     }
 
     /** @brief Subtracts every vector component from a scalar. */
-    friend constexpr Vector operator-(const float scalar, const Vector& vector)
+    friend constexpr Vector operator-(const T scalar, const Vector& vector)
     {
         return {scalar - vector.x, scalar - vector.y, scalar - vector.z, scalar - vector.w};
     }
 
     /** @brief Multiplies every component by a scalar. */
-    friend constexpr Vector operator*(const float scalar, const Vector& vector)
+    friend constexpr Vector operator*(const T scalar, const Vector& vector)
     {
         return vector * scalar;
     }
 
     /** @brief Divides a scalar by every vector component. */
-    friend constexpr Vector operator/(const float scalar, const Vector& vector)
+    friend constexpr Vector operator/(const T scalar, const Vector& vector)
     {
         return {scalar / vector.x, scalar / vector.y, scalar / vector.z, scalar / vector.w};
     }

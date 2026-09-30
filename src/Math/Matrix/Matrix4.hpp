@@ -7,10 +7,10 @@
 
 namespace N::M
 {
-template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
+template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, T>
 {
-    using BasicMatrix::BasicMatrix;
-    using BasicMatrix::operator*;
+    using BasicMatrix<4, 4, Matrix, T>::BasicMatrix;
+    using BasicMatrix<4, 4, Matrix, T>::operator*;
 
     /** @brief Applies a 3D translation. */
     constexpr Matrix Translate(const Vector<3>& translation) const
@@ -40,9 +40,9 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     }
 
     /** @brief Applies a rotation around the X axis. */
-    constexpr Matrix RotateX(const float radian) const
+    constexpr Matrix RotateX(const T radian) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(1, 1) = std::cos(radian);
         rotationMatrix(2, 1) = std::sin(radian);
@@ -53,9 +53,9 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     }
 
     /** @brief Applies a rotation around the Y axis. */
-    constexpr Matrix RotateY(const float radian) const
+    constexpr Matrix RotateY(const T radian) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(0, 0) = std::cos(radian);
         rotationMatrix(0, 2) = std::sin(radian);
@@ -66,9 +66,9 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     }
 
     /** @brief Applies a rotation around the Z axis. */
-    constexpr Matrix RotateZ(const float radian) const
+    constexpr Matrix RotateZ(const T radian) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(0, 0) = std::cos(radian);
         rotationMatrix(1, 0) = std::sin(radian);
@@ -81,7 +81,7 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     /** @brief Applies Euler rotations in XYZ order. */
     constexpr Matrix Rotate(const Vector<3>& eulerRotation) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix = rotationMatrix.RotateZ(eulerRotation(2));
         rotationMatrix = rotationMatrix.RotateY(eulerRotation(1));
@@ -91,19 +91,19 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     }
 
     /** @brief Applies a rotation around an arbitrary axis. */
-    constexpr Matrix RotateAroundAxis(const Vector<3>& axis, const float radian) const
+    constexpr Matrix RotateAroundAxis(const Vector<3>& axis, const T radian) const
     {
         const Vector<3> forward = axis.Normalized();
 
-        const float cosine = std::cos(radian);
-        const float sine = std::sin(radian);
-        const float oneMinusCosine = 1.0f - cosine;
+        const T cosine = std::cos(radian);
+        const T sine = std::sin(radian);
+        const T oneMinusCosine = 1.0f - cosine;
 
-        const float x = forward(0);
-        const float y = forward(1);
-        const float z = forward(2);
+        const T x = forward(0);
+        const T y = forward(1);
+        const T z = forward(2);
 
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(0, 0) = oneMinusCosine * x * x + cosine;
         rotationMatrix(0, 1) = oneMinusCosine * x * y - sine * z;
@@ -128,10 +128,10 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     }
 
     /** @brief Creates an orthographic projection matrix. */
-    static constexpr Matrix Orthographic(const float left, const float right, const float bottom,
-        const float top, const float near, const float far)
+    static constexpr Matrix Orthographic(
+        const T left, const T right, const T bottom, const T top, const T near, const T far)
     {
-        Matrix matrix = Identity();
+        Matrix matrix = Matrix::Identity();
 
         matrix(0, 0) = 2.0f / (right - left);
         matrix(1, 1) = 2.0f / (top - bottom);
@@ -145,12 +145,11 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     }
 
     /** @brief Creates a perspective projection matrix. */
-    static constexpr Matrix Perspective(
-        const float fovRad, const float aspectRatio, const float near, const float far)
+    static constexpr Matrix Perspective(const T fovRad, const T aspectRatio, const T near, const T far)
     {
-        Matrix matrix = Zero();
+        Matrix matrix = Matrix::Zero();
 
-        const float f = 1.0f / std::tan(fovRad * 0.5f);
+        const T f = 1.0f / std::tan(fovRad * 0.5f);
 
         matrix(0, 0) = f / aspectRatio;
         matrix(1, 1) = f;
@@ -166,14 +165,14 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     /** @brief Creates a view matrix looking from one position toward another. */
     static constexpr Matrix LookAt(const Vector<3>& position, const Vector<3>& target, const Vector<3>& up)
     {
-        Matrix translation = Identity();
+        Matrix translation = Matrix::Identity();
         translation = translation.Translate(-position);
 
         const Vector<3> forward = (target - position).Normalized();
         const Vector<3> right = forward.Cross(up).Normalized();
         const Vector<3> correctedUp = right.Cross(forward);
 
-        Matrix basisMatrix = Identity();
+        Matrix basisMatrix = Matrix::Identity();
 
         basisMatrix(0, 0) = right.x;
         basisMatrix(1, 0) = right.y;
@@ -191,7 +190,7 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     }
 
     /** @brief Returns the determinant of the matrix. */
-    constexpr float Determinant() const
+    constexpr T Determinant() const
     {
         return (*this)(0, 0) * Minor(0, 0).Determinant() - (*this)(0, 1) * Minor(0, 1).Determinant() +
             (*this)(0, 2) * Minor(0, 2).Determinant() - (*this)(0, 3) * Minor(0, 3).Determinant();
@@ -200,13 +199,13 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
     /** @brief Returns the inverse of the matrix. */
     constexpr Matrix Inverse() const
     {
-        Matrix cofactorMatrix = Zero();
+        Matrix cofactorMatrix = Matrix::Zero();
 
         for (unsigned int row = 0; row < 4; ++row)
         {
             for (unsigned int column = 0; column < 4; ++column)
             {
-                float determinant = Minor(row, column).Determinant();
+                T determinant = Minor(row, column).Determinant();
 
                 if ((row + column) % 2 == 1)
                 {
@@ -217,12 +216,12 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
             }
         }
 
-        const float determinant = Determinant();
+        const T determinant = Determinant();
 
         if (M::NearlyEquals(std::abs(determinant), 0.0f))
         {
             U::Log::Error("Matrix is not invertible");
-            return Identity();
+            return Matrix::Identity();
         }
 
         return cofactorMatrix.Transpose() / determinant;
@@ -267,10 +266,10 @@ template <> struct Matrix<4, 4> : BasicMatrix<4, 4, Matrix<4, 4>>
 
         for (int row = 0; row < 4; ++row)
         {
-            const float a0 = (*this)(row, 0);
-            const float a1 = (*this)(row, 1);
-            const float a2 = (*this)(row, 2);
-            const float a3 = (*this)(row, 3);
+            const T a0 = (*this)(row, 0);
+            const T a1 = (*this)(row, 1);
+            const T a2 = (*this)(row, 2);
+            const T a3 = (*this)(row, 3);
 
             result(row, 0) = a0 * mat4(0, 0) + a1 * mat4(1, 0) + a2 * mat4(2, 0) + a3 * mat4(3, 0);
 

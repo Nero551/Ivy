@@ -7,7 +7,7 @@
 namespace N::M
 {
 /**
- * @brief 2x2 floating-point matrix.
+ * @brief 2x2 Ting-point matrix.
  *
  * Matrix convention:
  * - Storage: column-major.
@@ -17,15 +17,15 @@ namespace N::M
  *
  * For column vectors, the rightmost transformation is applied first.
  */
-template <> struct Matrix<2, 2> : BasicMatrix<2, 2, Matrix<2, 2>>
+template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix<2, 2, T>, T>
 {
-    using BasicMatrix::BasicMatrix;
-    using BasicMatrix::operator*;
+    using BasicMatrix<2, 2, Matrix, T>::BasicMatrix;
+    using BasicMatrix<2, 2, Matrix, T>::operator*;
 
     /** @brief Applies a scale transformation. */
     constexpr Matrix Scale(const Vector<2>& scale) const
     {
-        Matrix scaleMatrix = Identity();
+        Matrix scaleMatrix = Matrix::Identity();
 
         scaleMatrix(0, 0) = scale.x;
         scaleMatrix(1, 1) = scale.y;
@@ -34,9 +34,9 @@ template <> struct Matrix<2, 2> : BasicMatrix<2, 2, Matrix<2, 2>>
     }
 
     /** @brief Applies a counter-clockwise rotation. */
-    constexpr Matrix Rotate(const float radian) const
+    constexpr Matrix Rotate(const T radian) const
     {
-        Matrix rotationMatrix = Identity();
+        Matrix rotationMatrix = Matrix::Identity();
 
         rotationMatrix(0, 0) = std::cos(radian);
         rotationMatrix(1, 0) = std::sin(radian);
@@ -47,7 +47,7 @@ template <> struct Matrix<2, 2> : BasicMatrix<2, 2, Matrix<2, 2>>
     }
 
     /** @brief Returns the determinant of the matrix. */
-    constexpr float Determinant() const
+    constexpr T Determinant() const
     {
         return (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
     }
@@ -55,12 +55,12 @@ template <> struct Matrix<2, 2> : BasicMatrix<2, 2, Matrix<2, 2>>
     /** @brief Returns the inverse of the matrix. */
     constexpr Matrix Inverse() const
     {
-        const float determinant = Determinant();
+        const T determinant = Determinant();
 
         if (std::abs(determinant) < EPSILON)
         {
             U::Log::Error("Matrix is not invertible");
-            return Identity();
+            return Matrix::Identity();
         }
 
         return Matrix((*this)(1, 1), -(*this)(0, 1), -(*this)(1, 0), (*this)(0, 0)) / determinant;

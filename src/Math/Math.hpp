@@ -13,6 +13,7 @@
 #include "Complex/ComplexExponentials.hpp"
 #include "Complex/ComplexLogarithms.hpp"
 #include "Complex/Constants.hpp"
+#include "Concepts.hpp"
 #include "Coordinates/HyperSpherical.hpp"
 #include "Coordinates/Polar.hpp"
 #include "Coordinates/QPolar.hpp"

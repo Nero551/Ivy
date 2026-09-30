@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Interpolation.hpp"
+#include "Math/Concepts.hpp"
 
 namespace N::M
 {
@@ -13,7 +14,7 @@ namespace N::M
  *
  * @tparam Components The number of components in the vector.
  */
-template <unsigned int Components> struct Vector
+template <unsigned int Components, Scalar T = float> struct Vector
 {
     constexpr Vector() {}
     constexpr explicit Vector(float all)
@@ -21,23 +22,23 @@ template <unsigned int Components> struct Vector
         m_Data.fill(all);
     }
 
-    constexpr const std::array<float, Components>& Data() const
+    constexpr const std::array<T, Components>& Data() const
     {
         return m_Data;
     }
 
     template <typename... Numbers>
-    requires(sizeof...(Numbers) == Components && (std::convertible_to<Numbers, float> && ...))
-    constexpr Vector(Numbers... numbers) : m_Data{static_cast<float>(numbers)...}
+    requires(sizeof...(Numbers) == Components && (std::convertible_to<Numbers, T> && ...))
+    constexpr Vector(Numbers... numbers) : m_Data{static_cast<T>(numbers)...}
     {
     }
 
-    constexpr float& operator()(const unsigned int component)
+    constexpr T& operator()(const unsigned int component)
     {
         return m_Data[component];
     }
 
-    constexpr const float& operator()(const unsigned int component) const
+    constexpr const T& operator()(const unsigned int component) const
     {
         return m_Data[component];
     }
@@ -48,10 +49,10 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Returns the squared length of the vector. */
-    constexpr float LengthSquared() const
+    constexpr T LengthSquared() const
     {
-        float result = 0;
-        for (float& fl : m_Data)
+        T result = 0;
+        for (T& fl : m_Data)
         {
             result += fl * fl;
         }
@@ -59,7 +60,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Returns the length of the vector. */
-    constexpr float Length() const
+    constexpr T Length() const
     {
         return std::sqrt(LengthSquared());
     }
@@ -67,7 +68,7 @@ template <unsigned int Components> struct Vector
     /** @brief Returns a normalized copy of the vector. */
     constexpr Vector Normalized() const
     {
-        const float length = Length();
+        const T length = Length();
 
         if (length == 0)
         {
@@ -84,9 +85,9 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Returns the dot product with another vector. */
-    constexpr float Dot(const Vector& vector) const
+    constexpr T Dot(const Vector& vector) const
     {
-        float result = 0;
+        T result = 0;
         for (int i = 0; i < Components; ++i)
         {
             result += (*this)(i)*vector(i);
@@ -96,7 +97,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Linearly interpolates between this vector and another vector. */
-    constexpr Vector Lerp(const Vector& vector, const float t) const
+    constexpr Vector Lerp(const Vector& vector, const T t) const
     {
         Vector result = 0;
         for (int i = 0; i < Components; ++i)
@@ -107,7 +108,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Returns the distance to another vector. */
-    constexpr float Distance(const Vector& vector) const
+    constexpr T Distance(const Vector& vector) const
     {
         return (*this - vector).Length();
     }
@@ -115,7 +116,7 @@ template <unsigned int Components> struct Vector
     /** @brief Projects the vector stereographically onto a line. */
     constexpr Vector<Components - 1> StereoProject() const
     {
-        const float r = Length();
+        const T r = Length();
         Vector<Components - 1> result;
 
         for (int i = 0; i < Components - 1; ++i)
@@ -127,7 +128,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Compares the vector against another using an error tolerance. */
-    constexpr bool NearlyEquals(const Vector& vector, const float epsilon = EPSILON) const
+    constexpr bool NearlyEquals(const Vector& vector, const T epsilon = EPSILON) const
     {
         for (int i = 0; i < Components; ++i)
         {
@@ -208,7 +209,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Adds a scalar to every component. */
-    constexpr Vector operator+(const float scalar) const
+    constexpr Vector operator+(const T scalar) const
     {
         Vector result;
         for (int i = 0; i < Components; ++i)
@@ -219,7 +220,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Subtracts a scalar from every component. */
-    constexpr Vector operator-(const float scalar) const
+    constexpr Vector operator-(const T scalar) const
     {
         Vector result;
         for (int i = 0; i < Components; ++i)
@@ -230,7 +231,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Multiplies every component by a scalar. */
-    constexpr Vector operator*(const float scalar) const
+    constexpr Vector operator*(const T scalar) const
     {
         Vector result;
         for (int i = 0; i < Components; ++i)
@@ -241,7 +242,7 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Divides every component by a scalar. */
-    constexpr Vector operator/(const float scalar) const
+    constexpr Vector operator/(const T scalar) const
     {
         Vector result;
         for (int i = 0; i < Components; ++i)
@@ -252,25 +253,25 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Adds a scalar to every component in place. */
-    constexpr Vector& operator+=(const float scalar)
+    constexpr Vector& operator+=(const T scalar)
     {
         return *this = *this + scalar;
     }
 
     /** @brief Subtracts a scalar from every component in place. */
-    constexpr Vector& operator-=(const float scalar)
+    constexpr Vector& operator-=(const T scalar)
     {
         return *this = *this - scalar;
     }
 
     /** @brief Multiplies every component by a scalar in place. */
-    constexpr Vector& operator*=(const float scalar)
+    constexpr Vector& operator*=(const T scalar)
     {
         return *this = *this * scalar;
     }
 
     /** @brief Divides every component by a scalar in place. */
-    constexpr Vector& operator/=(const float scalar)
+    constexpr Vector& operator/=(const T scalar)
     {
         return *this = *this / scalar;
     }
@@ -301,13 +302,13 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Adds a scalar to every component. */
-    friend constexpr Vector operator+(const float scalar, const Vector& vector)
+    friend constexpr Vector operator+(const T scalar, const Vector& vector)
     {
         return vector + scalar;
     }
 
     /** @brief Subtracts every vector component from a scalar. */
-    friend constexpr Vector operator-(const float scalar, const Vector& vector)
+    friend constexpr Vector operator-(const T scalar, const Vector& vector)
     {
         Vector result;
         for (int i = 0; i < Components; ++i)
@@ -318,13 +319,13 @@ template <unsigned int Components> struct Vector
     }
 
     /** @brief Multiplies every component by a scalar. */
-    friend constexpr Vector operator*(const float scalar, const Vector& vector)
+    friend constexpr Vector operator*(const T scalar, const Vector& vector)
     {
         return vector * scalar;
     }
 
     /** @brief Divides a scalar by every vector component. */
-    friend constexpr Vector operator/(const float scalar, const Vector& vector)
+    friend constexpr Vector operator/(const T scalar, const Vector& vector)
     {
         Vector result;
         for (int i = 0; i < Components; ++i)
@@ -352,7 +353,7 @@ template <unsigned int Components> struct Vector
     }
 
   private:
-    std::array<float, Components> m_Data{0};
+    std::array<T, Components> m_Data{0};
 };
 
 } // namespace N::M

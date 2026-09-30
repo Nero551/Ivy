@@ -11,7 +11,7 @@
 namespace N::M
 {
 /**
- * @brief 3D floating-point vector.
+ * @brief 3D Ting-point vector.
  *
  * Coordinate convention:
  * +X: right
@@ -20,14 +20,14 @@ namespace N::M
  *
  * The coordinate system follows the right-hand rule.
  */
-template <> struct Vector<3>
+template <Scalar T> struct Vector<3, T>
 {
-    float x = 0;
-    float y = 0;
-    float z = 0;
+    T x = 0;
+    T y = 0;
+    T z = 0;
 
     /** @brief Returns a component by index. */
-    constexpr float& operator()(const unsigned int component)
+    constexpr T& operator()(const unsigned int component)
     {
         switch (component)
         {
@@ -43,7 +43,7 @@ template <> struct Vector<3>
     }
 
     /** @brief Returns a component by index. */
-    constexpr const float& operator()(const unsigned int component) const
+    constexpr const T& operator()(const unsigned int component) const
     {
         switch (component)
         {
@@ -92,15 +92,15 @@ template <> struct Vector<3>
     constexpr Vector() = default;
 
     /** @brief Constructs a vector with all components set to the same value. */
-    explicit constexpr Vector(const float all) : x(all), y(all), z(all) {}
+    explicit constexpr Vector(const T all) : x(all), y(all), z(all) {}
 
     /** @brief Constructs a vector from individual components. */
-    constexpr Vector(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+    constexpr Vector(const T x, const T y, const T z) : x(x), y(y), z(z) {}
 
     /** @brief Constructs a vector from spherical coordinates. */
     static constexpr Vector FromSpherical(const Spherical& spherical)
     {
-        const float m = spherical.Magnitude;
+        const T m = spherical.Magnitude;
 
         return {m * std::cos(spherical.Elevation) * std::cos(spherical.Azimuth),
             m * std::sin(spherical.Elevation),
@@ -108,13 +108,13 @@ template <> struct Vector<3>
     }
 
     /** @brief Returns the squared length of the vector. */
-    constexpr float LengthSquared() const
+    constexpr T LengthSquared() const
     {
         return x * x + y * y + z * z;
     }
 
     /** @brief Returns the length of the vector. */
-    constexpr float Length() const
+    constexpr T Length() const
     {
         return std::sqrt(LengthSquared());
     }
@@ -122,7 +122,7 @@ template <> struct Vector<3>
     /** @brief Returns a normalized copy of the vector. */
     constexpr Vector Normalized() const
     {
-        const float length = Length();
+        const T length = Length();
 
         if (length == 0)
         {
@@ -133,7 +133,7 @@ template <> struct Vector<3>
     }
 
     /** @brief Returns the dot product with another vector. */
-    constexpr float Dot(const Vector& vector) const
+    constexpr T Dot(const Vector& vector) const
     {
         return x * vector.x + y * vector.y + z * vector.z;
     }
@@ -145,7 +145,7 @@ template <> struct Vector<3>
     }
 
     /** @brief Returns the distance to another vector. */
-    constexpr float Distance(const Vector& vector) const
+    constexpr T Distance(const Vector& vector) const
     {
         return (*this - vector).Length();
     }
@@ -153,19 +153,19 @@ template <> struct Vector<3>
     /** @brief Projects the vector stereographically onto a 2D plane. */
     constexpr Vector<2> StereoProject() const
     {
-        const float r = Length();
+        const T r = Length();
 
         return {r * x / (r - z), r * y / (r - z)};
     }
 
     /** @brief Returns the elevation angle of the vector. */
-    constexpr float Elevation() const
+    constexpr T Elevation() const
     {
         return std::asin(Normalized().y);
     }
 
     /** @brief Returns the azimuth angle of the vector. */
-    constexpr float Azimuth() const
+    constexpr T Azimuth() const
     {
         return std::atan2(z, x);
     }
@@ -177,7 +177,7 @@ template <> struct Vector<3>
     }
 
     /** @brief Compares the vector against another using an error tolerance. */
-    constexpr bool NearlyEquals(const Vector& vector, const float epsilon = EPSILON) const
+    constexpr bool NearlyEquals(const Vector& vector, const T epsilon = EPSILON) const
     {
         return M::NearlyEquals(x, vector.x, epsilon) && M::NearlyEquals(y, vector.y, epsilon) &&
             M::NearlyEquals(z, vector.z, epsilon);
@@ -206,7 +206,7 @@ template <> struct Vector<3>
     }
 
     /** @brief Linearly interpolates between this vector and another vector. */
-    constexpr Vector Lerp(const Vector& vector, const float t) const
+    constexpr Vector Lerp(const Vector& vector, const T t) const
     {
         return {M::Lerp(x, vector.x, t), M::Lerp(y, vector.y, t), M::Lerp(z, vector.z, t)};
     }
@@ -260,49 +260,49 @@ template <> struct Vector<3>
     }
 
     /** @brief Adds a scalar to every component. */
-    constexpr Vector operator+(const float scalar) const
+    constexpr Vector operator+(const T scalar) const
     {
         return {x + scalar, y + scalar, z + scalar};
     }
 
     /** @brief Subtracts a scalar from every component. */
-    constexpr Vector operator-(const float scalar) const
+    constexpr Vector operator-(const T scalar) const
     {
         return {x - scalar, y - scalar, z - scalar};
     }
 
     /** @brief Multiplies every component by a scalar. */
-    constexpr Vector operator*(const float scalar) const
+    constexpr Vector operator*(const T scalar) const
     {
         return {x * scalar, y * scalar, z * scalar};
     }
 
     /** @brief Divides every component by a scalar. */
-    constexpr Vector operator/(const float scalar) const
+    constexpr Vector operator/(const T scalar) const
     {
         return {x / scalar, y / scalar, z / scalar};
     }
 
     /** @brief Adds a scalar to every component in place. */
-    constexpr Vector& operator+=(const float scalar)
+    constexpr Vector& operator+=(const T scalar)
     {
         return *this = *this + scalar;
     }
 
     /** @brief Subtracts a scalar from every component in place. */
-    constexpr Vector& operator-=(const float scalar)
+    constexpr Vector& operator-=(const T scalar)
     {
         return *this = *this - scalar;
     }
 
     /** @brief Multiplies every component by a scalar in place. */
-    constexpr Vector& operator*=(const float scalar)
+    constexpr Vector& operator*=(const T scalar)
     {
         return *this = *this * scalar;
     }
 
     /** @brief Divides every component by a scalar in place. */
-    constexpr Vector& operator/=(const float scalar)
+    constexpr Vector& operator/=(const T scalar)
     {
         return *this = *this / scalar;
     }
@@ -326,25 +326,25 @@ template <> struct Vector<3>
     }
 
     /** @brief Adds a scalar to every component. */
-    friend constexpr Vector operator+(const float scalar, const Vector& vector)
+    friend constexpr Vector operator+(const T scalar, const Vector& vector)
     {
         return vector + scalar;
     }
 
     /** @brief Subtracts every vector component from a scalar. */
-    friend constexpr Vector operator-(const float scalar, const Vector& vector)
+    friend constexpr Vector operator-(const T scalar, const Vector& vector)
     {
         return {scalar - vector.x, scalar - vector.y, scalar - vector.z};
     }
 
     /** @brief Multiplies every component by a scalar. */
-    friend constexpr Vector operator*(const float scalar, const Vector& vector)
+    friend constexpr Vector operator*(const T scalar, const Vector& vector)
     {
         return vector * scalar;
     }
 
     /** @brief Divides a scalar by every vector component. */
-    friend constexpr Vector operator/(const float scalar, const Vector& vector)
+    friend constexpr Vector operator/(const T scalar, const Vector& vector)
     {
         return {scalar / vector.x, scalar / vector.y, scalar / vector.z};
     }

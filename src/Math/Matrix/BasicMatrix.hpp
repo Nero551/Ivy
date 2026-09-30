@@ -3,7 +3,7 @@
 
 namespace N::M
 {
-template <unsigned int Row, unsigned int Column, typename Derived> struct BasicMatrix
+template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> struct BasicMatrix
 {
     static constexpr unsigned int Size = Row * Column;
 
@@ -11,7 +11,7 @@ template <unsigned int Row, unsigned int Column, typename Derived> struct BasicM
     constexpr BasicMatrix() = default;
 
     /** @brief Constructs a matrix with every element set to the same value. */
-    explicit constexpr BasicMatrix(const float all)
+    explicit constexpr BasicMatrix(const T all)
     {
         for (auto& column : m_Data)
         {
@@ -21,10 +21,10 @@ template <unsigned int Row, unsigned int Column, typename Derived> struct BasicM
 
     /** @brief Constructs a matrix from individual elements in row-major order. */
     template <typename... Numbers>
-    requires(sizeof...(Numbers) == Size && (std::convertible_to<Numbers, float> && ...))
+    requires(sizeof...(Numbers) == Size && (std::convertible_to<Numbers, T> && ...))
     constexpr BasicMatrix(Numbers... numbers) : m_Data{}
     {
-        const float values[] = {static_cast<float>(numbers)...};
+        const T values[] = {static_cast<T>(numbers)...};
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -36,25 +36,25 @@ template <unsigned int Row, unsigned int Column, typename Derived> struct BasicM
     }
 
     /** @brief Returns an element by row and column. */
-    constexpr float& operator()(const unsigned int row, const unsigned int column)
+    constexpr T& operator()(const unsigned int row, const unsigned int column)
     {
         return m_Data[column][row];
     }
 
     /** @brief Returns an element by row and column. */
-    constexpr const float& operator()(const unsigned int row, const unsigned int column) const
+    constexpr const T& operator()(const unsigned int row, const unsigned int column) const
     {
         return m_Data[column][row];
     }
 
     /** @brief Returns the underlying matrix data. */
-    constexpr const std::array<std::array<float, Row>, Column>& Data() const
+    constexpr const std::array<std::array<T, Row>, Column>& Data() const
     {
         return m_Data;
     }
 
     /** @brief Compares the matrix against another using an error tolerance. */
-    constexpr bool NearlyEquals(const BasicMatrix& matrix, const float epsilon = EPSILON) const
+    constexpr bool NearlyEquals(const BasicMatrix& matrix, const T epsilon = EPSILON) const
     {
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -154,7 +154,7 @@ template <unsigned int Row, unsigned int Column, typename Derived> struct BasicM
     }
 
     /** @brief Multiplies every matrix element by a scalar. */
-    constexpr Derived operator*(const float scalar) const
+    constexpr Derived operator*(const T scalar) const
     {
         Derived result{0};
 
@@ -170,7 +170,7 @@ template <unsigned int Row, unsigned int Column, typename Derived> struct BasicM
     }
 
     /** @brief Divides every matrix element by a scalar. */
-    constexpr Derived operator/(const float scalar) const
+    constexpr Derived operator/(const T scalar) const
     {
         Derived result{0};
 
@@ -198,13 +198,13 @@ template <unsigned int Row, unsigned int Column, typename Derived> struct BasicM
     }
 
     /** @brief Multiplies this matrix by a scalar in place. */
-    constexpr Derived& operator*=(const float scalar)
+    constexpr Derived& operator*=(const T scalar)
     {
         return static_cast<Derived&>(*this) = *this * scalar;
     }
 
     /** @brief Divides this matrix by a scalar in place. */
-    constexpr Derived& operator/=(const float scalar)
+    constexpr Derived& operator/=(const T scalar)
     {
         return static_cast<Derived&>(*this) = *this / scalar;
     }
@@ -267,13 +267,13 @@ template <unsigned int Row, unsigned int Column, typename Derived> struct BasicM
     }
 
     /** @brief Multiplies a matrix by a scalar. */
-    friend constexpr Derived operator*(const float scalar, const BasicMatrix& matrix)
+    friend constexpr Derived operator*(const T scalar, const BasicMatrix& matrix)
     {
         return matrix * scalar;
     }
 
   protected:
-    std::array<std::array<float, Row>, Column> m_Data{};
+    std::array<std::array<T, Row>, Column> m_Data{};
 };
 
 } // namespace N::M
