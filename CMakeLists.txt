@@ -5,6 +5,7 @@ project(Nova)
 add_executable(Nova
         src/Main.cpp
         src/TracyMemory.cpp
+        src/Utilities/STB.cpp
 )
 
 
@@ -17,18 +18,19 @@ set_property(TARGET Nova PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 set(TRACY_ENABLE ON CACHE BOOL "Enable Tracy" FORCE)
 
 add_subdirectory(src/Core)
-add_subdirectory(src/Utilities)
 add_subdirectory(src/Modules)
 add_subdirectory(src/World)
-add_subdirectory(src/Math)
 add_subdirectory(src/Physics)
 add_subdirectory(External/tracy)
 
 include(scripts/GenerateUmbrellas.cmake)
-generate_umbrella_header(Core)
-generate_umbrella_header(Math)
-generate_umbrella_header(Physics)
-generate_umbrella_header(Utilities)
+generate_umbrella_header(Core Core)
+generate_umbrella_header(World World)
+generate_umbrella_header(Modules/Graphics Header)
+generate_umbrella_header(Modules/Input Header)
+generate_umbrella_header(Math Math)
+generate_umbrella_header(Physics Physics)
+generate_umbrella_header(Utilities Utilities)
 generate_nova_umbrella()
 
 target_include_directories(Nova PRIVATE

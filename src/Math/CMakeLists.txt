@@ -1,5 +1,0 @@
-file(GLOB_RECURSE MATH_SOURCES CONFIGURE_DEPENDS *.cpp)
-
-target_sources(Nova PRIVATE
-        ${MATH_SOURCES}
-)

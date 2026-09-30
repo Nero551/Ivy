@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 4.4.3)
 project(UnitTests)
 
 file(GLOB_RECURSE ENGINE_SOURCES
-        ../src/Math/*.cpp
         ../src/Utilities/*.cpp
         ../src/Physics/*.cpp
 )

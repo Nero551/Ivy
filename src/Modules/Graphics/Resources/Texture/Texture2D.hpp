@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Modules/Graphics/Enums/DataType.hpp"
-#include "Modules/Graphics/Resources/Texture/TextureFIlter.hpp"
+#include "Modules/Graphics/Resources/Texture/TextureFilter.hpp"
 #include "Texture.hpp"
 #include "TextureFormat.hpp"
 #include "TextureWrap.hpp"

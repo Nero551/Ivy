@@ -55,7 +55,7 @@
 #include <Modules/Graphics/Resources/Texture/Texture.hpp>
 #include <Modules/Graphics/Resources/Texture/Texture2D.hpp>
 #include <Modules/Graphics/Resources/Texture/Texture2DMultisample.hpp>
-#include <Modules/Graphics/Resources/Texture/TextureFIlter.hpp>
+#include <Modules/Graphics/Resources/Texture/TextureFilter.hpp>
 #include <Modules/Graphics/Resources/Texture/TextureFormat.hpp>
 #include <Modules/Graphics/Resources/Texture/TextureInternalFormat.hpp>
 #include <Modules/Graphics/Resources/Texture/TextureTarget.hpp>

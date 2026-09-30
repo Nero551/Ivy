@@ -4,7 +4,7 @@
 #include "FramebufferAttachment.hpp"
 #include "FramebufferTarget.hpp"
 #include "Modules/Graphics/Enums/BufferBit.hpp"
-#include "Modules/Graphics/Resources/Texture/TextureFIlter.hpp"
+#include "Modules/Graphics/Resources/Texture/TextureFilter.hpp"
 #include "Renderbuffer/Renderbuffer.hpp"
 #include "Utilities/CheckedPtr.hpp"
 

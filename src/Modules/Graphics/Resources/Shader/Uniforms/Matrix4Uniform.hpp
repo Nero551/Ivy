@@ -13,7 +13,7 @@ struct Matrix4Uniform : Uniform
 
     void Upload(const int location) override
     {
-        glUniformMatrix4fv(location, 1, GL_FALSE, *Value.Data());
+        glUniformMatrix4fv(location, 1, GL_FALSE, &Value.Data()[0][0]);
     }
 };
 } // namespace N::G
