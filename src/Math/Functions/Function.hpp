@@ -4,6 +4,7 @@
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Concepts.hpp"
+#include "Modules/Graphics/Resources/Material/Blend/BlendEquation.hpp"
 #include "Utilities/Log.hpp"
 
 namespace N::M
@@ -46,8 +47,9 @@ template <typename Input, typename Output> struct Function
      * @return A function representing the numerical derivative.
      * @note Only available for functions with a scalar Input type.
      */
-    Function Differentiate(Input dx = 0.001f,
-        DifferentiationMethod method = DifferentiationMethod::Central) const requires Scalar<Input>
+    Function Differentiate(
+        Input dx = 0.001f, DifferentiationMethod method = DifferentiationMethod::Central) const
+        requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
     {
         return [f = *this, dx, method](const Input x)
         {
@@ -76,17 +78,20 @@ template <typename Input, typename Output> struct Function
      * @note Only available for functions with a scalar Input type.
      */
     Output Derivative(Input x, const Input dx = 0.001f,
-        const DifferentiationMethod method = DifferentiationMethod::Central) const requires Scalar<Input>
+        const DifferentiationMethod method = DifferentiationMethod::Central) const
+        requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
     {
         return Differentiate(dx, method)(x);
     }
 
-    Output AverageRateOfChange(const Input start, const Input end) const requires Scalar<Input>
+    Output AverageRateOfChange(const Input start, const Input end) const
+        requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
     {
         return (Evaluate(end) - Evaluate(start)) / (end - start);
     }
 
-    Output Average(const Input start, const Input end) const requires Scalar<Input>
+    Output Average(const Input start, const Input end) const
+        requires(Scalar<Input> && Additive<Output, Output> && Divisible<Output, Input>)
     {
         return Integrate(start, end) / (end - start);
     }
@@ -101,7 +106,8 @@ template <typename Input, typename Output> struct Function
      * @note Only available for functions with a scalar Input type.
      */
     Output Integral(const Input lowerBound, Input upperBound, const Input dx = 0.001f,
-        const IntegrationMethod method = IntegrationMethod::Midpoint) const requires Scalar<Input>
+        const IntegrationMethod method = IntegrationMethod::Midpoint) const requires(Scalar<Input> &&
+        Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
     {
         return Integrate(lowerBound, dx, method)(upperBound);
     }
@@ -115,7 +121,8 @@ template <typename Input, typename Output> struct Function
      * @note Only available for functions with a scalar Input type.
      */
     Function Integrate(Input lowerBound, Input dx = 0.001f,
-        IntegrationMethod method = IntegrationMethod::Midpoint) const requires Scalar<Input>
+        IntegrationMethod method = IntegrationMethod::Midpoint) const requires(Scalar<Input> &&
+        Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
     {
         return [f = *this, lowerBound, dx, method](const Input upperBound)
         {
@@ -152,7 +159,8 @@ template <typename Input, typename Output> struct Function
      * @return A function representing the Taylor polynomial approximation.
      * @note Only available for functions with a scalar Input type.
      */
-    Function<float, Output> Taylor(unsigned int terms, Input a) const requires Scalar<Input>
+    Function<float, Output> Taylor(unsigned int terms, Input a) const
+        requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
     {
         return [terms, a, f = *this](const Input x)
         {
@@ -173,7 +181,8 @@ template <typename Input, typename Output> struct Function
      * @return A function representing the Maclaurin polynomial approximation.
      * @note Only available for functions with a scalar Input type.
      */
-    Function<float, Output> Maclaurin(const unsigned int terms) const requires Scalar<Input>
+    Function<float, Output> Maclaurin(const unsigned int terms) const
+        requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
     {
         return Taylor(terms, 0.0f);
     }
@@ -188,9 +197,9 @@ template <typename Input, typename Output> struct Function
      * given domain.
      */
     float InverseEvaluate(const Input y, Input domainMin, Input domainMax) const
-        requires Scalar<Input> && Scalar<Output>
+        requires(Scalar<Input> && Scalar<Output> && Divisible<Input, float> && Additive<Input, Input>)
     {
-        float x = 0.0f;
+        Input x = 0.0f;
         //Binary search, i need a better way to calculate this. am too stupid though.
         // use something called Newton's Method of finding roots
         while (!NearlyEquals(domainMax, domainMin))
@@ -217,7 +226,7 @@ template <typename Input, typename Output> struct Function
      * @note The function must be monotonic over the given domain.
      */
     Function<Input, Input> Inverse(Input domainMin, Input domainMax) const
-        requires Scalar<Input> && Scalar<Output>
+        requires(Scalar<Input> && Scalar<Output> && Divisible<Input, float> && Additive<Input, Input>)
     {
         return [f = *this, domainMin, domainMax](const Input y) -> float
         { return f.InverseEvaluate(y, domainMin, domainMax); };
@@ -236,175 +245,179 @@ template <typename Input, typename Output> struct Function
     }
 
     /** @brief Negates the function, producing -f(x). */
-    Function operator-() const
+    Function operator-() const requires(Negatable<Output>)
     {
         return [f = *this](const Input& x) { return -f(x); };
     }
 
     /** @brief Adds two functions pointwise, producing f(x) + g(x). */
-    Function operator+(const Function& g) const
+    Function operator+(const Function& g) const requires(Additive<Output, Output>)
     {
         return [f = *this, g](const Input& x) { return f(x) + g(x); };
     }
 
     /** @brief Subtracts two functions pointwise, producing f(x) - g(x). */
-    Function operator-(const Function& g) const
+    Function operator-(const Function& g) const requires(Subtractive<Output, Output>)
     {
         return [f = *this, g](const Input& x) { return f(x) - g(x); };
     }
 
     /** @brief Multiplies two functions pointwise, producing f(x) * g(x). */
-    Function operator*(const Function& g) const
+    Function operator*(const Function& g) const requires(Multiplicative<Output, Output>)
     {
         return [f = *this, g](const Input& x) { return f(x) * g(x); };
     }
 
     /** @brief Divides two functions pointwise, producing f(x) / g(x). */
-    Function operator/(const Function& g) const
+    Function operator/(const Function& g) const requires(Divisible<Output, Output>)
     {
         return [f = *this, g](const Input& x) { return f(x) / g(x); };
     }
 
     /** @brief Adds another function pointwise to this function. */
-    Function& operator+=(const Function& g)
+    Function& operator+=(const Function& g) requires(Additive<Output, Output>)
     {
         return *this = *this + g;
     }
 
     /** @brief Subtracts another function pointwise from this function. */
-    Function& operator-=(const Function& g)
+    Function& operator-=(const Function& g) requires(Subtractive<Output, Output>)
     {
         return *this = *this - g;
     }
 
     /** @brief Multiplies this function pointwise by another function. */
-    Function& operator*=(const Function& g)
+    Function& operator*=(const Function& g) requires(Multiplicative<Output, Output>)
     {
         return *this = *this * g;
     }
 
     /** @brief Divides this function pointwise by another function. */
-    Function& operator/=(const Function& g)
+    Function& operator/=(const Function& g) requires(Divisible<Output, Output>)
     {
         return *this = *this / g;
     }
 
-    Function operator+(const Output& value) const
+    Function operator+(const Output& value) const requires(Additive<Output, Output>)
     {
         return [f = *this, value](const Input& x) { return f(x) + value; };
     }
 
-    Function operator-(const Output& value) const
+    Function operator-(const Output& value) const requires(Subtractive<Output, Output>)
     {
         return [f = *this, value](const Input& x) { return f(x) - value; };
     }
 
-    Function operator*(const Output& value) const
+    Function operator*(const Output& value) const requires(Multiplicative<Output, Output>)
     {
         return [f = *this, value](const Input& x) { return f(x) * value; };
     }
 
-    Function operator/(const Output& value) const
+    Function operator/(const Output& value) const requires(Divisible<Output, Output>)
     {
         return [f = *this, value](const Input& x) { return f(x) / value; };
     }
 
-    Function& operator+=(const Output& value)
+    Function& operator+=(const Output& value) requires(Additive<Output, Output>)
     {
         return *this = *this + value;
     }
 
-    Function& operator-=(const Output& value)
+    Function& operator-=(const Output& value) requires(Subtractive<Output, Output>)
     {
         return *this = *this - value;
     }
 
-    Function& operator*=(const Output& value)
+    Function& operator*=(const Output& value) requires(Multiplicative<Output, Output>)
     {
         return *this = *this * value;
     }
 
-    Function& operator/=(const Output& value)
+    Function& operator/=(const Output& value) requires(Divisible<Output, Output>)
     {
         return *this = *this / value;
     }
 
     friend Function operator+(const Output& value, const Function& f)
+        requires(!Scalar<Output> && Additive<Output, Output>)
     {
         return f + value;
     }
 
     friend Function operator-(const Output& value, const Function& f)
+        requires(!Scalar<Output> && Subtractive<Output, Output>)
     {
         return [f, value](const Input& x) { return value - f(x); };
     }
 
     friend Function operator*(const Output& value, const Function& f)
+        requires(!Scalar<Output> && Multiplicative<Output, Output>)
     {
         return f * value;
     }
 
     friend Function operator/(const Output& value, const Function& f)
+        requires(!Scalar<Output> && Divisible<Output, Output>)
     {
         return [f, value](const Input& x) { return value / f(x); };
     }
 
-    Function operator+(float scalar) const requires(!Scalar<Output>)
+    Function operator+(float scalar) const requires(!Scalar<Output> && Additive<Output, float>)
     {
         return [f = *this, scalar](const Input& x) { return f(x) + scalar; };
     }
 
-    Function operator-(float scalar) const requires(!Scalar<Output>)
+    Function operator-(float scalar) const requires(!Scalar<Output> && Subtractive<Output, float>)
     {
         return [f = *this, scalar](const Input& x) { return f(x) - scalar; };
     }
 
-    Function operator*(float scalar) const requires(!Scalar<Output>)
+    Function operator*(float scalar) const requires(!Scalar<Output> && Multiplicative<Output, float>)
     {
         return [f = *this, scalar](const Input& x) { return f(x) * scalar; };
     }
 
-    Function operator/(float scalar) const requires(!Scalar<Output>)
+    Function operator/(float scalar) const requires(!Scalar<Output> && Divisible<Output, float>)
     {
         return [f = *this, scalar](const Input& x) { return f(x) / scalar; };
     }
 
-    Function& operator+=(float scalar) requires(!Scalar<Output>)
+    Function& operator+=(float scalar) requires(!Scalar<Output> && Additive<Output, float>)
     {
         return *this = *this + scalar;
     }
 
-    Function& operator-=(float scalar) requires(!Scalar<Output>)
+    Function& operator-=(float scalar) requires(!Scalar<Output> && Subtractive<Output, float>)
     {
         return *this = *this - scalar;
     }
 
-    Function& operator*=(float scalar) requires(!Scalar<Output>)
+    Function& operator*=(float scalar) requires(!Scalar<Output> && Multiplicative<Output, float>)
     {
         return *this = *this * scalar;
     }
 
-    Function& operator/=(float scalar) requires(!Scalar<Output>)
+    Function& operator/=(float scalar) requires(!Scalar<Output> && Divisible<Output, float>)
     {
         return *this = *this / scalar;
     }
 
-    friend Function operator+(float scalar, const Function& f) requires(!Scalar<Output>)
+    friend Function operator+(float scalar, const Function& f) requires Additive<float, Output>
     {
         return f + scalar;
     }
 
-    friend Function operator-(float scalar, const Function& f) requires(!Scalar<Output>)
+    friend Function operator-(float scalar, const Function& f) requires Subtractive<float, Output>
     {
         return [scalar, f](const Input& x) { return scalar - f(x); };
     }
 
-    friend Function operator*(float scalar, const Function& f) requires(!Scalar<Output>)
+    friend Function operator*(float scalar, const Function& f) requires Multiplicative<float, Output>
     {
         return f * scalar;
     }
 
-    friend Function operator/(float scalar, const Function& f) requires(!Scalar<Output>)
+    friend Function operator/(float scalar, const Function& f) requires Divisible<float, Output>
     {
         return [scalar, f](const Input& x) { return scalar / f(x); };
     }

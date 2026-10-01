@@ -7,15 +7,6 @@ namespace N::P
 /** @brief Checks whether two dimensional types resolve to the same normalized type. */
 template <typename T, typename K>
 concept SameNormalized = std::same_as<typename T::Normalized, typename K::Normalized>;
-
-template <typename T>
-concept DimensionalValue = requires(T a, T b) {
-    T{0};
-
-    a + b;
-    a - b;
-};
-
 struct IDimensional;
 
 /**
@@ -28,7 +19,7 @@ struct IDimensional;
  * Addition and subtraction require equivalent normalized dimensions, while
  * multiplication and division combine and normalize their dimensions.
  */
-template <typename T, typename D> requires(std::derived_from<D, IDimensional> && DimensionalValue<T>)
+template <typename T, typename D> requires(std::derived_from<D, IDimensional>)
 struct Dimension
 {
     using Dimensional = D;
@@ -49,14 +40,16 @@ struct Dimension
 
     /** @brief Adds two dimensionally equivalent values. */
     template <typename V, typename O>
-    constexpr Dimension operator+(const Dimension<V, O>& other) const requires(SameNormalized<D, O>)
+    constexpr Dimension operator+(const Dimension<V, O>& other) const
+        requires(SameNormalized<D, O> && M::Additive<T, V>)
     {
         return {Value + other.Value};
     }
 
     /** @brief Subtracts two dimensionally equivalent values. */
     template <typename V, typename O>
-    constexpr Dimension operator-(const Dimension<V, O>& other) const requires(SameNormalized<D, O>)
+    constexpr Dimension operator-(const Dimension<V, O>& other) const
+        requires(SameNormalized<D, O> && M::Subtractive<T, V>)
     {
         return {Value - other.Value};
     }
@@ -66,7 +59,7 @@ struct Dimension
      */
     template <typename V, typename O>
     constexpr Dimension<T, typename OperationDimensional<D, O>::Normalized> operator*(
-        const Dimension<V, O>& other) const
+        const Dimension<V, O>& other) const requires(M::Multiplicative<T, V>)
     {
         return {Value * other.Value};
     }
@@ -79,7 +72,7 @@ struct Dimension
      */
     template <typename V, typename O>
     constexpr Dimension<T, typename OperationDimensional<D, NegateExp<O>>::Normalized> operator/(
-        const Dimension<V, O>& other) const
+        const Dimension<V, O>& other) const requires(M::Divisible<T, V>)
     {
         return {Value / other.Value};
     }

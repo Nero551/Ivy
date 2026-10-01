@@ -380,5 +380,10 @@ inline void Test()
     float T1 = (122 * M::DCos(53)) / M::DSin(37 + 53);
     float T = 122 / (M::DSin(53) + M::DCos(53) * M::DTan(37));
     U::Log::Info(T);
+    Set<M::Complex<>> s1 = [](const M::Complex<>& c) { return c.Magnitude() > 10.0f; };
+    Set<M::Complex<>> s2 = [](const M::Complex<>& c) { return c.Argument() > M::Rad(60); };
+    Set<M::Complex<>> s3 = s1.Union(s2);
+    Set<M::Complex<>> s4 = s1.Intersection(s2);
+    Set<M::Complex<>> s5 = s1.Difference(s2);
 }
 } // namespace Sketch
