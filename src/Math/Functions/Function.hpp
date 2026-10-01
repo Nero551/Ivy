@@ -9,6 +9,20 @@
 
 namespace N::M
 {
+
+template <typename Input, typename Output> struct Function;
+
+template <typename T> struct IsFunctionType : std::false_type
+{
+};
+
+template <typename Input, typename Output> struct IsFunctionType<Function<Input, Output>> : std::true_type
+{
+};
+
+template <typename F>
+concept IsFunction = IsFunctionType<std::remove_cvref_t<F>>::value;
+
 /** @brief Represents a mathematical function mapping an Input type to an Output type. */
 template <typename Input, typename Output> struct Function
 {
@@ -16,8 +30,7 @@ template <typename Input, typename Output> struct Function
      * @brief Constructs a function from a callable returning Output when given Input.
      * @param f Callable used to evaluate the function.
      */
-    template <typename F> requires std::same_as<std::invoke_result_t<F, Input>, Output> &&
-        (!std::same_as<std::remove_cvref_t<F>, Function>)
+    template <typename F> requires(std::same_as<std::invoke_result_t<F, Input>, Output> && !IsFunction<F>)
     Function(F&& f) : m_Func(std::forward<F>(f)){};
 
     /**
@@ -292,134 +305,84 @@ template <typename Input, typename Output> struct Function
         return *this = *this * g;
     }
 
-    /** @brief Divides this function pointwise by another function. */
     Function& operator/=(const Function& g) requires(Divisible<Output, Output>)
     {
         return *this = *this / g;
     }
 
-    Function operator+(const Output& value) const requires(Additive<Output, Output>)
+    template <typename T>
+    Function operator+(const T& value) const requires(!IsFunction<T> && Additive<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) + value; };
     }
 
-    Function operator-(const Output& value) const requires(Subtractive<Output, Output>)
+    template <typename T>
+    Function operator-(const T& value) const requires(!IsFunction<T> && Subtractive<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) - value; };
     }
 
-    Function operator*(const Output& value) const requires(Multiplicative<Output, Output>)
+    template <typename T>
+    Function operator*(const T& value) const requires(!IsFunction<T> && Multiplicative<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) * value; };
     }
 
-    Function operator/(const Output& value) const requires(Divisible<Output, Output>)
+    template <typename T>
+    Function operator/(const T& value) const requires(!IsFunction<T> && Divisible<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) / value; };
     }
 
-    Function& operator+=(const Output& value) requires(Additive<Output, Output>)
+    template <typename T> Function& operator+=(const T& value) requires(!IsFunction<T> && Additive<Output, T>)
     {
         return *this = *this + value;
     }
 
-    Function& operator-=(const Output& value) requires(Subtractive<Output, Output>)
+    template <typename T>
+    Function& operator-=(const T& value) requires(!IsFunction<T> && Subtractive<Output, T>)
     {
         return *this = *this - value;
     }
 
-    Function& operator*=(const Output& value) requires(Multiplicative<Output, Output>)
+    template <typename T>
+    Function& operator*=(const T& value) requires(!IsFunction<T> && Multiplicative<Output, T>)
     {
         return *this = *this * value;
     }
 
-    Function& operator/=(const Output& value) requires(Divisible<Output, Output>)
+    template <typename T>
+    Function& operator/=(const T& value) requires(!IsFunction<T> && Divisible<Output, T>)
     {
         return *this = *this / value;
     }
 
-    friend Function operator+(const Output& value, const Function& f)
-        requires(!Scalar<Output> && Additive<Output, Output>)
+    template <typename T>
+    friend Function operator+(const T& value, const Function& f)
+        requires(!IsFunction<T> && Additive<T, Output>)
     {
         return f + value;
     }
 
-    friend Function operator-(const Output& value, const Function& f)
-        requires(!Scalar<Output> && Subtractive<Output, Output>)
+    template <typename T>
+    friend Function operator-(const T& value, const Function& f)
+        requires(!IsFunction<T> && Subtractive<T, Output>)
     {
         return [f, value](const Input& x) { return value - f(x); };
     }
 
-    friend Function operator*(const Output& value, const Function& f)
-        requires(!Scalar<Output> && Multiplicative<Output, Output>)
+    template <typename T>
+    friend Function operator*(const T& value, const Function& f)
+        requires(!IsFunction<T> && Multiplicative<T, Output>)
     {
         return f * value;
     }
 
-    friend Function operator/(const Output& value, const Function& f)
-        requires(!Scalar<Output> && Divisible<Output, Output>)
+    template <typename T>
+    friend Function operator/(const T& value, const Function& f)
+        requires(!IsFunction<T> && Divisible<T, Output>)
     {
         return [f, value](const Input& x) { return value / f(x); };
-    }
-
-    Function operator+(float scalar) const requires(!Scalar<Output> && Additive<Output, float>)
-    {
-        return [f = *this, scalar](const Input& x) { return f(x) + scalar; };
-    }
-
-    Function operator-(float scalar) const requires(!Scalar<Output> && Subtractive<Output, float>)
-    {
-        return [f = *this, scalar](const Input& x) { return f(x) - scalar; };
-    }
-
-    Function operator*(float scalar) const requires(!Scalar<Output> && Multiplicative<Output, float>)
-    {
-        return [f = *this, scalar](const Input& x) { return f(x) * scalar; };
-    }
-
-    Function operator/(float scalar) const requires(!Scalar<Output> && Divisible<Output, float>)
-    {
-        return [f = *this, scalar](const Input& x) { return f(x) / scalar; };
-    }
-
-    Function& operator+=(float scalar) requires(!Scalar<Output> && Additive<Output, float>)
-    {
-        return *this = *this + scalar;
-    }
-
-    Function& operator-=(float scalar) requires(!Scalar<Output> && Subtractive<Output, float>)
-    {
-        return *this = *this - scalar;
-    }
-
-    Function& operator*=(float scalar) requires(!Scalar<Output> && Multiplicative<Output, float>)
-    {
-        return *this = *this * scalar;
-    }
-
-    Function& operator/=(float scalar) requires(!Scalar<Output> && Divisible<Output, float>)
-    {
-        return *this = *this / scalar;
-    }
-
-    friend Function operator+(float scalar, const Function& f) requires Additive<float, Output>
-    {
-        return f + scalar;
-    }
-
-    friend Function operator-(float scalar, const Function& f) requires Subtractive<float, Output>
-    {
-        return [scalar, f](const Input& x) { return scalar - f(x); };
-    }
-
-    friend Function operator*(float scalar, const Function& f) requires Multiplicative<float, Output>
-    {
-        return f * scalar;
-    }
-
-    friend Function operator/(float scalar, const Function& f) requires Divisible<float, Output>
-    {
-        return [scalar, f](const Input& x) { return scalar / f(x); };
     }
 
   private:
