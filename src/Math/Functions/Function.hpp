@@ -385,10 +385,12 @@ template <typename Input, typename Output> struct Function
         return [f, value](const Input& x) { return value / f(x); };
     }
 
+    static Function Identity()
+    {
+        return [](const Input& input) { return input; };
+    }
+
   private:
     std::function<Output(Input)> m_Func;
-
-  public:
-    inline static const Function Identity = {[](const Input& input) { return input; }};
 };
 } // namespace N::M

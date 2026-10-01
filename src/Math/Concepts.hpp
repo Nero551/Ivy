@@ -24,4 +24,7 @@ concept Negatable = requires(T a) { -a; };
 template <typename T>
 concept Indexable = requires(T object, unsigned int i) { object(i); };
 
+template <typename T>
+concept Printable = requires(T a) { std::cout << a; };
+
 } // namespace N::M

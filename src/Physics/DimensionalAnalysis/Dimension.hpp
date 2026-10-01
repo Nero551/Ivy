@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Concepts.hpp"
 #include "OperationDimensional.hpp"
 
 namespace N::P
@@ -90,7 +91,7 @@ struct Dimension
     }
 
     /** @brief Prints the value followed by its dimensional representation. */
-    friend std::ostream& operator<<(std::ostream& os, Dimension dimension)
+    friend std::ostream& operator<<(std::ostream& os, Dimension dimension) requires(M::Printable<T>)
     {
         os << dimension.Value << ' ';
         return D::Print(os);
