@@ -4,6 +4,7 @@
 #include <any>
 #include <array>
 #include <assert.h>
+#include <bitset>
 #include <cassert>
 #include <cmath>
 #include <concepts>

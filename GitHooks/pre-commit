@@ -4,8 +4,8 @@ set -e
 ROOT="$(git rev-parse --show-toplevel)"
 
 "$ROOT/scripts/format-code.sh"
-"$ROOT/scripts/run-tests.sh"
 "$ROOT/scripts/build.sh"
+"$ROOT/scripts/run-tests.sh"
 
 git add .
 

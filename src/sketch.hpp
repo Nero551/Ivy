@@ -2,8 +2,6 @@
 #include "Math/Functions/Function.hpp"
 #include "Utilities/Log.hpp"
 
-#include <bitset>
-
 namespace Sketch
 {
 //TODO- the size of transform component is whats bottlenecking.
@@ -227,30 +225,6 @@ inline Bits<2> FullAdder(const Bit bit1, const Bit bit2, const Bit carry)
     return {sum, carry2};
 }
 
-inline Bits<3> FullAdder2(const Bits<2> bits1, const Bits<2> bits2, const Bit carry)
-{
-    Bits<2> fullAdded1 = FullAdder(bits1(0), bits2(0), carry);
-    Bits<2> fullAdded2 = FullAdder(bits1(1), bits2(1), fullAdded1(1));
-
-    Bit sum1 = fullAdded1(0);
-    Bit sum2 = fullAdded2(0);
-    Bit carry2 = fullAdded2(1);
-
-    return {sum1, sum2, carry2};
-}
-
-inline Bits<5> FullAdder4(const Bits<4>& bits1, const Bits<4>& bits2, const Bit carry)
-{
-    Bits<3> full2Added1 = FullAdder2({bits1(0), bits1(1)}, {bits2(0), bits2(1)}, carry);
-    Bits<3> full2Added2 = FullAdder2({bits1(2), bits1(3)}, {bits2(2), bits2(3)}, full2Added1(2));
-
-    Bits<2> sum1 = {full2Added1(0), full2Added1(1)};
-    Bits<2> sum2 = {full2Added2(0), full2Added2(1)};
-    Bit carry2 = full2Added2(2);
-
-    return {sum1(0), sum1(1), sum2(0), sum2(1), carry2};
-}
-
 struct ALU
 {
     using Flag = Bit;
@@ -340,6 +314,59 @@ struct uInt8 : Bits<8>
     }
 };
 
+template <typename T> struct Set
+{
+    template <typename F>
+    requires std::same_as<std::invoke_result_t<F, T>, bool> && (!std::same_as<std::remove_cvref_t<F>, Set>)
+    Set(F&& predicate) : m_Predicate(std::forward<F>(predicate))
+    {
+    }
+
+    bool Belongs(const T& x) const
+    {
+        return m_Predicate(x);
+    }
+
+    Set Intersection(const Set& other) const
+    {
+        return Set{[left = *this, right = other](const T& x) { return left.Belongs(x) && right.Belongs(x); }};
+    }
+
+    Set Union(const Set& other) const
+    {
+        return Set{[left = *this, right = other](const T& x) { return left.Belongs(x) || right.Belongs(x); }};
+    }
+
+    Set Difference(const Set& other) const
+    {
+        return Set{
+            [left = *this, right = other](const T& x) { return left.Belongs(x) && !right.Belongs(x); }};
+    }
+
+    Set SymmetricDifference(const Set& other) const
+    {
+        return Set{[left = *this, right = other](const T& x) { return left.Belongs(x) != right.Belongs(x); }};
+    }
+
+    Set Complement() const
+    {
+        return Set{[set = *this](const T& x) { return !set.Belongs(x); }};
+    }
+
+    static Set Empty()
+    {
+        return Set{[](const T&) { return false; }};
+    }
+
+    static Set Universal()
+    {
+        return Set{[](const T&) { return true; }};
+    }
+
+  private:
+    std::function<bool(const T&)> m_Predicate;
+};
+
 inline void Test()
 {
     ALU alu;
@@ -348,6 +375,10 @@ inline void Test()
     uInt8 d = {33};
     // N::U::Log::Info(alu.Add(c, d));
     // N::U::Log::Info(alu.Zero);
-    // N::U::Log::Info(alu.Overflow);P
+    // N::U::Log::Info(alu.Overflow);
+
+    float T1 = (122 * M::DCos(53)) / M::DSin(37 + 53);
+    float T = 122 / (M::DSin(53) + M::DCos(53) * M::DTan(37));
+    U::Log::Info(T);
 }
 } // namespace Sketch
