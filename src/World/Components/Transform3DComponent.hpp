@@ -13,13 +13,7 @@ struct Graphics;
 
 namespace N
 {
-//
 
-//TODO- split this into 3 components for cpu cache locality.
-// a Transform3DComponent, containing Position,Rotation,Scale,InheritTransform.
-// a WorldTransform3DComponent, containing the global versions of the transform.
-// a Transform3DMatricesComponent, containing the matrices.
-// transform system will be the one who keeps all 3 datas in sync.
 struct Transform3DComponent : C::Component
 {
     C::Track<M::Vector<3>> Position = M::Vector<3>::Zero();
@@ -28,39 +22,20 @@ struct Transform3DComponent : C::Component
 
     bool InheritTransform = true;
 
-  private:
-    M::Matrix<4, 4> DirtyModelMatrix;
-    M::Matrix<3, 3> DirtyNormalMatrix;
-
   public:
-    [[nodiscard]] M::Matrix<4, 4> GetModelMatrix()
+    M::Matrix<4, 4> GetModelMatrix()
     {
-        if (GlobalPosition.IsChanged() || GlobalRotation.IsChanged() || GlobalScale.IsChanged())
-        {
-            M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
-            modelMatrix = modelMatrix.Translate({GlobalPosition});
-            modelMatrix *= GlobalRotation().ToMatrix4();
-            modelMatrix = modelMatrix.Scale(GlobalScale);
-            DirtyModelMatrix = modelMatrix;
-            Position.ClearChanged();
-            Rotation.ClearChanged();
-            Scale.ClearChanged();
-            GlobalPosition.ClearChanged();
-            GlobalRotation.ClearChanged();
-            GlobalScale.ClearChanged();
-        }
-
-        return DirtyModelMatrix;
+        M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
+        modelMatrix = modelMatrix.Translate({GlobalPosition});
+        modelMatrix *= GlobalRotation().ToMatrix4();
+        modelMatrix = modelMatrix.Scale(GlobalScale);
+        return modelMatrix;
     }
 
-    [[nodiscard]] M::Matrix<3, 3> GetNormalMatrix()
+    M::Matrix<3, 3> GetNormalMatrix()
     {
-        if (GlobalPosition.IsChanged() || GlobalRotation.IsChanged() || GlobalScale.IsChanged())
-        {
-            DirtyNormalMatrix = GetModelMatrix().ToMatrix3().Inverse().Transpose();
-            return DirtyNormalMatrix;
-        }
-        return DirtyNormalMatrix;
+
+        return GetModelMatrix().ToMatrix3().Inverse().Transpose();
     }
 
     [[nodiscard]] M::Vector<3> GetRight() const

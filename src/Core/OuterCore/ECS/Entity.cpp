@@ -96,7 +96,7 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetChildren()
     std::vector<U::CheckedPtr<Entity>> children;
     children.reserve(m_Children.Size());
 
-    for (auto [i, id] : m_Children)
+    for (auto id : m_Children)
     {
         children.emplace_back(&World::Get().FindEntity(id));
     }
@@ -105,7 +105,7 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetChildren()
 }
 void Entity::ForEachChild(const std::function<void(unsigned int)>& callback)
 {
-    for (auto [id, i] : m_Children)
+    for (auto id : m_Children)
     {
         callback(id);
     }
@@ -115,7 +115,7 @@ void Entity::DestroyChildren()
 {
     while (!m_Children.Empty())
     {
-        DestroyChild(m_Children.begin()->Value);
+        DestroyChild(*m_Children.begin());
     }
 }
 std::vector<U::CheckedPtr<Entity>> Entity::GetDescendants()
@@ -189,7 +189,7 @@ void Entity::ForEachAncestor(const std::function<void(unsigned int)>& callback) 
 }
 bool Entity::IsAncestorOf(const unsigned int entityId) const
 {
-    for (auto [id, i] : m_Children)
+    for (auto id : m_Children)
     {
         if (id == entityId)
         {
@@ -263,7 +263,7 @@ Entity& Entity::GetRoot()
 
 void Entity::RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity)
 {
-    for (auto [id, i] : entity.m_Children)
+    for (auto id : entity.m_Children)
     {
         Entity& child = World::Get().FindEntity(id);
 

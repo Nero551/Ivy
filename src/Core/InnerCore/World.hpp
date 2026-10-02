@@ -81,9 +81,9 @@ struct World : SystemOwner
         entity.Initialize();
 
         auto it = m_Entities.Emplace(id, std::move(entity));
-        Service::Get<EventBus>().Fire<EntityCreated>(it->Value);
+        Service::Get<EventBus>().Fire<EntityCreated>(*it);
 
-        return it->Value;
+        return *it;
     }
 
     /**
@@ -118,7 +118,7 @@ struct World : SystemOwner
     friend struct Engine;
 
   private:
-    U::SparseSetAoS<Entity> m_Entities{};
+    U::SparseSetSoA<Entity> m_Entities{};
     unsigned int m_nextId = 0;
 
     unsigned int m_Root{};

@@ -123,6 +123,9 @@ void Graphics::PresentFramebuffer()
 
 void Graphics::Start()
 {
+    C::Service::Get<C::EventBus>().Sub<C::EntityDestroyed>(
+        [this](const C::EntityDestroyed& event) { OnEntityDestroyed(event); });
+
     AddSystem<CameraSystem>();
     AddSystem<LightingSystem>();
 
@@ -207,8 +210,29 @@ void Graphics::FillBatches(unsigned int entityId, Transform3DComponent& transfor
         batch = Batches.Emplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
     }
 
-    batch->Instances.EmplaceOrReplace(
-        entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
+    if (!batch->Instances.Contains(entityId) || transformComponent.GlobalPosition.IsChanged() ||
+        transformComponent.GlobalRotation.IsChanged() || transformComponent.GlobalScale.IsChanged())
+    {
+        batch->Instances.EmplaceOrReplace(
+            entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
+        transformComponent.GlobalPosition.ClearChanged();
+        transformComponent.GlobalRotation.ClearChanged();
+        transformComponent.GlobalRotation.ClearChanged();
+        transformComponent.Rotation.ClearChanged();
+        transformComponent.Position.ClearChanged();
+        transformComponent.Scale.ClearChanged();
+    }
+}
+
+void Graphics::OnEntityDestroyed(const C::EntityDestroyed& event)
+{
+    for (auto& batch : Batches)
+    {
+        if (batch.Instances.Contains(event.entity.GetId()))
+        {
+            batch.Instances.Erase(event.entity.GetId());
+        }
+    }
 }
 
 // TODO- if there is multiple semi-transparent objects behind each other , depth testing

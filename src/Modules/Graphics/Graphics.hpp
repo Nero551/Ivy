@@ -2,6 +2,7 @@
 
 #include "Components/MaterialComponent.hpp"
 #include "Components/MeshComponent.hpp"
+#include "Core/Events/EntityDestroyed.hpp"
 #include "Core/InnerCore/Module.hpp"
 #include "RenderBatch.hpp"
 #include "Resources/Framebuffer/Framebuffer.hpp"
@@ -36,6 +37,7 @@ struct Graphics : C::Module
     void RenderWorld();
     void FillBatches(unsigned int entityId, Transform3DComponent& transformComponent,
         MaterialComponent& materialComponent, MeshComponent& meshComponent);
+    void OnEntityDestroyed(const C::EntityDestroyed& event);
 
     void Render() override;
     void Update(double dt) override;
