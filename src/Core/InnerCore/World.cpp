@@ -51,7 +51,7 @@ Entity& World::FindEntity(const unsigned int id)
     {
         U::Log::Fatal("Entity Not Found: ", id);
     }
-    return m_Entities.At(id);
+    return m_Entities[id];
 }
 
 U::CheckedPtr<Entity> World::TryFindEntity(const unsigned int id)

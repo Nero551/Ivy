@@ -67,7 +67,7 @@ static float x = -10;
 
 void calculus::Start()
 {
-    ThreeDimensionalProjection(10);
+    ThreeDimensionalProjection(1);
 }
 
 static float multiplier = 1;

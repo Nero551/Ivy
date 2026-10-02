@@ -39,7 +39,6 @@ struct RenderBatch
 
         unsigned int instanceCount = Instances.Size();
         Buffer.SetData(Instances.Data());
-        // U::Log::Info(Instances.Data());
 
         Mesh->Generate();
         Mesh->VAO.SetVertexBuffer(Buffer, 1, sizeof(InstanceData));
