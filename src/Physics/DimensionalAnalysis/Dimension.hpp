@@ -8,6 +8,7 @@ namespace N::P
 /** @brief Checks whether two dimensional types resolve to the same normalized type. */
 template <typename T, typename K>
 concept SameNormalized = std::same_as<typename T::Normalized, typename K::Normalized>;
+
 struct IDimensional;
 
 template <typename T, typename D> requires(std::derived_from<D, IDimensional>)
@@ -23,6 +24,7 @@ template <typename T, typename D> struct IsDimensionType<Dimension<T, D>> : std:
 
 template <typename F>
 concept IsDimension = IsDimensionType<std::remove_cvref_t<F>>::value;
+
 /**
  * @brief Associates a runtime value with a compile-time dimensional type.
  *
@@ -39,6 +41,7 @@ struct Dimension
     using Dimensional = D;
 
     template <typename P, typename O> using AddExp = P::template WithExponent<P::Exponent + O::Exponent>;
+
     template <typename P> using NegateExp = P::template WithExponent<-P::Exponent>;
 
     T Value{0};
@@ -55,16 +58,16 @@ struct Dimension
 
     /** @brief Adds two dimensionally equivalent values. */
     template <typename V, typename O>
-    constexpr auto operator+(const Dimension<V, O>& other) const
-        -> Dimension<decltype(Value + other.Value), D> requires(SameNormalized<D, O> && M::Additive<T, V>)
+    constexpr Dimension<M::AdditionResult<T, V>, D> operator+(const Dimension<V, O>& other) const
+        requires(SameNormalized<D, O> && M::Additive<T, V>)
     {
         return {Value + other.Value};
     }
 
     /** @brief Subtracts two dimensionally equivalent values. */
     template <typename V, typename O>
-    constexpr auto operator-(const Dimension<V, O>& other) const
-        -> Dimension<decltype(Value - other.Value), D> requires(SameNormalized<D, O> && M::Subtractive<T, V>)
+    constexpr Dimension<M::SubtractionResult<T, V>, D> operator-(const Dimension<V, O>& other) const
+        requires(SameNormalized<D, O> && M::Subtractive<T, V>)
     {
         return {Value - other.Value};
     }
@@ -74,9 +77,8 @@ struct Dimension
      * The resulting dimensions are combined and normalized at compile time.
      */
     template <typename V, typename O>
-    constexpr auto operator*(const Dimension<V, O>& other) const
-        -> Dimension<decltype(Value * other.Value), typename OperationDimensional<D, O>::Normalized>
-        requires(M::Multiplicative<T, V>)
+    constexpr Dimension<M::MultiplicationResult<T, V>, typename OperationDimensional<D, O>::Normalized>
+    operator*(const Dimension<V, O>& other) const requires(M::Multiplicative<T, V>)
     {
         return {Value * other.Value};
     }
@@ -88,8 +90,8 @@ struct Dimension
      * and normalized at compile time.
      */
     template <typename V, typename O>
-    constexpr auto operator/(const Dimension<V, O>& other) const -> Dimension<decltype(Value / other.Value),
-        typename OperationDimensional<D, NegateExp<O>>::Normalized> requires(M::Divisible<T, V>)
+    constexpr Dimension<M::DivisionResult<T, V>, typename OperationDimensional<D, NegateExp<O>>::Normalized>
+    operator/(const Dimension<V, O>& other) const requires(M::Divisible<T, V>)
     {
         return {Value / other.Value};
     }
@@ -108,65 +110,64 @@ struct Dimension
 
     // Dimension + V
     template <typename V>
-    constexpr auto operator+(const V& v) const
-        -> Dimension<decltype(Value + v), D> requires(!IsDimension<V> && M::Additive<T, V>)
+    constexpr Dimension<M::AdditionResult<T, V>, D> operator+(const V& v) const
+        requires(!IsDimension<V> && M::Additive<T, V>)
     {
         return {Value + v};
     }
 
     // Dimension - V
     template <typename V>
-    constexpr auto operator-(const V& v) const
-        -> Dimension<decltype(Value - v), D> requires(!IsDimension<V> && M::Subtractive<T, V>)
+    constexpr Dimension<M::SubtractionResult<T, V>, D> operator-(const V& v) const
+        requires(!IsDimension<V> && M::Subtractive<T, V>)
     {
         return {Value - v};
     }
 
     // Dimension * V
     template <typename V>
-    constexpr auto operator*(const V& v) const
-        -> Dimension<decltype(Value * v), D> requires(!IsDimension<V> && M::Multiplicative<T, V>)
+    constexpr Dimension<M::MultiplicationResult<T, V>, D> operator*(const V& v) const
+        requires(!IsDimension<V> && M::Multiplicative<T, V>)
     {
         return {Value * v};
     }
 
     // Dimension / V
     template <typename V>
-    constexpr auto operator/(const V& v) const
-        -> Dimension<decltype(Value / v), D> requires(!IsDimension<V> && M::Divisible<T, V>)
+    constexpr Dimension<M::DivisionResult<T, V>, D> operator/(const V& v) const
+        requires(!IsDimension<V> && M::Divisible<T, V>)
     {
         return {Value / v};
     }
 
     // V + Dimension
     template <typename V>
-    friend constexpr auto operator+(const V& v, const Dimension& d)
-        -> Dimension<decltype(v + d.Value), D> requires(!IsDimension<V> && M::Additive<V, T>)
+    friend constexpr Dimension<M::AdditionResult<V, T>, D> operator+(const V& v, const Dimension& d)
+        requires(!IsDimension<V> && M::Additive<V, T>)
     {
         return {v + d.Value};
     }
 
     // V - Dimension
     template <typename V>
-    friend constexpr auto operator-(const V& v, const Dimension& d)
-        -> Dimension<decltype(v - d.Value), D> requires(!IsDimension<V> && M::Subtractive<V, T>)
+    friend constexpr Dimension<M::SubtractionResult<V, T>, D> operator-(const V& v, const Dimension& d)
+        requires(!IsDimension<V> && M::Subtractive<V, T>)
     {
         return {v - d.Value};
     }
 
     // V * Dimension
     template <typename V>
-    friend constexpr auto operator*(const V& v, const Dimension& d)
-        -> Dimension<decltype(v * d.Value), D> requires(!IsDimension<V> && M::Multiplicative<V, T>)
+    friend constexpr Dimension<M::MultiplicationResult<V, T>, D> operator*(const V& v, const Dimension& d)
+        requires(!IsDimension<V> && M::Multiplicative<V, T>)
     {
         return {v * d.Value};
     }
 
     // V / Dimension
     template <typename V>
-    friend constexpr auto operator/(const V& v, const Dimension& d)
-        -> Dimension<decltype(v / d.Value), typename NegateExp<D>::Normalized>
-        requires(!IsDimension<V> && M::Divisible<V, T>)
+    friend constexpr Dimension<M::DivisionResult<V, T>, typename NegateExp<D>::Normalized> operator/(
+        const V& v, const Dimension& d) requires(!IsDimension<V> && M::Divisible<V, T>)
     {
         return {v / d.Value};
     }

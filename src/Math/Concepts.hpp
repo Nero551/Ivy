@@ -27,4 +27,13 @@ concept Indexable = requires(T object, unsigned int i) { object(i); };
 template <typename T>
 concept Printable = requires(T a) { std::cout << a; };
 
+template <typename T, typename O> using AdditionResult = decltype(std::declval<T>() + std::declval<O>());
+
+template <typename T, typename O> using SubtractionResult = decltype(std::declval<T>() - std::declval<O>());
+
+template <typename T, typename O>
+using MultiplicationResult = decltype(std::declval<T>() * std::declval<O>());
+
+template <typename T, typename O> using DivisionResult = decltype(std::declval<T>() / std::declval<O>());
+
 } // namespace N::M

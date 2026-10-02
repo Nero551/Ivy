@@ -495,6 +495,10 @@ inline void Test()
     M::Matrix<2, 2> mat2 = M::Matrix<2, 2>::Identity();
     mat2 = mat2.Rotate(M::Rad(theta));
     U::Log::Info(a);
-    U::Log::Info(a * M::Vector<2>{1, 0});
+    U::Log::Info(mat2.Transpose() * a);
+
+    M::Function<float, M::Vector<2>> f = [](const float x) { return M::Vector<2>{x, x * x}; };
+    M::Function<float, float> p = [](const float x) { return x * x; };
+    U::Log::Info((f + p)(5));
 }
 } // namespace Sketch

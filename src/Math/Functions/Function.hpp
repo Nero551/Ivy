@@ -88,7 +88,6 @@ template <typename Input, typename Output> struct Function
      * @param dx Step size used for numerical differentiation.
      * @param method Numerical differentiation method to use.
      * @return The numerical derivative at x.
-     * @note Only available for functions with a scalar Input type.
      */
     Output Derivative(Input x, const Input dx = 0.001f,
         const DifferentiationMethod method = DifferentiationMethod::Central) const
@@ -115,8 +114,7 @@ template <typename Input, typename Output> struct Function
      * @param upperBound Upper bound of the integration interval.
      * @param dx Step size used for numerical integration.
      * @param method Numerical integration method to use.
-     * @return The approximate value of the definite integral.
-     * @note Only available for functions with a scalar Input type.
+     * @return The approximate value of the integral.
      */
     Output Integral(const Input lowerBound, Input upperBound, const Input dx = 0.001f,
         const IntegrationMethod method = IntegrationMethod::Midpoint) const requires(Scalar<Input> &&
@@ -131,7 +129,6 @@ template <typename Input, typename Output> struct Function
      * @param dx Step size used for numerical integration.
      * @param method Numerical integration method to use.
      * @return A function whose value is the integral from lowerBound to its input.
-     * @note Only available for functions with a scalar Input type.
      */
     Function Integrate(Input lowerBound, Input dx = 0.001f,
         IntegrationMethod method = IntegrationMethod::Midpoint) const requires(Scalar<Input> &&
@@ -143,24 +140,30 @@ template <typename Input, typename Output> struct Function
             for (Input x = lowerBound; x < upperBound; x += dx)
             {
                 const Input width = std::min(dx, upperBound - x);
+
                 switch (method)
                 {
                 case IntegrationMethod::Midpoint:
                     result += f(x + width / 2.0f) * width;
                     break;
+
                 case IntegrationMethod::Right:
                     result += f(x + width) * width;
                     break;
+
                 case IntegrationMethod::Left:
                     result += f(x) * width;
                     break;
+
                 case IntegrationMethod::Trapezoid:
                     result += (f(x) + f(x + width)) / 2.0f * width;
                     break;
+
                 default:
                     U::Log::Fatal("Invalid Integration Method");
                 }
             }
+
             return result;
         };
     }
@@ -170,7 +173,6 @@ template <typename Input, typename Output> struct Function
      * @param terms Number of terms in the Taylor polynomial.
      * @param a Point about which the polynomial is expanded.
      * @return A function representing the Taylor polynomial approximation.
-     * @note Only available for functions with a scalar Input type.
      */
     Function<float, Output> Taylor(unsigned int terms, Input a) const
         requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
@@ -179,11 +181,13 @@ template <typename Input, typename Output> struct Function
         {
             Output result{};
             Function currentFunc = f;
+
             for (unsigned int n = 0; n < terms; ++n)
             {
                 result += currentFunc(a) * Pow(x - a, n) / Factorial(n);
                 currentFunc = currentFunc.Differentiate();
             }
+
             return result;
         };
     }
@@ -192,7 +196,6 @@ template <typename Input, typename Output> struct Function
      * @brief Creates a Taylor polynomial approximation centered at zero.
      * @param terms Number of terms in the Taylor polynomial.
      * @return A function representing the Maclaurin polynomial approximation.
-     * @note Only available for functions with a scalar Input type.
      */
     Function<float, Output> Maclaurin(const unsigned int terms) const
         requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
@@ -206,19 +209,19 @@ template <typename Input, typename Output> struct Function
      * @param domainMin Lower bound of the search domain.
      * @param domainMax Upper bound of the search domain.
      * @return An input value whose function value approximately equals y.
-     * @note Requires a scalar-to-scalar function that is monotonic over the
-     * given domain.
+     * @note Requires a scalar-to-scalar function that is monotonic over the given domain.
      */
-    float InverseEvaluate(const Input y, Input domainMin, Input domainMax) const
+    float InverseEvaluate(Input y, Input domainMin, Input domainMax) const
         requires(Scalar<Input> && Scalar<Output> && Divisible<Input, float> && Additive<Input, Input>)
     {
         Input x = 0.0f;
-        //Binary search, i need a better way to calculate this. am too stupid though.
-        // use something called Newton's Method of finding roots
+
+        // Binary search; Newton's method would be a better approach here.
         while (!NearlyEquals(domainMax, domainMin))
         {
             x = (domainMin + domainMax) / 2.0f;
             const Input value = Evaluate(x);
+
             if (value < y)
             {
                 domainMin = x;
@@ -228,6 +231,7 @@ template <typename Input, typename Output> struct Function
                 domainMax = x;
             }
         }
+
         return x;
     }
 
@@ -264,25 +268,33 @@ template <typename Input, typename Output> struct Function
     }
 
     /** @brief Adds two functions pointwise, producing f(x) + g(x). */
-    Function operator+(const Function& g) const requires(Additive<Output, Output>)
+    template <typename O>
+    Function<Input, AdditionResult<Output, O>> operator+(const Function<Input, O>& g) const
+        requires(Additive<Output, O>)
     {
         return [f = *this, g](const Input& x) { return f(x) + g(x); };
     }
 
     /** @brief Subtracts two functions pointwise, producing f(x) - g(x). */
-    Function operator-(const Function& g) const requires(Subtractive<Output, Output>)
+    template <typename O>
+    Function<Input, SubtractionResult<Output, O>> operator-(const Function<Input, O>& g) const
+        requires(Subtractive<Output, O>)
     {
         return [f = *this, g](const Input& x) { return f(x) - g(x); };
     }
 
     /** @brief Multiplies two functions pointwise, producing f(x) * g(x). */
-    Function operator*(const Function& g) const requires(Multiplicative<Output, Output>)
+    template <typename O>
+    Function<Input, MultiplicationResult<Output, O>> operator*(const Function<Input, O>& g) const
+        requires(Multiplicative<Output, O>)
     {
         return [f = *this, g](const Input& x) { return f(x) * g(x); };
     }
 
     /** @brief Divides two functions pointwise, producing f(x) / g(x). */
-    Function operator/(const Function& g) const requires(Divisible<Output, Output>)
+    template <typename O>
+    Function<Input, DivisionResult<Output, O>> operator/(const Function<Input, O>& g) const
+        requires(Divisible<Output, O>)
     {
         return [f = *this, g](const Input& x) { return f(x) / g(x); };
     }
@@ -305,92 +317,98 @@ template <typename Input, typename Output> struct Function
         return *this = *this * g;
     }
 
+    /** @brief Divides this function pointwise by another function. */
     Function& operator/=(const Function& g) requires(Divisible<Output, Output>)
     {
         return *this = *this / g;
     }
 
     template <typename T>
-    Function operator+(const T& value) const requires(!IsFunction<T> && Additive<Output, T>)
+    Function<Input, AdditionResult<Output, T>> operator+(const T& value) const
+        requires(!IsFunction<T> && Additive<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) + value; };
     }
 
     template <typename T>
-    Function operator-(const T& value) const requires(!IsFunction<T> && Subtractive<Output, T>)
+    Function<Input, SubtractionResult<Output, T>> operator-(const T& value) const
+        requires(!IsFunction<T> && Subtractive<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) - value; };
     }
 
     template <typename T>
-    Function operator*(const T& value) const requires(!IsFunction<T> && Multiplicative<Output, T>)
+    Function<Input, MultiplicationResult<Output, T>> operator*(const T& value) const
+        requires(!IsFunction<T> && Multiplicative<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) * value; };
     }
 
     template <typename T>
-    Function operator/(const T& value) const requires(!IsFunction<T> && Divisible<Output, T>)
+    Function<Input, DivisionResult<Output, T>> operator/(const T& value) const
+        requires(!IsFunction<T> && Divisible<Output, T>)
     {
         return [f = *this, value](const Input& x) { return f(x) / value; };
     }
 
-    template <typename T> Function& operator+=(const T& value) requires(!IsFunction<T> && Additive<Output, T>)
+    template <typename T>
+    Function& operator+=(const T& value)
+        requires(!IsFunction<T> && Additive<Output, T> && std::same_as<AdditionResult<Output, T>, Output>)
     {
         return *this = *this + value;
     }
 
     template <typename T>
-    Function& operator-=(const T& value) requires(!IsFunction<T> && Subtractive<Output, T>)
+    Function& operator-=(const T& value) requires(
+        !IsFunction<T> && Subtractive<Output, T> && std::same_as<SubtractionResult<Output, T>, Output>)
     {
         return *this = *this - value;
     }
 
     template <typename T>
-    Function& operator*=(const T& value) requires(!IsFunction<T> && Multiplicative<Output, T>)
+    Function& operator*=(const T& value) requires(
+        !IsFunction<T> && Multiplicative<Output, T> && std::same_as<MultiplicationResult<Output, T>, Output>)
     {
         return *this = *this * value;
     }
 
     template <typename T>
-    Function& operator/=(const T& value) requires(!IsFunction<T> && Divisible<Output, T>)
+    Function& operator/=(const T& value)
+        requires(!IsFunction<T> && Divisible<Output, T> && std::same_as<DivisionResult<Output, T>, Output>)
     {
         return *this = *this / value;
     }
 
     template <typename T>
-    friend Function operator+(const T& value, const Function& f)
+    friend Function<Input, AdditionResult<T, Output>> operator+(const T& value, const Function& f)
         requires(!IsFunction<T> && Additive<T, Output>)
     {
         return f + value;
     }
 
     template <typename T>
-    friend Function operator-(const T& value, const Function& f)
+    friend Function<Input, SubtractionResult<T, Output>> operator-(const T& value, const Function& f)
         requires(!IsFunction<T> && Subtractive<T, Output>)
     {
         return [f, value](const Input& x) { return value - f(x); };
     }
 
     template <typename T>
-    friend Function operator*(const T& value, const Function& f)
+    friend Function<Input, MultiplicationResult<T, Output>> operator*(const T& value, const Function& f)
         requires(!IsFunction<T> && Multiplicative<T, Output>)
     {
         return f * value;
     }
 
     template <typename T>
-    friend Function operator/(const T& value, const Function& f)
+    friend Function<Input, DivisionResult<T, Output>> operator/(const T& value, const Function& f)
         requires(!IsFunction<T> && Divisible<T, Output>)
     {
         return [f, value](const Input& x) { return value / f(x); };
     }
 
-    static Function Identity()
-    {
-        return [](const Input& input) { return input; };
-    }
-
   private:
     std::function<Output(Input)> m_Func;
 };
+
 } // namespace N::M
