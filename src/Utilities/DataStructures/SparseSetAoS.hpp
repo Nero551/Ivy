@@ -12,10 +12,11 @@ namespace N::U
  */
 template <typename T, std::unsigned_integral SparseIndexType = unsigned int,
     std::unsigned_integral DenseIndexType = unsigned int>
-struct SparseSet
+struct SparseSetAoS
 {
 
     static constexpr auto InvalidSparseIndex = std::numeric_limits<SparseIndexType>::max();
+    static constexpr auto InvalidDenseIndex = std::numeric_limits<DenseIndexType>::max();
 
     struct Entry
     {
@@ -25,7 +26,7 @@ struct SparseSet
 
     template <bool Const> struct BasicIterator
     {
-        using SetType = std::conditional_t<Const, const SparseSet, SparseSet>;
+        using SetType = std::conditional_t<Const, const SparseSetAoS, SparseSetAoS>;
         using EntryType = std::conditional_t<Const, const Entry, Entry>;
 
         SetType* Set;
@@ -83,7 +84,7 @@ struct SparseSet
 
     bool Contains(const SparseIndexType index) const
     {
-        return index < m_Sparse.size() && m_Sparse[index] != InvalidSparseIndex;
+        return index < m_Sparse.size() && m_Sparse[index] != InvalidDenseIndex;
     }
 
     T& At(const SparseIndexType index)
@@ -185,6 +186,17 @@ struct SparseSet
         return {.Set = this, .Index = m_Sparse[index]};
     }
 
+    template <typename... Args> Iterator EmplaceOrReplace(const SparseIndexType index, Args&&... args)
+    {
+        if (!Contains(index))
+        {
+            return Emplace(index, std::forward<Args>(args)...);
+        }
+
+        m_Dense[m_Sparse[index]].Value = T{std::forward<Args>(args)...};
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
     /**
      * @brief Removes an entry while keeping the dense storage packed.
      *
@@ -230,15 +242,29 @@ struct SparseSet
         }
     }
 
-    void Reserve(const DenseIndexType size)
+    void ReserveDense(const DenseIndexType size)
     {
         m_Dense.reserve(size);
+    }
+
+    void ReserveSparse(const SparseIndexType size)
+    {
         m_Sparse.reserve(size);
     }
 
     DenseIndexType Size() const
     {
         return m_Dense.size();
+    }
+
+    std::vector<Entry>& Data()
+    {
+        return m_Dense;
+    }
+
+    const std::vector<Entry>& Data() const
+    {
+        return m_Dense;
     }
 
     bool Empty() const

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utilities/CheckedPtr.hpp"
-#include "Utilities/DataStructures/SparseSet.hpp"
+#include "Utilities/DataStructures/SparseSetAoS.hpp"
 
 namespace N::C
 {
@@ -105,7 +105,7 @@ struct Entity
   private:
     void RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity);
 
-    U::SparseSet<unsigned int> m_Children{};
+    U::SparseSetAoS<unsigned int> m_Children{};
     unsigned int m_Id = 0;
     unsigned int m_Parent = 0;
 

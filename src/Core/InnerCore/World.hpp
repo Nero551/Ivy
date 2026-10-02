@@ -118,7 +118,7 @@ struct World : SystemOwner
     friend struct Engine;
 
   private:
-    U::SparseSet<Entity> m_Entities{};
+    U::SparseSetAoS<Entity> m_Entities{};
     unsigned int m_nextId = 0;
 
     unsigned int m_Root{};

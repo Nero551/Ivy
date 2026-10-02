@@ -2,7 +2,7 @@
 
 #include "Core/OuterCore/Resource.hpp"
 #include "Core/OuterCore/Service.hpp"
-#include "Utilities/DataStructures/SparseSet.hpp"
+#include "Utilities/DataStructures/SparseSetAoS.hpp"
 
 namespace N::C
 {
@@ -155,7 +155,7 @@ struct ResourceManager : Service
     }
 
   private:
-    U::SparseSet<std::unique_ptr<Resource>> m_Resources{};
+    U::SparseSetAoS<std::unique_ptr<Resource>> m_Resources{};
     std::unordered_map<std::string, Resource::Handle> m_ResourceLookup{};
     U::GIndexPool<> m_Handles{};
 };

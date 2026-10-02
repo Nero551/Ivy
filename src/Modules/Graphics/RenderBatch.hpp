@@ -2,6 +2,8 @@
 #include "Math/Matrix/Matrix4.hpp"
 #include "Resources/Material/Material.hpp"
 #include "Resources/Mesh/Mesh.hpp"
+#include "Utilities/DataStructures/SparseSetAoS.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
 
 namespace N::G
 {
@@ -20,7 +22,7 @@ struct RenderBatch
 {
     U::CheckedPtr<Material> Material;
     U::CheckedPtr<Mesh> Mesh;
-    std::vector<InstanceData> Instances;
+    U::SparseSetSoA<InstanceData> Instances;
     ArrayBuffer Buffer;
     VertexArray VAO;
 
@@ -35,8 +37,9 @@ struct RenderBatch
     {
         Material->Use();
 
-        int instanceCount = Instances.size();
-        Buffer.SetData(Instances);
+        unsigned int instanceCount = Instances.Size();
+        Buffer.SetData(Instances.Data());
+        // U::Log::Info(Instances.Data());
 
         Mesh->Generate();
         Mesh->VAO.SetVertexBuffer(Buffer, 1, sizeof(InstanceData));

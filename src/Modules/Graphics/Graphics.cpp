@@ -171,11 +171,11 @@ void Graphics::RenderWorld()
     GUniformbuffer->Set(
         query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).GlobalPosition, 144);
     GUniformbuffer->Bind();
-
-    for (auto& batch : Batches)
-    {
-        batch.Instances.clear();
-    }
+    //
+    // for (auto& batch : Batches)
+    // {
+    //     batch.Instances.Clear();
+    // }
 
     query.ForEach<MaterialComponent, Transform3DComponent, MeshComponent>(
         [&](unsigned int entityId, MaterialComponent& materialComponent, Transform3DComponent& transform,
@@ -186,7 +186,7 @@ void Graphics::RenderWorld()
                 materialComponent.Material->Shader->Reload();
             }
 
-            FillBatches(transform, materialComponent, meshComponent);
+            FillBatches(entityId, transform, materialComponent, meshComponent);
         });
     for (auto& batch : Batches)
     {
@@ -194,8 +194,8 @@ void Graphics::RenderWorld()
     }
 }
 
-void Graphics::FillBatches(Transform3DComponent& transformComponent, MaterialComponent& materialComponent,
-    MeshComponent& meshComponent)
+void Graphics::FillBatches(unsigned int entityId, Transform3DComponent& transformComponent,
+    MaterialComponent& materialComponent, MeshComponent& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
@@ -207,7 +207,8 @@ void Graphics::FillBatches(Transform3DComponent& transformComponent, MaterialCom
         batch = Batches.Emplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
     }
 
-    batch->Instances.emplace_back(transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
+    batch->Instances.EmplaceOrReplace(
+        entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
 }
 
 // TODO- if there is multiple semi-transparent objects behind each other , depth testing

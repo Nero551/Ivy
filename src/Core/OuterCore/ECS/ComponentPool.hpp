@@ -6,7 +6,7 @@
 #include "Core/Events/ComponentRemoved.hpp"
 #include "Core/Events/EntityDestroyed.hpp"
 #include "Core/Services/EventBus.hpp"
-#include "Utilities/DataStructures/SparseSet.hpp"
+#include "Utilities/DataStructures/SparseSetAoS.hpp"
 
 namespace N::C
 {
@@ -179,7 +179,7 @@ template <ComponentType T> struct ComponentPool : IComponentPool
 
   private:
     /** @brief Stores components using dense storage with sparse entity ID lookup. */
-    U::SparseSet<T> m_Components{};
+    U::SparseSetAoS<T> m_Components{};
 };
 
 } // namespace N::C

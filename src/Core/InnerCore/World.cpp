@@ -41,7 +41,8 @@ void World::RemoveEntity(const unsigned int id)
 }
 void World::ReserveEntities(const size_t count)
 {
-    m_Entities.Reserve(count);
+    m_Entities.ReserveDense(count);
+    m_Entities.ReserveSparse(count);
 }
 
 Entity& World::FindEntity(const unsigned int id)
