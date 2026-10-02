@@ -10,7 +10,7 @@
 namespace N::M
 {
 /**
- * @brief 2D Ting-point vector.
+ * @brief 2D floating-point vector.
  *
  * Components:
  * - x: horizontal component.
@@ -22,6 +22,21 @@ template <Scalar T> struct Vector<2, T>
 {
     T x = 0;
     T y = 0;
+
+    /** @brief Constructs a zero vector. */
+    constexpr Vector() = default;
+
+    /** @brief Constructs a vector with all components set to the same value. */
+    explicit constexpr Vector(const T all) : x(all), y(all) {}
+
+    /** @brief Constructs a vector from individual components. */
+    constexpr Vector(const T x, const T y) : x(x), y(y) {}
+
+    /** @brief Constructs a vector from polar coordinates. */
+    static constexpr Vector FromPolar(const Polar<T>& polar)
+    {
+        return {polar.Magnitude * std::cos(polar.Angle), polar.Magnitude * std::sin(polar.Angle)};
+    }
 
     /** @brief Returns a component by index. */
     constexpr T& operator()(const unsigned int component)
@@ -55,21 +70,6 @@ template <Scalar T> struct Vector<2, T>
     static constexpr Vector Zero()
     {
         return Vector{0};
-    }
-
-    /** @brief Constructs a zero vector. */
-    constexpr Vector() = default;
-
-    /** @brief Constructs a vector with all components set to the same value. */
-    explicit constexpr Vector(const T all) : x(all), y(all) {}
-
-    /** @brief Constructs a vector from individual components. */
-    constexpr Vector(const T x, const T y) : x(x), y(y) {}
-
-    /** @brief Constructs a vector from polar coordinates. */
-    static constexpr Vector FromPolar(const Polar<T>& polar)
-    {
-        return {polar.Magnitude * std::cos(polar.Angle), polar.Magnitude * std::sin(polar.Angle)};
     }
 
     /** @brief Returns the squared length of the vector. */

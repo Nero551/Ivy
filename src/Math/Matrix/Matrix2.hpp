@@ -7,7 +7,7 @@
 namespace N::M
 {
 /**
- * @brief 2x2 Ting-point matrix.
+ * @brief 2x2 floating matrix.
  *
  * Matrix convention:
  * - Storage: column-major.

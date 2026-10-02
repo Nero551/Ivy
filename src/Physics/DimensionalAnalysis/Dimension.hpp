@@ -10,6 +10,19 @@ template <typename T, typename K>
 concept SameNormalized = std::same_as<typename T::Normalized, typename K::Normalized>;
 struct IDimensional;
 
+template <typename T, typename D> requires(std::derived_from<D, IDimensional>)
+struct Dimension;
+
+template <typename T> struct IsDimensionType : std::false_type
+{
+};
+
+template <typename T, typename D> struct IsDimensionType<Dimension<T, D>> : std::true_type
+{
+};
+
+template <typename F>
+concept IsDimension = IsDimensionType<std::remove_cvref_t<F>>::value;
 /**
  * @brief Associates a runtime value with a compile-time dimensional type.
  *
@@ -32,6 +45,7 @@ struct Dimension
 
     constexpr Dimension() {}
     constexpr Dimension(const T& value) : Value(value) {}
+
     template <typename V, typename O>
     constexpr Dimension(const Dimension<V, O>& other)
         requires(SameNormalized<D, O> && std::convertible_to<V, T>)
@@ -41,26 +55,28 @@ struct Dimension
 
     /** @brief Adds two dimensionally equivalent values. */
     template <typename V, typename O>
-    constexpr Dimension operator+(const Dimension<V, O>& other) const
-        requires(SameNormalized<D, O> && M::Additive<T, V>)
+    constexpr auto operator+(const Dimension<V, O>& other) const
+        -> Dimension<decltype(Value + other.Value), D> requires(SameNormalized<D, O> && M::Additive<T, V>)
     {
         return {Value + other.Value};
     }
 
     /** @brief Subtracts two dimensionally equivalent values. */
     template <typename V, typename O>
-    constexpr Dimension operator-(const Dimension<V, O>& other) const
-        requires(SameNormalized<D, O> && M::Subtractive<T, V>)
+    constexpr auto operator-(const Dimension<V, O>& other) const
+        -> Dimension<decltype(Value - other.Value), D> requires(SameNormalized<D, O> && M::Subtractive<T, V>)
     {
         return {Value - other.Value};
     }
+
     /**
      * @brief Multiplies values with potentially different dimensions.
      * The resulting dimensions are combined and normalized at compile time.
      */
     template <typename V, typename O>
-    constexpr Dimension<T, typename OperationDimensional<D, O>::Normalized> operator*(
-        const Dimension<V, O>& other) const requires(M::Multiplicative<T, V>)
+    constexpr auto operator*(const Dimension<V, O>& other) const
+        -> Dimension<decltype(Value * other.Value), typename OperationDimensional<D, O>::Normalized>
+        requires(M::Multiplicative<T, V>)
     {
         return {Value * other.Value};
     }
@@ -72,8 +88,8 @@ struct Dimension
      * and normalized at compile time.
      */
     template <typename V, typename O>
-    constexpr Dimension<T, typename OperationDimensional<D, NegateExp<O>>::Normalized> operator/(
-        const Dimension<V, O>& other) const requires(M::Divisible<T, V>)
+    constexpr auto operator/(const Dimension<V, O>& other) const -> Dimension<decltype(Value / other.Value),
+        typename OperationDimensional<D, NegateExp<O>>::Normalized> requires(M::Divisible<T, V>)
     {
         return {Value / other.Value};
     }
@@ -88,6 +104,71 @@ struct Dimension
     constexpr const T& operator()() const
     {
         return Value;
+    }
+
+    // Dimension + V
+    template <typename V>
+    constexpr auto operator+(const V& v) const
+        -> Dimension<decltype(Value + v), D> requires(!IsDimension<V> && M::Additive<T, V>)
+    {
+        return {Value + v};
+    }
+
+    // Dimension - V
+    template <typename V>
+    constexpr auto operator-(const V& v) const
+        -> Dimension<decltype(Value - v), D> requires(!IsDimension<V> && M::Subtractive<T, V>)
+    {
+        return {Value - v};
+    }
+
+    // Dimension * V
+    template <typename V>
+    constexpr auto operator*(const V& v) const
+        -> Dimension<decltype(Value * v), D> requires(!IsDimension<V> && M::Multiplicative<T, V>)
+    {
+        return {Value * v};
+    }
+
+    // Dimension / V
+    template <typename V>
+    constexpr auto operator/(const V& v) const
+        -> Dimension<decltype(Value / v), D> requires(!IsDimension<V> && M::Divisible<T, V>)
+    {
+        return {Value / v};
+    }
+
+    // V + Dimension
+    template <typename V>
+    friend constexpr auto operator+(const V& v, const Dimension& d)
+        -> Dimension<decltype(v + d.Value), D> requires(!IsDimension<V> && M::Additive<V, T>)
+    {
+        return {v + d.Value};
+    }
+
+    // V - Dimension
+    template <typename V>
+    friend constexpr auto operator-(const V& v, const Dimension& d)
+        -> Dimension<decltype(v - d.Value), D> requires(!IsDimension<V> && M::Subtractive<V, T>)
+    {
+        return {v - d.Value};
+    }
+
+    // V * Dimension
+    template <typename V>
+    friend constexpr auto operator*(const V& v, const Dimension& d)
+        -> Dimension<decltype(v * d.Value), D> requires(!IsDimension<V> && M::Multiplicative<V, T>)
+    {
+        return {v * d.Value};
+    }
+
+    // V / Dimension
+    template <typename V>
+    friend constexpr auto operator/(const V& v, const Dimension& d)
+        -> Dimension<decltype(v / d.Value), typename NegateExp<D>::Normalized>
+        requires(!IsDimension<V> && M::Divisible<V, T>)
+    {
+        return {v / d.Value};
     }
 
     /** @brief Prints the value followed by its dimensional representation. */

@@ -1,5 +1,6 @@
 #pragma once
 #include "Event.hpp"
+#include "Math/Concepts.hpp"
 
 namespace N::C
 {
@@ -32,6 +33,7 @@ template <typename T> struct Track
             ClearChanged();
             return;
         }
+
         m_Value = value;
         MarkChanged();
     }
@@ -41,70 +43,76 @@ template <typename T> struct Track
         return m_Value;
     }
 
-    template <typename V> Track& operator+=(const V& value)
+    template <typename V> Track& operator+=(const V& value) requires(M::Additive<T, V>)
     {
         operator()() += value;
         return *this;
     }
 
-    template <typename V> Track& operator-=(const V& value)
+    template <typename V> Track& operator-=(const V& value) requires(M::Subtractive<T, V>)
     {
         operator()() -= value;
         return *this;
     }
 
-    template <typename V> Track& operator*=(const V& value)
+    template <typename V> Track& operator*=(const V& value) requires(M::Multiplicative<T, V>)
     {
         operator()() *= value;
         return *this;
     }
 
-    template <typename V> Track& operator/=(const V& value)
+    template <typename V> Track& operator/=(const V& value) requires(M::Divisible<T, V>)
     {
         operator()() /= value;
         return *this;
     }
 
-    template <typename V> T operator+(const V& value)
+    template <typename V> decltype(auto) operator+(const V& value) const requires(M::Additive<T, V>)
     {
         return m_Value + value;
     }
 
-    template <typename V> T operator-(const V& value)
+    template <typename V> decltype(auto) operator-(const V& value) const requires(M::Subtractive<T, V>)
     {
         return m_Value - value;
     }
 
-    template <typename V> T operator*(const V& value)
+    template <typename V> decltype(auto) operator*(const V& value) const requires(M::Multiplicative<T, V>)
     {
         return m_Value * value;
     }
-    template <typename V> T operator/(const V& value)
+
+    template <typename V> decltype(auto) operator/(const V& value) const requires(M::Divisible<T, V>)
     {
         return m_Value / value;
     }
 
     template <typename V>
-    T friend operator+(const V& other, const Track& value) requires(!std::same_as<V, Track>)
+    friend decltype(auto) operator+(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Additive<V, T>)
     {
-        return other + value;
-    }
-    template <typename V>
-    T friend operator-(const V& other, const Track& value) requires(!std::same_as<V, Track>)
-    {
-        return other - value;
+        return other + value.m_Value;
     }
 
     template <typename V>
-    T friend operator*(const V& other, const Track& value) requires(!std::same_as<V, Track>)
+    friend decltype(auto) operator-(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Subtractive<V, T>)
     {
-        return other * value;
+        return other - value.m_Value;
     }
 
     template <typename V>
-    T friend operator/(const V& other, const Track& value) requires(!std::same_as<V, Track>)
+    friend decltype(auto) operator*(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Multiplicative<V, T>)
     {
-        return other / value;
+        return other * value.m_Value;
+    }
+
+    template <typename V>
+    friend decltype(auto) operator/(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Divisible<V, T>)
+    {
+        return other / value.m_Value;
     }
 
     Track& operator=(const T& value)

@@ -367,6 +367,117 @@ template <typename T> struct Set
     std::function<bool(const T&)> m_Predicate;
 };
 
+template <typename T> struct FiniteSet
+{
+    void Add(const T& value)
+    {
+        m_Elements.emplace(value);
+    }
+
+    void Remove(const T& value)
+    {
+        m_Elements.erase(value);
+    }
+
+    bool Belongs(const T& value) const
+    {
+        return m_Elements.contains(value);
+    }
+
+    FiniteSet Union(const FiniteSet& other) const
+    {
+        FiniteSet result = *this;
+        for (const auto& elem : other.m_Elements)
+        {
+            result.Add(elem);
+        }
+        return result;
+    }
+
+    FiniteSet Intersection(const FiniteSet& other) const
+    {
+        FiniteSet result;
+        for (const auto& elem : m_Elements)
+        {
+            if (other.m_Elements.contains(elem))
+            {
+                result.Add(elem);
+            }
+        }
+        return result;
+    }
+
+    FiniteSet Difference(const FiniteSet& other) const
+    {
+        FiniteSet result;
+        for (const auto& elem : m_Elements)
+        {
+            if (!other.m_Elements.contains(elem))
+            {
+                result.Add(elem);
+            }
+        }
+        return result;
+    }
+
+    FiniteSet SymmetricDifference(const FiniteSet& other) const
+    {
+        FiniteSet result;
+        for (const auto& elem : m_Elements)
+        {
+            if (!other.m_Elements.contains(elem))
+            {
+                result.Add(elem);
+            }
+        }
+        for (const auto& elem : other.m_Elements)
+        {
+            if (!m_Elements.contains(elem))
+            {
+                result.Add(elem);
+            }
+        }
+        return result;
+    }
+
+    bool IsSubSetOf(const FiniteSet& other) const
+    {
+        for (const auto& elem : m_Elements)
+        {
+            if (!other.m_Elements.contains(elem))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool IsSuperSetOf(const FiniteSet& other) const
+    {
+        return other.IsSubSetOf(*this);
+    }
+
+    bool operator==(const FiniteSet& other) const
+    {
+        if (m_Elements.size() == other.m_Elements.size())
+        {
+            for (const auto& elem : m_Elements)
+            {
+                if (!other.m_Elements.contains(elem))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+  private:
+    std::unordered_set<T> m_Elements{};
+};
+
 inline void Test()
 {
     ALU alu;
@@ -377,13 +488,13 @@ inline void Test()
     // N::U::Log::Info(alu.Zero);
     // N::U::Log::Info(alu.Overflow);
 
-    float T1 = (122 * M::DCos(53)) / M::DSin(37 + 53);
-    float T = 122 / (M::DSin(53) + M::DCos(53) * M::DTan(37));
-    U::Log::Info(T);
-    Set<M::Complex<>> s1 = [](const M::Complex<>& c) { return c.Magnitude() > 10.0f; };
-    Set<M::Complex<>> s2 = [](const M::Complex<>& c) { return c.Argument() > M::Rad(60); };
-    Set<M::Complex<>> s3 = s1.Union(s2);
-    Set<M::Complex<>> s4 = s1.Intersection(s2);
-    Set<M::Complex<>> s5 = s1.Difference(s2);
+    constexpr float theta = 90;
+    P::Dimension<M::Vector<2>, P::Acceleration> g = M::Vector<2>{0, -9.8f};
+    P::Dimension<M::Vector<2>, P::Acceleration> a = M::Vector<2>{9.8f * M::DSin(theta), 0};
+
+    M::Matrix<2, 2> mat2 = M::Matrix<2, 2>::Identity();
+    mat2 = mat2.Rotate(M::Rad(theta));
+    U::Log::Info(a);
+    U::Log::Info(a * M::Vector<2>{1, 0});
 }
 } // namespace Sketch

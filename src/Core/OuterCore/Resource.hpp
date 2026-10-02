@@ -20,9 +20,9 @@ struct Resource
 
     Resource& operator=(const Resource&) = delete;
 
-    Resource(Resource&&) = default;
+    Resource(Resource&&) noexcept = default;
 
-    Resource& operator=(Resource&&) = default;
+    Resource& operator=(Resource&&) noexcept = default;
 
     Handle GetHandle() const
     {

@@ -6,8 +6,7 @@ namespace N::M
 /**
  * @brief Represents a quaternion in polar form.
  * A quaternion can be represented as `q = m(cos(θ) + u sin(θ))`,
- * where `m` is the magnitude, `θ` is the angle, and `u` is the normalized imaginary-axis
- * direction.
+ * where `m` is the magnitude, `θ` is the angle, and `u` is the normalized imaginary-axis direction.
  */
 template <Scalar T> struct QPolar
 {

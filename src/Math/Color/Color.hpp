@@ -21,4 +21,5 @@ inline static constexpr Color Purple = {0.5f, 0.0f, 1.0f, 1.0f};
 inline static constexpr Color Brown = {0.6f, 0.3f, 0.1f, 1.0f};
 inline static constexpr Color Pink = {1.0f, 0.4f, 0.7f, 1.0f};
 inline static constexpr Color Transparent = {0.0f, 0.0f, 0.0f, 0.0f};
+
 } // namespace N::M::Color
