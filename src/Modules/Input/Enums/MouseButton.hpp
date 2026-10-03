@@ -1,8 +1,9 @@
 #pragma once
 
-/** @brief Mouse buttons for input */
 namespace Ivy::I
 {
+
+/** @brief Mouse buttons for input */
 enum class MouseButton
 {
     Left = GLFW_MOUSE_BUTTON_LEFT,

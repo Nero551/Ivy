@@ -62,7 +62,7 @@ command -v git
 command -v cmake
 command -v doxygen
 
-echo "🥳 Nova Dependencies Installed!"
+echo "🥳 Dependencies Installed!"
 
 ROOT="$(git rev-parse --show-toplevel)"
 "$ROOT/scripts/init-submodules.sh"

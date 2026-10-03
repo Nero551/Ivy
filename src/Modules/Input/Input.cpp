@@ -80,7 +80,7 @@ constexpr unsigned int Input::ToIndex(MouseButton button)
 
 void Input::Start()
 {
-    C::Window& window = C::Engine::Get().Window;
+    G::Window& window = C::Engine::Get().Window;
     glfwSetCursorPosCallback(window.GetGlfwWindow(),
         [](GLFWwindow*, const double xPos, const double yPos)
         {

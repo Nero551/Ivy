@@ -1,6 +1,6 @@
 #include "Framebuffer.hpp"
 
-#include "../../Enums/BufferBit.hpp"
+#include "../BufferBit.hpp"
 
 namespace Ivy::G
 {

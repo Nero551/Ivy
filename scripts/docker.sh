@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-docker build -t nova-dev .
+docker build -t engine-dev .
 
 echo "🥳 Built Image"
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Enums/BufferBit.hpp"
 #include "../../Texture/Texture.hpp"
 #include "../../Texture/TextureFilter.hpp"
+#include "../BufferBit.hpp"
 #include "../Renderbuffer/Renderbuffer.hpp"
 #include "FramebufferAttachment.hpp"
 #include "FramebufferTarget.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "../Enums/DataType.hpp"
+#include "../DataType.hpp"
 #include "Texture.hpp"
 #include "TextureFilter.hpp"
 #include "TextureFormat.hpp"

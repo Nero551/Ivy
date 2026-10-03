@@ -1,10 +1,13 @@
 #pragma once
+#include "Graphics/OpenGLProfile.hpp"
+
 #include <OpenGL.hpp>
 
 #include "Utilities/Image.hpp"
 
-namespace Ivy::C
+namespace Ivy::G
 {
+
 /**
  * @brief Wrapper around a GLFW window.
  * Owns the underlying GLFW window and provides basic window
@@ -12,6 +15,23 @@ namespace Ivy::C
  */
 struct Window
 {
+    struct Configuration
+    {
+        int Major = 4;
+        int Minor = 6;
+        OpenGLProfile Profile = OpenGLProfile::Core;
+        bool Debug = true;
+        bool ForwardCompatibility = true;
+        std::string X11ClassName = "ivy_engine";
+        std::string WaylandAppId = "ivy_engine";
+        bool DoubleBuffer = true;
+        int DepthBits = 24;
+        int StencilBits = 8;
+        int Samples = 4;
+    };
+
+    Configuration Config;
+
     Window() = default;
     ~Window();
 
@@ -73,6 +93,6 @@ struct Window
   private:
     GLFWwindow* m_GlfwWindow;
 
-    void SetHints();
+    void SetConfiguration();
 };
-} // namespace Ivy::C
+} // namespace Ivy::G

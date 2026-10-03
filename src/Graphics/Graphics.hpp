@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Buffers/ArrayBuffer/ArrayBuffer.hpp"
+#include "Buffers/BufferBit.hpp"
 #include "Buffers/BufferTarget.hpp"
 #include "Buffers/BufferUsage.hpp"
 #include "Buffers/Framebuffer/Framebuffer.hpp"
@@ -10,8 +11,8 @@
 #include "Buffers/Renderbuffer/Renderbuffer.hpp"
 #include "Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Buffers/VertexArray/VertexArray.hpp"
-#include "Enums/BufferBit.hpp"
-#include "Enums/DataType.hpp"
+#include "DataType.hpp"
+#include "GraphicsContext.hpp"
 #include "Material/Blend/Blend.hpp"
 #include "Material/Blend/BlendEquation.hpp"
 #include "Material/Blend/BlendFactor.hpp"
@@ -27,6 +28,8 @@
 #include "Mesh/RenderMode.hpp"
 #include "Mesh/Topology.hpp"
 #include "Mesh/Vertex.hpp"
+#include "Namespace.hpp"
+#include "OpenGLProfile.hpp"
 #include "Shader/Shader.hpp"
 #include "Shader/ShaderSource.hpp"
 #include "Shader/ShaderSourceValidator.hpp"
@@ -49,3 +52,4 @@
 #include "Texture/TextureInternalFormat.hpp"
 #include "Texture/TextureTarget.hpp"
 #include "Texture/TextureWrap.hpp"
+#include "Window.hpp"

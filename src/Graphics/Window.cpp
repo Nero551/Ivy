@@ -1,9 +1,9 @@
 #include "Window.hpp"
 
-#include "Engine.hpp"
+#include "../Core/Engine.hpp"
 #include "Utilities/Log.hpp"
 
-namespace Ivy::C
+namespace Ivy::G
 {
 Window::~Window()
 {
@@ -11,7 +11,7 @@ Window::~Window()
 }
 void Window::Generate(const int width, const int height, const std::string& title)
 {
-    SetHints();
+    SetConfiguration();
 
     GLFWwindow* glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     m_GlfwWindow = glfwWindow;
@@ -123,18 +123,18 @@ GLFWwindow* Window::GetGlfwWindow() const
     return m_GlfwWindow;
 }
 
-void Window::SetHints()
+void Window::SetConfiguration()
 {
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-    glfwWindowHintString(GLFW_X11_CLASS_NAME, "nova_engine");
-    glfwWindowHintString(GLFW_WAYLAND_APP_ID, "nova_engine");
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwWindowHint(GLFW_DEPTH_BITS, 24);
-    glfwWindowHint(GLFW_STENCIL_BITS, 8);
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Config.Major);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Config.Minor);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, static_cast<int>(Config.Profile));
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, Config.Debug);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Config.ForwardCompatibility);
+    glfwWindowHintString(GLFW_X11_CLASS_NAME, Config.X11ClassName.c_str());
+    glfwWindowHintString(GLFW_WAYLAND_APP_ID, Config.WaylandAppId.c_str());
+    glfwWindowHint(GLFW_DOUBLEBUFFER, Config.DoubleBuffer);
+    glfwWindowHint(GLFW_DEPTH_BITS, Config.DepthBits);
+    glfwWindowHint(GLFW_STENCIL_BITS, Config.StencilBits);
+    glfwWindowHint(GLFW_SAMPLES, Config.Samples);
 }
-} // namespace Ivy::C
+} // namespace Ivy::G

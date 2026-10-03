@@ -1,15 +1,14 @@
 #pragma once
 
 #include "Engine.hpp"
-#include "GraphicsContext.hpp"
 #include "Module.hpp"
+#include "Namespace.hpp"
 #include "Service.hpp"
 #include "Services/EventBus/Event.hpp"
 #include "Services/EventBus/EventBus.hpp"
 #include "Services/ResourceManager/Resource.hpp"
 #include "Services/ResourceManager/ResourceManager.hpp"
 #include "SystemOwner.hpp"
-#include "Window.hpp"
 #include "World/ECS/Component.hpp"
 #include "World/ECS/ComponentPool.hpp"
 #include "World/ECS/ComponentPoolQuery.hpp"

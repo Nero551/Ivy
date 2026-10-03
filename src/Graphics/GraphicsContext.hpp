@@ -6,7 +6,7 @@
 /** @brief Handles initialization and termination of graphics specific things
  * that need to run before window creation and everything else.
  */
-namespace Ivy::C::GraphicsContext
+namespace Ivy::G::GraphicsContext
 {
 inline void Initialize()
 {
@@ -29,4 +29,4 @@ inline void Terminate()
     glslang::FinalizeProcess();
     glfwTerminate();
 }
-} // namespace Ivy::C::GraphicsContext
+} // namespace Ivy::G::GraphicsContext

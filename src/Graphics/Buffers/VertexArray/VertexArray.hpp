@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Enums/DataType.hpp"
+#include "../../DataType.hpp"
 #include "../IndexBuffer/IndexBuffer.hpp"
 
 namespace Ivy::G

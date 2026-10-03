@@ -1,8 +1,8 @@
 #pragma once
-#include "GraphicsContext.hpp"
+#include "../Graphics/GraphicsContext.hpp"
+#include "../Graphics/Window.hpp"
 #include "Module.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include "Window.hpp"
 #include "World/World.hpp"
 
 /** @brief Root namespace for Nova engine functionality. */
@@ -16,7 +16,7 @@ concept ModuleType = std::derived_from<T, Module>;
  */
 struct Engine
 {
-    Window Window;
+    G::Window Window;
     std::optional<World> World;
 
     Engine(const Engine&) = delete;

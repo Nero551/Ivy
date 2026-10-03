@@ -28,7 +28,7 @@ void Material::AssignTexture(Texture& texture, const unsigned int slot)
 {
     if (slot >= MaxCustomTextures)
     {
-        U::Log::Error("Material: ", GetName(), " Texture slot: ", slot, " out of bounds: " + texture.GetId());
+        U::Log::Error("Material: ", GetName(), " Texture slot: ", slot, " out of bounds: ", texture.GetId());
         return;
     }
     m_CustomTextures[slot] = &texture;

@@ -10,5 +10,6 @@
 #include "FileSystem.hpp"
 #include "Image.hpp"
 #include "Log.hpp"
+#include "Namespace.hpp"
 #include "Reflection.hpp"
 #include "Track.hpp"

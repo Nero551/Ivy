@@ -81,8 +81,8 @@ void Engine::Configure()
 
 void Engine::Start()
 {
-    GraphicsContext::Initialize();
-    Window.Generate(800, 600, "Nova");
+    G::GraphicsContext::Initialize();
+    Window.Generate(800, 600, "Ivy");
     Configure();
     World.emplace();
 
@@ -224,7 +224,7 @@ void Engine::Stop()
     }
 
     Window.Terminate();
-    GraphicsContext::Terminate();
+    G::GraphicsContext::Terminate();
     Service::TerminateServices();
 }
 } // namespace Ivy::C

@@ -12,9 +12,9 @@ namespace Sketch
 //TODO- play minecraft in the redstone modpack i made for understanding logic gates.
 
 //TODO- redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
-
-//TODO- the bottleneck is prob the SetAttrib() every render batch.
-// fix that by making the batch own the VAO and setting on construction.
+//
+//TODO- try to make dependency injection to avoid global accessors like Engine::Get().
+// try to decouple as much as possible before attempting to implement DI(dependency injection)
 
 using namespace Ivy;
 
