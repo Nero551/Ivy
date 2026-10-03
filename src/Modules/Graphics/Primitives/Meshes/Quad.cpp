@@ -1,5 +1,5 @@
 #include "../Primitives.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
 
 namespace N::G
 {

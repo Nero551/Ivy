@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/OuterCore/Resource.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Modules/Graphics/Buffers/ArrayBuffer.hpp"
 #include "OpenGL.hpp"
 

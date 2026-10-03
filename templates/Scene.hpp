@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/OuterCore/Scene.hpp"
+#include "Core/World/Scene.hpp"
 
 namespace N {
 struct Scene : C::Scene {

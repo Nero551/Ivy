@@ -1,5 +1,5 @@
 #include "../Resources/Texture/Texture.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Modules/Graphics/Resources/Texture/Texture2D.hpp"
 #include "Primitives.hpp"
 

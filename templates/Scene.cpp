@@ -1,4 +1,4 @@
-#include "Core/InnerCore/Scene.hpp"
+#include "Core/World/Scene.hpp"
 namespace N {
 Scene Scene() {
     

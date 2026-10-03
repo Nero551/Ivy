@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/OuterCore/ECS/Entity.hpp"
+#include "Core/World/ECS/Entity.hpp"
 
 namespace N
 {

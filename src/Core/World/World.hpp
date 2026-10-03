@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/OuterCore/ECS/ComponentPoolQuery.hpp"
-#include "Core/OuterCore/Service.hpp"
-#include "Core/Services/EventBus.hpp"
-#include "SystemOwner.hpp"
+#include "Core/Service.hpp"
+#include "Core/Services/EventBus/EventBus.hpp"
+#include "Core/SystemOwner.hpp"
+#include "Core/World/ECS/ComponentPoolQuery.hpp"
 #include "Utilities/Log.hpp"
 
 namespace N::C

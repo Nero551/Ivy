@@ -1,7 +1,7 @@
 #include "Transform3DSystem.hpp"
 
-#include "Core/InnerCore/Engine.hpp"
-#include "Core/OuterCore/ECS/Entity.hpp"
+#include "Core/Engine.hpp"
+#include "Core/World/ECS/Entity.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
 namespace N

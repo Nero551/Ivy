@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/OuterCore/ECS/Component.hpp"
-#include "Core/OuterCore/Track.hpp"
+#include "Core/World/ECS/Component.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
+#include "Utilities/Track.hpp"
 
 namespace N::G
 {

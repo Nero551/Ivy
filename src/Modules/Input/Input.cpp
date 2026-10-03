@@ -2,7 +2,7 @@
 
 #include <OpenGL.hpp>
 
-#include "Core/InnerCore/Engine.hpp"
+#include "Core/Engine.hpp"
 
 namespace N::I
 {

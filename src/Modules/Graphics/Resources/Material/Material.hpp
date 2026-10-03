@@ -3,7 +3,7 @@
 #include "../Shader/Shader.hpp"
 #include "../Texture/Texture.hpp"
 #include "Blend/Blend.hpp"
-#include "Core/OuterCore/Resource.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Depth/Depth.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Math/Vector/Vector4.hpp"

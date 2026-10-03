@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/OuterCore/ECS/System.hpp"
+#include "Core/World/ECS/System.hpp"
 
 namespace N
 {

@@ -3,7 +3,7 @@
 #include "Module.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Window.hpp"
-#include "World.hpp"
+#include "World/World.hpp"
 
 /** @brief Root namespace for Nova engine functionality. */
 namespace N::C

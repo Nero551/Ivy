@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/OuterCore/Resource.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "ShaderSource.hpp"
 #include "Uniforms/Uniform.hpp"
 #include "Utilities/CheckedPtr.hpp"

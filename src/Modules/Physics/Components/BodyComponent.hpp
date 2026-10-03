@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/OuterCore/ECS/Component.hpp"
+#include "Core/World/ECS/Component.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Physics/Units.hpp"
 

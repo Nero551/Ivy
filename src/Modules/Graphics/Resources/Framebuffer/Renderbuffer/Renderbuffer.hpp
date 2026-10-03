@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../Texture/TextureInternalFormat.hpp"
-#include "Core/OuterCore/Resource.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 
 namespace N::G
 {

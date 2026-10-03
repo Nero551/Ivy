@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/InnerCore/World.hpp"
+#include "Core/World/World.hpp"
 #include "Nova.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 

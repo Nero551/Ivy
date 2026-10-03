@@ -5,7 +5,7 @@
 #include "../Components/MaterialComponent.hpp"
 #include "../Resources/Shader/Uniforms/IntUniform.hpp"
 #include "../Resources/Shader/Uniforms/Vector3Uniform.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
 
 namespace N::G
 {

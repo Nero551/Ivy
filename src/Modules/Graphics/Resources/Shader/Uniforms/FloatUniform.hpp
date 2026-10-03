@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/InnerCore/Engine.hpp"
+#include "Core/Engine.hpp"
 #include "Uniform.hpp"
 
 namespace N::G

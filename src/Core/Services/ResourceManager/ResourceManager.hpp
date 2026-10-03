@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/OuterCore/Resource.hpp"
-#include "Core/OuterCore/Service.hpp"
+#include "Core/Service.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
 
 namespace N::C

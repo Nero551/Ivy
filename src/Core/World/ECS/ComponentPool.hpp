@@ -2,10 +2,10 @@
 
 #include "Component.hpp"
 
-#include "Core/Events/ComponentAdded.hpp"
-#include "Core/Events/ComponentRemoved.hpp"
-#include "Core/Events/EntityDestroyed.hpp"
-#include "Core/Services/EventBus.hpp"
+#include "Core/Services/EventBus/EventBus.hpp"
+#include "Core/World/ECS/Events/ComponentAdded.hpp"
+#include "Core/World/ECS/Events/ComponentRemoved.hpp"
+#include "Core/World/ECS/Events/EntityDestroyed.hpp"
 
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
 

@@ -1,5 +1,5 @@
 #include "Entity.hpp"
-#include "Core/InnerCore/Engine.hpp"
+#include "Core/Engine.hpp"
 
 namespace N::C
 {

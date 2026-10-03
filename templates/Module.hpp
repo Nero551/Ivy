@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/InnerCore/Module.hpp"
+#include "Core/Module.hpp"
 namespace N {
 struct Module : C::Module {
 protected:

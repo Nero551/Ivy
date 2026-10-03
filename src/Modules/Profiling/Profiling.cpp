@@ -1,6 +1,6 @@
 #include "Profiling.hpp"
 
-#include "Core/InnerCore/Engine.hpp"
+#include "Core/Engine.hpp"
 
 namespace N
 {

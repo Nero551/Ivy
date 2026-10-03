@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/OuterCore/Event.hpp"
+#include "Core/Services/EventBus/Event.hpp"
 namespace N::C
 {
 struct ComponentRemoved : Event<ComponentRemoved>

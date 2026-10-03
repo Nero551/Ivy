@@ -1,6 +1,6 @@
-#include "Scene.hpp"
+#include "Core/World/Scene.hpp"
 
-#include "Core/InnerCore/World.hpp"
+#include "Core/World/World.hpp"
 
 N::C::Entity& N::C::Scene::GetRoot() const
 {

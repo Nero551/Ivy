@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/OuterCore/ECS/Component.hpp"
+#include "Core/World/ECS/Component.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "Modules/Graphics/Enums/ProjectionMode.hpp"

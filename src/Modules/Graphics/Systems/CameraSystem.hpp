@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/OuterCore/ECS/System.hpp"
+#include "Core/World/ECS/System.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 
 namespace N::G

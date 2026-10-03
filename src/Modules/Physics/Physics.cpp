@@ -1,9 +1,9 @@
 #include "Physics.hpp"
 
 #include "Components/BodyComponent.hpp"
-#include "Core/InnerCore/Engine.hpp"
-#include "Core/InnerCore/World.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Engine.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/World.hpp"
 #include "Math/Complex/Complex.hpp"
 #include "Modules/Graphics/Components/MaterialComponent.hpp"
 #include "Modules/Graphics/Components/MeshComponent.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../OuterCore/Event.hpp"
-#include "Core/OuterCore/Service.hpp"
+#include "Core/Service.hpp"
+#include "Core/Services/EventBus/Event.hpp"
 
 namespace N::C
 {

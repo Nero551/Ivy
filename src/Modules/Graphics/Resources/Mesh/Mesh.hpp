@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/OuterCore/Resource.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "CullMode.hpp"
 #include "FrontFace.hpp"
 #include "Modules/Graphics/Buffers/ArrayBuffer.hpp"

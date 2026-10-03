@@ -2,7 +2,7 @@
 
 #include <deque>
 
-#include "Core/InnerCore/Module.hpp"
+#include "Core/Module.hpp"
 
 namespace N
 {

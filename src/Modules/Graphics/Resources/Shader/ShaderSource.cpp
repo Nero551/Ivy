@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <utility>
 
-#include "Core/OuterCore/Resource.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Modules/Graphics/Resources/Shader/ShaderSourceValidator.hpp"
 #include "Utilities/FileSystem.hpp"
 #include "Utilities/Log.hpp"

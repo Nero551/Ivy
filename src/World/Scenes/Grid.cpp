@@ -1,8 +1,8 @@
 #include "Grid.hpp"
 
-#include "Core/InnerCore/World.hpp"
-#include "Core/OuterCore/Service.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Service.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/World.hpp"
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Modules/Graphics/Novas/MeshInstance3D.hpp"

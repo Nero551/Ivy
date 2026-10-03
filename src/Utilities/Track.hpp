@@ -1,5 +1,4 @@
 #pragma once
-#include "Event.hpp"
 #include "Math/Concepts.hpp"
 
 namespace N::C

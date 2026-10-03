@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/OuterCore/Scene.hpp"
+#include "Core/World/Scene.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector3.hpp"
 

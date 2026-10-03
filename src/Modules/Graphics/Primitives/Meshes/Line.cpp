@@ -1,6 +1,6 @@
 #include "../Primitives.hpp"
-#include "Core/InnerCore/Engine.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Engine.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Math/Color/Color.hpp"
 
 namespace N::G

@@ -1,7 +1,7 @@
 #include "World.hpp"
 
-#include "Core/Events/EntityDestroyed.hpp"
-#include "Engine.hpp"
+#include "Core/Engine.hpp"
+#include "Core/World/ECS/Events/EntityDestroyed.hpp"
 #include "Modules/Graphics/Novas/Camera.hpp"
 #include "Modules/Input/Enums/Keys.hpp"
 #include "Modules/Input/Input.hpp"

@@ -1,8 +1,8 @@
 #include "calculus.hpp"
 
-#include "Core/InnerCore/Engine.hpp"
-#include "Core/InnerCore/World.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Engine.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/World.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector4.hpp"

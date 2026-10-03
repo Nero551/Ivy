@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/OuterCore/ECS/Entity.hpp"
-#include "Core/OuterCore/Event.hpp"
+#include "Core/Services/EventBus/Event.hpp"
+#include "Core/World/ECS/Entity.hpp"
 
 namespace N::C
 {

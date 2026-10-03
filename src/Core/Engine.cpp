@@ -1,10 +1,9 @@
 #include "Engine.hpp"
-
 #include <OpenGL.hpp>
 
-#include "../../Modules/Graphics/Graphics.hpp"
-#include "../OuterCore/Service.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Service.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Modules/Graphics/Graphics.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Physics/Physics.hpp"
 #include "Modules/Profiling/Profiling.hpp"

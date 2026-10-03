@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/InnerCore/Module.hpp"
+#include "Core/Module.hpp"
 #include "Enums/Keys.hpp"
 #include "Enums/MouseButton.hpp"
 #include "Enums/MouseMode.hpp"

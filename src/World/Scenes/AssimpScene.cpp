@@ -4,8 +4,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-#include "Core/InnerCore/Engine.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Engine.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Modules/Graphics/Novas/MeshInstance3D.hpp"
 #include "Modules/Graphics/Resources/Texture/Texture2D.hpp"
 

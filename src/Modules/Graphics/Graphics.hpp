@@ -2,8 +2,8 @@
 
 #include "Components/MaterialComponent.hpp"
 #include "Components/MeshComponent.hpp"
-#include "Core/Events/EntityDestroyed.hpp"
-#include "Core/InnerCore/Module.hpp"
+#include "Core/Module.hpp"
+#include "Core/World/ECS/Events/EntityDestroyed.hpp"
 #include "RenderBatch.hpp"
 #include "Resources/Framebuffer/Framebuffer.hpp"
 #include "Resources/Material/Material.hpp"

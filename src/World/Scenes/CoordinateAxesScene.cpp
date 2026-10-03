@@ -1,7 +1,7 @@
 #include "CoordinateAxesScene.hpp"
 
-#include "Core/InnerCore/Engine.hpp"
-#include "Core/Services/ResourceManager.hpp"
+#include "Core/Engine.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Grid.hpp"
 #include "Math/Color/Color.hpp"
 #include "Modules/Graphics/Components/MaterialComponent.hpp"

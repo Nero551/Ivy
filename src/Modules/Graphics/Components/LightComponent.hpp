@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Enums/LightType.hpp"
-#include "Core/OuterCore/ECS/Component.hpp"
+#include "Core/World/ECS/Component.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Vector/Vector3.hpp"
 
