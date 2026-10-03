@@ -3,18 +3,56 @@
 
 namespace N::C
 {
-/**
- * @brief Base class for resources managed by ResourceManager.
- *
- * Provides a name shared by all resource types and establishes
- * polymorphic destruction through a virtual destructor.
- * Resources are non-copyable but movable.
- */
-struct Resource
+
+template <typename T, typename... Args>
+concept NamedResource = std::constructible_from<T, const std::string&, Args...>;
+
+struct IResource
 {
     using Handle = U::GIndexPool<>::Handle;
 
-    virtual ~Resource() = default;
+  protected:
+    Handle m_Handle{};
+    friend struct ResourceManager;
+};
+
+template <typename T> struct Resource : IResource
+{
+  private:
+    T m_Resource;
+
+  public:
+    template <typename... Args> requires NamedResource<T, Args...>
+    Resource(const std::string& name, Args&&... args) : m_Resource(name, std::forward<Args>(args)...)
+    {
+    }
+
+    T& Get()
+    {
+        return m_Resource;
+    }
+
+    T& operator()()
+    {
+        return m_Resource;
+    }
+
+    const T& operator()() const
+    {
+        return m_Resource;
+    }
+
+    operator T&()
+    {
+        return m_Resource;
+    }
+
+    operator const T&() const
+    {
+        return m_Resource;
+    }
+
+    ~Resource() = default;
 
     Resource(const Resource&) = delete;
 
@@ -38,18 +76,6 @@ struct Resource
     {
         return m_Handle.Generation;
     }
-
-    const std::string& GetName() const
-    {
-        return m_Name;
-    }
-
-  protected:
-    Resource(std::string name) : m_Name(std::move(name)) {}
-
-  private:
-    friend struct ResourceManager;
-    Handle m_Handle;
-    std::string m_Name;
 };
+
 } // namespace N::C

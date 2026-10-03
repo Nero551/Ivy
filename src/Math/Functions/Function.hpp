@@ -1,10 +1,10 @@
 #pragma once
 #include "DifferentiationMethod.hpp"
+#include "Graphics/Material/Blend/BlendEquation.hpp"
 #include "IntegrationMethod.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Concepts.hpp"
-#include "Modules/Graphics/Resources/Material/Blend/BlendEquation.hpp"
 #include "Utilities/Log.hpp"
 
 namespace N::M

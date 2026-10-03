@@ -1,9 +1,9 @@
 #include "FirstScene.hpp"
 
 #include "AssimpScene.hpp"
-#include "Modules/Graphics/Novas/MeshInstance3D.hpp"
-#include "Modules/Graphics/Resources/Shader/Uniforms/Vector3Uniform.hpp"
 
+#include "Graphics/Shader/Uniforms/Vector3Uniform.hpp"
+#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
 namespace N
 {
 FirstScene::FirstScene()

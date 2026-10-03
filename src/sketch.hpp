@@ -16,6 +16,11 @@ namespace Sketch
 //TODO- the bottleneck is prob the SetAttrib() every render batch.
 // fix that by making the batch own the VAO and setting on construction.
 
+//! HIGH PRIORITY
+//TODO- extract the graphics API out of nova and remove Resource Inheritance.
+// make a Resource struct that owns an object and handle.
+// so u can just do Resource<G::Texture>. preventing coupling between engine and graphics API
+
 using namespace N;
 
 using Index = unsigned int;

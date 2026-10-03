@@ -6,8 +6,8 @@
 
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Modules/Graphics/Novas/MeshInstance3D.hpp"
-#include "Modules/Graphics/Resources/Texture/Texture2D.hpp"
+#include "Graphics/Texture/Texture2D.hpp"
+#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
 
 namespace N
 {
@@ -43,18 +43,19 @@ static void ProcessFaces(std::vector<unsigned int>& indices, const aiMesh* mesh)
     }
 }
 
-static G::Material& ProcessMaterial(const aiScene* scene, const aiMesh* mesh, const std::string& directory)
+static C::Resource<G::Material>& ProcessMaterial(
+    const aiScene* scene, const aiMesh* mesh, const std::string& directory)
 {
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
 
     auto& material = resourceManager.Load<G::Material>("material_" + std::to_string(mesh->mMaterialIndex));
 
-    material.Shader = &resourceManager.Load<G::Shader>("s");
+    material().Shader = &resourceManager.Load<G::Shader>("s")();
 
-    material.Shader->AssignSource(
+    material().Shader->AssignSource(
         resourceManager.Load<G::ShaderSource>("s", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
-    material.Shader->AssignSource(
+    material().Shader->AssignSource(
         resourceManager.Load<G::ShaderSource>("s", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex));
 
     aiMaterial* aiMat = scene->mMaterials[mesh->mMaterialIndex];
@@ -65,9 +66,9 @@ static G::Material& ProcessMaterial(const aiScene* scene, const aiMesh* mesh, co
         aiMat->GetTexture(aiTextureType_DIFFUSE, t, &str);
 
         auto& diffuseMap = resourceManager.Load<G::Texture2D>("diffuse" + std::to_string(t));
-        diffuseMap.UseImage(U::Image{std::filesystem::path(directory) / str.C_Str(), true});
+        diffuseMap().UseImage(U::Image{std::filesystem::path(directory) / str.C_Str(), true});
 
-        material.DiffuseMap = &diffuseMap;
+        material().DiffuseMap = &diffuseMap();
     }
 
     for (unsigned int t = 0; t < aiMat->GetTextureCount(aiTextureType_SPECULAR); ++t)
@@ -76,9 +77,9 @@ static G::Material& ProcessMaterial(const aiScene* scene, const aiMesh* mesh, co
         aiMat->GetTexture(aiTextureType_SPECULAR, t, &str);
 
         auto& specularMap = resourceManager.Load<G::Texture2D>("specular" + std::to_string(t));
-        specularMap.UseImage(U::Image{std::filesystem::path(directory) / str.C_Str(), true});
+        specularMap().UseImage(U::Image{std::filesystem::path(directory) / str.C_Str(), true});
 
-        material.SpecularMap = &specularMap;
+        material().SpecularMap = &specularMap();
     }
 
     return material;
@@ -93,8 +94,8 @@ static void ProcessNode(
 
     auto& entity = world.CreateEntity<Nova3D>();
 
-    auto& meshPool = query.Pool<G::MeshComponent>();
-    auto& materialPool = query.Pool<G::MaterialComponent>();
+    auto& meshPool = query.Pool<R::MeshComponent>();
+    auto& materialPool = query.Pool<R::MaterialComponent>();
 
     for (unsigned int m = 0; m < node->mNumMeshes; ++m)
     {
@@ -109,8 +110,8 @@ static void ProcessNode(
         auto& material = ProcessMaterial(scene, mesh, directory);
 
         auto& meshResource = resourceManager.Load<G::Mesh>("mesh_" + std::to_string(node->mMeshes[m]));
-        meshResource.Vertices = vertices;
-        meshResource.Indices = indices;
+        meshResource().Vertices = vertices;
+        meshResource().Indices = indices;
 
         meshPool.Add(entity.GetId()).Mesh = &meshResource;
         materialPool.Add(entity.GetId()).Material = &material;

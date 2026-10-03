@@ -3,10 +3,11 @@
 
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Modules/Graphics/Graphics.hpp"
+#include "Graphics/Graphics.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Physics/Physics.hpp"
 #include "Modules/Profiling/Profiling.hpp"
+#include "Modules/Renderer/Renderer.hpp"
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
 
@@ -73,7 +74,7 @@ void Engine::Configure()
     Service::Add<ResourceManager>();
 
     AddModule<I::Input>();
-    AddModule<G::Graphics>();
+    AddModule<R::Renderer>();
     AddModule<Profiling>();
     AddModule<Physics>();
 }

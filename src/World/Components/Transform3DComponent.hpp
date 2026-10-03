@@ -5,11 +5,11 @@
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Utilities/Track.hpp"
 
-namespace N::G
+namespace N::R
 {
 struct CameraSystem;
-struct Graphics;
-} // namespace N::G
+struct Renderer;
+} // namespace N::R
 
 namespace N
 {
@@ -58,7 +58,7 @@ struct Transform3DComponent : C::Component
     C::Track<M::Quaternion<>> GlobalRotation = M::Quaternion<>::Identity();
     C::Track<M::Vector<3>> GlobalScale = M::Vector<3>::One();
     friend struct Transform3DSystem;
-    friend struct G::Graphics;
-    friend struct G::CameraSystem;
+    friend struct R::Renderer;
+    friend struct R::CameraSystem;
 };
 } // namespace N

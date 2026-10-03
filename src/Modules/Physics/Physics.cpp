@@ -5,11 +5,11 @@
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/World.hpp"
 #include "Math/Complex/Complex.hpp"
-#include "Modules/Graphics/Components/MaterialComponent.hpp"
-#include "Modules/Graphics/Components/MeshComponent.hpp"
-#include "Modules/Graphics/Novas/MeshInstance3D.hpp"
-#include "Modules/Graphics/Primitives/Primitives.hpp"
 #include "Modules/Input/Input.hpp"
+#include "Modules/Renderer/Components/MaterialComponent.hpp"
+#include "Modules/Renderer/Components/MeshComponent.hpp"
+#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
+#include "Modules/Renderer/Primitives/Primitives.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
 namespace N
@@ -17,20 +17,20 @@ namespace N
 static C::Entity& CreatePoint(M::Vector<4> col)
 {
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
-    auto& mesh = G::Primitives::CreateCube("point");
+    auto& mesh = R::Primitives::CreateCube("point");
     auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
-    material.Color = col;
+    material().Color = col;
     auto& shader = resourceManager.Load<G::Shader>("pointShader");
 
-    shader.AssignSource(resourceManager.Load<G::ShaderSource>(
+    shader().AssignSource(resourceManager.Load<G::ShaderSource>(
         "pointVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex));
-    shader.AssignSource(resourceManager.Load<G::ShaderSource>(
+    shader().AssignSource(resourceManager.Load<G::ShaderSource>(
         "pointFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
-    material.Shader = &shader;
+    material().Shader = &shader();
 
-    auto& point = C::World::Get().CreateEntity<G::MeshInstance3D>();
-    C::World::Get().Query.Pool<G::MeshComponent>().GetComponentById(point.GetId()).Mesh = &mesh;
-    C::World::Get().Query.Pool<G::MaterialComponent>().GetComponentById(point.GetId()).Material = &material;
+    auto& point = C::World::Get().CreateEntity<R::MeshInstance3D>();
+    C::World::Get().Query.Pool<R::MeshComponent>().GetComponentById(point.GetId()).Mesh = &mesh;
+    C::World::Get().Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material = &material;
     C::World::Get().Query.Pool<Transform3DComponent>().GetComponentById(point.GetId()).Scale =
         M::Vector<3>{0.2};
     C::World::Get().GetRoot().AttachChild(point);
@@ -57,20 +57,20 @@ void Physics::Start()
 {
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
     auto& query = C::World::Get().Query;
-    auto& mesh = G::Primitives::CreateCube("mesh");
+    auto& mesh = R::Primitives::CreateCube("mesh");
     auto& objectShader = resourceManager.Load<G::Shader>("objectShader");
 
-    objectShader.AssignSource(resourceManager.Load<G::ShaderSource>(
+    objectShader().AssignSource(resourceManager.Load<G::ShaderSource>(
         "objectFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
-    objectShader.AssignSource(resourceManager.Load<G::ShaderSource>(
+    objectShader().AssignSource(resourceManager.Load<G::ShaderSource>(
         "objectVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex));
 
     auto& objectMaterial = resourceManager.Load<G::Material>("cubeMaterial");
-    objectMaterial.Shader = &objectShader;
+    objectMaterial().Shader = &objectShader();
 
-    auto& cube = C::World::Get().CreateEntity<G::MeshInstance3D>();
-    query.Pool<G::MeshComponent>().GetComponentById(cube.GetId()).Mesh = &mesh;
-    query.Pool<G::MaterialComponent>().GetComponentById(cube.GetId()).Material = &objectMaterial;
+    auto& cube = C::World::Get().CreateEntity<R::MeshInstance3D>();
+    query.Pool<R::MeshComponent>().GetComponentById(cube.GetId()).Mesh = &mesh;
+    query.Pool<R::MaterialComponent>().GetComponentById(cube.GetId()).Material = &objectMaterial;
     query.Pool<BodyComponent>().Add(cube.GetId());
     cubeId = cube.GetId();
     C::World::Get().GetRoot().AttachChild(cube);

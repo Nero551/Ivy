@@ -2,9 +2,9 @@
 
 #include "Core/Engine.hpp"
 #include "Core/World/ECS/Events/EntityDestroyed.hpp"
-#include "Modules/Graphics/Novas/Camera.hpp"
 #include "Modules/Input/Enums/Keys.hpp"
 #include "Modules/Input/Input.hpp"
+#include "Modules/Renderer/Novas/Camera.hpp"
 #include "World/Scenes/CoordinateAxesScene.hpp"
 #include "World/Scenes/FirstScene.hpp"
 #include "World/Systems/Transform3DSystem.hpp"
@@ -79,7 +79,7 @@ void World::Start()
 
     SetRoot(CreateEntity<Nova>().GetId());
 
-    auto& camera = CreateEntity<G::Camera>();
+    auto& camera = CreateEntity<R::Camera>();
     Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
     GetRoot().AttachChild(camera);
     SetCamera(camera.GetId());
