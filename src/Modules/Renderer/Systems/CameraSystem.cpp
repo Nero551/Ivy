@@ -6,7 +6,7 @@
 #include "Modules/Input/Input.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 void CameraSystem::Update(const double dt)
 {
@@ -82,4 +82,4 @@ M::Matrix<4, 4> CameraSystem::GetViewMatrix()
 
     return M::Matrix<4, 4>::LookAt(pos, pos + forward, up);
 }
-} // namespace N::R
+} // namespace Ivy::R

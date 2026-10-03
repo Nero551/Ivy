@@ -7,7 +7,7 @@
 #include "Graphics/Shader/Uniforms/IntUniform.hpp"
 #include "Graphics/Shader/Uniforms/Vector3Uniform.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 void LightingSystem::Start()
 {
@@ -56,4 +56,4 @@ void LightingSystem::Render()
 
     LightingBuffer->Bind();
 }
-} // namespace N::R
+} // namespace Ivy::R

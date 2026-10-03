@@ -8,8 +8,8 @@
 using Catch::Approx;
 using Catch::Matchers::WithinAbs;
 using Catch::Matchers::WithinRel;
-using namespace N::M;
-using namespace N::P;
+using namespace Ivy::M;
+using namespace Ivy::P;
 
 //==============================================================================
 // Dimensional Analysis

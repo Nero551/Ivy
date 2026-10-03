@@ -1,7 +1,7 @@
 #pragma once
 
 /** @brief Mouse buttons for input */
-namespace N::I
+namespace Ivy::I
 {
 enum class MouseButton
 {
@@ -14,4 +14,4 @@ enum class MouseButton
     Button7 = GLFW_MOUSE_BUTTON_7,
     Button8 = GLFW_MOUSE_BUTTON_8,
 };
-} // namespace N::I
+} // namespace Ivy::I

@@ -2,7 +2,7 @@
 #include "Utilities/Log.hpp"
 
 #include <vector>
-namespace N::U
+namespace Ivy::U
 {
 
 template <typename T, std::unsigned_integral SparseIndexType = unsigned int,
@@ -273,4 +273,4 @@ struct SparseSetSoA
     std::vector<SparseIndexType> m_Indices{};
 };
 
-} // namespace N::U
+} // namespace Ivy::U

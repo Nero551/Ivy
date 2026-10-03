@@ -5,7 +5,7 @@
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 struct InstanceData
 {
@@ -63,4 +63,4 @@ struct RenderBatch
         }
     };
 };
-} // namespace N::R
+} // namespace Ivy::R

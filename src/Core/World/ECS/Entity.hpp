@@ -4,7 +4,7 @@
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 /** @brief Represents an entity and its parent-child hierarchy. */
 struct Entity
@@ -128,4 +128,4 @@ struct Entity
 
     friend struct World;
 };
-} // namespace N::C
+} // namespace Ivy::C

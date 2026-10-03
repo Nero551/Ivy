@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Defines how texture coordinates outside the [0, 1] range are handled.
@@ -20,4 +20,4 @@ enum class TextureWrap
      * texture. */
     ClampToBorder = GL_CLAMP_TO_BORDER
 };
-} // namespace N::G
+} // namespace Ivy::G

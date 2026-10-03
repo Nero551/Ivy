@@ -5,7 +5,7 @@
 #include "Math/Vector/Vector3.hpp"
 #include "Modules/Renderer/LightType.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 struct LightComponent : C::Component
 {
@@ -22,4 +22,4 @@ struct LightComponent : C::Component
     float InnerCutOff = M::Rad(7.5);
     float OuterCutOff = M::Rad(17.5);
 };
-} // namespace N::R
+} // namespace Ivy::R

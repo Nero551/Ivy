@@ -2,7 +2,7 @@
 
 #include "Core/Module.hpp"
 
-namespace N
+namespace Ivy
 {
 struct Physics : C::Module
 {
@@ -10,4 +10,4 @@ struct Physics : C::Module
     void Start() override;
     void FixedUpdate(double fdt) override;
 };
-} // namespace N
+} // namespace Ivy

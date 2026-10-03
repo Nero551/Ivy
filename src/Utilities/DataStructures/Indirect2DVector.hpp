@@ -2,7 +2,7 @@
 
 #include "Utilities/Log.hpp"
 
-namespace N::U
+namespace Ivy::U
 {
 
 /**
@@ -101,7 +101,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
     {
         if (!Contains(a, b))
         {
-            U::Log::Fatal("Indirect2DVector: Index does not exist.");
+            Log::Fatal("Indirect2DVector: Index does not exist.");
         }
 
         return m_Data[m_Lookup[a][b]];
@@ -111,7 +111,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
     {
         if (!Contains(a, b))
         {
-            U::Log::Fatal("Indirect2DVector: Index does not exist.");
+            Log::Fatal("Indirect2DVector: Index does not exist.");
         }
 
         return m_Data[m_Lookup[a][b]];
@@ -219,4 +219,4 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
     }
 };
 
-} // namespace N::U
+} // namespace Ivy::U

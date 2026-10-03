@@ -2,7 +2,7 @@
 #include "OpenGL.hpp"
 #include "Uniform.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 struct IntUniform : Uniform
 {
@@ -15,4 +15,4 @@ struct IntUniform : Uniform
         glUniform1i(location, Value);
     }
 };
-} // namespace N::G
+} // namespace Ivy::G

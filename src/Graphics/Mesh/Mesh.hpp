@@ -10,7 +10,7 @@
 #include "Topology.hpp"
 #include "Vertex.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents a renderable mesh resource.
@@ -118,4 +118,4 @@ struct Mesh
      */
     void ApplyCulling() const;
 };
-} // namespace N::G
+} // namespace Ivy::G

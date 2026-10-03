@@ -3,7 +3,7 @@
 #include "../Vector/Vector3.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 struct Basis
 {
@@ -35,4 +35,4 @@ struct Basis
         return basisMatrix;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

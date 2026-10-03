@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Format of pixel data supplied to OpenGL.
@@ -70,4 +70,4 @@ enum class TextureFormat
     /** Stencil component only. */
     Stencil = GL_STENCIL_INDEX
 };
-} // namespace N::G
+} // namespace Ivy::G

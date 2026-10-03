@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Defines the mathematical operation used to combine source and destination colors
@@ -24,4 +24,4 @@ enum class BlendEquation
     /** Selects the component-wise maximum of the source and destination colors. */
     Max = GL_MAX
 };
-} // namespace N::G
+} // namespace Ivy::G

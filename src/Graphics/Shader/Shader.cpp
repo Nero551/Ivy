@@ -5,7 +5,7 @@
 #include "Uniforms/FloatUniform.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 Shader::~Shader()
 {
@@ -40,7 +40,7 @@ void Shader::AssignSource(ShaderSource& source)
     {
         if (existing->GetStage() == source.GetStage())
         {
-            // N::U::Logger::Error("Shader: " + Name + " Duplicate Shader Stage.");
+            // Ivy::U::Logger::Error("Shader: " + Name + " Duplicate Shader Stage.");
             return;
         }
     }
@@ -140,4 +140,4 @@ void Shader::UploadUniforms()
         }
     }
 }
-} // namespace N::G
+} // namespace Ivy::G

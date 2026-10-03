@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/Log.hpp"
 
-namespace N::U
+namespace Ivy::U
 {
 
 /**
@@ -124,4 +124,4 @@ struct GIndexPool
     std::vector<IndexType> m_Free{};
 };
 
-} // namespace N::U
+} // namespace Ivy::U

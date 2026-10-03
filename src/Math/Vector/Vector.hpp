@@ -3,7 +3,7 @@
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Concepts.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  *
@@ -356,4 +356,4 @@ template <unsigned int Components, Scalar T = float> struct Vector
     std::array<T, Components> m_Data{0};
 };
 
-} // namespace N::M
+} // namespace Ivy::M

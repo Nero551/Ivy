@@ -7,7 +7,7 @@
 using Catch::Approx;
 using Catch::Matchers::WithinAbs;
 using Catch::Matchers::WithinRel;
-using namespace N::M;
+using namespace Ivy::M;
 
 //==============================================================================
 // Common

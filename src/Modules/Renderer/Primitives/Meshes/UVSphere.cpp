@@ -2,7 +2,7 @@
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Math/Color/Color.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 C::Resource<G::Mesh>& Primitives::CreateUVSphere(
     const std::string& name, const float radius, const int sectors, const int stacks)
@@ -74,4 +74,4 @@ C::Resource<G::Mesh>& Primitives::CreateUVSphere(
 
     return mesh;
 }
-} // namespace N::R
+} // namespace Ivy::R

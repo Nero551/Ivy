@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Specifies the target type of a texture.
@@ -25,4 +25,4 @@ enum class TextureTarget
     /** Two-dimensional multisample texture. */
     Texture2DMultisample = GL_TEXTURE_2D_MULTISAMPLE,
 };
-} // namespace N::G
+} // namespace Ivy::G

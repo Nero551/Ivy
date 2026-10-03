@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /** @brief Specifies the purpose and binding target of a buffer. */
 enum class BufferTarget : GLenum
@@ -17,4 +17,4 @@ enum class BufferTarget : GLenum
     /** @brief Indirect drawing command data. */
     DrawIndirect = GL_DRAW_INDIRECT_BUFFER
 };
-} // namespace N::G
+} // namespace Ivy::G

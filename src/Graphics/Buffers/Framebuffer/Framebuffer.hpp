@@ -8,7 +8,7 @@
 #include "FramebufferTarget.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents an OpenGL framebuffer object.
@@ -150,4 +150,4 @@ struct Framebuffer
     unsigned int m_Id = 0;
     std::string m_Name;
 };
-} // namespace N::G
+} // namespace Ivy::G

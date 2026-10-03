@@ -1,7 +1,7 @@
 #pragma once
 #include "DepthFunction.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Controls depth testing and depth buffer writes.
@@ -22,4 +22,4 @@ struct Depth
     /** @brief Applies the configured depth state to the OpenGL context. */
     void Apply();
 };
-} // namespace N::G
+} // namespace Ivy::G

@@ -1,7 +1,7 @@
 #pragma once
 #include "Complex.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 inline constexpr Complex<> I{0, 1};
 }

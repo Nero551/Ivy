@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/Log.hpp"
 
-namespace N::U
+namespace Ivy::U
 {
 /**
  * @brief Non-owning pointer wrapper that checks for null dereferences.
@@ -90,4 +90,4 @@ template <typename T> struct CheckedPtr
     T* m_Ptr = nullptr;
     std::string_view m_NullMessage = "[NULL PTR] ";
 };
-} // namespace N::U
+} // namespace Ivy::U

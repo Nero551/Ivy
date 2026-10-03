@@ -1,5 +1,5 @@
 file(GLOB_RECURSE PHYSICS_SOURCES CONFIGURE_DEPENDS *.cpp)
 
-target_sources(Nova PRIVATE
+target_sources(Ivy PRIVATE
         ${PHYSICS_SOURCES}
 )

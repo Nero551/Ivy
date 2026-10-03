@@ -2,7 +2,7 @@
 #include "Core/Services/EventBus/Event.hpp"
 #include "Core/World/ECS/Entity.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 struct EntityDestroyed : Event<EntityDestroyed>
 {
@@ -11,4 +11,4 @@ struct EntityDestroyed : Event<EntityDestroyed>
 
     EntityDestroyed(unsigned int entityId) : EntityId(entityId) {}
 };
-} // namespace N::C
+} // namespace Ivy::C

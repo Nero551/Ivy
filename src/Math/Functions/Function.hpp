@@ -7,7 +7,7 @@
 #include "Math/Concepts.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 
 template <typename Input, typename Output> struct Function;
@@ -31,7 +31,9 @@ template <typename Input, typename Output> struct Function
      * @param f Callable used to evaluate the function.
      */
     template <typename F> requires(std::same_as<std::invoke_result_t<F, Input>, Output> && !IsFunction<F>)
-    Function(F&& f) : m_Func(std::forward<F>(f)){};
+    Function(F&& f) : m_Func(std::forward<F>(f))
+    {
+    }
 
     /**
      * @brief Evaluates the function at the given input.
@@ -411,4 +413,4 @@ template <typename Input, typename Output> struct Function
     std::function<Output(Input)> m_Func;
 };
 
-} // namespace N::M
+} // namespace Ivy::M

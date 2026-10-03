@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Defines which faces of a mesh are culled during rendering.
@@ -22,4 +22,4 @@ enum class CullMode
     /** @brief Culls both front-facing and back-facing faces. */
     FrontAndBack = GL_FRONT_AND_BACK
 };
-} // namespace N::G
+} // namespace Ivy::G

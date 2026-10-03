@@ -4,7 +4,7 @@
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 
 /** @brief Manages the lifetime, storage, and retrieval of resources. */
@@ -136,4 +136,4 @@ struct ResourceManager : Service
     std::unordered_map<std::string, IResource::Handle> m_ResourceLookup{};
     U::GIndexPool<> m_Handles{};
 };
-} // namespace N::C
+} // namespace Ivy::C

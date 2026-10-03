@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/Log.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 /** @brief Base interface for all event types, providing polymorphic event identity. */
 struct IEvent
@@ -62,4 +62,4 @@ template <typename T> struct Event : IEvent
     std::vector<Entry> m_Listeners;
     std::size_t m_NextSubscription = 0;
 };
-} // namespace N::C
+} // namespace Ivy::C

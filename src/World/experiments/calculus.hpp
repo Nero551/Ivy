@@ -2,7 +2,7 @@
 
 #include "Core/World/ECS/System.hpp"
 
-namespace N
+namespace Ivy
 {
 struct calculus : C::System
 {
@@ -15,4 +15,4 @@ struct calculus : C::System
     void ThreeDimensionalProjection(int increase);
     void FourDimensionalProjection(int increase);
 };
-} // namespace N
+} // namespace Ivy

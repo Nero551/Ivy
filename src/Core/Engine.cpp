@@ -11,7 +11,7 @@
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 Engine::Engine()
 {
@@ -227,4 +227,4 @@ void Engine::Stop()
     GraphicsContext::Terminate();
     Service::TerminateServices();
 }
-} // namespace N::C
+} // namespace Ivy::C

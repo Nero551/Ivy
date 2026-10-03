@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Common/Exponentials.hpp"
-namespace N::M
+namespace Ivy::M
 {
 
 struct QuadraticResult
@@ -19,9 +19,9 @@ constexpr QuadraticResult SolveQuadratic(const float a, const float b, const flo
         return {.HasRealSolution = false};
     }
 
-    const float sqrtD = M::Sqrt(d);
+    const float sqrtD = Sqrt(d);
     const float denominator = 2.0f * a;
 
-    return {(-b + sqrtD) / denominator, (-b - sqrtD) / denominator, true};
+    return {.x1 = (-b + sqrtD) / denominator, .x2 = (-b - sqrtD) / denominator, .HasRealSolution = true};
 }
-} // namespace N::M
+} // namespace Ivy::M

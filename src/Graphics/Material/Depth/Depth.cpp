@@ -1,6 +1,6 @@
 #include "Depth.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 void Depth::Apply()
 {
@@ -16,4 +16,4 @@ void Depth::Apply()
     glDepthMask(Write);
     glDepthFunc(static_cast<GLenum>(Function));
 }
-} // namespace N::G
+} // namespace Ivy::G

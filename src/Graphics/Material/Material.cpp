@@ -8,7 +8,7 @@
 #include "../Texture/Texture2D.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 Material::Material(const std::string& name) : m_Name(name)
 {
@@ -72,4 +72,4 @@ void Material::SetProperties() const
     Shader->SetUniform(IntUniform("MATERIAL.EmissionMap", 14));
     EmissionMap->Bind(14);
 }
-} // namespace N::G
+} // namespace Ivy::G

@@ -4,7 +4,7 @@
 #include "Math/Vector/Vector3.hpp"
 #include "Physics/Units.hpp"
 
-namespace N
+namespace Ivy
 {
 struct BodyComponent : C::Component
 {
@@ -12,4 +12,4 @@ struct BodyComponent : C::Component
     M::Vector<3> Force = M::Vector<3>::Zero();
     float Mass = P::Units::Kilogram;
 };
-} // namespace N
+} // namespace Ivy

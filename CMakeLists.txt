@@ -1,20 +1,20 @@
 cmake_minimum_required(VERSION 4.4.3)
 
-project(Nova)
+project(Ivy)
 
-add_executable(Nova
+add_executable(Ivy
         src/Main.cpp
         src/TracyMemory.cpp
         src/Utilities/STB.cpp
 )
 
 
-target_precompile_headers(Nova PRIVATE
+target_precompile_headers(Ivy PRIVATE
         "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.hpp>"
 )
 
-set_target_properties(Nova PROPERTIES UNITY_BUILD ON)
-set_property(TARGET Nova PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+set_target_properties(Ivy PROPERTIES UNITY_BUILD ON)
+set_property(TARGET Ivy PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 set(TRACY_ENABLE ON CACHE BOOL "Enable Tracy" FORCE)
 
 add_subdirectory(src/Core)
@@ -33,9 +33,9 @@ generate_umbrella_header(Math Math)
 generate_umbrella_header(Physics Physics)
 generate_umbrella_header(Graphics Graphics)
 generate_umbrella_header(Utilities Utilities)
-generate_nova_umbrella()
+generate_engine_umbrella(Ivy)
 
-target_include_directories(Nova PRIVATE
+target_include_directories(Ivy PRIVATE
         src
 )
 
@@ -46,7 +46,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(glslang REQUIRED)
 find_package(magic_enum REQUIRED)
 
-target_link_libraries(Nova
+target_link_libraries(Ivy
         PRIVATE
         glfw
         assimp::assimp
@@ -58,7 +58,7 @@ target_link_libraries(Nova
         Tracy::TracyClient
 )
 
-target_compile_options(Nova PRIVATE
+target_compile_options(Ivy PRIVATE
         #        -Wall
         #        -Wextra
         #        -Wpedantic

@@ -6,7 +6,7 @@
 #include "Math/Common/Logarithms.hpp"
 #include "Math/Concepts.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /** @brief Raises a real number to a complex power. */
 template <Scalar T> constexpr Complex<T> CPow(const T x, const Complex<T>& z)
@@ -46,4 +46,4 @@ template <Scalar T> constexpr Complex<T> CExp(const Complex<T>& z)
     T magnitude = Exp(z.Real);
     return {magnitude * std::cos(z.Imaginary), magnitude * std::sin(z.Imaginary)};
 }
-} // namespace N::M
+} // namespace Ivy::M

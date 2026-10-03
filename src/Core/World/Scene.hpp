@@ -2,7 +2,7 @@
 
 #include "ECS/Entity.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 /**
  * @brief Temporary container for a group of entities.
@@ -26,4 +26,4 @@ struct Scene
   private:
     unsigned int m_Root;
 };
-} // namespace N::C
+} // namespace Ivy::C

@@ -1,7 +1,7 @@
 #include "Texture.hpp"
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 Texture::Texture(const std::string& name, const TextureTarget target) : m_Name(name), m_Target(target) {}
 
@@ -52,4 +52,4 @@ void Texture::Unbind(const unsigned int unit) const
 {
     glBindTextureUnit(unit, 0);
 }
-} // namespace N::G
+} // namespace Ivy::G

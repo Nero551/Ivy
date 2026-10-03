@@ -3,7 +3,7 @@
 #include "Graphics/Texture/Texture2D.hpp"
 #include "Primitives.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 C::Resource<G::Texture2D>& Primitives::CreateWhiteTexture()
 {
@@ -40,4 +40,4 @@ C::Resource<G::Texture2D>& Primitives::CreateBlackTexture()
 
     return blackTexture;
 }
-} // namespace N::R
+} // namespace Ivy::R

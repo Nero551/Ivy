@@ -16,12 +16,7 @@ namespace Sketch
 //TODO- the bottleneck is prob the SetAttrib() every render batch.
 // fix that by making the batch own the VAO and setting on construction.
 
-//! HIGH PRIORITY
-//TODO- extract the graphics API out of nova and remove Resource Inheritance.
-// make a Resource struct that owns an object and handle.
-// so u can just do Resource<G::Texture>. preventing coupling between engine and graphics API
-
-using namespace N;
+using namespace Ivy;
 
 using Index = unsigned int;
 template <typename T, Index Size> struct Array
@@ -86,7 +81,7 @@ template <unsigned int... Dimensions> struct Tensor
     {
         std::array<unsigned int, Order> indexArray{static_cast<unsigned int>(indices)...};
         unsigned int flatIndex = Summation(0, Order - 1,
-            N::M::Function<int, unsigned int>{[&](const int i) { return indexArray[i] * Strides[i]; }});
+            Ivy::M::Function<int, unsigned int>{[&](const int i) { return indexArray[i] * Strides[i]; }});
 
         return m_Data[flatIndex];
     }
@@ -160,9 +155,9 @@ inline void Test()
 
     uInt8 c = {34};
     uInt8 d = {33};
-    // N::U::Log::Info(alu.Add(c, d));
-    // N::U::Log::Info(alu.Zero);
-    // N::U::Log::Info(alu.Overflow);
+    // Ivy::U::Log::Info(alu.Add(c, d));
+    // Ivy::U::Log::Info(alu.Zero);
+    // Ivy::U::Log::Info(alu.Overflow);
 
     constexpr float theta = 90;
     P::Dimension<M::Vector<2>, P::Acceleration> g = M::Vector<2>{0, -9.8f};

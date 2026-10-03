@@ -3,7 +3,7 @@
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Math/Color/Color.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 C::Resource<G::Mesh>& Primitives::CreateLine(const std::string& name)
 {
@@ -25,4 +25,4 @@ C::Resource<G::Mesh>& Primitives::CreateLine(const std::string& name)
 
     return mesh;
 }
-} // namespace N::R
+} // namespace Ivy::R

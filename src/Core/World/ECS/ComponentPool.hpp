@@ -9,7 +9,7 @@
 
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 
 struct World;
@@ -190,4 +190,4 @@ template <ComponentType T> struct ComponentPool : IComponentPool
     U::SparseSetAoS<T> m_Components{};
 };
 
-} // namespace N::C
+} // namespace Ivy::C

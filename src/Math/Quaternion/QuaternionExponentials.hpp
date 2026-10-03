@@ -5,7 +5,7 @@
 #include "Math/Quaternion/QuaternionLogarithms.hpp"
 #include "Quaternion.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /** @brief Computes the exponential of a quaternion. */
 template <Scalar T> constexpr Quaternion<T> QExp(const Quaternion<T>& q)
@@ -60,4 +60,4 @@ template <Scalar T> constexpr Quaternion<T> QSqrt(const Quaternion<T>& q)
 {
     return QPow(q, T{1} / T{2});
 }
-} // namespace N::M
+} // namespace Ivy::M

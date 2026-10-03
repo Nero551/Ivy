@@ -2,7 +2,7 @@
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 C::Resource<G::Mesh>& Primitives::CreateCube(const std::string& name)
 {
@@ -56,4 +56,4 @@ C::Resource<G::Mesh>& Primitives::CreateCube(const std::string& name)
 
     return mesh;
 }
-} // namespace N::R
+} // namespace Ivy::R

@@ -2,7 +2,7 @@
 
 #include "Utilities/Log.hpp"
 
-namespace N::U
+namespace Ivy::U
 {
 
 /**
@@ -82,7 +82,7 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
     {
         if (!Contains<Args...>())
         {
-            U::Log::Fatal("TypedVector does not contain the specified TypeId.");
+            Log::Fatal("TypedVector does not contain the specified TypeId.");
         }
 
         return m_Data[GetTypeId<Args...>()];
@@ -190,4 +190,4 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
     }
 };
 
-} // namespace N::U
+} // namespace Ivy::U

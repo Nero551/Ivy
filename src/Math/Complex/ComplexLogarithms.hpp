@@ -3,7 +3,7 @@
 #include "Complex.hpp"
 #include "Math/Common/Logarithms.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /** @brief Computes the natural logarithm of a complex number. */
 template <Scalar T> constexpr Complex<T> CLn(const Complex<T>& z)
@@ -20,4 +20,4 @@ template <Scalar T> constexpr Complex<T> CLog(const Complex<T>& base, const Comp
 {
     return CLn(z) / CLn(base);
 }
-} // namespace N::M
+} // namespace Ivy::M

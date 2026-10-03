@@ -26,9 +26,9 @@ function(generate_umbrella_header DIR SUBSYSTEM)
     endforeach ()
 endfunction()
 
-function(generate_nova_umbrella)
+function(generate_engine_umbrella NAME)
     set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-    set(OUTPUT "${ROOT_DIR}/Nova.hpp")
+    set(OUTPUT "${ROOT_DIR}/${NAME}.hpp")
 
     file(GLOB SUBSYSTEM_DIRS
             CONFIGURE_DEPENDS

@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Operation performed on the stencil buffer.
@@ -35,4 +35,4 @@ enum class StencilAction : GLenum
     /** Invert all bits of the stencil value. */
     Invert = GL_INVERT
 };
-} // namespace N::G
+} // namespace Ivy::G

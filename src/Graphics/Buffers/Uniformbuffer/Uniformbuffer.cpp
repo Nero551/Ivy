@@ -1,6 +1,6 @@
 #include "Uniformbuffer.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 void Uniformbuffer::Generate()
 {
@@ -39,4 +39,4 @@ unsigned int Uniformbuffer::GetId() const
 {
     return m_Id;
 }
-} // namespace N::G
+} // namespace Ivy::G

@@ -1,6 +1,6 @@
 #pragma once
 #include "Exponentials.hpp"
-namespace N::M
+namespace Ivy::M
 {
 constexpr float Lerp(const float a, const float b, const float t)
 {
@@ -46,4 +46,4 @@ constexpr float EaseInOutCubic(const float t)
 
     return 0.5f + 0.5f * EaseOutCubic((t - 0.5f) * 2.0f);
 }
-} // namespace N::M
+} // namespace Ivy::M

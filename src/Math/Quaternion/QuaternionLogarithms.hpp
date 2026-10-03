@@ -2,7 +2,7 @@
 #include "Math/Common/Logarithms.hpp"
 #include "Quaternion.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 template <Scalar T> constexpr Quaternion<T> QLn(const Quaternion<T>& q)
 {
@@ -22,4 +22,4 @@ template <Scalar T> constexpr Quaternion<T> QLn(const Quaternion<T>& q)
 
     return result;
 }
-} // namespace N::M
+} // namespace Ivy::M

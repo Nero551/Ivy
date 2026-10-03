@@ -1,5 +1,5 @@
 file(GLOB_RECURSE WORLD_SOURCES CONFIGURE_DEPENDS *.cpp)
 
-target_sources(Nova PRIVATE
+target_sources(Ivy PRIVATE
         ${WORLD_SOURCES}
 )

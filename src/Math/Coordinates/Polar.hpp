@@ -2,7 +2,7 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief Represents a two-dimensional point in polar coordinates.
@@ -35,4 +35,4 @@ template <Scalar T> struct Polar
         return os;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

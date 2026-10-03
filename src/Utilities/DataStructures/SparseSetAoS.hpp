@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::U
+namespace Ivy::U
 {
 
 /**
@@ -277,4 +277,4 @@ struct SparseSetAoS
     std::vector<DenseIndexType> m_Sparse{};
 };
 
-} // namespace N::U
+} // namespace Ivy::U

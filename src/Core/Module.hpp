@@ -2,7 +2,7 @@
 
 #include "SystemOwner.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 /**
  * @brief Base class for all engine modules.
@@ -87,4 +87,4 @@ struct Module : SystemOwner
 
     friend struct Engine;
 };
-} // namespace N::C
+} // namespace Ivy::C

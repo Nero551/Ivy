@@ -10,7 +10,7 @@
 #include "Stencil/Stencil.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents the rendering properties and textures of a surface.
@@ -108,4 +108,4 @@ struct Material
      */
     void SetProperties() const;
 };
-} // namespace N::G
+} // namespace Ivy::G

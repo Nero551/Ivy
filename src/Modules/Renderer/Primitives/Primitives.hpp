@@ -2,11 +2,11 @@
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Texture/Texture.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 struct Texture2D;
 }
-namespace N::R::Primitives
+namespace Ivy::R::Primitives
 {
 C::Resource<G::Mesh>& CreateCube(const std::string& name);
 
@@ -20,4 +20,4 @@ C::Resource<G::Mesh>& CreateLine(const std::string& name);
 C::Resource<G::Texture2D>& CreateWhiteTexture();
 
 C::Resource<G::Texture2D>& CreateBlackTexture();
-} // namespace N::R::Primitives
+} // namespace Ivy::R::Primitives

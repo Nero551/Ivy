@@ -6,7 +6,7 @@
 #include "Core/World/ECS/ComponentPoolQuery.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 /**
  * @brief Owns and manages the runtime state of the engine world.
@@ -125,4 +125,4 @@ struct World : SystemOwner
     unsigned int m_Root{};
     unsigned int m_ActiveCamera{};
 };
-} // namespace N::C
+} // namespace Ivy::C

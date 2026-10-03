@@ -1,6 +1,6 @@
 #include "Blend.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 void Blend::Apply()
 {
@@ -22,4 +22,4 @@ void Blend::Apply()
     glBlendFuncSeparate(static_cast<GLenum>(SourceRGB), static_cast<GLenum>(DestinationRGB),
         static_cast<GLenum>(SourceAlpha), static_cast<GLenum>(DestinationAlpha));
 }
-} // namespace N::G
+} // namespace Ivy::G

@@ -7,7 +7,7 @@
 #include "Utilities/Log.hpp"
 #include "Vector.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief 2D floating-point vector.
@@ -297,4 +297,4 @@ template <Scalar T> struct Vector<2, T>
         return os;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

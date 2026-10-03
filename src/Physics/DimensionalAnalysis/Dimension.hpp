@@ -2,7 +2,7 @@
 #include "Math/Concepts.hpp"
 #include "OperationDimensional.hpp"
 
-namespace N::P
+namespace Ivy::P
 {
 
 /** @brief Checks whether two dimensional types resolve to the same normalized type. */
@@ -180,4 +180,4 @@ struct Dimension
     }
 };
 
-} // namespace N::P
+} // namespace Ivy::P

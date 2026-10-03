@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::I
+namespace Ivy::I
 {
 
 /** @brief Keyboard keys for input */
@@ -152,4 +152,4 @@ enum class Key
     F24 = GLFW_KEY_F24,
     F25 = GLFW_KEY_F25,
 };
-} // namespace N::I
+} // namespace Ivy::I

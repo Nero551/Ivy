@@ -3,7 +3,7 @@
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents an OpenGL Uniform Buffer Object.
@@ -67,4 +67,4 @@ struct Uniformbuffer
     /** OpenGL uniform buffer object ID. */
     unsigned int m_Id = 0;
 };
-} // namespace N::G
+} // namespace Ivy::G

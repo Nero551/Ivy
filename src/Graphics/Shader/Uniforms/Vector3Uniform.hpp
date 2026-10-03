@@ -3,7 +3,7 @@
 #include "Math/Vector/Vector3.hpp"
 #include "Uniform.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 struct Vector3Uniform : Uniform
 {
@@ -16,4 +16,4 @@ struct Vector3Uniform : Uniform
         glUniform3fv(location, 1, &Value.x);
     }
 };
-} // namespace N::G
+} // namespace Ivy::G

@@ -4,7 +4,7 @@
 
 #include "Core/Module.hpp"
 
-namespace N
+namespace Ivy
 {
 struct Profiling : C::Module
 {
@@ -19,4 +19,4 @@ struct Profiling : C::Module
   private:
     std::deque<double> FrameTimes;
 };
-} // namespace N
+} // namespace Ivy

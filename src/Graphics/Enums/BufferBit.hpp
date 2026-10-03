@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /** @brief Specifies framebuffer buffers affected by an operation. */
 enum class BufferBit
@@ -15,4 +15,4 @@ constexpr BufferBit operator|(BufferBit a, BufferBit b)
 {
     return static_cast<BufferBit>(static_cast<GLbitfield>(a) | static_cast<GLbitfield>(b));
 }
-} // namespace N::G
+} // namespace Ivy::G

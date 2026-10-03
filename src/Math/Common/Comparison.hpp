@@ -1,10 +1,10 @@
 #pragma once
 #include "Constants.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 constexpr bool NearlyEquals(const float a, const float b, const float epsilon = EPSILON)
 {
     return std::abs(a - b) <= epsilon;
 }
-} // namespace N::M
+} // namespace Ivy::M

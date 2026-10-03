@@ -10,7 +10,7 @@
 #include "World/Systems/Transform3DSystem.hpp"
 #include "World/experiments/calculus.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 World& World::Get()
 {
@@ -165,4 +165,4 @@ void World::Render()
         system->Render();
     }
 }
-} // namespace N::C
+} // namespace Ivy::C

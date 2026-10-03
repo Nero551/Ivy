@@ -1,5 +1,5 @@
 #pragma once
-namespace N::M
+namespace Ivy::M
 {
 template <typename T> struct Set
 {
@@ -54,4 +54,4 @@ template <typename T> struct Set
     std::function<bool(const T&)> m_Predicate;
 };
 
-} // namespace N::M
+} // namespace Ivy::M

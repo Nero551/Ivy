@@ -6,7 +6,7 @@
 
 #include "Utilities/Log.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, T>
 {
@@ -238,4 +238,4 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, 
         return *this = *this * matrix;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

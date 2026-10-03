@@ -1,12 +1,12 @@
 #pragma once
 #include "Math/Concepts.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 
 template <typename T> struct Track
 {
-    Track() {};
+    Track() {}
     Track(const T& value) : m_Value(value) {}
 
     const T& Get() const
@@ -143,4 +143,4 @@ template <typename T> struct Track
     bool m_Changed = false;
 };
 
-} // namespace N::C
+} // namespace Ivy::C

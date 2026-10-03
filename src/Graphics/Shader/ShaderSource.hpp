@@ -3,7 +3,7 @@
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "ShaderStage.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents a shader source file and its OpenGL shader object.
@@ -59,4 +59,4 @@ struct ShaderSource
     void PreprocessIncludes(
         const std::string& path, std::string& code, std::unordered_set<std::string>& includesProcessing);
 };
-} // namespace N::G
+} // namespace Ivy::G

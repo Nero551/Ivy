@@ -2,7 +2,7 @@
 #include "Math/Vector/Vector4.hpp"
 #include "Uniform.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 struct Vector4Uniform : Uniform
 {
@@ -15,4 +15,4 @@ struct Vector4Uniform : Uniform
         glUniform4fv(location, 1, &Value.x);
     }
 };
-} // namespace N::G
+} // namespace Ivy::G

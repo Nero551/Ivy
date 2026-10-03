@@ -2,7 +2,7 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief Represents a vector using spherical coordinates.
@@ -40,4 +40,4 @@ template <Scalar T> struct Spherical
         return os;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

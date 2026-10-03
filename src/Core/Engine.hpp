@@ -6,7 +6,7 @@
 #include "World/World.hpp"
 
 /** @brief Root namespace for Nova engine functionality. */
-namespace N::C
+namespace Ivy::C
 {
 template <typename T>
 concept ModuleType = std::derived_from<T, Module>;
@@ -91,4 +91,4 @@ struct Engine
     void EndFrame();
     void Stop();
 };
-} // namespace N::C
+} // namespace Ivy::C

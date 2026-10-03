@@ -5,7 +5,7 @@
 #include "Math/Vector/Vector4.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, T>
 {
@@ -289,4 +289,4 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
         return *this = *this * matrix;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

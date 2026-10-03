@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Sized internal format used to store texture data on the GPU.
@@ -272,4 +272,4 @@ enum class TextureInternalFormat
     /** 16-bit unsigned integer stencil index. */
     Stencil16 = GL_STENCIL_INDEX16
 };
-} // namespace N::G
+} // namespace Ivy::G

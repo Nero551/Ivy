@@ -2,7 +2,7 @@
 #include "StencilAction.hpp"
 #include "StencilFunction.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Controls stencil testing and stencil buffer operations.
@@ -38,4 +38,4 @@ struct Stencil
     /** @brief Applies the configured stencil state to the OpenGL context. */
     void Apply();
 };
-} // namespace N::G
+} // namespace Ivy::G

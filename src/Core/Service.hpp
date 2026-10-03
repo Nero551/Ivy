@@ -3,7 +3,7 @@
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 struct Service;
 template <typename T>
@@ -82,4 +82,4 @@ struct Service
     static U::TypedVector<std::unique_ptr<Service>> Services;
 };
 inline U::TypedVector<std::unique_ptr<Service>> Service::Services;
-} // namespace N::C
+} // namespace Ivy::C

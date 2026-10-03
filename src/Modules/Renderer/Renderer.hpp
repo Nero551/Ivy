@@ -12,7 +12,7 @@
 #include "Utilities/DataStructures/Indirect2DVector.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 struct Renderer : C::Module
 {
@@ -48,4 +48,4 @@ struct Renderer : C::Module
 
     void Stop() override;
 };
-} // namespace N::R
+} // namespace Ivy::R

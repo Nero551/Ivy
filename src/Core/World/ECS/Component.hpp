@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::C
+namespace Ivy::C
 {
 struct Component
 {
@@ -13,4 +13,4 @@ struct Component
     Component(Component&&) noexcept = default;
     Component& operator=(Component&&) noexcept = default;
 };
-} // namespace N::C
+} // namespace Ivy::C

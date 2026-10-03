@@ -4,7 +4,7 @@
 #include "Core/World/ECS/Entity.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
-namespace N
+namespace Ivy
 {
 void Transform3DSystem::Update(double fdt)
 {
@@ -44,4 +44,4 @@ void Transform3DSystem::Update(double fdt)
             transform.GlobalScale = transform.Scale;
         });
 }
-} // namespace N
+} // namespace Ivy

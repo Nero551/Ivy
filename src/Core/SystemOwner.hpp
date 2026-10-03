@@ -3,7 +3,7 @@
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 /** @brief Restricts types to classes derived from System. */
 template <typename T>
@@ -50,4 +50,4 @@ struct SystemOwner
         return ref;
     }
 };
-} // namespace N::C
+} // namespace Ivy::C

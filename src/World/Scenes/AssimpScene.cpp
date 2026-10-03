@@ -9,7 +9,7 @@
 #include "Graphics/Texture/Texture2D.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 
-namespace N
+namespace Ivy
 {
 static Assimp::Importer importer;
 
@@ -142,4 +142,4 @@ AssimpScene::AssimpScene(const std::string& filepath)
 
     ProcessNode(scene->mRootNode, scene, directory, GetRoot());
 }
-} // namespace N
+} // namespace Ivy

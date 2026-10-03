@@ -2,10 +2,10 @@
 
 #include "Core/World/Scene.hpp"
 
-namespace N
+namespace Ivy
 {
 struct CoordinateAxesScene : C::Scene
 {
     CoordinateAxesScene();
 };
-} // namespace N
+} // namespace Ivy

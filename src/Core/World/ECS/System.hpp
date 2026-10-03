@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::C
+namespace Ivy::C
 {
 struct System
 {
@@ -20,4 +20,4 @@ struct System
 
     virtual void EndFrame(double dt) {}
 };
-} // namespace N::C
+} // namespace Ivy::C

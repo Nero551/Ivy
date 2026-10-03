@@ -6,7 +6,7 @@
 #include "Enums/MouseMode.hpp"
 #include "Math/Vector/Vector2.hpp"
 
-namespace N::I
+namespace Ivy::I
 {
 struct Input : C::Module
 {
@@ -62,4 +62,4 @@ struct Input : C::Module
 
     void EndFrame(double dt) override;
 };
-} // namespace N::I
+} // namespace Ivy::I

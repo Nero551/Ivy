@@ -1,6 +1,6 @@
 #include "Renderbuffer.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 Renderbuffer::~Renderbuffer()
 {
@@ -47,4 +47,4 @@ unsigned int Renderbuffer::GetId() const
 {
     return m_Id;
 }
-} // namespace N::G
+} // namespace Ivy::G

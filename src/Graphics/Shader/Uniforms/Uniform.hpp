@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::G
+namespace Ivy::G
 {
 struct Uniform
 {
@@ -11,4 +11,4 @@ struct Uniform
 
     virtual void Upload(int location) {};
 };
-} // namespace N::G
+} // namespace Ivy::G

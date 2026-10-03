@@ -1,7 +1,7 @@
 #include "Entity.hpp"
 #include "Core/Engine.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 unsigned int Entity::GetId() const
 {
@@ -254,4 +254,4 @@ void Entity::RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, con
         RecursiveChildren(entities, child);
     }
 }
-} // namespace N::C
+} // namespace Ivy::C

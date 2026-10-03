@@ -2,7 +2,7 @@
 #include "../BufferUsage.hpp"
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /** @brief OpenGL buffer for storing vertex and other array data. */
 struct ArrayBuffer
@@ -52,4 +52,4 @@ struct ArrayBuffer
   private:
     unsigned int m_Id = 0;
 };
-} // namespace N::G
+} // namespace Ivy::G

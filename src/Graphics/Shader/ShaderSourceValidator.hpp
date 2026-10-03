@@ -6,7 +6,7 @@
 #include "ShaderSource.hpp"
 #include "ShaderStage.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Result produced by shader source validation.
@@ -60,4 +60,4 @@ struct ShaderSourceValidator
      */
     static ShaderValidationResult Validate(const ShaderSource& source);
 };
-} // namespace N::G
+} // namespace Ivy::G

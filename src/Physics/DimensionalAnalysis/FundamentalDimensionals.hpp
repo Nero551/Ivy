@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::P
+namespace Ivy::P
 {
 
 /** @brief Converts an integer exponent to its Unicode superscript representation. */
@@ -77,4 +77,4 @@ template <int Exp> struct Mass : Dimensional<Mass, Exp>
     }
 };
 
-} // namespace N::P
+} // namespace Ivy::P

@@ -8,7 +8,7 @@
 
 #include "Utilities/Log.hpp"
 
-namespace N::U
+namespace Ivy::U
 {
 /**
  * @brief Represents a raster image.
@@ -128,4 +128,4 @@ struct Image
     /** Number and configuration of color channels per pixel. */
     ColorChannels Channels = ColorChannels::RGB;
 };
-} // namespace N::U
+} // namespace Ivy::U

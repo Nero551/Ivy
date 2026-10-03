@@ -6,7 +6,7 @@
 #include "../Coordinates/Polar.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief Represents a complex number in Cartesian form.
@@ -297,4 +297,4 @@ template <Scalar T = float> struct Complex
         return os;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

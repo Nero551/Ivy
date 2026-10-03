@@ -3,7 +3,7 @@
 #include "Core/Service.hpp"
 #include "Core/Services/EventBus/Event.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 /** @brief Concept constraining types that can be dispatched through the event system. */
 template <typename T>
@@ -107,4 +107,4 @@ struct EventBus : Service
   protected:
     void EndFrame() override;
 };
-} // namespace N::C
+} // namespace Ivy::C

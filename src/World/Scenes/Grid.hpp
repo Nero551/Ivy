@@ -4,7 +4,7 @@
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector3.hpp"
 
-namespace N
+namespace Ivy
 {
 struct Grid : C::Scene
 {
@@ -16,4 +16,4 @@ struct Grid : C::Scene
     void CreateXZ();
     void CreateYZ();
 };
-} // namespace N
+} // namespace Ivy

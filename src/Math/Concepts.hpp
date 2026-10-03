@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::M
+namespace Ivy::M
 {
 
 template <typename T>
@@ -36,4 +36,4 @@ using MultiplicationResult = decltype(std::declval<T>() * std::declval<O>());
 
 template <typename T, typename O> using DivisionResult = decltype(std::declval<T>() / std::declval<O>());
 
-} // namespace N::M
+} // namespace Ivy::M

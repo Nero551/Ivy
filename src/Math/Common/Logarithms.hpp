@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::M
+namespace Ivy::M
 {
 constexpr float Ln(const float x)
 {
@@ -11,4 +11,4 @@ constexpr float Log(const float base, const float x)
 {
     return Ln(x) / Ln(base);
 }
-} // namespace N::M
+} // namespace Ivy::M

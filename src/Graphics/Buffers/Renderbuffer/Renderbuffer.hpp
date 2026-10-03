@@ -3,7 +3,7 @@
 #include "../../Texture/TextureInternalFormat.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents an OpenGL renderbuffer resource.
@@ -84,4 +84,4 @@ struct Renderbuffer
     // OpenGL renderbuffer object ID. Zero indicates that no renderbuffer exists.
     unsigned int m_Id = 0;
 };
-} // namespace N::G
+} // namespace Ivy::G

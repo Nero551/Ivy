@@ -11,7 +11,7 @@
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
 
-namespace N
+namespace Ivy
 {
 static C::Entity& CreatePoint(M::Vector<4> col)
 {
@@ -168,7 +168,7 @@ void calculus::FourDimensionalProjection(const int increase)
         }
     }
 }
-} // namespace N
+} // namespace Ivy
 
 //
 // M::Vector3 Tween(M::Vector3 start, M::Vector3 end, float duration, double dt)

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::U
+namespace Ivy::U
 {
 /**
  * @brief Manages a pool of reusable integer indices.
@@ -86,4 +86,4 @@ template <std::unsigned_integral IndexType = unsigned int> struct IndexPool
     std::vector<IndexType> m_Free;
 };
 
-} // namespace N::U
+} // namespace Ivy::U

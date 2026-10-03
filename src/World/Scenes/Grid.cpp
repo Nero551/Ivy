@@ -11,7 +11,7 @@
 #include "Modules/Renderer/Primitives/Primitives.hpp"
 #include "World/Nodes/Node.hpp"
 
-namespace N
+namespace Ivy
 {
 Grid::Grid()
 {
@@ -114,4 +114,4 @@ void Grid::CreateYZ()
         }
     }
 }
-} // namespace N
+} // namespace Ivy

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Defines how source and destination colors are factored during blending.
@@ -64,4 +64,4 @@ enum class BlendFactor
     /** Uses one minus the alpha component of the second source color as the factor. */
     OneMinusSource1Alpha = GL_ONE_MINUS_SRC1_ALPHA
 };
-} // namespace N::G
+} // namespace Ivy::G

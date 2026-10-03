@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace N::Reflection
+namespace Ivy::Reflection
 {
 
 //TODO- understanding macros is the key to making reflection.
@@ -115,6 +115,6 @@ template <typename T> AttributeInfo RegisterAttribute(const std::string_view nam
 }
 
 #define REGISTER_ATTRIBUTE(Struct, Member)                                                                   \
-    N::Reflection::RegisterAttribute<decltype(Struct::Member)>(#Member, offsetof(Struct, Member))
+    Ivy::Reflection::RegisterAttribute<decltype(Struct::Member)>(#Member, offsetof(Struct, Member))
 
-} // namespace N::Reflection
+} // namespace Ivy::Reflection

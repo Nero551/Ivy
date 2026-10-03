@@ -1,5 +1,5 @@
 #pragma once
-namespace N::M
+namespace Ivy::M
 {
 inline static std::mt19937 rng(std::random_device{}());
 
@@ -31,4 +31,4 @@ inline unsigned long RandomRaw()
 {
     return rng();
 }
-} // namespace N::M
+} // namespace Ivy::M

@@ -2,7 +2,7 @@
 
 #include "Utilities/Log.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 void Cubemap::Generate()
 {
@@ -54,4 +54,4 @@ void Cubemap::SetParameters() const
     glTextureParameteri(m_Id, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(MagFilter));
     glTextureParameteri(m_Id, GL_TEXTURE_WRAP_R, static_cast<GLint>(WrapR));
 }
-} // namespace N::G
+} // namespace Ivy::G

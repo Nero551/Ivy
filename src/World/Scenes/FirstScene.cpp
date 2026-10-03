@@ -4,10 +4,10 @@
 
 #include "Graphics/Shader/Uniforms/Vector3Uniform.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
-namespace N
+namespace Ivy
 {
 FirstScene::FirstScene()
 {
     SetRoot(C::World::Get().CreateEntity<Node3D>());
 }
-} // namespace N
+} // namespace Ivy

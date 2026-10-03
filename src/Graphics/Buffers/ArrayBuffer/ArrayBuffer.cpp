@@ -1,6 +1,6 @@
 #include "ArrayBuffer.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 
 ArrayBuffer& ArrayBuffer::operator=(ArrayBuffer&& Other) noexcept
@@ -53,4 +53,4 @@ unsigned int ArrayBuffer::GetId() const
 {
     return m_Id;
 }
-} // namespace N::G
+} // namespace Ivy::G

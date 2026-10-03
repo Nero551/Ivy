@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Comparison function used by the stencil test.
@@ -36,4 +36,4 @@ enum class StencilFunction
     /** Always passes the stencil test. */
     Always = GL_ALWAYS
 };
-} // namespace N::G
+} // namespace Ivy::G

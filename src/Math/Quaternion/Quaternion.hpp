@@ -7,7 +7,7 @@
 #include "../Matrix/Matrix4.hpp"
 #include "../Vector/Vector3.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief Represents a quaternion number.
@@ -533,4 +533,4 @@ template <Scalar T = float> struct Quaternion
         return Quaternion{1, 0, 0, 0};
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

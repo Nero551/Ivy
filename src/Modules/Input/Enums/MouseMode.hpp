@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::I
+namespace Ivy::I
 {
 /** @brief Specifies how the mouse cursor is handled by the window. */
 enum class MouseMode
@@ -17,4 +17,4 @@ enum class MouseMode
     /** @brief The cursor is visible and confined to the window. */
     Captured = GLFW_CURSOR_CAPTURED
 };
-} // namespace N::I
+} // namespace Ivy::I

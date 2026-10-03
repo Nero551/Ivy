@@ -6,7 +6,7 @@
 
 #include "Utilities/Log.hpp"
 
-namespace N::U::FileSystem
+namespace Ivy::U::FileSystem
 {
 /** @brief Reads and returns the contents of a file. */
 inline std::string ReadFile(const std::string& path)
@@ -38,4 +38,4 @@ inline void WriteFile(const std::string& path, const std::string& content)
 
     file << content;
 }
-} // namespace N::U::FileSystem
+} // namespace Ivy::U::FileSystem

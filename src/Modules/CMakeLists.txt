@@ -1,5 +1,5 @@
 file(GLOB_RECURSE MODULES_SOURCES CONFIGURE_DEPENDS *.cpp)
 
-target_sources(Nova PRIVATE
-    ${MODULES_SOURCES}
+target_sources(Ivy PRIVATE
+        ${MODULES_SOURCES}
 )

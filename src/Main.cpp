@@ -1,4 +1,4 @@
-#include "Nova.hpp"
+#include "Ivy.hpp"
 #include "sketch.hpp"
 
 int main(const int argc, char* argv[])
@@ -15,10 +15,10 @@ int main(const int argc, char* argv[])
         //? ex: "Nova --renderer vulkan"
     }
 
-    // Sketch::Test();
-    // return 0;
+    Sketch::Test();
+    return 0;
 
-    N::C::Engine engine;
+    Ivy::C::Engine engine;
     engine.Run();
     return 0;
 }

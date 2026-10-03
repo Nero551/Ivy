@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 constexpr float Rad(const float deg)
 {
@@ -47,4 +47,4 @@ constexpr float Atan2D(const float y, const float x)
 {
     return Deg(std::atan2(y, x));
 }
-} // namespace N::M
+} // namespace Ivy::M

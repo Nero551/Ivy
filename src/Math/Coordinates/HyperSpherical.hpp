@@ -2,7 +2,7 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief Represents a vector using hyperspherical coordinates.
@@ -45,4 +45,4 @@ template <Scalar T> struct HyperSpherical
         return os;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

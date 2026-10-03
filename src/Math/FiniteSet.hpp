@@ -1,5 +1,5 @@
 #pragma once
-namespace N::M
+namespace Ivy::M
 {
 template <typename T> struct FiniteSet
 {
@@ -112,4 +112,4 @@ template <typename T> struct FiniteSet
     std::unordered_set<T> m_Elements{};
 };
 
-} // namespace N::M
+} // namespace Ivy::M

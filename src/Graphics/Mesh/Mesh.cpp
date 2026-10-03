@@ -2,7 +2,7 @@
 
 #include <OpenGL.hpp>
 
-namespace N::G
+namespace Ivy::G
 {
 
 Mesh::~Mesh() {}
@@ -117,4 +117,4 @@ void Mesh::ApplyCulling() const
         glCullFace(static_cast<GLenum>(CullMode));
     }
 }
-} // namespace N::G
+} // namespace Ivy::G

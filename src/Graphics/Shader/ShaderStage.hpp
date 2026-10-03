@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Type of shader stage used in a graphics pipeline.
@@ -18,4 +18,4 @@ enum class ShaderStage
      * modified or generated. */
     Geometry = GL_GEOMETRY_SHADER,
 };
-} // namespace N::G
+} // namespace Ivy::G

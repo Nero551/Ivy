@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Vector/Vector3.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief Represents a quaternion in polar form.
@@ -32,4 +32,4 @@ template <Scalar T> struct QPolar
         return os;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

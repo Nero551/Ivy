@@ -2,10 +2,10 @@
 
 #include "Core/World/Scene.hpp"
 
-namespace N
+namespace Ivy
 {
 struct AssimpScene : C::Scene
 {
     AssimpScene(const std::string& filepath);
 };
-} // namespace N
+} // namespace Ivy

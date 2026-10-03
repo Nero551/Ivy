@@ -5,7 +5,7 @@
 #include "Uniforms/Uniform.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents an OpenGL shader program.
@@ -104,4 +104,4 @@ struct Shader
 
     void UploadUniforms();
 };
-} // namespace N::G
+} // namespace Ivy::G

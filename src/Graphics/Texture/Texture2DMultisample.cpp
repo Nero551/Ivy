@@ -1,6 +1,6 @@
 #include "Texture2DMultisample.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 void Texture2DMultisample::Generate()
 {
@@ -13,4 +13,4 @@ void Texture2DMultisample::Generate()
     glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_Id);
     glTextureStorage2DMultisample(m_Id, Samples, static_cast<GLint>(InternalFormat), Width, Height, GL_TRUE);
 }
-} // namespace N::G
+} // namespace Ivy::G

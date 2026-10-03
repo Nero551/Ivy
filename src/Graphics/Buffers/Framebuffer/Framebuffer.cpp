@@ -2,7 +2,7 @@
 
 #include "../../Enums/BufferBit.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 Framebuffer::~Framebuffer()
 {
@@ -118,4 +118,4 @@ const std::string& Framebuffer::GetName() const
 {
     return m_Name;
 }
-} // namespace N::G
+} // namespace Ivy::G

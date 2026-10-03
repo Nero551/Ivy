@@ -8,7 +8,7 @@
 #include "Vector.hpp"
 #include "Vector3.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief 4D Ting-point vector.
@@ -321,4 +321,4 @@ template <Scalar T> struct Vector<4, T>
         return os;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

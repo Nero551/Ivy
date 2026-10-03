@@ -12,7 +12,7 @@
 #include "Modules/Renderer/Primitives/Primitives.hpp"
 #include "World/Nodes/Node3D.hpp"
 
-namespace N
+namespace Ivy
 {
 CoordinateAxesScene::CoordinateAxesScene()
 {
@@ -89,4 +89,4 @@ CoordinateAxesScene::CoordinateAxesScene()
     Grid grid;
     GetRoot().AttachChild(grid.GetRoot());
 }
-} // namespace N
+} // namespace Ivy

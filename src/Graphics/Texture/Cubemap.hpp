@@ -8,7 +8,7 @@
 #include "TextureWrap.hpp"
 #include "Utilities/Image.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Represents an OpenGL cubemap texture resource.
@@ -82,4 +82,4 @@ struct Cubemap : Texture
     /** @brief Configures the cubemap's wrapping and filtering parameters. */
     void SetParameters() const;
 };
-} // namespace N::G
+} // namespace Ivy::G

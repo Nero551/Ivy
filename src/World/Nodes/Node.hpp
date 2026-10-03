@@ -1,13 +1,13 @@
 #pragma once
 #include "Core/World/ECS/Entity.hpp"
 
-namespace N
+namespace Ivy
 {
 struct Node : C::Entity
 {
     void Initialize() override
     {
-        C::Entity::Initialize();
+        Entity::Initialize();
     }
 };
-} // namespace N
+} // namespace Ivy

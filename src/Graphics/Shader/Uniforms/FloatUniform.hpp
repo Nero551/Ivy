@@ -2,7 +2,7 @@
 #include "Core/Engine.hpp"
 #include "Uniform.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 struct FloatUniform : Uniform
 {
@@ -15,4 +15,4 @@ struct FloatUniform : Uniform
         glUniform1f(location, Value);
     }
 };
-} // namespace N::G
+} // namespace Ivy::G

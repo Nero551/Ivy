@@ -2,7 +2,7 @@
 
 #include "BasicMatrix.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 template <unsigned int Row, unsigned int Column, Scalar T = float>
 struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column, T>, T>
@@ -119,4 +119,4 @@ struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column, T>, T>
         return cofactorMatrix.Transpose() / determinant;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

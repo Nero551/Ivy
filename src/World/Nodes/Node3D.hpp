@@ -3,7 +3,7 @@
 #include "Node.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
-namespace N
+namespace Ivy
 {
 struct Node3D : Node
 {
@@ -13,4 +13,4 @@ struct Node3D : Node
         C::World::Get().Query.Pool<Transform3DComponent>().Add(GetId());
     }
 };
-} // namespace N
+} // namespace Ivy

@@ -4,7 +4,7 @@
 #include "TextureInternalFormat.hpp"
 #include "TextureTarget.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Base class for OpenGL texture resources.
@@ -103,4 +103,4 @@ struct Texture
     /** OpenGL texture target associated with this texture type. */
     TextureTarget m_Target;
 };
-} // namespace N::G
+} // namespace Ivy::G

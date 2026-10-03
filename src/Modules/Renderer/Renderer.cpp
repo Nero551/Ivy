@@ -16,7 +16,7 @@
 #include "Systems/LightingSystem.hpp"
 #include <tracy/Tracy.hpp>
 
-namespace N::R
+namespace Ivy::R
 {
 void Renderer::SetupFramebuffer()
 {
@@ -263,4 +263,4 @@ void Renderer::Stop()
     U::Image image = {texture->Width, texture->Height, U::Image::ColorChannels::RGB, pixels};
     image.SaveToDiskPNG("Assets/LastFrame.png", true);
 }
-} // namespace N::R
+} // namespace Ivy::R

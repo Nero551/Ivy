@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::M
+namespace Ivy::M
 {
 constexpr float Clamp(const float value, const float min, const float max)
 {
@@ -8,4 +8,4 @@ constexpr float Clamp(const float value, const float min, const float max)
 }
 /** @brief Smooth maximum */
 float SMax(float a, float b, float bias);
-} // namespace N::M
+} // namespace Ivy::M

@@ -2,17 +2,21 @@
 
 #include "Core/World/World.hpp"
 
-N::C::Entity& N::C::Scene::GetRoot() const
+namespace Ivy::C
 {
-    return N::C::World::Get().FindEntity(m_Root);
+Entity& Scene::GetRoot() const
+{
+    return World::Get().FindEntity(m_Root);
 }
 
-void N::C::Scene::SetRoot(const N::C::Entity& entity)
+void Scene::SetRoot(const Entity& entity)
 {
     m_Root = entity.GetId();
 }
 
-void N::C::Scene::SetRoot(const unsigned int entityId)
+void Scene::SetRoot(const unsigned int entityId)
 {
     m_Root = entityId;
 }
+
+} // namespace Ivy::C

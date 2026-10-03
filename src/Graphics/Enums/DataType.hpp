@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Specifies the data type of texture pixel components.
@@ -50,4 +50,4 @@ enum class DataType
     /** Packed unsigned 32-bit depth/stencil data. */
     Float32UnsignedInt248Rev = GL_FLOAT_32_UNSIGNED_INT_24_8_REV
 };
-} // namespace N::G
+} // namespace Ivy::G

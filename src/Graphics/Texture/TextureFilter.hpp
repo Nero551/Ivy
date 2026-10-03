@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Defines how texture samples are filtered when being minified or magnified.
@@ -27,4 +27,4 @@ enum class TextureFilter
      */
     LinearMipmapLinear = GL_LINEAR_MIPMAP_LINEAR
 };
-} // namespace N::G
+} // namespace Ivy::G

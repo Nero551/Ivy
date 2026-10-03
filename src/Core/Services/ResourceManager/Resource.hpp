@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/DataStructures/GIndexPool.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 
 template <typename T, typename... Args>
@@ -78,4 +78,4 @@ template <typename T> struct Resource : IResource
     }
 };
 
-} // namespace N::C
+} // namespace Ivy::C

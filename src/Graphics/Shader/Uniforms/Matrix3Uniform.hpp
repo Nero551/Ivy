@@ -3,7 +3,7 @@
 #include "OpenGL.hpp"
 #include "Uniform.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 struct Matrix3Uniform : Uniform
 {
@@ -16,4 +16,4 @@ struct Matrix3Uniform : Uniform
         glUniformMatrix3fv(location, 1, GL_FALSE, &Value.Data()[0][0]);
     }
 };
-} // namespace N::G
+} // namespace Ivy::G

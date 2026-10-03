@@ -5,7 +5,7 @@
 #include "Math/Matrix/Matrix4.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 struct CameraComponent : C::Component
 {
@@ -30,4 +30,4 @@ struct CameraComponent : C::Component
         return M::Matrix<4, 4>::Perspective(M::Rad(FOV), AspectRatio, Near, Far);
     }
 };
-} // namespace N::R
+} // namespace Ivy::R

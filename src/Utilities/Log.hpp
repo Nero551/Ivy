@@ -1,6 +1,6 @@
 #pragma once
 
-namespace N::U
+namespace Ivy::U
 {
 template <typename T> std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
 {
@@ -95,4 +95,4 @@ struct Log
     /** @brief Sets the console text color to blue. */
     static constexpr auto m_Blue = "\033[34m";
 }; // namespace Log
-} // namespace N::U
+} // namespace Ivy::U

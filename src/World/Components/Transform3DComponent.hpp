@@ -5,13 +5,13 @@
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Utilities/Track.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 struct CameraSystem;
 struct Renderer;
-} // namespace N::R
+} // namespace Ivy::R
 
-namespace N
+namespace Ivy
 {
 
 struct Transform3DComponent : C::Component
@@ -61,4 +61,4 @@ struct Transform3DComponent : C::Component
     friend struct R::Renderer;
     friend struct R::CameraSystem;
 };
-} // namespace N
+} // namespace Ivy

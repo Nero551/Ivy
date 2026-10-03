@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Vector/Vector.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> struct BasicMatrix
 {
@@ -22,7 +22,7 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     /** @brief Constructs a matrix from individual elements in row-major order. */
     template <typename... Numbers>
     requires(sizeof...(Numbers) == Size && (std::convertible_to<Numbers, T> && ...))
-    constexpr BasicMatrix(Numbers... numbers) : m_Data{}
+    constexpr BasicMatrix(Numbers... numbers)
     {
         const T values[] = {static_cast<T>(numbers)...};
 
@@ -276,4 +276,4 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     std::array<std::array<T, Row>, Column> m_Data{};
 };
 
-} // namespace N::M
+} // namespace Ivy::M

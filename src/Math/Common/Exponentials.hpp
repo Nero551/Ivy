@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/Log.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 constexpr float Pow(const float x, const float power)
 {
@@ -34,4 +34,4 @@ constexpr float Factorial(const int x)
 
     return result;
 }
-} // namespace N::M
+} // namespace Ivy::M

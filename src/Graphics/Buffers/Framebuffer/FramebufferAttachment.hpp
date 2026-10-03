@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /**
  * @brief Specifies an attachment point of a framebuffer.
@@ -71,4 +71,4 @@ enum class FramebufferAttachment
     /** Combined depth and stencil attachment. */
     DepthStencil = GL_DEPTH_STENCIL_ATTACHMENT
 };
-} // namespace N::G
+} // namespace Ivy::G

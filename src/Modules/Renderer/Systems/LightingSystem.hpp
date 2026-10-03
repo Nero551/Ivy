@@ -3,7 +3,7 @@
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 struct LightingSystem : C::System
 {
@@ -12,4 +12,4 @@ struct LightingSystem : C::System
     void Start() override;
     void Render() override;
 };
-} // namespace N::R
+} // namespace Ivy::R

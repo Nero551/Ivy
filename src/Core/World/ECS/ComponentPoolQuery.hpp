@@ -5,7 +5,7 @@
 #include "Core/World/World.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 
 /**
@@ -143,4 +143,4 @@ struct ComponentPoolQuery
     U::TypedVector<QueryCache> m_CachedQueries{};
 };
 
-} // namespace N::C
+} // namespace Ivy::C

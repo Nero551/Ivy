@@ -1,7 +1,7 @@
 #include "../Primitives.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 
-namespace N::R
+namespace Ivy::R
 {
 C::Resource<G::Mesh>& Primitives::CreateQuad(const std::string& name)
 {
@@ -25,4 +25,4 @@ C::Resource<G::Mesh>& Primitives::CreateQuad(const std::string& name)
 
     return mesh;
 }
-} // namespace N::R
+} // namespace Ivy::R

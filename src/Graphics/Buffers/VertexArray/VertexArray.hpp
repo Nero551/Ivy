@@ -3,7 +3,7 @@
 #include "../../Enums/DataType.hpp"
 #include "../IndexBuffer/IndexBuffer.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /** @brief OpenGL vertex array object that stores vertex buffer and attribute
  * configuration. */
@@ -93,4 +93,4 @@ struct VertexArray
   private:
     unsigned int m_Id = 0;
 };
-} // namespace N::G
+} // namespace Ivy::G

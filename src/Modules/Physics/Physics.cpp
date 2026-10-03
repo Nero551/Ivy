@@ -12,7 +12,7 @@
 #include "Modules/Renderer/Primitives/Primitives.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
-namespace N
+namespace Ivy
 {
 static C::Entity& CreatePoint(M::Vector<4> col)
 {
@@ -118,4 +118,4 @@ void Physics::FixedUpdate(const double fdt)
     // transform.Position += body.Velocity * fdt;
     // transform.Position.y = std::max(transform.Position.y, 0.0f);
 }
-} // namespace N
+} // namespace Ivy

@@ -1,7 +1,7 @@
 #pragma once
 #include "OpenGL.hpp"
 
-namespace N::G
+namespace Ivy::G
 {
 /** @brief Specifies how a buffer's data will be used. */
 enum class BufferUsage : GLenum
@@ -33,4 +33,4 @@ enum class BufferUsage : GLenum
      * copying. */
     DynamicCopy = GL_DYNAMIC_COPY
 };
-} // namespace N::G
+} // namespace Ivy::G

@@ -1,5 +1,4 @@
 #pragma once
-using namespace N;
 
 using Bit = bool;
 

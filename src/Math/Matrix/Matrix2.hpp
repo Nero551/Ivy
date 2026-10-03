@@ -4,7 +4,7 @@
 #include "Math/Matrix/Matrix.hpp"
 #include "Math/Vector/Vector2.hpp"
 
-namespace N::M
+namespace Ivy::M
 {
 /**
  * @brief 2x2 floating matrix.
@@ -91,4 +91,4 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix<2, 2, T>, 
         return *this = *this * matrix;
     }
 };
-} // namespace N::M
+} // namespace Ivy::M

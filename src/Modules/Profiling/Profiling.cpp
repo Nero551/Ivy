@@ -2,7 +2,7 @@
 
 #include "Core/Engine.hpp"
 
-namespace N
+namespace Ivy
 {
 void Profiling::Start() {}
 
@@ -37,11 +37,11 @@ void Profiling::Update(const double dt)
         C::Engine::Get().Window.SetTitle("FPS: " + std::to_string(FrameCount) + " | " +
             "AVG: " + std::to_string(averageFrameMs) + " ms" + " | " + std::to_string(FrameMs) + " ms");
 
-        // N::U::Logger::Info(
+        // Ivy::U::Logger::Info(
         //     "FPS: " + std::to_string(FrameCount) + " | " + "AVG: " +
         //     std::to_string(averageFrameMs) + " ms" + " | " +
         //     std::to_string(FrameMs) + " ms");
         FrameCount = 0;
     }
 }
-} // namespace N
+} // namespace Ivy

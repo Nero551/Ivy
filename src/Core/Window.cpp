@@ -3,7 +3,7 @@
 #include "Engine.hpp"
 #include "Utilities/Log.hpp"
 
-namespace N::C
+namespace Ivy::C
 {
 Window::~Window()
 {
@@ -137,4 +137,4 @@ void Window::SetHints()
     glfwWindowHint(GLFW_STENCIL_BITS, 8);
     glfwWindowHint(GLFW_SAMPLES, 4);
 }
-} // namespace N::C
+} // namespace Ivy::C
