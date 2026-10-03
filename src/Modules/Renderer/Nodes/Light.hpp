@@ -1,14 +1,14 @@
 #pragma once
-#include "../../../World/Novas/Nova3D.hpp"
 #include "../Components/LightComponent.hpp"
+#include "World/Nodes/Node3D.hpp"
 
 namespace N::R
 {
-struct Light : Nova3D
+struct Light : Node3D
 {
     void Initialize() override
     {
-        Nova3D::Initialize();
+        Node3D::Initialize();
         C::World::Get().Query.Pool<R::LightComponent>().Add(GetId());
     }
 };

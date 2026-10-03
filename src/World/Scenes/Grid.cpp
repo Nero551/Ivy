@@ -7,15 +7,15 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
-#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
+#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
-#include "World/Novas/Nova.hpp"
+#include "World/Nodes/Node.hpp"
 
 namespace N
 {
 Grid::Grid()
 {
-    SetRoot(C::World::Get().CreateEntity<Nova>());
+    SetRoot(C::World::Get().CreateEntity<Node>());
 
     CreateXY();
     // CreateXZ();

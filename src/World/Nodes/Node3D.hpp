@@ -1,15 +1,15 @@
 #pragma once
 #include "Core/World/World.hpp"
-#include "Nova.hpp"
+#include "Node.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
 namespace N
 {
-struct Nova3D : Nova
+struct Node3D : Node
 {
     void Initialize() override
     {
-        Nova::Initialize();
+        Node::Initialize();
         C::World::Get().Query.Pool<Transform3DComponent>().Add(GetId());
     }
 };

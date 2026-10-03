@@ -8,7 +8,7 @@
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components/MaterialComponent.hpp"
 #include "Modules/Renderer/Components/MeshComponent.hpp"
-#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
+#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 

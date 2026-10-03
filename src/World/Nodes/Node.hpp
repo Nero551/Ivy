@@ -3,7 +3,7 @@
 
 namespace N
 {
-struct Nova : C::Entity
+struct Node : C::Entity
 {
     void Initialize() override
     {

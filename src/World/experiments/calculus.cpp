@@ -8,7 +8,7 @@
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector4.hpp"
 #include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
+#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
 
 namespace N

@@ -1,14 +1,14 @@
 #pragma once
-#include "../../../World/Novas/Nova3D.hpp"
 #include "../Components/CameraComponent.hpp"
+#include "World/Nodes/Node3D.hpp"
 
 namespace N::R
 {
-struct Camera : Nova3D
+struct Camera : Node3D
 {
     void Initialize() override
     {
-        Nova3D::Initialize();
+        Node3D::Initialize();
         C::World::Get().Query.Pool<R::CameraComponent>().Add(GetId());
     }
 };

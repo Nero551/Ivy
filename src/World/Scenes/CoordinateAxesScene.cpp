@@ -6,11 +6,11 @@
 #include "Math/Color/Color.hpp"
 #include "Modules/Renderer/Components/MaterialComponent.hpp"
 #include "Modules/Renderer/Components/MeshComponent.hpp"
-#include "Modules/Renderer/Novas/Camera.hpp"
-#include "Modules/Renderer/Novas/Light.hpp"
-#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
+#include "Modules/Renderer/Nodes/Camera.hpp"
+#include "Modules/Renderer/Nodes/Light.hpp"
+#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
-#include "World/Novas/Nova3D.hpp"
+#include "World/Nodes/Node3D.hpp"
 
 namespace N
 {
@@ -20,7 +20,7 @@ CoordinateAxesScene::CoordinateAxesScene()
     auto& query = world.Query;
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
 
-    SetRoot(world.CreateEntity<Nova>());
+    SetRoot(world.CreateEntity<Node>());
 
     auto& lightShader = resourceManager.Load<G::Shader>("lightShader");
     lightShader().AssignSource(resourceManager.Load<G::ShaderSource>(

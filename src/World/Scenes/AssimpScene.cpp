@@ -7,7 +7,7 @@
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Graphics/Texture/Texture2D.hpp"
-#include "Modules/Renderer/Novas/MeshInstance3D.hpp"
+#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 
 namespace N
 {
@@ -92,7 +92,7 @@ static void ProcessNode(
     auto& query = world.Query;
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
 
-    auto& entity = world.CreateEntity<Nova3D>();
+    auto& entity = world.CreateEntity<Node3D>();
 
     auto& meshPool = query.Pool<R::MeshComponent>();
     auto& materialPool = query.Pool<R::MaterialComponent>();
@@ -127,7 +127,7 @@ static void ProcessNode(
 
 AssimpScene::AssimpScene(const std::string& filepath)
 {
-    SetRoot(C::World::Get().CreateEntity<Nova3D>());
+    SetRoot(C::World::Get().CreateEntity<Node3D>());
 
     const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs);
 

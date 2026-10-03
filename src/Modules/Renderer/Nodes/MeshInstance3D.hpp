@@ -1,15 +1,15 @@
 #pragma once
 #include "../Components/MaterialComponent.hpp"
 #include "../Components/MeshComponent.hpp"
-#include "World/Novas/Nova3D.hpp"
+#include "World/Nodes/Node3D.hpp"
 
 namespace N::R
 {
-struct MeshInstance3D : Nova3D
+struct MeshInstance3D : Node3D
 {
     void Initialize() override
     {
-        Nova3D::Initialize();
+        Node3D::Initialize();
         C::World::Get().Query.Pool<R::MaterialComponent>().Add(GetId());
         C::World::Get().Query.Pool<R::MeshComponent>().Add(GetId());
     }
