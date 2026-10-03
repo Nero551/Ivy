@@ -22,7 +22,6 @@ struct Transform3DComponent : C::Component
 
     bool InheritTransform = true;
 
-  public:
     M::Matrix<4, 4> GetModelMatrix()
     {
         M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();

@@ -7,11 +7,6 @@
 
 namespace N::G
 {
-template <typename T>
-
-/** @brief Concept for structs inheriting Uniform, used for OpenGL shader uniforms */
-concept UniformType = std::derived_from<T, Uniform>;
-
 /**
  * @brief Represents an OpenGL shader program.
  * manages the lifetime and use of an OpenGL shader program,
@@ -56,7 +51,7 @@ struct Shader : C::Resource
      *
      * @note The uniform is uploaded the next time the shader is used.
      */
-    template <UniformType T> void SetUniform(const T& uniform)
+    template <typename T> void SetUniform(const T& uniform) requires(std::derived_from<T, Uniform>)
     {
         auto it = m_PendingUniforms.find(uniform.Name);
 

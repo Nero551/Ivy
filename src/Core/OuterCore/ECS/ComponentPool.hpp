@@ -124,10 +124,11 @@ template <ComponentType T> struct ComponentPool : IComponentPool
         return m_Components.At(entityId);
     }
 
-    T& GetComponentByIdUnchecked(const unsigned int entityId)
+    T& operator[](const unsigned int entityId)
     {
         return m_Components[entityId];
     }
+
     void Reserve(size_t count)
     {
         m_Components.Reserve(count);

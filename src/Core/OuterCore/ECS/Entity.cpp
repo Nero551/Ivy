@@ -103,13 +103,6 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetChildren()
 
     return children;
 }
-void Entity::ForEachChild(const std::function<void(unsigned int)>& callback)
-{
-    for (auto id : m_Children)
-    {
-        callback(id);
-    }
-}
 
 void Entity::DestroyChildren()
 {
@@ -126,16 +119,6 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetDescendants()
     RecursiveChildren(descendants, *this);
 
     return descendants;
-}
-
-void Entity::ForEachDescendant(const std::function<void(unsigned int)>& callback)
-{
-    ForEachChild(
-        [&](const unsigned int childId)
-        {
-            callback(childId);
-            World::Get().FindEntity(childId).ForEachDescendant(callback);
-        });
 }
 
 bool Entity::HasDescendant(const unsigned int id) const
@@ -223,7 +206,7 @@ U::CheckedPtr<Entity> Entity::TryGetParent() const
 
 Entity& Entity::GetParent() const
 {
-    return World::Get().FindEntity(m_Parent);
+    return World::Get().GetEntity(m_Parent);
 }
 
 void Entity::SetParent(Entity& parent)
@@ -235,7 +218,7 @@ void Entity::ClearParent()
 {
     if (HasParent())
     {
-        World::Get().FindEntity(m_Parent).DetachChild(m_Id);
+        World::Get().GetEntity(m_Parent).DetachChild(m_Id);
     }
 }
 

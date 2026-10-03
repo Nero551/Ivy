@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <unordered_set>
-
 #include "Core/OuterCore/Resource.hpp"
 #include "ShaderStage.hpp"
 

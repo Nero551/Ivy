@@ -57,8 +57,8 @@ target_link_libraries(Nova
 )
 
 target_compile_options(Nova PRIVATE
-        -Wall
-        -Wextra
-        -Wpedantic
-        -g -fno-omit-frame-pointer -rdynamic
+        #        -Wall
+        #        -Wextra
+        #        -Wpedantic
+        #        -g -fno-omit-frame-pointer -rdynamic
 )

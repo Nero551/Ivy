@@ -50,7 +50,14 @@ struct Entity
     std::vector<U::CheckedPtr<Entity>> GetChildren();
 
     /** @brief Calls a callback for every direct child ID. */
-    void ForEachChild(const std::function<void(unsigned int)>& callback);
+    template <typename F> requires std::invocable<F&, unsigned int>
+    void ForEachChild(F&& callback)
+    {
+        for (const auto id : m_Children)
+        {
+            callback(id);
+        }
+    }
 
     /** @brief Destroys all direct children. */
     void DestroyChildren();
@@ -59,7 +66,16 @@ struct Entity
     std::vector<U::CheckedPtr<Entity>> GetDescendants();
 
     /** @brief Calls a callback for every descendant ID. */
-    void ForEachDescendant(const std::function<void(unsigned int)>& callback);
+    template <typename F> requires std::invocable<F&, unsigned int>
+    void ForEachDescendant(F&& callback)
+    {
+        ForEachChild(
+            [&](const unsigned int childId)
+            {
+                callback(childId);
+                GetChild(childId).ForEachDescendant(callback);
+            });
+    }
 
     /** @brief Returns whether the specified entity is a descendant. */
     bool HasDescendant(unsigned int id) const;

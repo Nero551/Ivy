@@ -45,6 +45,11 @@ void World::ReserveEntities(const size_t count)
     m_Entities.ReserveSparse(count);
 }
 
+Entity& World::GetEntity(const unsigned int id)
+{
+    return m_Entities[id];
+}
+
 Entity& World::FindEntity(const unsigned int id)
 {
     if (!m_Entities.Contains(id))

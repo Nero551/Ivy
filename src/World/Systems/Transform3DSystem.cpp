@@ -15,14 +15,14 @@ void Transform3DSystem::Update(double fdt)
     world.GetRoot().ForEachDescendant(
         [&](const unsigned int entityId)
         {
-            auto& entity = world.FindEntity(entityId);
+            auto& entity = world.GetEntity(entityId);
 
             if (!transformPool.HasId(entityId))
             {
                 return;
             }
 
-            auto& transform = transformPool.GetComponentById(entityId);
+            auto& transform = transformPool[entityId];
 
             if (transform.InheritTransform)
             {
@@ -30,7 +30,7 @@ void Transform3DSystem::Update(double fdt)
 
                 if (transformPool.HasId(parent.GetId()))
                 {
-                    auto& parentTransform = transformPool.GetComponentById(parent.GetId());
+                    auto& parentTransform = transformPool[parent.GetId()];
 
                     transform.GlobalPosition = parentTransform.GlobalPosition + transform.Position;
                     transform.GlobalRotation = parentTransform.GlobalRotation * transform.Rotation;

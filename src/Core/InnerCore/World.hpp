@@ -62,6 +62,7 @@ struct World : SystemOwner
     void RemoveEntity(unsigned int id);
 
     void ReserveEntities(size_t count);
+    Entity& GetEntity(unsigned int id);
 
     /**
      * @brief Creates and registers an entity in the world.
