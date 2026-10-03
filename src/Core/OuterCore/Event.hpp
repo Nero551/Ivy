@@ -13,6 +13,7 @@ struct IEvent
  * after Fire(). */
 template <typename T> struct Event : IEvent
 {
+    Event() {}
     ~Event() override = default;
 
     /** @brief Dispatches the event to all registered listeners. */

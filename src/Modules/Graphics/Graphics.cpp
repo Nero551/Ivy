@@ -228,9 +228,9 @@ void Graphics::OnEntityDestroyed(const C::EntityDestroyed& event)
 {
     for (auto& batch : Batches)
     {
-        if (batch.Instances.Contains(event.entity.GetId()))
+        if (batch.Instances.Contains(event.EntityId))
         {
-            batch.Instances.Erase(event.entity.GetId());
+            batch.Instances.Erase(event.EntityId);
         }
     }
 }

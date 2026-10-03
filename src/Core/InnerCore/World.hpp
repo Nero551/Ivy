@@ -82,7 +82,7 @@ struct World : SystemOwner
         entity.Initialize();
 
         auto it = m_Entities.Emplace(id, std::move(entity));
-        Service::Get<EventBus>().Fire<EntityCreated>(*it);
+        Service::Get<EventBus>().Fire<EntityCreated>(id);
 
         return *it;
     }

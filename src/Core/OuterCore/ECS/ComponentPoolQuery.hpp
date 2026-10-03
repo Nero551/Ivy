@@ -2,26 +2,41 @@
 
 #include "ComponentPool.hpp"
 #include "Core/Events/EntityCreated.hpp"
+#include "Core/InnerCore/World.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 
 namespace N::C
 {
+
 /**
  * @brief Provides cached queries over component pools.
  *
- * Queries match entities containing all requested component types and invoke
- * a callback with references to their components. Matching entity IDs are
- * cached and reused until the query structure changes.
+ * Queries match entities containing all requested component types. Matching
+ * entity IDs are cached and reused until the query structure changes.
  */
 struct ComponentPoolQuery
 {
-
     ComponentPoolQuery()
     {
         Service::Get<EventBus>().Sub<EntityDestroyed>([this](const EntityDestroyed&) { ++m_QueryVersion; });
         Service::Get<EventBus>().Sub<EntityCreated>([this](const EntityCreated&) { ++m_QueryVersion; });
-        Service::Get<EventBus>().Sub<ComponentAdded>([this](const ComponentAdded&) { ++m_QueryVersion; });
-        Service::Get<EventBus>().Sub<ComponentRemoved>([this](const ComponentRemoved&) { ++m_QueryVersion; });
+    }
+
+    /**
+     * @brief Creates and registers a component pool.
+     *
+     * @tparam T Component type.
+     * @return Iterator to the newly created pool.
+     */
+    template <ComponentType T> auto AddPool()
+    {
+        auto it = m_ComponentPools.Emplace<T>(std::make_unique<ComponentPool<T>>());
+        ComponentPool<T>& pool = static_cast<ComponentPool<T>&>(**it);
+
+        pool.ComponentAdded.Sub([this](const ComponentAdded&) { ++m_QueryVersion; });
+        pool.ComponentRemoved.Sub([this](const ComponentRemoved&) { ++m_QueryVersion; });
+
+        return it;
     }
 
     /**
@@ -32,19 +47,21 @@ struct ComponentPoolQuery
      */
     template <ComponentType T> ComponentPool<T>& Pool()
     {
-        if (!m_ComponentPools.Contains<T>())
+        auto it = m_ComponentPools.Find<T>();
+
+        if (it == m_ComponentPools.end())
         {
-            m_ComponentPools.Emplace<T>(std::make_unique<ComponentPool<T>>());
+            it = AddPool<T>();
         }
 
-        return static_cast<ComponentPool<T>&>(*m_ComponentPools.At<T>());
+        return static_cast<ComponentPool<T>&>(**it);
     }
 
     /** @brief Stores the cached results and version of a component query. */
     struct QueryCache
     {
         std::vector<unsigned int> Entities;
-        unsigned int Version = 0;
+        unsigned long Version = 0;
     };
 
     /**
@@ -64,8 +81,6 @@ struct ComponentPoolQuery
     requires std::invocable<Function, unsigned int, First&, Rest&...>
     void ForEach(Function&& callback)
     {
-        //TODO- it appears the actual problem is the size of my components.
-        // transform component is 216 bytes, multiply that by 120k entities
         auto pools = GetPools<First, Rest...>();
 
         if (!m_CachedQueries.Contains<First, Rest...>())
@@ -77,11 +92,10 @@ struct ComponentPoolQuery
 
         if (cache.Version == m_QueryVersion)
         {
-            ComponentPool<First>& firstPool = std::get<ComponentPool<First>&>(pools);
+            auto& firstPool = std::get<ComponentPool<First>&>(pools);
 
             for (unsigned int entityId : cache.Entities)
             {
-
                 callback(entityId, firstPool[entityId], (std::get<ComponentPool<Rest>&>(pools)[entityId])...);
             }
 
@@ -108,15 +122,6 @@ struct ComponentPoolQuery
     }
 
   private:
-    /** @brief Version used to detect changes that can invalidate query caches. */
-    unsigned int m_QueryVersion = 1;
-
-    /** @brief Stores all component pools indexed by their component type. */
-    U::TypedVector<std::unique_ptr<IComponentPool>> m_ComponentPools{};
-
-    /** @brief Stores cached results for each component query. */
-    U::TypedVector<QueryCache> m_CachedQueries;
-
     /**
      * @brief Returns the component pools for the specified types.
      *
@@ -127,6 +132,15 @@ struct ComponentPoolQuery
     {
         return {Pool<Args>()...};
     }
+
+    /** @brief Version used to detect changes that invalidate query caches. */
+    unsigned long m_QueryVersion = 1;
+
+    /** @brief Stores all component pools indexed by component type. */
+    U::TypedVector<std::unique_ptr<IComponentPool>> m_ComponentPools{};
+
+    /** @brief Stores cached results for each component query. */
+    U::TypedVector<QueryCache> m_CachedQueries{};
 };
 
 } // namespace N::C

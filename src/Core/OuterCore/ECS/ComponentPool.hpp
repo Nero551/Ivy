@@ -6,18 +6,18 @@
 #include "Core/Events/ComponentRemoved.hpp"
 #include "Core/Events/EntityDestroyed.hpp"
 #include "Core/Services/EventBus.hpp"
+
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
 
 namespace N::C
 {
 
-/**
- * @brief Type-erased base class for component pools.
- */
+struct World;
+
+/** @brief Type-erased base class for component pools. */
 struct IComponentPool
 {
     virtual ~IComponentPool() = default;
-    virtual unsigned int Size() const = 0;
 };
 
 /** @brief Defines a valid component type. */
@@ -36,8 +36,11 @@ concept ComponentType = std::derived_from<T, Component>;
  */
 template <ComponentType T> struct ComponentPool : IComponentPool
 {
+    ComponentAdded ComponentAdded{};
+    ComponentRemoved ComponentRemoved{};
+
     /**
-     * @brief Iterator over the components in dense storage.
+     * @brief Iterator over components in dense storage.
      *
      * Dereferencing the iterator returns the entity ID and corresponding component.
      */
@@ -83,9 +86,9 @@ template <ComponentType T> struct ComponentPool : IComponentPool
         Service::Get<EventBus>().Sub<EntityDestroyed>(
             [this](const EntityDestroyed& event)
             {
-                if (HasId(event.entity.GetId()))
+                if (HasId(event.EntityId))
                 {
-                    Remove(event.entity.GetId());
+                    Remove(event.EntityId);
                 }
             });
     }
@@ -99,10 +102,9 @@ template <ComponentType T> struct ComponentPool : IComponentPool
     T& Add(const unsigned int entityId)
     {
         auto& component = m_Components.Emplace(entityId)->Value;
-        Service::Get<EventBus>().Fire<ComponentAdded>(entityId);
 
-        // U::Log::Info(Components.Size(), " × ", sizeof(typename SparseSet<T>::Entry), " = ",
-        // Components.Size() * sizeof(typename SparseSet<T>::Entry), " bytes");
+        ComponentAdded.EntityId = entityId;
+        ComponentAdded.Fire();
 
         return component;
     }
@@ -124,12 +126,14 @@ template <ComponentType T> struct ComponentPool : IComponentPool
         return m_Components.At(entityId);
     }
 
+    /** @brief Returns the component belonging to an entity. */
     T& operator[](const unsigned int entityId)
     {
         return m_Components[entityId];
     }
 
-    void Reserve(size_t count)
+    /** @brief Reserves storage for the specified number of components. */
+    void Reserve(const size_t count)
     {
         m_Components.Reserve(count);
     }
@@ -164,22 +168,25 @@ template <ComponentType T> struct ComponentPool : IComponentPool
     void Remove(const unsigned int entityId)
     {
         m_Components.Erase(entityId);
-        Service::Get<EventBus>().Fire<ComponentRemoved>(entityId);
+
+        ComponentRemoved.EntityId = entityId;
+        ComponentRemoved.Fire();
     }
 
-    unsigned int GetIndexById(unsigned int entityId)
+    /** @brief Returns the dense storage index of an entity. */
+    unsigned int GetIndexById(const unsigned int entityId)
     {
         return m_Components.GetDenseIndex(entityId);
     }
 
     /** @brief Returns the number of stored components. */
-    unsigned int Size() const override
+    unsigned int Size() const
     {
         return m_Components.Size();
     }
 
   private:
-    /** @brief Stores components using dense storage with sparse entity ID lookup. */
+    /** @brief Stores components with dense storage and sparse entity ID lookup. */
     U::SparseSetAoS<T> m_Components{};
 };
 

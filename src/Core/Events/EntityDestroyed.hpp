@@ -6,8 +6,9 @@ namespace N::C
 {
 struct EntityDestroyed : Event<EntityDestroyed>
 {
-    C::Entity& entity;
+    using Event::Event;
+    unsigned int EntityId;
 
-    EntityDestroyed(C::Entity& entity) : entity(entity) {}
+    EntityDestroyed(unsigned int entityId) : EntityId(entityId) {}
 };
 } // namespace N::C

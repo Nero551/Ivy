@@ -30,12 +30,12 @@ void World::RemoveEntity(const unsigned int id)
         entity->ClearParent();
     }
 
-    Service::Get<EventBus>().Fire<EntityDestroyed>(*entity);
+    Service::Get<EventBus>().Fire<EntityDestroyed>(id);
     m_Entities.Erase(id);
 
     for (auto& descendant : descendants)
     {
-        Service::Get<EventBus>().Fire<EntityDestroyed>(*descendant);
+        Service::Get<EventBus>().Fire<EntityDestroyed>(descendant->GetId());
         m_Entities.Erase(descendant->GetId());
     }
 }
