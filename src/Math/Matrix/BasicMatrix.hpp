@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
 
 namespace Ivy::M
@@ -73,13 +74,107 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     /** @brief Returns the transpose of the matrix. */
     constexpr Derived Transpose() const
     {
-        Derived result = Zero();
+        Derived result = AsDerived();
 
         for (unsigned int row = 0; row < Row; ++row)
         {
             for (unsigned int column = 0; column < Column; ++column)
             {
                 result(row, column) = (*this)(column, row);
+            }
+        }
+
+        return result;
+    }
+
+    // constexpr unsigned int Rank() {}
+    // constexpr Set<Vector<Column, T>> NullSpace() {}
+
+    constexpr Derived RowEchelon()
+    {
+        Derived result = AsDerived();
+        unsigned int pivotRow = 0;
+        for (unsigned int pivotCol = 0; pivotCol < Column; ++pivotCol)
+        {
+            if (result(pivotRow, pivotCol) == 0)
+            {
+                for (unsigned int row = pivotRow + 1; row < Row; ++row)
+                {
+                    if (result(row, pivotCol) != 0)
+                    {
+                        result = result.SwapRow(pivotRow, row);
+                        break;
+                    }
+                }
+            }
+
+            if (result(pivotRow, pivotCol) == 0)
+            {
+                continue;
+            }
+
+            for (unsigned int row = pivotRow + 1; row < Row; ++row)
+            {
+                const T multiplier = result(row, pivotCol) / result(pivotRow, pivotCol);
+                for (unsigned int col = 0; col < Column; ++col)
+                {
+                    result(row, col) -= multiplier * result(pivotRow, col);
+                }
+            }
+            ++pivotRow;
+        }
+
+        return result;
+    }
+
+    constexpr Derived MultiplyRow(unsigned int r, T scalar)
+    {
+        U::Log::Assert(r < Row, "Matrix: Row index out of bounds.");
+        Derived result = *this;
+
+        for (unsigned int column = 0; column < Column; ++column)
+        {
+            result(r, column) = (*this)(r, column) * scalar;
+        }
+
+        return result;
+    }
+
+    constexpr Derived AddRow(unsigned int target, unsigned int source) const
+    {
+        U::Log::Assert(target < Row, "Matrix: Row index out of bounds.");
+        U::Log::Assert(source < Row, "Matrix: Row index out of bounds.");
+
+        Derived result = *this;
+
+        for (unsigned int column = 0; column < Column; ++column)
+        {
+            result(target, column) += result(source, column);
+        }
+
+        return result;
+    }
+
+    constexpr Derived SwapRow(unsigned int r1, unsigned int r2)
+    {
+        U::Log::Assert(r1 < Row && r2 < Row, "Matrix: Row index out of bounds.");
+        Derived result = Zero();
+
+        for (unsigned int row = 0; row < Row; ++row)
+        {
+            for (unsigned int column = 0; column < Column; ++column)
+            {
+                if (row == r1)
+                {
+                    result(row, column) = (*this)(r2, column);
+                    continue;
+                }
+                if (row == r2)
+                {
+                    result(row, column) = (*this)(r1, column);
+                    continue;
+                }
+                result(row, column) = (*this)(row, column);
             }
         }
 
@@ -274,6 +369,17 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
 
   protected:
     std::array<std::array<T, Row>, Column> m_Data{};
+
+  private:
+    constexpr const Derived& AsDerived() const
+    {
+        return static_cast<const Derived&>(*this);
+    }
+
+    constexpr Derived& AsDerived()
+    {
+        return static_cast<Derived&>(*this);
+    }
 };
 
 } // namespace Ivy::M

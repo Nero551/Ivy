@@ -19,8 +19,10 @@ template <int Variables, Scalar T = float> struct LinearSolution
 {
     const SolutionType Type;
 
-    LinearSolution(SolutionType type, const Vector<Variables, T>& sol) : Type(type), m_Solution(sol) {}
-    LinearSolution(SolutionType type, const Set<Vector<Variables, T>>& solSet)
+    constexpr LinearSolution(SolutionType type, const Vector<Variables, T>& sol) : Type(type), m_Solution(sol)
+    {
+    }
+    constexpr LinearSolution(SolutionType type, const Set<Vector<Variables, T>>& solSet)
         : Type(type), m_SolutionSet(solSet)
     {
     }
@@ -42,28 +44,28 @@ template <int Variables, Scalar T = float> struct LinearSolution
         return os;
     }
 
-    bool IsUnique() const
+    constexpr bool IsUnique() const
     {
         return Type == SolutionType::Unique;
     }
 
-    bool IsInfinite() const
+    constexpr bool IsInfinite() const
     {
         return Type == SolutionType::Infinite;
     }
 
-    bool IsNone() const
+    constexpr bool IsNone() const
     {
         return Type == SolutionType::None;
     }
 
-    Vector<Variables, T>& GetSolution() requires(Variables != 0)
+    constexpr Vector<Variables, T>& GetSolution() requires(Variables != 0)
     {
         U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
         return m_Solution.value();
     }
 
-    Set<Vector<Variables, T>>& GetSolutionSet()
+    constexpr Set<Vector<Variables, T>>& GetSolutionSet() requires(Variables != 0)
     {
         U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
         return m_SolutionSet.value();
@@ -89,14 +91,17 @@ struct LinearSystem
         Matrix<Equations, Variables, T> A;
         Vector<Variables, T> b;
 
-        for (int i = 0; i < Equations; ++i)
+        for (int r = 0; r < Equations; ++r)
         {
-            b(i) = m_Equations[i].Result;
-            for (int j = 0; j < Variables; ++j)
+            auto& equation = m_Equations[r];
+            b(r) = equation.Result;
+            for (int c = 0; c < Variables; ++c)
             {
-                A(i, j) = m_Equations[i](j);
+                A(r, c) = m_Equations[r](c);
             }
         }
+
+        //? Gaussian Elimination
 
         if (M::NearlyEquals(A.Determinant(), 0.0f))
         {

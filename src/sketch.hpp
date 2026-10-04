@@ -2,6 +2,7 @@
 #include "Math/Equations/LinearEquation.hpp"
 #include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Matrix/Matrix.hpp"
 #include "Protos/LogicPrototype.hpp"
 #include "Utilities/Log.hpp"
 
@@ -166,19 +167,6 @@ inline void Test()
     // Ivy::U::Log::Info(alu.Zero);
     // Ivy::U::Log::Info(alu.Overflow);
 
-    constexpr float theta = 90;
-    P::Dimension<M::Vector<2>, P::Acceleration> g = M::Vector<2>{0, -9.8f};
-    P::Dimension<M::Vector<2>, P::Acceleration> a = M::Vector<2>{9.8f * M::DSin(theta), 0};
-
-    M::Matrix<2, 2> mat2 = M::Matrix<2, 2>::Identity();
-    mat2 = mat2.Rotate(M::Rad(theta));
-    U::Log::Info(a);
-    U::Log::Info(mat2.Transpose() * a);
-
-    M::Function<float, M::Vector<2>> f = [](const float x) { return M::Vector<2>{x, x * x}; };
-    M::Function<float, float> p = [](const float x) { return x * x; };
-    U::Log::Info((f + p)(5));
-
     M::LinearEquation<2> eq1{30.0, -3.0, 1.0};
     M::LinearEquation<2> eq2{-70.0, -7.0, -1.0};
 
@@ -186,5 +174,53 @@ inline void Test()
 
     auto solution = system.Solve();
     U::Log::Info(solution);
+
+    M::Matrix<3, 3> A{4, 7, 2, 3, 6, 1, 8, 5, 9};
+    U::Log::Print(A.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 3> B{0, 2, 3, 1, 4, 5, 2, 6, 8};
+    U::Log::Print(B.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 3> C{0, 2, 3, 0, 4, 5, 0, 6, 7};
+    U::Log::Print(C.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 3> D{1, 2, 3, 0, 0, 4, 0, 0, 5};
+    U::Log::Print(D.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 3> E{1, 2, 3, 2, 4, 6, 3, 6, 9};
+    U::Log::Print(E.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 3> F{2, 4, 1, 4, 8, 2, 6, 12, 3};
+    U::Log::Print(F.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 3> G{0, 0, 1, 0, 2, 3, 4, 5, 6};
+    U::Log::Print(G.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 3> H{1, 0, 3, 0, 2, 4, 5, 1, 7};
+    U::Log::Print(H.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<4, 3> I{1, 2, 3, 2, 4, 6, 1, 0, 1, 3, 2, 4};
+    U::Log::Print(I.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<3, 4> J{1, 2, 3, 4, 2, 4, 6, 8, 1, 1, 1, 2};
+    U::Log::Print(J.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<4, 4> K{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    U::Log::Print(K.RowEchelon());
+    U::Log::Print("");
+
+    M::Matrix<4, 4> L{1, 2, 3, 4, 2, 4, 6, 8, 0, 1, 2, 3, 3, 5, 7, 9};
+    U::Log::Print(L.RowEchelon());
+    U::Log::Print("");
 }
 } // namespace Sketch

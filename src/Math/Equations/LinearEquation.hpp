@@ -30,6 +30,50 @@ template <int Variables, Scalar T = float> struct LinearEquation
         return m_Coefficients;
     }
 
+    constexpr LinearEquation operator*(T scalar)
+    {
+        LinearEquation result{};
+        result.Result = Result * scalar;
+        for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
+        {
+            result(i) = (*this)(i)*scalar;
+        }
+
+        return result;
+    }
+
+    constexpr LinearEquation operator-(const LinearEquation& other) const
+    {
+        LinearEquation result{};
+        result.Result = Result - other.Result;
+        for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
+        {
+            result(i) = (*this)(i)-other(i);
+        }
+
+        return result;
+    }
+
+    constexpr LinearEquation& operator-=(const LinearEquation& other)
+    {
+        Result -= other.Result;
+        for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
+        {
+            (*this)(i) -= other(i);
+        }
+        return *this;
+    }
+
+    constexpr LinearEquation& operator*=(T scalar)
+    {
+        Result *= scalar;
+        for (auto& coefficient : m_Coefficients)
+        {
+            coefficient *= scalar;
+        }
+        return *this;
+    }
+
   private:
     std::array<T, Variables> m_Coefficients;
 };
