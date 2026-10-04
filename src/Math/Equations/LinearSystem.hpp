@@ -107,8 +107,8 @@ struct LinearSystem
             auto& equation = (*this)(r);
             for (int c = 0; c < Variables; ++c)
             {
-                A(r, c) = (*this)(r)(c);
-                coefficientMatrix(r, c) = (*this)(r)(c);
+                A(r, c) = equation(c);
+                coefficientMatrix(r, c) = equation(c);
             }
             A(r, Variables) = equation.Result;
         }

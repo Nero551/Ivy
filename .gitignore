@@ -1,9 +1,9 @@
-/build/
 /.cache
 /.vscode/
 /.idea/
 /.agent/
 /.codex/
+/build/
 /Tests/build-tests/
 /Docs/API/
 /Traces/

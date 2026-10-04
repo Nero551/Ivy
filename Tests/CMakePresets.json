@@ -11,6 +11,7 @@
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_CXX_STANDARD": "26",
+        "CMAKE_CXX_EXTENSIONS": "ON",
         "CMAKE_CXX_STANDARD_REQUIRED": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
