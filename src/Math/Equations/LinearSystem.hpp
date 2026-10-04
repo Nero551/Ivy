@@ -120,6 +120,7 @@ struct LinearSystem
 
         case SolutionType::Unique:
         {
+            //TODO- i dont understand this part.
             Vector<Variables, T> solution;
             for (int row = Variables - 1; row >= 0; --row)
             {

@@ -116,7 +116,17 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
 
         return rank;
     }
-    // constexpr Set<Vector<Column, T>> NullSpace() {}
+    constexpr Set<Vector<Column, T>> NullSpace()
+    {
+        return Set<Vector<Column, T>>{[&](const Vector<Column, T>& x)
+            {
+                if (AsDerived() * x == Vector<Row, T>{0})
+                {
+                    return true;
+                }
+                return false;
+            }};
+    }
 
     constexpr Derived RowEchelon() const
     {
