@@ -4,14 +4,14 @@
 namespace Ivy::M
 {
 
-template <int Variables, M::Scalar T = float> struct LinearEquation
+template <int Variables, Scalar T = float> struct LinearEquation
 {
-    T Constant;
+    T Result;
 
     template <typename... Args>
-    constexpr LinearEquation(const T constant, Args... coefficients)
+    constexpr LinearEquation(const T result, Args... coefficients)
         requires(sizeof...(Args) == Variables && (std::convertible_to<Args, T> && ...))
-        : Constant(constant), m_Coefficients{static_cast<T>(coefficients)...}
+        : Result(result), m_Coefficients{static_cast<T>(coefficients)...}
     {
     }
 
@@ -36,31 +36,28 @@ template <int Variables, M::Scalar T = float> struct LinearEquation
 
 template <M::Scalar T> struct LinearEquation<1, T>
 {
-    constexpr LinearEquation(const T constant, const T coefficient)
-        : Constant(constant), Coefficient(coefficient)
+    constexpr LinearEquation(const T result, const T coefficient) : Result(result), Coefficient(coefficient)
     {
     }
 
     constexpr const T& operator()(unsigned int index) const
     {
-        return Coefficient;
+        return index == 0 ? Coefficient : U::Log::Fatal("LinearEquation: Index out of bounds.");
     }
 
     constexpr T& operator()(unsigned int index)
     {
-        return Coefficient;
+        return index == 0 ? Coefficient : U::Log::Fatal("LinearEquation: Index out of bounds.");
     }
 
     constexpr T Solve() const
     {
-        if (Coefficient == 0)
-        {
-            U::Log::Fatal("LinearEquation: Coefficient cannot be zero.");
-        }
-        return Constant / Coefficient;
+        U::Log::Assert(Coefficient != 0, "LinearEquation: Coefficient cannot be zero.");
+        U::Log::Assert(Result != 0, "LinearEquation: Result cannot be zero.");
+        return Result / Coefficient;
     }
 
-    T Constant;
+    T Result;
     T Coefficient;
 };
 } // namespace Ivy::M

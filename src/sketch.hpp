@@ -178,16 +178,7 @@ inline void Test()
     M::Function<float, M::Vector<2>> f = [](const float x) { return M::Vector<2>{x, x * x}; };
     M::Function<float, float> p = [](const float x) { return x * x; };
     U::Log::Info((f + p)(5));
-    //
-    // constexpr M::LinearEquation<2> eq1{3 * 9.81, -3, 1};
-    // constexpr M::LinearEquation<2> eq2{200000000 * 9.81, 200000000, 1};
-    //
-    // constexpr M::LinearSystem<2> sys{eq1, eq2};
-    //
-    // constexpr M::LinearEquation<1> eq{3, 2};
-    // U::Log::Info(eq.Solve());
-    //
-    // U::Log::Info(sys.Solve());
+
     M::LinearEquation<2> eq1{30.0, -3.0, 1.0};
     M::LinearEquation<2> eq2{-70.0, -7.0, -1.0};
 
