@@ -2,14 +2,13 @@
 
 /**
  * @namespace Ivy::M
- * @brief A Float-based math library for the Nova game engine. everything uses floats
+ * @brief A math library for the Ivy game engine.
  * here. Mainly contains:
  *  - Vectors
  *  - Matrices
  *  - Complex numbers
  *  - Quaternions
  *  - Multi-variable/valued functions
- *  - Dimensional Analysis
  */
 namespace Ivy::M
 {

@@ -3,7 +3,7 @@
 /**
  * @namespace Ivy::U
  * @brief Contains utility functions, helpers, and supporting structures for
- * Nova.
+ * Ivy game engine.
  */
 namespace Ivy::U
 {

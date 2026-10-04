@@ -1,4 +1,4 @@
-# Nova (2026-06-26) 3D game engine hobby project
+# Ivy (2026-06-26) 3D game engine hobby project
 
 ## Installing System Dependencies for Linux.
 
@@ -95,7 +95,7 @@
 ### Week 9 — August 21–28
 
 - complex arithmetic
-- Quaternion<> arithmetic & rotation conversions
+- Quaternion arithmetic & rotation conversions
 - depth, stencil & blending added as per material configurations
 - per mesh face culling configurations
 - redesigned texture system
@@ -116,7 +116,7 @@
 
 ### Week 11 — September 5–11
 
-- Optimizations (CPU can now handle ~32k entities 40fps)
+- Optimizations (CPU can now handle ~32k entities 60fps)
 
 ### Week 12 — September 12–18
 

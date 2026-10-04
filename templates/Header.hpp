@@ -1,2 +1,2 @@
 #pragma once
-namespace N {}
+namespace Ivy {}

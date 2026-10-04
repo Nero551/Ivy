@@ -16,6 +16,10 @@ namespace Sketch
 //TODO- try to make dependency injection to avoid global accessors like Engine::Get().
 // try to decouple as much as possible before attempting to implement DI(dependency injection)
 
+//TODO- probably wanna rethink my entire architecture (Core + Modules + World).
+// the other stuff can be extracted out of this project and still work.
+// so they dont count as "part of the architecture".
+
 using namespace Ivy;
 
 using Index = unsigned int;
