@@ -18,6 +18,8 @@
 #include "Coordinates/Polar.hpp"
 #include "Coordinates/QPolar.hpp"
 #include "Coordinates/Spherical.hpp"
+#include "Equations/LinearEquation.hpp"
+#include "Equations/LinearSystem.hpp"
 #include "Equations/QuadraticEquationSolver.hpp"
 #include "FiniteSet.hpp"
 #include "Functions/DifferentiationMethod.hpp"

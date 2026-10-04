@@ -23,7 +23,7 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix<2, 2, T>, 
     using BasicMatrix<2, 2, Matrix, T>::operator*;
 
     /** @brief Applies a scale transformation. */
-    constexpr Matrix Scale(const Vector<2>& scale) const
+    constexpr Matrix Scale(const Vector<2, T>& scale) const
     {
         Matrix scaleMatrix = Matrix::Identity();
 

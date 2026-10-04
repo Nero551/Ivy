@@ -4,7 +4,7 @@ namespace Ivy::M
 {
 
 template <typename T>
-concept Scalar = std::same_as<T, float> || std::same_as<T, double>;
+concept Scalar = std::same_as<T, float>;
 
 template <typename T, typename O>
 concept Additive = requires(T a, O b) { a + b; };

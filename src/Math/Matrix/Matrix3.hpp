@@ -14,7 +14,7 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, 
     using BasicMatrix<3, 3, Matrix, T>::operator*;
 
     /** @brief Applies a scale transformation. */
-    constexpr Matrix Scale(const Vector<3>& scale) const
+    constexpr Matrix Scale(const Vector<3, T>& scale) const
     {
         Matrix result = *this;
 
@@ -68,7 +68,7 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, 
     }
 
     /** @brief Applies Euler rotations in XYZ order. */
-    constexpr Matrix Rotate(const Vector<3>& eulerRotation) const
+    constexpr Matrix Rotate(const Vector<3, T>& eulerRotation) const
     {
         Matrix rotationMatrix = Matrix::Identity();
 
@@ -80,9 +80,9 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, 
     }
 
     /** @brief Applies a rotation around an arbitrary axis. */
-    constexpr Matrix RotateAroundAxis(const Vector<3>& axis, const T radian) const
+    constexpr Matrix RotateAroundAxis(const Vector<3, T>& axis, const T radian) const
     {
-        const Vector<3> forward = axis.Normalized();
+        const Vector<3, T> forward = axis.Normalized();
 
         const T cosine = std::cos(radian);
         const T sine = std::sin(radian);
@@ -110,7 +110,7 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, 
     }
 
     /** @brief Applies a 2D translation using homogeneous coordinates. */
-    constexpr Matrix Translate(const Vector<2>& translation) const
+    constexpr Matrix Translate(const Vector<2, T>& translation) const
     {
         Matrix translationMatrix = Matrix::Identity();
 
@@ -181,9 +181,9 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, 
     }
 
     /** @brief Returns the minor produced by removing a row and column. */
-    constexpr Matrix<2, 2> Minor(const unsigned int row, const unsigned int column) const
+    constexpr Matrix<2, 2, T> Minor(const unsigned int row, const unsigned int column) const
     {
-        Matrix<2, 2> result;
+        Matrix<2, 2, T> result;
         unsigned int resultRow = 0;
 
         for (unsigned int currentRow = 0; currentRow < 3; ++currentRow)

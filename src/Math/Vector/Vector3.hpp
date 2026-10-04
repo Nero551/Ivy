@@ -202,7 +202,7 @@ template <Scalar T> struct Vector<3, T>
             return false;
         }
 
-        return M::NearlyEquals(std::abs(Dot(vector)), 0);
+        return M::NearlyEquals(std::abs(Dot(vector)), 0.0f);
     }
 
     /** @brief Linearly interpolates between this vector and another vector. */

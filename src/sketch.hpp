@@ -1,4 +1,6 @@
 #pragma once
+#include "Math/Equations/LinearEquation.hpp"
+#include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Protos/LogicPrototype.hpp"
 #include "Utilities/Log.hpp"
@@ -154,82 +156,6 @@ template <unsigned int... Dimensions> struct Tensor
     }
 };
 
-template <int Variables, M::Scalar T = float> struct LinearEquation
-{
-
-    template <typename... Args>
-    constexpr LinearEquation(const T& constant, Args... coefficients)
-        requires(sizeof...(Args) == Variables && (std::convertible_to<Args, T> && ...))
-        : m_Coefficients{static_cast<T>(coefficients)...}, Constant(constant)
-    {
-    }
-
-    constexpr const T& operator()(unsigned int index) const
-    {
-        return m_Coefficients[index];
-    }
-
-    constexpr T& operator()(unsigned int index)
-    {
-        return m_Coefficients[index];
-    }
-
-    T Constant;
-
-    constexpr const std::array<T, Variables>& Data() const
-    {
-        return m_Coefficients;
-    }
-
-  private:
-    std::array<T, Variables> m_Coefficients;
-};
-
-template <int Variables, M::Scalar T = float> struct LinearSystem
-{
-    template <typename... Args>
-    constexpr LinearSystem(Args... equations)
-        requires(sizeof...(Args) == Variables && (std::same_as<Args, LinearEquation<Variables, T>> && ...))
-        : m_Equations{equations...}
-    {
-    }
-
-    constexpr M::Vector<Variables> Solve() const
-    {
-        M::Matrix<Variables, Variables> A;
-        M::Vector<Variables> b;
-
-        for (int i = 0; i < Variables; ++i)
-        {
-            b(i) = m_Equations[i].Constant;
-            for (int j = 0; j < Variables; ++j)
-            {
-                A(i, j) = m_Equations[i](j);
-            }
-        }
-
-        return A.Inverse() * b;
-    }
-
-    constexpr LinearEquation<Variables, T>& operator()(unsigned int index)
-    {
-        return m_Equations[index];
-    }
-
-    constexpr const LinearEquation<Variables, T>& operator()(unsigned int index) const
-    {
-        return m_Equations[index];
-    }
-
-    constexpr const std::array<LinearEquation<Variables, T>, Variables>& Data() const
-    {
-        return m_Equations;
-    }
-
-  private:
-    std::array<LinearEquation<Variables, T>, Variables> m_Equations;
-};
-
 inline void Test()
 {
     ALU alu;
@@ -252,12 +178,22 @@ inline void Test()
     M::Function<float, M::Vector<2>> f = [](const float x) { return M::Vector<2>{x, x * x}; };
     M::Function<float, float> p = [](const float x) { return x * x; };
     U::Log::Info((f + p)(5));
+    //
+    // constexpr M::LinearEquation<2> eq1{3 * 9.81, -3, 1};
+    // constexpr M::LinearEquation<2> eq2{200000000 * 9.81, 200000000, 1};
+    //
+    // constexpr M::LinearSystem<2> sys{eq1, eq2};
+    //
+    // constexpr M::LinearEquation<1> eq{3, 2};
+    // U::Log::Info(eq.Solve());
+    //
+    // U::Log::Info(sys.Solve());
+    M::LinearEquation<2> eq1{30.0, -3.0, 1.0};
+    M::LinearEquation<2> eq2{-70.0, -7.0, -1.0};
 
-    LinearEquation<2> eq1{3 * 9.81, -3, 1};
-    LinearEquation<2> eq2{7 * 9.81, 7, 1};
+    M::LinearSystem<2> system{eq1, eq2};
 
-    LinearSystem<2> sys{eq1, eq2};
-
-    U::Log::Info(sys.Solve());
+    auto solution = system.Solve();
+    U::Log::Info(solution);
 }
 } // namespace Sketch

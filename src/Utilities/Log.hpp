@@ -57,7 +57,7 @@ struct Log
         std::cout << m_Red << "💀 [FATAL] " << m_Reset;
         (..., (std::cout << args));
         std::cout << '\n';
-        throw std::runtime_error("");
+        throw "";
     }
 
     /** @brief Validates a raw pointer and returns the dereferenced object. */
@@ -71,7 +71,7 @@ struct Log
     }
 
     /** @brief its assert but cleaner. */
-    template <typename... Args> static void Assert(const bool condition, Args... args)
+    template <typename... Args> static constexpr void Assert(const bool condition, Args... args)
     {
         if (!condition)
         {

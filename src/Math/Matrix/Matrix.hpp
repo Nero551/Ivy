@@ -12,9 +12,9 @@ struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column, T>, T>
 
     /** @brief Multiplies this matrix by another matrix. */
     template <unsigned int R, unsigned int C>
-    constexpr Matrix<Row, C> operator*(const Matrix<R, C>& matrix) const requires(Column == R)
+    constexpr Matrix<Row, C, T> operator*(const Matrix<R, C, T>& matrix) const requires(Column == R)
     {
-        Matrix<Row, C> result{0};
+        Matrix<Row, C, T> result{0};
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -37,9 +37,9 @@ struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column, T>, T>
     }
 
     /** @brief Returns the minor produced by removing a row and column. */
-    constexpr Matrix<Row - 1, Column - 1> Minor(const unsigned int row, const unsigned int column) const
+    constexpr Matrix<Row - 1, Column - 1, T> Minor(const unsigned int row, const unsigned int column) const
     {
-        Matrix<Row - 1, Column - 1> result;
+        Matrix<Row - 1, Column - 1, T> result;
         unsigned int resultRow = 0;
 
         for (unsigned int currentRow = 0; currentRow < Row; ++currentRow)

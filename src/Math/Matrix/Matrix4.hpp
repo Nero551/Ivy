@@ -13,7 +13,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
     using BasicMatrix<4, 4, Matrix, T>::operator*;
 
     /** @brief Applies a 3D translation. */
-    constexpr Matrix Translate(const Vector<3>& translation) const
+    constexpr Matrix Translate(const Vector<3, T>& translation) const
     {
         Matrix result = *this;
 
@@ -25,7 +25,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
     }
 
     /** @brief Applies a 3D scale. */
-    constexpr Matrix Scale(const Vector<3>& scale) const
+    constexpr Matrix Scale(const Vector<3, T>& scale) const
     {
         Matrix result = *this;
 
@@ -79,7 +79,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
     }
 
     /** @brief Applies Euler rotations in XYZ order. */
-    constexpr Matrix Rotate(const Vector<3>& eulerRotation) const
+    constexpr Matrix Rotate(const Vector<3, T>& eulerRotation) const
     {
         Matrix rotationMatrix = Matrix::Identity();
 
@@ -91,9 +91,9 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
     }
 
     /** @brief Applies a rotation around an arbitrary axis. */
-    constexpr Matrix RotateAroundAxis(const Vector<3>& axis, const T radian) const
+    constexpr Matrix RotateAroundAxis(const Vector<3, T>& axis, const T radian) const
     {
-        const Vector<3> forward = axis.Normalized();
+        const Vector<3, T> forward = axis.Normalized();
 
         const T cosine = std::cos(radian);
         const T sine = std::sin(radian);
@@ -121,7 +121,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
     }
 
     /** @brief Extracts the upper-left 3x3 portion of the matrix. */
-    constexpr Matrix<3, 3> ToMatrix3() const
+    constexpr Matrix<3, 3, T> ToMatrix3() const
     {
         return {(*this)(0, 0), (*this)(0, 1), (*this)(0, 2), (*this)(1, 0), (*this)(1, 1), (*this)(1, 2),
             (*this)(2, 0), (*this)(2, 1), (*this)(2, 2)};
@@ -163,14 +163,15 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
     }
 
     /** @brief Creates a view matrix looking from one position toward another. */
-    static constexpr Matrix LookAt(const Vector<3>& position, const Vector<3>& target, const Vector<3>& up)
+    static constexpr Matrix LookAt(
+        const Vector<3, T>& position, const Vector<3, T>& target, const Vector<3, T>& up)
     {
         Matrix translation = Matrix::Identity();
         translation = translation.Translate(-position);
 
-        const Vector<3> forward = (target - position).Normalized();
-        const Vector<3> right = forward.Cross(up).Normalized();
-        const Vector<3> correctedUp = right.Cross(forward);
+        const Vector<3, T> forward = (target - position).Normalized();
+        const Vector<3, T> right = forward.Cross(up).Normalized();
+        const Vector<3, T> correctedUp = right.Cross(forward);
 
         Matrix basisMatrix = Matrix::Identity();
 
@@ -228,9 +229,9 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
     }
 
     /** @brief Returns the minor produced by removing a row and column. */
-    constexpr Matrix<3, 3> Minor(const unsigned int row, const unsigned int column) const
+    constexpr Matrix<3, 3, T> Minor(const unsigned int row, const unsigned int column) const
     {
-        Matrix<3, 3> result;
+        Matrix<3, 3, T> result;
         unsigned int resultRow = 0;
 
         for (unsigned int currentRow = 0; currentRow < 4; ++currentRow)
@@ -260,7 +261,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
         return result;
     }
 
-    Matrix operator*(const Matrix& mat4) const
+    constexpr Matrix operator*(const Matrix& mat4) const
     {
         Matrix result;
 

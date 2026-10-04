@@ -138,9 +138,9 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Multiplies this matrix by a column vector. */
-    constexpr Vector<Row> operator*(const Vector<Column>& vector) const
+    constexpr Vector<Row, T> operator*(const Vector<Column, T>& vector) const
     {
-        Vector<Row> result = Vector<Row>::Zero();
+        Vector<Row, T> result = Vector<Row, T>::Zero();
 
         for (unsigned int row = 0; row < Row; ++row)
         {

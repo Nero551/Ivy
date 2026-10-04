@@ -3,7 +3,7 @@
 
 namespace Ivy::M
 {
-constexpr bool NearlyEquals(const float a, const float b, const float epsilon = EPSILON)
+template <Scalar T> constexpr bool NearlyEquals(const T a, const T b, const T epsilon = EPSILON)
 {
     return std::abs(a - b) <= epsilon;
 }
