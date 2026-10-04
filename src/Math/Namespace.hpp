@@ -9,6 +9,7 @@
  *  - Complex numbers
  *  - Quaternions
  *  - Multi-variable/valued functions
+ *  - Linear system of equations solver.
  */
 namespace Ivy::M
 {

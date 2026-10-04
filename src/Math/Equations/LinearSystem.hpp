@@ -180,8 +180,8 @@ struct LinearSystem
   private:
     std::array<LinearEquation<Variables, T>, Equations> m_Equations;
 
-    SolutionType DetermineSolutionType(const Matrix<Equations, Variables, T>& coefficientMatrix,
-        const Matrix<Equations, Variables + 1, T>& augmentedMatrix) const
+    static SolutionType DetermineSolutionType(const Matrix<Equations, Variables, T>& coefficientMatrix,
+        const Matrix<Equations, Variables + 1, T>& augmentedMatrix)
     {
         unsigned int coefficientRank = coefficientMatrix.Rank();
         unsigned int augmentedRank = augmentedMatrix.Rank();

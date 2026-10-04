@@ -120,4 +120,16 @@
 
 ### Week 12 — September 12–18
 
-- Compile-time dimensional analysis 
+- Compile-time dimensional analysis
+
+### Week 13 — September 19–26
+
+- generic matrices and vectors
+
+### Week 14 — September 26–October 3
+
+- Infinite Sets and Finite Sets.
+
+### Week 15 — October 3–10
+
+- Linear system of equations solver.
