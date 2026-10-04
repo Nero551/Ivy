@@ -48,6 +48,16 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
         return m_Data[column][row];
     }
 
+    constexpr T& Last()
+    {
+        return (*this)(Column - 1, Row - 1);
+    }
+
+    const constexpr T& Last() const
+    {
+        return (*this)(Column - 1, Row - 1);
+    }
+
     /** @brief Returns the underlying matrix data. */
     constexpr const std::array<std::array<T, Row>, Column>& Data() const
     {
@@ -87,14 +97,32 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
         return result;
     }
 
-    // constexpr unsigned int Rank() {}
+    constexpr unsigned int Rank() const
+    {
+        const Derived echelon = RowEchelon();
+        unsigned int rank = 0;
+
+        for (unsigned int row = 0; row < Row; ++row)
+        {
+            for (unsigned int column = 0; column < Column; ++column)
+            {
+                if (echelon(row, column) != 0)
+                {
+                    ++rank;
+                    break;
+                }
+            }
+        }
+
+        return rank;
+    }
     // constexpr Set<Vector<Column, T>> NullSpace() {}
 
-    constexpr Derived RowEchelon()
+    constexpr Derived RowEchelon() const
     {
         Derived result = AsDerived();
         unsigned int pivotRow = 0;
-        for (unsigned int pivotCol = 0; pivotCol < Column; ++pivotCol)
+        for (unsigned int pivotCol = 0; pivotCol < Column && pivotRow < Row; ++pivotCol)
         {
             if (result(pivotRow, pivotCol) == 0)
             {
@@ -126,8 +154,10 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
 
         return result;
     }
+    const
 
-    constexpr Derived MultiplyRow(unsigned int r, T scalar)
+        constexpr Derived
+        MultiplyRow(unsigned int r, T scalar)
     {
         U::Log::Assert(r < Row, "Matrix: Row index out of bounds.");
         Derived result = *this;

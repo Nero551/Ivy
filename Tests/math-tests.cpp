@@ -1414,3 +1414,93 @@ TEST_CASE(
     Vector<3> proj = v.StereoProject();
     REQUIRE(proj == Vector<3>(2, 2, 2));
 }
+
+TEST_CASE("Linear system has a unique solution")
+{
+    LinearEquation<2> eq1{30.0, -3.0, 1.0};
+    LinearEquation<2> eq2{-70.0, -7.0, -1.0};
+
+    LinearSystem<2> system{eq1, eq2};
+
+    const auto solution = system.Solve();
+
+    REQUIRE(solution.IsUnique());
+    REQUIRE(solution.GetSolution() == Vector<2>{4.0, 42.0});
+}
+
+TEST_CASE("Linear system has infinite solutions")
+{
+    // x + y = 5
+    // 2x + 2y = 10
+    LinearEquation<2> eq1{5.0, 1.0, 1.0};
+    LinearEquation<2> eq2{10.0, 2.0, 2.0};
+
+    LinearSystem<2> system{eq1, eq2};
+
+    const auto solution = system.Solve();
+
+    REQUIRE(solution.IsInfinite());
+
+    const auto& set = solution.GetSolutionSet();
+
+    REQUIRE(set.Belongs(Vector<2>{0.0, 5.0}));
+    REQUIRE(set.Belongs(Vector<2>{1.0, 4.0}));
+    REQUIRE(set.Belongs(Vector<2>{5.0, 0.0}));
+    REQUIRE(set.Belongs(Vector<2>{-10.0, 15.0}));
+
+    REQUIRE_FALSE(set.Belongs(Vector<2>{1.0, 5.0}));
+    REQUIRE_FALSE(set.Belongs(Vector<2>{0.0, 0.0}));
+}
+
+TEST_CASE("Linear system has no solution")
+{
+    // x + y = 5
+    // x + y = 7
+    LinearEquation<2> eq1{5.0, 1.0, 1.0};
+    LinearEquation<2> eq2{7.0, 1.0, 1.0};
+
+    LinearSystem<2> system{eq1, eq2};
+
+    const auto solution = system.Solve();
+
+    REQUIRE(solution.IsNone());
+}
+
+TEST_CASE("Linear system has infinite solutions with nontrivial relation")
+{
+    // x + 2y - z = 3
+    // z = 2
+    LinearEquation<3> eq1{3.0, 1.0, 2.0, -1.0};
+    LinearEquation<3> eq2{2.0, 0.0, 0.0, 1.0};
+
+    LinearSystem<3, 2> system{eq1, eq2};
+
+    const auto solution = system.Solve();
+
+    REQUIRE(solution.IsInfinite());
+
+    const auto& set = solution.GetSolutionSet();
+
+    REQUIRE(set.Belongs(Vector<3>{5.0, 0.0, 2.0}));
+    REQUIRE(set.Belongs(Vector<3>{3.0, 1.0, 2.0}));
+    REQUIRE(set.Belongs(Vector<3>{7.0, -1.0, 2.0}));
+
+    REQUIRE_FALSE(set.Belongs(Vector<3>{1.0, 1.0, 2.0}));
+}
+
+TEST_CASE("Overdetermined linear system has unique solution")
+{
+    // x + y = 5
+    // 2x - y = 1
+    // 3x     = 6
+    LinearEquation<2> eq1{5.0, 1.0, 1.0};
+    LinearEquation<2> eq2{1.0, 2.0, -1.0};
+    LinearEquation<2> eq3{6.0, 3.0, 0.0};
+
+    LinearSystem<2, 3> system{eq1, eq2, eq3};
+
+    const auto solution = system.Solve();
+
+    REQUIRE(solution.IsUnique());
+    REQUIRE(solution.GetSolution() == Vector<2>{2.0, 3.0});
+}

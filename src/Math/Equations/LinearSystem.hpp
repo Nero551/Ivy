@@ -13,8 +13,6 @@ enum class SolutionType
     None
 };
 
-//TODO- need case for 1 variable and multiple equations, do with template specialization.
-
 template <int Variables, Scalar T = float> struct LinearSolution
 {
     const SolutionType Type;
@@ -65,7 +63,19 @@ template <int Variables, Scalar T = float> struct LinearSolution
         return m_Solution.value();
     }
 
+    constexpr const Vector<Variables, T>& GetSolution() const requires(Variables != 0)
+    {
+        U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
+        return m_Solution.value();
+    }
+
     constexpr Set<Vector<Variables, T>>& GetSolutionSet() requires(Variables != 0)
+    {
+        U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
+        return m_SolutionSet.value();
+    }
+
+    constexpr const Set<Vector<Variables, T>>& GetSolutionSet() const requires(Variables != 0)
     {
         U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
         return m_SolutionSet.value();
@@ -88,26 +98,67 @@ struct LinearSystem
 
     constexpr LinearSolution<Variables, T> Solve() const
     {
-        Matrix<Equations, Variables, T> A;
-        Vector<Variables, T> b;
+        Matrix<Equations, Variables, T> coefficientMatrix;
+        Matrix<Equations, Variables + 1, T> A;
 
         for (int r = 0; r < Equations; ++r)
         {
             auto& equation = m_Equations[r];
-            b(r) = equation.Result;
             for (int c = 0; c < Variables; ++c)
             {
                 A(r, c) = m_Equations[r](c);
+                coefficientMatrix(r, c) = m_Equations[r](c);
             }
+            A(r, Variables) = equation.Result;
         }
+        A = A.RowEchelon();
 
-        //? Gaussian Elimination
-
-        if (M::NearlyEquals(A.Determinant(), 0.0f))
+        switch (DetermineSolutionType(coefficientMatrix, A))
         {
-            return LinearSolution<Variables, T>{SolutionType::Infinite, Set<Vector<Variables, T>>::Empty()};
+        case SolutionType::None:
+            return LinearSolution<Variables, T>{SolutionType::None, Set<Vector<Variables, T>>::Empty()};
+
+        case SolutionType::Unique:
+        {
+            Vector<Variables, T> solution;
+            for (int row = Variables - 1; row >= 0; --row)
+            {
+                T value = A(row, Variables);
+
+                for (int column = row + 1; column < Variables; ++column)
+                {
+                    value -= A(row, column) * solution(column);
+                }
+
+                solution(row) = value / A(row, row);
+            }
+            return LinearSolution<Variables, T>{SolutionType::Unique, solution};
         }
-        return LinearSolution<Variables, T>{SolutionType::Unique, A.Inverse() * b};
+
+        case SolutionType::Infinite:
+            return LinearSolution<Variables, T>{SolutionType::Infinite,
+                Set<Vector<Variables, T>>{[&](const Vector<Variables, T>& x)
+                    {
+                        for (const auto& equation : m_Equations)
+                        {
+                            T result = -equation.Result;
+
+                            for (int variable = 0; variable < Variables; ++variable)
+                            {
+                                result += equation(variable) * x(variable);
+                            }
+
+                            if (result != 0)
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }}};
+        default:
+            U::Log::Fatal("LinearSystem: Unknown solution type.");
+        }
     }
 
     constexpr LinearEquation<Variables, T>& operator()(unsigned int index)
@@ -127,6 +178,25 @@ struct LinearSystem
 
   private:
     std::array<LinearEquation<Variables, T>, Equations> m_Equations;
+
+    SolutionType DetermineSolutionType(const Matrix<Equations, Variables, T>& coefficientMatrix,
+        const Matrix<Equations, Variables + 1, T>& augmentedMatrix) const
+    {
+        unsigned int coefficientRank = coefficientMatrix.Rank();
+        unsigned int augmentedRank = augmentedMatrix.Rank();
+
+        if (coefficientRank != augmentedRank)
+        {
+            return SolutionType::None;
+        }
+
+        if (coefficientRank < Variables)
+        {
+            return SolutionType::Infinite;
+        }
+
+        return SolutionType::Unique;
+    }
 };
 
 } // namespace Ivy::M
