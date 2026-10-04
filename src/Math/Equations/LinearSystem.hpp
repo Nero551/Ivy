@@ -1,8 +1,8 @@
 #pragma once
 #include "LinearEquation.hpp"
-#include "Math/Matrix/Matrix3.hpp"
+#include "Math/Matrix/Matrix.hpp"
 #include "Math/Set.hpp"
-#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vector.hpp"
 namespace Ivy::M
 {
 
@@ -13,7 +13,8 @@ enum class SolutionType
     None
 };
 
-template <int Variables, Scalar T = float> struct LinearSolution
+template <int Variables, Scalar T = float> requires(Variables != 0)
+struct LinearSolution
 {
     const SolutionType Type;
 
@@ -57,25 +58,25 @@ template <int Variables, Scalar T = float> struct LinearSolution
         return Type == SolutionType::None;
     }
 
-    constexpr Vector<Variables, T>& GetSolution() requires(Variables != 0)
+    constexpr Vector<Variables, T>& GetSolution()
     {
         U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
         return m_Solution.value();
     }
 
-    constexpr const Vector<Variables, T>& GetSolution() const requires(Variables != 0)
+    constexpr const Vector<Variables, T>& GetSolution() const
     {
         U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
         return m_Solution.value();
     }
 
-    constexpr Set<Vector<Variables, T>>& GetSolutionSet() requires(Variables != 0)
+    constexpr Set<Vector<Variables, T>>& GetSolutionSet()
     {
         U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
         return m_SolutionSet.value();
     }
 
-    constexpr const Set<Vector<Variables, T>>& GetSolutionSet() const requires(Variables != 0)
+    constexpr const Set<Vector<Variables, T>>& GetSolutionSet() const
     {
         U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
         return m_SolutionSet.value();
@@ -103,11 +104,11 @@ struct LinearSystem
 
         for (int r = 0; r < Equations; ++r)
         {
-            auto& equation = m_Equations[r];
+            auto& equation = (*this)(r);
             for (int c = 0; c < Variables; ++c)
             {
-                A(r, c) = m_Equations[r](c);
-                coefficientMatrix(r, c) = m_Equations[r](c);
+                A(r, c) = (*this)(r)(c);
+                coefficientMatrix(r, c) = (*this)(r)(c);
             }
             A(r, Variables) = equation.Result;
         }
@@ -137,10 +138,12 @@ struct LinearSystem
         }
 
         case SolutionType::Infinite:
+        {
+            auto equations = Data();
             return LinearSolution<Variables, T>{SolutionType::Infinite,
-                Set<Vector<Variables, T>>{[&](const Vector<Variables, T>& x)
+                Set<Vector<Variables, T>>{[equations](const Vector<Variables, T>& x)
                     {
-                        for (const auto& equation : m_Equations)
+                        for (const auto& equation : equations)
                         {
                             T result = -equation.Result;
 
@@ -157,6 +160,7 @@ struct LinearSystem
 
                         return true;
                     }}};
+        }
         default:
             U::Log::Fatal("LinearSystem: Unknown solution type.");
         }
