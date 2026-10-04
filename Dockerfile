@@ -25,7 +25,7 @@ RUN curl -L \
     && /tmp/cmake.sh --skip-license --prefix=/usr/local \
     && rm /tmp/cmake.sh
 
-WORKDIR /Nova
+WORKDIR /Ivy
 
 RUN git config --global --add safe.directory '*'
 

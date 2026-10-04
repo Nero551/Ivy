@@ -1,4 +1,4 @@
-@mainpage Nova
+@mainpage Ivy
 
 # Framework (ECS-hybrid)
 

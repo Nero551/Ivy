@@ -5,14 +5,14 @@ int main(const int argc, char* argv[])
 {
     for (int i = 1; i < argc; ++i)
     {
-        std::string_view Argument = argv[i];
+        std::string_view argument = argv[i];
 
-        if (Argument == "--debug")
+        if (argument == "--debug")
         {
             // Enable debug mode
         }
         //? This is where u can add custom features for command line args
-        //? ex: "Nova --renderer vulkan"
+        //? ex: "Ivy --renderer vulkan"
     }
 
     Sketch::Test();

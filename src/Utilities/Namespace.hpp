@@ -2,7 +2,7 @@
 
 /**
  * @namespace Ivy::U
- * @brief Contains utility functions, helpers, and supporting structures for
+ * @brief Contains utility functions, helpers, and data structures for
  * Ivy game engine.
  */
 namespace Ivy::U

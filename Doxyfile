@@ -1,4 +1,4 @@
-PROJECT_NAME = "Nova"
+PROJECT_NAME = "Ivy"
 
 INPUT = src Docs
 RECURSIVE = YES

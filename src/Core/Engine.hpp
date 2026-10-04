@@ -5,14 +5,14 @@
 #include "Utilities/CheckedPtr.hpp"
 #include "World/World.hpp"
 
-/** @brief Root namespace for Nova engine functionality. */
+/** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
 {
 template <typename T>
 concept ModuleType = std::derived_from<T, Module>;
 
 /**
- * @brief Main Nova engine and game loop. Manages the window, world, modules, and frame lifecycle.
+ * @brief Main Ivy engine and game loop. Manages the window, world, modules, and frame lifecycle.
  */
 struct Engine
 {

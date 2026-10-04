@@ -1,11 +1,8 @@
 #pragma once
-#include "Math/Common/Exponentials.hpp"
-
-#include <glad/glad.h>
 
 /**
  * @namespace Ivy::P::Units
- * @brief Standard International System of Units (SI) constants used throughout Nova.
+ * @brief Standard International System of Units (SI).
  *
  * Provides constexpr scale factors for common SI units.
  * Base units are represented by a value of 1.0f, while derived units are expressed
@@ -32,5 +29,4 @@ constexpr float Millisecond = 1e-3f * Second;
 constexpr float Minute = 60.0f * Second;
 constexpr float Hour = 60.0f * Minute;
 constexpr float Day = 24.0f * Hour;
-// constexpr float Newton = Kilogram * (Meter / M::Pow(Second, 2.0f));
 } // namespace Ivy::P::Units
