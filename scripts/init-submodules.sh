@@ -10,7 +10,7 @@ VCPKG="$ROOT/External/vcpkg/vcpkg"
 
 if [ ! -x "$VCPKG" ]; then
     echo "🔧 Bootstrapping vcpkg..."
-    "$ROOT/External/vcpkg/bootstrap-vcpkg.sh"
+    "$ROOT/External/vcpkg/bootstrap-vcpkg.sh --disable-metrics"
 fi
 
 echo "✅ Submodules Initialized"

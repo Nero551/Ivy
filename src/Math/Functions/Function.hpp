@@ -1,6 +1,5 @@
 #pragma once
 #include "DifferentiationMethod.hpp"
-#include "Graphics/Material/Blend/BlendEquation.hpp"
 #include "IntegrationMethod.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Exponentials.hpp"
