@@ -6,6 +6,6 @@ ROOT="$(git rev-parse --show-toplevel)"
 "$ROOT/scripts/build-tests.sh"
 
 echo "🧪 Running Tests..."
-"$ROOT/Tests/build-tests/UnitTests"
+xmake run -P "$ROOT" IvyTests
 
 echo "✅ All tests passed."

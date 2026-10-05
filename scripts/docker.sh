@@ -12,8 +12,7 @@ docker run --rm -it \
     -v "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY" \
     -e WAYLAND_DISPLAY="$WAYLAND_DISPLAY" \
     -e XDG_RUNTIME_DIR=/tmp \
-    -v "$PWD/CMakeLists.txt:/Ivy/CMakeLists.txt" \
-    -v "$PWD/CMakePresets.json:/Ivy/CMakePresets.json" \
+    -v "$PWD/xmake.lua:/Ivy/xmake.lua" \
     -v "$PWD/src:/Ivy/src" \
     -v "$PWD/scripts:/Ivy/scripts" \
     -v "$PWD/Tests:/Ivy/Tests" \
