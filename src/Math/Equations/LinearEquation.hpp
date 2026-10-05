@@ -37,7 +37,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     }
 
     /** @brief Returns the equation multiplied by a scalar. */
-    constexpr LinearEquation operator*(T scalar)
+    constexpr LinearEquation operator*(T scalar) const
     {
         LinearEquation result{};
         result.Result = Result * scalar;
@@ -45,6 +45,34 @@ template <int Variables, Scalar T = float> struct LinearEquation
         for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
         {
             result(i) = (*this)(i)*scalar;
+        }
+
+        return result;
+    }
+
+    /** @brief Returns the equation divided by a scalar. */
+    constexpr LinearEquation operator/(T scalar) const
+    {
+        LinearEquation result{};
+        result.Result = Result / scalar;
+
+        for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
+        {
+            result(i) = (*this)(i) / scalar;
+        }
+
+        return result;
+    }
+
+    /** @brief Returns the sum of two equations. */
+    constexpr LinearEquation operator+(const LinearEquation& other) const
+    {
+        LinearEquation result{};
+        result.Result = Result + other.Result;
+
+        for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
+        {
+            result(i) = (*this)(i) + other(i);
         }
 
         return result;
@@ -62,6 +90,19 @@ template <int Variables, Scalar T = float> struct LinearEquation
         }
 
         return result;
+    }
+
+    /** @brief Adds another equation to this equation. */
+    constexpr LinearEquation& operator+=(const LinearEquation& other)
+    {
+        Result += other.Result;
+
+        for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
+        {
+            (*this)(i) += other(i);
+        }
+
+        return *this;
     }
 
     /** @brief Subtracts another equation from this equation. */
@@ -90,6 +131,25 @@ template <int Variables, Scalar T = float> struct LinearEquation
         return *this;
     }
 
+    /** @brief Divides this equation by a scalar. */
+    constexpr LinearEquation& operator/=(T scalar)
+    {
+        Result /= scalar;
+
+        for (auto& coefficient : m_Coefficients)
+        {
+            coefficient /= scalar;
+        }
+
+        return *this;
+    }
+
+    /** @brief Returns the equation multiplied by a scalar. */
+    friend constexpr LinearEquation operator*(T scalar, const LinearEquation& equation)
+    {
+        return equation * scalar;
+    }
+
   private:
     std::array<T, Variables> m_Coefficients;
 };
@@ -114,6 +174,68 @@ template <Scalar T> struct LinearEquation<1, T>
         return index == 0 ? Coefficient : U::Log::Fatal("LinearEquation: Index out of bounds.");
     }
 
+    /** @brief Returns the equation multiplied by a scalar. */
+    constexpr LinearEquation operator*(T scalar) const
+    {
+        return {Result * scalar, Coefficient * scalar};
+    }
+
+    /** @brief Returns the equation divided by a scalar. */
+    constexpr LinearEquation operator/(T scalar) const
+    {
+        return {Result / scalar, Coefficient / scalar};
+    }
+
+    /** @brief Returns the sum of two equations. */
+    constexpr LinearEquation operator+(const LinearEquation& other) const
+    {
+        return {Result + other.Result, Coefficient + other.Coefficient};
+    }
+
+    /** @brief Returns the difference between two equations. */
+    constexpr LinearEquation operator-(const LinearEquation& other) const
+    {
+        return {Result - other.Result, Coefficient - other.Coefficient};
+    }
+
+    /** @brief Adds another equation to this equation. */
+    constexpr LinearEquation& operator+=(const LinearEquation& other)
+    {
+        Result += other.Result;
+        Coefficient += other.Coefficient;
+        return *this;
+    }
+
+    /** @brief Subtracts another equation from this equation. */
+    constexpr LinearEquation& operator-=(const LinearEquation& other)
+    {
+        Result -= other.Result;
+        Coefficient -= other.Coefficient;
+        return *this;
+    }
+
+    /** @brief Multiplies this equation by a scalar. */
+    constexpr LinearEquation& operator*=(T scalar)
+    {
+        Result *= scalar;
+        Coefficient *= scalar;
+        return *this;
+    }
+
+    /** @brief Divides this equation by a scalar. */
+    constexpr LinearEquation& operator/=(T scalar)
+    {
+        Result /= scalar;
+        Coefficient /= scalar;
+        return *this;
+    }
+
+    /** @brief Returns the equation multiplied by a scalar. */
+    friend constexpr LinearEquation operator*(T scalar, const LinearEquation& equation)
+    {
+        return equation * scalar;
+    }
+
     /** @brief Solves the equation when a unique solution exists. */
     constexpr T Solve() const
     {
@@ -124,5 +246,4 @@ template <Scalar T> struct LinearEquation<1, T>
     T Result;
     T Coefficient;
 };
-
 } // namespace Ivy::M

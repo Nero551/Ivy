@@ -117,7 +117,7 @@ struct LinearSystem
     constexpr LinearSolution<Variables, T> Solve() const
     {
         Matrix<Equations, Variables, T> coefficientMatrix;
-        Matrix<Equations, Variables + 1, T> A;
+        Matrix<Equations, Variables + 1, T> augmentedMatrix;
 
         //construct the coefficient matrix and the augmented row echelon form matrix.
         for (int r = 0; r < Equations; ++r)
@@ -125,20 +125,20 @@ struct LinearSystem
             auto& equation = (*this)(r);
             for (int c = 0; c < Variables; ++c)
             {
-                A(r, c) = equation(c);
+                augmentedMatrix(r, c) = equation(c);
                 coefficientMatrix(r, c) = equation(c);
             }
-            A(r, Variables) = equation.Result;
+            augmentedMatrix(r, Variables) = equation.Result;
         }
-        A = A.RowEchelon();
+        augmentedMatrix = augmentedMatrix.RowEchelon();
 
-        switch (DetermineSolutionType(coefficientMatrix, A))
+        switch (DetermineSolutionType(coefficientMatrix, augmentedMatrix))
         {
         case SolutionType::None:
             return LinearSolution<Variables, T>{SolutionType::None, Set<Vector<Variables, T>>::Empty()};
 
         case SolutionType::Unique:
-            return LinearSolution<Variables, T>{SolutionType::Unique, BackSubstitute(A)};
+            return LinearSolution<Variables, T>{SolutionType::Unique, BackSubstitute(augmentedMatrix)};
 
         case SolutionType::Infinite:
             return LinearSolution<Variables, T>{SolutionType::Infinite, CreateSolutionSet()};
@@ -170,7 +170,8 @@ struct LinearSystem
     std::array<LinearEquation<Variables, T>, Equations> m_Equations;
 
     /** @brief Determines the type of solutions from the coefficient and augmented matrices. */
-    static SolutionType DetermineSolutionType(const Matrix<Equations, Variables, T>& coefficientMatrix,
+    static constexpr SolutionType DetermineSolutionType(
+        const Matrix<Equations, Variables, T>& coefficientMatrix,
         const Matrix<Equations, Variables + 1, T>& augmentedMatrix)
     {
         const unsigned int coefficientRank = coefficientMatrix.Rank();
@@ -190,7 +191,7 @@ struct LinearSystem
     }
 
     /** @brief Creates the set of vectors satisfying every equation in the system (for infinite solutions). */
-    Set<Vector<Variables, T>> CreateSolutionSet() const
+    constexpr Set<Vector<Variables, T>> CreateSolutionSet() const
     {
         auto equations = Data();
         return Set<Vector<Variables, T>>{[equations](const Vector<Variables, T>& x)
@@ -215,19 +216,20 @@ struct LinearSystem
     }
 
     /** @brief Solves a row-echelon system by back-substitution. */
-    Vector<Variables, T> BackSubstitute(const Matrix<Equations, Variables + 1, T>& A) const
+    constexpr Vector<Variables, T> BackSubstitute(
+        const Matrix<Equations, Variables + 1, T>& augmentedMatrix) const
     {
         Vector<Variables, T> solution;
         for (int row = Variables - 1; row >= 0; --row)
         {
-            T value = A(row, Variables);
+            T value = augmentedMatrix(row, Variables);
 
             for (int column = row + 1; column < Variables; ++column)
             {
-                value -= A(row, column) * solution(column);
+                value -= augmentedMatrix(row, column) * solution(column);
             }
 
-            solution(row) = value / A(row, row);
+            solution(row) = value / augmentedMatrix(row, row);
         }
         return solution;
     }
