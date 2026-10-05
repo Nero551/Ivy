@@ -1,8 +1,5 @@
 #pragma once
-#include "Math/Equations/LinearEquation.hpp"
-#include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Math/Matrix/Matrix.hpp"
 #include "Protos/LogicPrototype.hpp"
 #include "Utilities/Log.hpp"
 
@@ -163,6 +160,7 @@ inline void Test()
 
     uInt8 c = {34};
     uInt8 d = {33};
+
     // Ivy::U::Log::Info(alu.Add(c, d));
     // Ivy::U::Log::Info(alu.Zero);
     // Ivy::U::Log::Info(alu.Overflow);

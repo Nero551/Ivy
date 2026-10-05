@@ -1,6 +1,4 @@
 #include "Window.hpp"
-
-#include "../Core/Engine.hpp"
 #include "Utilities/Log.hpp"
 
 namespace Ivy::G
