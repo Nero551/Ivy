@@ -1415,6 +1415,279 @@ TEST_CASE(
     REQUIRE(proj == Vector<3>(2, 2, 2));
 }
 
+TEST_CASE("Set membership", "[Set]")
+{
+    const Set<int> even = [](int x) { return x % 2 == 0; };
+
+    REQUIRE(even.Belongs(2));
+    REQUIRE(even.Belongs(0));
+    REQUIRE_FALSE(even.Belongs(3));
+    REQUIRE_FALSE(even.Belongs(-1));
+}
+
+TEST_CASE("Set intersection", "[Set]")
+{
+    const Set<int> even = [](int x) { return x % 2 == 0; };
+
+    const Set<int> positive = [](int x) { return x > 0; };
+
+    const auto intersection = even.Intersection(positive);
+
+    REQUIRE(intersection.Belongs(2));
+    REQUIRE(intersection.Belongs(4));
+    REQUIRE_FALSE(intersection.Belongs(0));
+    REQUIRE_FALSE(intersection.Belongs(-2));
+    REQUIRE_FALSE(intersection.Belongs(3));
+}
+
+TEST_CASE("Set union", "[Set]")
+{
+    const Set<int> even = [](int x) { return x % 2 == 0; };
+
+    const Set<int> positive = [](int x) { return x > 0; };
+
+    const auto unionSet = even.Union(positive);
+
+    REQUIRE(unionSet.Belongs(2));
+    REQUIRE(unionSet.Belongs(3));
+    REQUIRE(unionSet.Belongs(0));
+    REQUIRE_FALSE(unionSet.Belongs(-3));
+}
+
+TEST_CASE("Set difference", "[Set]")
+{
+    const Set<int> even = [](int x) { return x % 2 == 0; };
+
+    const Set<int> positive = [](int x) { return x > 0; };
+
+    const auto difference = even.Difference(positive);
+
+    REQUIRE(difference.Belongs(0));
+    REQUIRE(difference.Belongs(-2));
+    REQUIRE_FALSE(difference.Belongs(2));
+    REQUIRE_FALSE(difference.Belongs(3));
+}
+
+TEST_CASE("Set symmetric difference", "[Set]")
+{
+    const Set<int> even = [](int x) { return x % 2 == 0; };
+
+    const Set<int> positive = [](int x) { return x > 0; };
+
+    const auto difference = even.SymmetricDifference(positive);
+
+    REQUIRE_FALSE(difference.Belongs(2));
+    REQUIRE_FALSE(difference.Belongs(4));
+    REQUIRE(difference.Belongs(3));
+    REQUIRE(difference.Belongs(-2));
+    REQUIRE(difference.Belongs(0));
+}
+
+TEST_CASE("Set complement", "[Set]")
+{
+    const Set<int> even = [](int x) { return x % 2 == 0; };
+
+    const auto complement = even.Complement();
+
+    REQUIRE_FALSE(complement.Belongs(2));
+    REQUIRE_FALSE(complement.Belongs(0));
+    REQUIRE(complement.Belongs(1));
+    REQUIRE(complement.Belongs(-3));
+}
+
+TEST_CASE("Set empty and universal", "[Set]")
+{
+    const auto empty = Set<int>::Empty();
+    const auto universal = Set<int>::Universal();
+
+    REQUIRE_FALSE(empty.Belongs(0));
+    REQUIRE_FALSE(empty.Belongs(42));
+    REQUIRE_FALSE(empty.Belongs(-10));
+
+    REQUIRE(universal.Belongs(0));
+    REQUIRE(universal.Belongs(42));
+    REQUIRE(universal.Belongs(-10));
+}
+
+TEST_CASE("FiniteSet membership", "[FiniteSet]")
+{
+    FiniteSet<int> set;
+
+    REQUIRE_FALSE(set.Belongs(1));
+
+    set.Add(1);
+    set.Add(2);
+
+    REQUIRE(set.Belongs(1));
+    REQUIRE(set.Belongs(2));
+    REQUIRE_FALSE(set.Belongs(3));
+}
+
+TEST_CASE("FiniteSet does not contain duplicates", "[FiniteSet]")
+{
+    FiniteSet<int> set;
+
+    set.Add(5);
+    set.Add(5);
+    set.Add(5);
+
+    REQUIRE(set.Belongs(5));
+
+    const auto difference = set.Difference(FiniteSet<int>{});
+    REQUIRE(difference.Belongs(5));
+}
+
+TEST_CASE("FiniteSet remove", "[FiniteSet]")
+{
+    FiniteSet<int> set;
+
+    set.Add(1);
+    set.Add(2);
+
+    set.Remove(1);
+
+    REQUIRE_FALSE(set.Belongs(1));
+    REQUIRE(set.Belongs(2));
+
+    set.Remove(42);
+
+    REQUIRE(set.Belongs(2));
+}
+
+TEST_CASE("FiniteSet union", "[FiniteSet]")
+{
+    FiniteSet<int> a;
+    a.Add(1);
+    a.Add(2);
+    a.Add(3);
+
+    FiniteSet<int> b;
+    b.Add(3);
+    b.Add(4);
+    b.Add(5);
+
+    const auto result = a.Union(b);
+
+    REQUIRE(result.Belongs(1));
+    REQUIRE(result.Belongs(2));
+    REQUIRE(result.Belongs(3));
+    REQUIRE(result.Belongs(4));
+    REQUIRE(result.Belongs(5));
+}
+
+TEST_CASE("FiniteSet intersection", "[FiniteSet]")
+{
+    FiniteSet<int> a;
+    a.Add(1);
+    a.Add(2);
+    a.Add(3);
+
+    FiniteSet<int> b;
+    b.Add(2);
+    b.Add(3);
+    b.Add(4);
+
+    const auto result = a.Intersection(b);
+
+    REQUIRE_FALSE(result.Belongs(1));
+    REQUIRE(result.Belongs(2));
+    REQUIRE(result.Belongs(3));
+    REQUIRE_FALSE(result.Belongs(4));
+}
+
+TEST_CASE("FiniteSet difference", "[FiniteSet]")
+{
+    FiniteSet<int> a;
+    a.Add(1);
+    a.Add(2);
+    a.Add(3);
+
+    FiniteSet<int> b;
+    b.Add(2);
+    b.Add(4);
+
+    const auto result = a.Difference(b);
+
+    REQUIRE(result.Belongs(1));
+    REQUIRE_FALSE(result.Belongs(2));
+    REQUIRE(result.Belongs(3));
+}
+
+TEST_CASE("FiniteSet symmetric difference", "[FiniteSet]")
+{
+    FiniteSet<int> a;
+    a.Add(1);
+    a.Add(2);
+    a.Add(3);
+
+    FiniteSet<int> b;
+    b.Add(2);
+    b.Add(3);
+    b.Add(4);
+
+    const auto result = a.SymmetricDifference(b);
+
+    REQUIRE(result.Belongs(1));
+    REQUIRE_FALSE(result.Belongs(2));
+    REQUIRE_FALSE(result.Belongs(3));
+    REQUIRE(result.Belongs(4));
+}
+
+TEST_CASE("FiniteSet subset and superset", "[FiniteSet]")
+{
+    FiniteSet<int> small;
+    small.Add(1);
+    small.Add(2);
+
+    FiniteSet<int> large;
+    large.Add(1);
+    large.Add(2);
+    large.Add(3);
+
+    REQUIRE(small.IsSubsetOf(large));
+    REQUIRE_FALSE(large.IsSubsetOf(small));
+
+    REQUIRE(large.IsSupersetOf(small));
+    REQUIRE_FALSE(small.IsSupersetOf(large));
+}
+
+TEST_CASE("FiniteSet equality", "[FiniteSet]")
+{
+    FiniteSet<int> a;
+    a.Add(1);
+    a.Add(2);
+    a.Add(3);
+
+    FiniteSet<int> b;
+    b.Add(3);
+    b.Add(1);
+    b.Add(2);
+
+    FiniteSet<int> c;
+    c.Add(1);
+    c.Add(2);
+
+    REQUIRE(a == b);
+    REQUIRE_FALSE(a == c);
+}
+
+TEST_CASE("Set operations satisfy basic set identities", "[Set]")
+{
+    const Set<int> a = [](int x) { return x % 2 == 0; };
+
+    const Set<int> b = [](int x) { return x > 0; };
+
+    const Set<int> c = [](int x) { return x < 5; };
+
+    const auto left = a.Intersection(b.Union(c));
+    const auto right = a.Intersection(b).Union(a.Intersection(c));
+
+    for (int x = -10; x <= 10; ++x)
+    {
+        REQUIRE(left.Belongs(x) == right.Belongs(x));
+    }
+}
+
 TEST_CASE("Linear system has a unique solution")
 {
     LinearEquation<2> eq1{30.0, -3.0, 1.0};
