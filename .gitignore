@@ -1,10 +1,11 @@
 /.cache
 /.vscode/
 /.idea/
+/.xmake/
+/compile_commands.json
 /.agent/
 /.codex/
 /build/
-/Tests/build-tests/
 /Docs/API/
 /Traces/
 /External/

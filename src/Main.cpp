@@ -15,8 +15,8 @@ int main(const int argc, char* argv[])
         //? ex: "Ivy --renderer vulkan"
     }
 
-    Sketch::Test();
-    return 0;
+    // Sketch::Test();
+    // return 0;
 
     Ivy::C::Engine engine;
     engine.Run();

@@ -1,5 +1,0 @@
-file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS *.cpp)
-
-target_sources(Ivy PRIVATE
-        ${CORE_SOURCES}
-)
