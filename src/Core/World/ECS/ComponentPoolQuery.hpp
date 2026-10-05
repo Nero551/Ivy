@@ -57,13 +57,6 @@ struct ComponentPoolQuery
         return static_cast<ComponentPool<T>&>(**it);
     }
 
-    /** @brief Stores the cached results and version of a component query. */
-    struct QueryCache
-    {
-        std::vector<unsigned int> Entities;
-        unsigned long Version = 0;
-    };
-
     /**
      * @brief Iterates over entities containing all specified components.
      *
@@ -122,6 +115,12 @@ struct ComponentPoolQuery
     }
 
   private:
+    struct QueryCache
+    {
+        std::vector<unsigned int> Entities;
+        unsigned long Version = 0;
+    };
+
     /**
      * @brief Returns the component pools for the specified types.
      *

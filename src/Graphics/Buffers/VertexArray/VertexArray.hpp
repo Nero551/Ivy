@@ -25,7 +25,7 @@ struct VertexArray
     bool IsGenerated() const;
 
     /** @brief Deletes the VAO and resets its ID to zero. */
-    void Delete();
+    void Regenerate();
 
     /** @brief Deletes the VAO when destroyed. */
     ~VertexArray();

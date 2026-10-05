@@ -11,7 +11,7 @@ VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
 {
     if (this != &other)
     {
-        Delete();
+        Regenerate();
         m_Id = std::exchange(other.m_Id, 0);
     }
 
@@ -31,7 +31,7 @@ bool VertexArray::IsGenerated() const
     return m_Id != 0;
 }
 
-void VertexArray::Delete()
+void VertexArray::Regenerate()
 {
     glDeleteVertexArrays(1, &m_Id);
     m_Id = 0;
@@ -39,7 +39,7 @@ void VertexArray::Delete()
 
 VertexArray::~VertexArray()
 {
-    Delete();
+    glDeleteVertexArrays(1, &m_Id);
 }
 
 void VertexArray::Bind()

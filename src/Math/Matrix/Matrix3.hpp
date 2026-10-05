@@ -8,6 +8,18 @@
 
 namespace Ivy::M
 {
+
+/**
+ * @brief 3x3 matrix.
+ *
+ * Matrix convention:
+ * - Storage: column-major.
+ * - Vectors: column vectors.
+ * - Vector multiplication: M * v.
+ * - Transformations are composed through matrix multiplication.
+ *
+ * For column vectors, the rightmost transformation is applied first.
+ */
 template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, T>
 {
     using BasicMatrix<3, 3, Matrix, T>::BasicMatrix;

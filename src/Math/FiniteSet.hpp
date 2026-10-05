@@ -121,6 +121,11 @@ template <typename T> struct FiniteSet
         return false;
     }
 
+    bool operator!=(const FiniteSet& other) const
+    {
+        return !(*this == other);
+    }
+
   private:
     std::unordered_set<T> m_Elements{};
 };

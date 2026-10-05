@@ -27,7 +27,7 @@ struct IndexBuffer
     bool IsGenerated() const;
 
     /** @brief Releases the buffer and resets its ID to zero. */
-    void Delete();
+    void Regenerate();
 
     /** @brief Releases the buffer when this object is destroyed. */
     ~IndexBuffer();

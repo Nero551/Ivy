@@ -22,7 +22,8 @@ struct Uniformbuffer
     /** @brief Uniform buffer binding point. */
     unsigned int Binding = 0;
 
-    explicit Uniformbuffer(const std::string& name) : m_Name(name) {}
+    Uniformbuffer(const std::string& name) : m_Name(name) {}
+    ~Uniformbuffer();
 
     /** @brief Gets the resource name. */
     [[nodiscard]] const std::string& GetName() const

@@ -2,6 +2,10 @@
 
 namespace Ivy::G
 {
+Uniformbuffer::~Uniformbuffer()
+{
+    glDeleteBuffers(1, &m_Id);
+}
 void Uniformbuffer::Generate()
 {
     if (IsGenerated())

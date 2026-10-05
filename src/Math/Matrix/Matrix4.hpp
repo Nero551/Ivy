@@ -7,6 +7,18 @@
 
 namespace Ivy::M
 {
+
+/**
+ * @brief 4Mx4 matrix.
+ *
+ * Matrix convention:
+ * - Storage: column-major.
+ * - Vectors: column vectors.
+ * - Vector multiplication: M * v.
+ * - Transformations are composed through matrix multiplication.
+ *
+ * For column vectors, the rightmost transformation is applied first.
+ */
 template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, T>
 {
     using BasicMatrix<4, 4, Matrix, T>::BasicMatrix;

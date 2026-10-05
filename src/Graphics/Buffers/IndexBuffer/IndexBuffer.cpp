@@ -25,7 +25,7 @@ bool IndexBuffer::IsGenerated() const
     return m_Id != 0;
 }
 
-void IndexBuffer::Delete()
+void IndexBuffer::Regenerate()
 {
     glDeleteBuffers(1, &m_Id);
     m_Id = 0;

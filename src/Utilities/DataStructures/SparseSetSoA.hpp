@@ -4,7 +4,23 @@
 #include <vector>
 namespace Ivy::U
 {
-
+/**
+ * @brief Sparse-indexed storage with separately packed indices and values.
+ *
+ * Each sparse index maps to a dense index, allowing O(1) lookup while keeping
+ * active values contiguous. Dense values and their corresponding sparse indices
+ * are stored in separate arrays.
+ *
+ * Unlike SparseSetAoS, the sparse index is not stored alongside each value.
+ * This can reduce per-value storage overhead and keeps the value array free of
+ * index metadata.
+ *
+ * Erasing an entry uses swap-and-pop, so dense indices can change after an erase.
+ *
+ * @tparam T The stored value type.
+ * @tparam SparseIndexType The type used for sparse indices.
+ * @tparam DenseIndexType The type used for dense indices.
+ */
 template <typename T, std::unsigned_integral SparseIndexType = unsigned int,
     std::unsigned_integral DenseIndexType = unsigned int>
 struct SparseSetSoA

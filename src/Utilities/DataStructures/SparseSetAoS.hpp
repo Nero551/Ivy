@@ -1,29 +1,43 @@
 #pragma once
 
+#include "Utilities/Log.hpp"
+
+#include <vector>
+
 namespace Ivy::U
 {
 
 /**
- * @brief Sparse-indexed storage with densely packed values.
+ * @brief Sparse-indexed storage with densely packed entries.
  *
  * Each sparse index maps to a dense index, allowing O(1) lookup while keeping
- * active entries contiguous. Erasing an entry uses swap-and-pop, so dense
- * indices can change after an erase.
+ * active entries contiguous. Each dense entry stores both its sparse index
+ * and its associated value.
+ *
+ * Erasing an entry uses swap-and-pop, so dense indices can change after an erase.
+ *
+ * @tparam T The stored value type.
+ * @tparam SparseIndexType The type used for sparse indices.
+ * @tparam DenseIndexType The type used for dense indices.
  */
 template <typename T, std::unsigned_integral SparseIndexType = unsigned int,
     std::unsigned_integral DenseIndexType = unsigned int>
 struct SparseSetAoS
 {
-
+    /** @brief Sentinel value representing an invalid sparse index. */
     static constexpr auto InvalidSparseIndex = std::numeric_limits<SparseIndexType>::max();
+
+    /** @brief Sentinel value representing an invalid dense index. */
     static constexpr auto InvalidDenseIndex = std::numeric_limits<DenseIndexType>::max();
 
+    /** @brief A densely stored value and its associated sparse index. */
     struct Entry
     {
         SparseIndexType SparseIndex;
         T Value;
     };
 
+    /** @brief Iterator over densely stored entries. */
     template <bool Const> struct BasicIterator
     {
         using SetType = std::conditional_t<Const, const SparseSetAoS, SparseSetAoS>;
@@ -59,7 +73,10 @@ struct SparseSetAoS
         }
     };
 
+    /** @brief Mutable iterator over densely stored entries. */
     using Iterator = BasicIterator<false>;
+
+    /** @brief Read-only iterator over densely stored entries. */
     using ConstIterator = BasicIterator<true>;
 
     Iterator begin()
@@ -82,45 +99,53 @@ struct SparseSetAoS
         return {.Set = this, .Index = Size()};
     }
 
+    /** @brief Checks whether a sparse index is present. */
     bool Contains(const SparseIndexType index) const
     {
         return index < m_Sparse.size() && m_Sparse[index] != InvalidDenseIndex;
     }
 
+    /** @brief Returns the value associated with a sparse index. */
     T& At(const SparseIndexType index)
     {
         Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]].Value;
     }
 
+    /** @brief Returns the value associated with a sparse index. */
     const T& At(const SparseIndexType index) const
     {
         Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]].Value;
     }
 
+    /** @brief Returns the value associated with a sparse index without bounds checking. */
     T& operator[](const SparseIndexType index)
     {
         return m_Dense[m_Sparse[index]].Value;
     }
 
+    /** @brief Returns the value associated with a sparse index without bounds checking. */
     const T& operator[](const SparseIndexType index) const
     {
         return m_Dense[m_Sparse[index]].Value;
     }
 
+    /** @brief Returns the entry at a dense index. */
     Entry& AtDense(const DenseIndexType index)
     {
         Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 
+    /** @brief Returns the entry at a dense index. */
     const Entry& AtDense(const DenseIndexType index) const
     {
         Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 
+    /** @brief Finds the entry associated with a sparse index. */
     Iterator Find(const SparseIndexType index)
     {
         if (!Contains(index))
@@ -131,6 +156,7 @@ struct SparseSetAoS
         return {.Set = this, .Index = m_Sparse[index]};
     }
 
+    /** @brief Finds the entry associated with a sparse index. */
     ConstIterator Find(const SparseIndexType index) const
     {
         if (!Contains(index))
@@ -141,11 +167,13 @@ struct SparseSetAoS
         return {.Set = this, .Index = m_Sparse[index]};
     }
 
+    /** @brief Returns the dense index associated with a sparse index. */
     DenseIndexType DenseIndexOf(const SparseIndexType index) const
     {
         return m_Sparse[index];
     }
 
+    /** @brief Returns the sparse index associated with a dense index. */
     SparseIndexType SparseIndexOf(const DenseIndexType index) const
     {
         return m_Dense[index].SparseIndex;
@@ -186,6 +214,7 @@ struct SparseSetAoS
         return {.Set = this, .Index = m_Sparse[index]};
     }
 
+    /** @brief Constructs or replaces the value at a sparse index. */
     template <typename... Args> Iterator EmplaceOrReplace(const SparseIndexType index, Args&&... args)
     {
         if (!Contains(index))
@@ -198,7 +227,7 @@ struct SparseSetAoS
     }
 
     /**
-     * @brief Removes an entry while keeping the dense storage packed.
+     * @brief Removes an entry while keeping dense storage packed.
      *
      * The last entry is moved into the erased entry's position, so dense
      * indices are not stable across erases.
@@ -227,11 +256,13 @@ struct SparseSetAoS
         return true;
     }
 
+    /** @brief Removes the entry at a dense index. */
     bool EraseByDense(const DenseIndexType index)
     {
         return Erase(m_Dense[index].SparseIndex);
     }
 
+    /** @brief Removes all entries from the set. */
     void Clear()
     {
         m_Dense.clear();
@@ -242,31 +273,37 @@ struct SparseSetAoS
         }
     }
 
+    /** @brief Reserves capacity for dense entries. */
     void ReserveDense(const DenseIndexType size)
     {
         m_Dense.reserve(size);
     }
 
+    /** @brief Reserves capacity for sparse indices. */
     void ReserveSparse(const SparseIndexType size)
     {
         m_Sparse.reserve(size);
     }
 
+    /** @brief Returns the number of entries in the set. */
     DenseIndexType Size() const
     {
         return m_Dense.size();
     }
 
+    /** @brief Returns the densely stored entries. */
     std::vector<Entry>& Data()
     {
         return m_Dense;
     }
 
+    /** @brief Returns the densely stored entries. */
     const std::vector<Entry>& Data() const
     {
         return m_Dense;
     }
 
+    /** @brief Checks whether the set contains no entries. */
     bool Empty() const
     {
         return m_Dense.empty();

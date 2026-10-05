@@ -3,14 +3,12 @@
 
 namespace Ivy::C
 {
-/** @brief Base interface for all event types, providing polymorphic event identity. */
 struct IEvent
 {
     virtual ~IEvent() = default;
 };
 
-/** @brief Self-managing event that owns its listeners and dispatches them immediately
- * after Fire(). */
+/** @brief Self-managing event that owns its listeners and dispatches them immediately after Fire(). */
 template <typename T> struct Event : IEvent
 {
     Event() {}

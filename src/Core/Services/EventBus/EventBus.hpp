@@ -13,14 +13,9 @@ concept EventType = std::derived_from<T, IEvent>;
 struct EventBus : Service
 {
     /** @brief Constructs and immediately dispatches a global event. */
-    template <EventType T, typename... Args> void Fire(Args&&... args)
+    template <EventType T, typename... Args>
+    void Fire(Args&&... args) requires(std::constructible_from<T, Args...>)
     {
-        if constexpr (!std::constructible_from<T, Args...>)
-        {
-            U::Log::Fatal(std::string("Event: ") + typeid(T).name() +
-                " Can't Be Constructed From the Given Arguments.");
-        }
-
         auto listeners = m_Listeners.find(typeid(T));
         if (listeners == m_Listeners.end())
         {
@@ -35,14 +30,9 @@ struct EventBus : Service
     }
 
     /** @brief Queues a global event for deferred dispatch at the end of the frame. */
-    template <EventType T, typename... Args> void Queue(Args&&... args)
+    template <EventType T, typename... Args>
+    void Queue(Args&&... args) requires(std::constructible_from<T, Args...>)
     {
-        if constexpr (!std::constructible_from<T, Args...>)
-        {
-            U::Log::Fatal(std::string("Event: ") + typeid(T).name() +
-                " Can't Be Constructed From the Given Arguments.");
-        }
-
         auto event = std::make_unique<T>(std::forward<Args>(args)...);
         m_FireQueue.emplace_back(std::move(event));
     }

@@ -4,6 +4,18 @@
 
 namespace Ivy::M
 {
+
+/**
+ * @brief RxC generic matrix.
+ *
+ * Matrix convention:
+ * - Storage: column-major.
+ * - Vectors: column vectors.
+ * - Vector multiplication: M * v.
+ * - Transformations are composed through matrix multiplication.
+ *
+ * For column vectors, the rightmost transformation is applied first.
+ */
 template <unsigned int Row, unsigned int Column, Scalar T = float>
 struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column, T>, T>
 {

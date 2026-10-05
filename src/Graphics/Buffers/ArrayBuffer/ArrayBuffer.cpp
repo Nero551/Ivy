@@ -7,7 +7,7 @@ ArrayBuffer& ArrayBuffer::operator=(ArrayBuffer&& Other) noexcept
 {
     if (this != &Other)
     {
-        Delete();
+        Regenerate();
         m_Id = std::exchange(Other.m_Id, 0);
     }
 
@@ -27,7 +27,7 @@ bool ArrayBuffer::IsGenerated() const
     return m_Id != 0;
 }
 
-void ArrayBuffer::Delete()
+void ArrayBuffer::Regenerate()
 {
     glDeleteBuffers(1, &m_Id);
     m_Id = 0;
@@ -35,7 +35,7 @@ void ArrayBuffer::Delete()
 
 ArrayBuffer::~ArrayBuffer()
 {
-    Delete();
+    glDeleteBuffers(1, &m_Id);
 }
 
 void ArrayBuffer::Bind()

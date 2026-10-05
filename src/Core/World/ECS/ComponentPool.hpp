@@ -14,7 +14,6 @@ namespace Ivy::C
 
 struct World;
 
-/** @brief Type-erased base class for component pools. */
 struct IComponentPool
 {
     virtual ~IComponentPool() = default;
@@ -39,11 +38,6 @@ template <ComponentType T> struct ComponentPool : IComponentPool
     ComponentAdded ComponentAdded{};
     ComponentRemoved ComponentRemoved{};
 
-    /**
-     * @brief Iterator over components in dense storage.
-     *
-     * Dereferencing the iterator returns the entity ID and corresponding component.
-     */
     struct Iterator
     {
         ComponentPool* Pool;

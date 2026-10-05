@@ -53,7 +53,7 @@ template <typename T, Index Size> struct Array
 
 template <typename Input, typename Output>
 Output Summation(const int start, const int end, const M::Function<Input, Output>& f)
-    requires(std::is_arithmetic_v<Input>)
+    requires(std::convertible_to<int, Input> && M::Additive<Output, Output>)
 {
     Output result{};
 
@@ -166,13 +166,5 @@ inline void Test()
     // Ivy::U::Log::Info(alu.Add(c, d));
     // Ivy::U::Log::Info(alu.Zero);
     // Ivy::U::Log::Info(alu.Overflow);
-
-    M::LinearEquation<2> eq1{30.0, -3.0, 1.0};
-    M::LinearEquation<2> eq2{-70.0, -7.0, -1.0};
-
-    M::LinearSystem<2> system{eq1, eq2};
-
-    auto solution = system.Solve();
-    U::Log::Info(solution);
 }
 } // namespace Sketch

@@ -7,7 +7,7 @@
 namespace Ivy::M
 {
 /**
- * @brief 2x2 floating matrix.
+ * @brief 2x2 matrix.
  *
  * Matrix convention:
  * - Storage: column-major.
