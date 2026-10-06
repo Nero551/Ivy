@@ -1,24 +1,28 @@
 #pragma once
+#include "Math/Equations/LinearEquation.hpp"
+#include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Protos/LogicPrototype.hpp"
 #include "Utilities/Log.hpp"
 
 namespace Sketch
 {
-//TODO- If converting a general Quaternion to a rotation quaternion proves
+//TODO - If converting a general Quaternion to a rotation quaternion proves
 // expensive in a hot path, introduce a specialized RotQuaternion (RQuaternion)
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
-//TODO- play minecraft in the redstone modpack i made for understanding logic gates.
+//TODO - play minecraft in the redstone modpack i made for understanding logic gates.
 
-//TODO- redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
+//TODO - redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
 //
-//TODO- try to make dependency injection to avoid global accessors like Engine::Get().
+//TODO - try to make dependency injection to avoid global accessors like Engine::Get().
 // try to decouple as much as possible before attempting to implement DI(dependency injection)
 
-//TODO- probably wanna rethink my entire architecture (Core + Modules + World).
+//TODO - probably wanna rethink my entire architecture (Core + Modules + World).
 // the other stuff can be extracted out of this project and still work.
 // so they dont count as "part of the architecture".
+
+//TODO - it appears that clion is not seeing my pch?
 
 using namespace Ivy;
 
@@ -160,9 +164,12 @@ inline void Test()
 
     uInt8 c = {34};
     uInt8 d = {33};
-
     // Ivy::U::Log::Info(alu.Add(c, d));
     // Ivy::U::Log::Info(alu.Zero);
     // Ivy::U::Log::Info(alu.Overflow);
+    // Ivy::U::Log::Info(ls.Solve());
+
+    M::LinearEquation<1> eq{-296, -37};
+    U::Log::Info(eq.Solve());
 }
 } // namespace Sketch

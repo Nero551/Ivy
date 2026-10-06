@@ -165,13 +165,23 @@ template <Scalar T> struct LinearEquation<1, T>
     /** @brief Returns the coefficient at the specified index. */
     constexpr const T& operator()(unsigned int index) const
     {
-        return index == 0 ? Coefficient : U::Log::Fatal("LinearEquation: Index out of bounds.");
+        if (index == 0)
+        {
+            return Coefficient;
+        }
+
+        U::Log::Fatal("LinearEquation: Index out of bounds.");
     }
 
     /** @brief Returns the coefficient at the specified index. */
     constexpr T& operator()(unsigned int index)
     {
-        return index == 0 ? Coefficient : U::Log::Fatal("LinearEquation: Index out of bounds.");
+        if (index == 0)
+        {
+            return Coefficient;
+        }
+
+        U::Log::Fatal("LinearEquation: Index out of bounds.");
     }
 
     /** @brief Returns the equation multiplied by a scalar. */

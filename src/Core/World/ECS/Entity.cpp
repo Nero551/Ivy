@@ -1,5 +1,5 @@
 #include "Entity.hpp"
-#include "Core/Engine.hpp"
+#include "Core/World/World.hpp"
 
 namespace Ivy::C
 {

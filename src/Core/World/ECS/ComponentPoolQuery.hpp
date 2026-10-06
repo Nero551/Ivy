@@ -2,7 +2,6 @@
 
 #include "ComponentPool.hpp"
 #include "Core/World/ECS/Events/EntityCreated.hpp"
-#include "Core/World/World.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 
 namespace Ivy::C
