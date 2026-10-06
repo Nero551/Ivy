@@ -7,8 +7,8 @@
 #include "Modules/Renderer/Nodes/Camera.hpp"
 #include "World/Scenes/CoordinateAxesScene.hpp"
 #include "World/Scenes/FirstScene.hpp"
+#include "World/StressTester.hpp"
 #include "World/Systems/Transform3DSystem.hpp"
-#include "World/experiments/calculus.hpp"
 
 namespace Ivy::C
 {
@@ -73,7 +73,7 @@ U::CheckedPtr<Entity> World::TryFindEntity(const unsigned int id)
 void World::Start()
 {
     AddSystem<Transform3DSystem>();
-    AddSystem<calculus>();
+    AddSystem<StressTester>();
 
     Engine::Get().GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
 

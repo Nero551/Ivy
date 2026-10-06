@@ -1,5 +1,4 @@
 #pragma once
-#include "../Graphics/GraphicsContext.hpp"
 #include "../Graphics/Window.hpp"
 #include "Module.hpp"
 #include "Utilities/CheckedPtr.hpp"

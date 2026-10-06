@@ -1,7 +1,11 @@
 #pragma once
+#include "Math/Common/Exponentials.hpp"
 #include "Math/Equations/LinearEquation.hpp"
 #include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Physics/DimensionalAnalysis/DerivedDimensionals.hpp"
+#include "Physics/DimensionalAnalysis/Dimension.hpp"
+#include "Physics/DimensionalAnalysis/FundamentalDimensionals.hpp"
 #include "Protos/LogicPrototype.hpp"
 #include "Utilities/Log.hpp"
 
@@ -167,9 +171,16 @@ inline void Test()
     // Ivy::U::Log::Info(alu.Add(c, d));
     // Ivy::U::Log::Info(alu.Zero);
     // Ivy::U::Log::Info(alu.Overflow);
-    // Ivy::U::Log::Info(ls.Solve());
 
-    M::LinearEquation<1> eq{-296, -37};
-    U::Log::Info(eq.Solve());
+    P::Dimension<float, P::Velocity> speed{20};
+    P::Dimension<float, P::Length<1>> dist{115};
+
+    P::Dimension<float, P::Acceleration> accel = (speed * speed) / (2 * dist);
+    ;
+    P::Dimension<float, P::Acceleration> g{9.8};
+
+    float coefficient = accel / g;
+    //
+    U::Log::Info(coefficient);
 }
 } // namespace Sketch

@@ -47,7 +47,10 @@ template <typename A, typename B> using AddTerms = A::template WithExponent<A::E
 
 template <typename Left, typename Right> struct OperationNormalization
 {
-    using Type = OperationDimensional<Left, Right>;
+    using Operation = OperationDimensional<Left, Right>;
+
+    using Type = std::conditional_t<ZeroExponent<Left> && ZeroExponent<Right>,
+        typename Operation::template WithExponent<0>, typename Operation::template WithExponent<1>>;
 };
 
 // Term * Term

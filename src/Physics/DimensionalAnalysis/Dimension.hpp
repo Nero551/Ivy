@@ -96,6 +96,11 @@ struct Dimension
         return {Value / other.Value};
     }
 
+    constexpr operator T() const requires(D::Normalized::Exponent == 0)
+    {
+        return Value;
+    }
+
     /** @brief Provides mutable access to the underlying value. */
     constexpr T& operator()()
     {
@@ -170,6 +175,11 @@ struct Dimension
         const V& v, const Dimension& d) requires(!IsDimension<V> && M::Divisible<V, T>)
     {
         return {v / d.Value};
+    }
+
+    constexpr Dimension operator-()
+    {
+        return {-Value};
     }
 
     /** @brief Prints the value followed by its dimensional representation. */
