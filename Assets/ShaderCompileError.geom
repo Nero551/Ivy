@@ -9,7 +9,6 @@ layout (std140, binding = 0) uniform Global {
     vec3 VIEW_POSITION;
 };
 
-
 in VS_OUT {
     vec4 Position;
     vec4 WorldPosition;
@@ -41,6 +40,7 @@ void GenerateLine(int index)
     vec4(GSIn[index].Normal, 0.0) * 0.4);
     EmitVertex();
     EndPrimitive();
+
 }
 
 void main()

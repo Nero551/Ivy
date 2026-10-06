@@ -172,15 +172,15 @@ inline void Test()
     // Ivy::U::Log::Info(alu.Zero);
     // Ivy::U::Log::Info(alu.Overflow);
 
-    P::Dimension<float, P::Velocity> speed{20};
-    P::Dimension<float, P::Length<1>> dist{115};
-
-    P::Dimension<float, P::Acceleration> accel = (speed * speed) / (2 * dist);
-    ;
+    P::Dimension<float, P::Mass<1>> m1{1};
+    P::Dimension<float, P::Mass<1>> m2{20};
     P::Dimension<float, P::Acceleration> g{9.8};
 
-    float coefficient = accel / g;
+    float muk = 0.2;
+
+    P::Dimension<float, P::Acceleration> a = (((muk * m2) - m1) * g) / (m2 + m1);
+
     //
-    U::Log::Info(coefficient);
+    U::Log::Info(P::Dimension<float, P::Force>{5});
 }
 } // namespace Sketch

@@ -8,6 +8,7 @@
 #include "DataStructures/SparseSetSoA.hpp"
 #include "DataStructures/TypedVector.hpp"
 #include "FileSystem.hpp"
+#include "FixedString.hpp"
 #include "Image.hpp"
 #include "Log.hpp"
 #include "Namespace.hpp"
