@@ -1,4 +1,5 @@
 #pragma once
+#include "GLFWPlatform.hpp"
 #include "Graphics/OpenGLProfile.hpp"
 
 #include <OpenGL.hpp>
@@ -90,8 +91,14 @@ struct Window
 
     GLFWwindow* GetGlfwWindow() const;
 
+    GLFWPlatform GetPlatform() const
+    {
+        return m_Platform;
+    }
+
   private:
     GLFWwindow* m_GlfwWindow;
+    GLFWPlatform m_Platform;
 
     void SetConfiguration();
 };

@@ -7,6 +7,10 @@ add_rules("mode.debug", "mode.release")
 add_requires("catch2","glfw", "assimp", "glslang", "stb", "glad 0.1.36", "nlohmann_json", "magic_enum")
 
 target("Ivy")
+    if is_mode("release") then
+        set_policy("build.optimization.lto", true)
+    end
+
     set_kind("binary")
     set_rundir(os.projectdir())
     add_files("src/**.cpp")

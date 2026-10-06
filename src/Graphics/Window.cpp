@@ -10,6 +10,7 @@ Window::~Window()
 void Window::Generate(const int width, const int height, const std::string& title)
 {
     SetConfiguration();
+    m_Platform = static_cast<GLFWPlatform>(glfwGetPlatform());
 
     GLFWwindow* glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     m_GlfwWindow = glfwWindow;
@@ -73,6 +74,11 @@ void Window::SetTitle(const std::string& title)
 
 void Window::SetIcon(const U::Image& icon)
 {
+    if (GetPlatform() == GLFWPlatform::Wayland)
+    {
+        return;
+    }
+
     GLFWimage image;
     image.height = icon.Height;
     image.width = icon.Width;

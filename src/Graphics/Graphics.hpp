@@ -12,6 +12,7 @@
 #include "Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Buffers/VertexArray/VertexArray.hpp"
 #include "DataType.hpp"
+#include "GLFWPlatform.hpp"
 #include "GraphicsContext.hpp"
 #include "Material/Blend/BlendEquation.hpp"
 #include "Material/Blend/BlendFactor.hpp"

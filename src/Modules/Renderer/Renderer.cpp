@@ -257,7 +257,6 @@ void Renderer::Stop()
         static_cast<size_t>(texture->Width) * static_cast<size_t>(texture->Height) * 3);
 
     glBindTexture(GL_TEXTURE_2D, texture->GetId());
-
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 
     U::Image image = {texture->Width, texture->Height, U::Image::ColorChannels::RGB, pixels};
