@@ -1,5 +1,4 @@
 #pragma once
-
 namespace Ivy::U
 {
 struct TypeTree
@@ -30,6 +29,13 @@ struct TypeTree
         using Type = List<Ts..., T>;
     };
 
+    template <typename Left, typename Right> struct Concat;
+    template <typename... Ls, typename... Rs> struct Concat<List<Ls...>, List<Rs...>>
+    {
+
+        using Type = List<Ls..., Rs...>;
+    };
+
     template <typename... Ts> struct List
     {
         static constexpr std::size_t Size = sizeof...(Ts);
@@ -41,13 +47,6 @@ struct TypeTree
     {
         using Value = T;
         using Flatten = List<Leaf<T>>;
-    };
-
-    template <typename Left, typename Right> struct Concat;
-
-    template <typename... L, typename... R> struct Concat<List<L...>, List<R...>>
-    {
-        using Type = List<L..., R...>;
     };
 
     template <typename Left, typename Right> struct Node
