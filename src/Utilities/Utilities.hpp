@@ -7,6 +7,7 @@
 #include "DataStructures/SparseSetAoS.hpp"
 #include "DataStructures/SparseSetSoA.hpp"
 #include "DataStructures/TypedVector.hpp"
+#include "DataStructures/TypeTree.hpp"
 #include "FileSystem.hpp"
 #include "FixedString.hpp"
 #include "Image.hpp"

@@ -1,20 +1,10 @@
 #pragma once
-#include "Graphics/Mesh/Vertex.hpp"
-#include "Graphics/Texture/Texture2DMultisample.hpp"
-#include "Math/Common/Exponentials.hpp"
-#include "Math/Common/Trigonometry.hpp"
-#include "Math/Concepts.hpp"
-#include "Math/Equations/LinearEquation.hpp"
-#include "Math/Equations/LinearSystem.hpp"
+
 #include "Math/Math.hpp"
-#include "Physics/DimensionalAnalysis/DerivedDimensionals.hpp"
-#include "Physics/DimensionalAnalysis/Dimension.hpp"
-#include "Physics/DimensionalAnalysis/FundamentalDimensionals.hpp"
-#include "Physics/DimensionalAnalysis/OperationDimensional.hpp"
 #include "Physics/Physics.hpp"
+#include "Utilities/Utilities.hpp"
 
 #include "Utilities/Log.hpp"
-#include <cstdlib>
 
 namespace Sketch
 {
@@ -194,5 +184,9 @@ inline void Test()
     U::Log::Info(muK);
     U::Log::Info(fk);
     U::Log::Info(vf);
+
+    U::TypeTree::Node<U::TypeTree::Node<U::TypeTree::Leaf<long>, U::TypeTree::Leaf<float>>,
+        U::TypeTree::Node<U::TypeTree::Node<U::TypeTree::Leaf<int>, U::TypeTree::Leaf<unsigned int>>,
+            U::TypeTree::Leaf<double>>>::Flatten::Append<U::TypeTree::Leaf<int>>::Rebuild b;
 }
 } // namespace Sketch

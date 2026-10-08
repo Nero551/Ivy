@@ -1,0 +1,65 @@
+#pragma once
+
+namespace Ivy::U
+{
+struct TypeTree
+{
+    template <typename... T> struct List;
+    template <typename Left, typename Right> struct Node;
+
+    template <typename List> struct Rebuild;
+
+    template <typename T> struct Rebuild<List<T>>
+    {
+        using Type = T;
+    };
+
+    template <typename First, typename Second, typename... Rest> struct Rebuild<List<First, Second, Rest...>>
+    {
+      private:
+        using Tail = typename Rebuild<List<Second, Rest...>>::Type;
+
+      public:
+        using Type = Node<First, Tail>;
+    };
+
+    template <typename List, typename T> struct Append;
+
+    template <typename... Ts, typename T> struct Append<List<Ts...>, T>
+    {
+        using Type = List<Ts..., T>;
+    };
+
+    template <typename... Ts> struct List
+    {
+        static constexpr std::size_t Size = sizeof...(Ts);
+        using Rebuild = Rebuild<List<Ts...>>::Type;
+        template <typename T> using Append = Append<List<Ts...>, T>::Type;
+    };
+
+    template <typename T> struct Leaf
+    {
+        using Value = T;
+        using Flatten = List<Leaf<T>>;
+    };
+
+    template <typename Left, typename Right> struct Concat;
+
+    template <typename... L, typename... R> struct Concat<List<L...>, List<R...>>
+    {
+        using Type = List<L..., R...>;
+    };
+
+    template <typename Left, typename Right> struct Node
+    {
+        using L = Left;
+        using R = Right;
+
+        using Flatten = typename Concat<typename Left::Flatten, typename Right::Flatten>::Type;
+    };
+
+    TypeTree() = delete;
+    ~TypeTree() = delete;
+};
+
+} // namespace Ivy::U
