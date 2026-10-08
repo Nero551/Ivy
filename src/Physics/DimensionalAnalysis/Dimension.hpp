@@ -186,8 +186,31 @@ struct Dimension
     friend std::ostream& operator<<(std::ostream& os, Dimension dimension) requires(M::Printable<T>)
     {
         os << dimension.Value << ' ';
+        if (D::Exponent == 0)
+        {
+            return os;
+        }
         return D::Print(os);
     }
 };
+
+template <int N, typename T, typename D>
+P::Dimension<M::MultiplicationResult<T, T>, typename D::template WithExponent<D::Exponent * N>> Pow(
+    const P::Dimension<T, D>& dim)
+{
+    T result = dim.Value;
+    for (int i = 1; i < N; ++i)
+    {
+        result *= dim.Value;
+    }
+    return result;
+}
+
+template <typename T, typename D>
+P::Dimension<M::SqRootResult<T>, typename D::Normalized::template WithRoot<2>> Sqrt(
+    const P::Dimension<T, D>& dim) requires(M::SqRootable<T>)
+{
+    return M::Sqrt(dim.Value);
+}
 
 } // namespace Ivy::P

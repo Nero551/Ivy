@@ -189,6 +189,10 @@ struct OperationDimensional : IOperationDimensional
     using WithExponent = OperationDimensional<Exponentiate<Left, Left::Exponent * E>,
         Exponentiate<Right, Right::Exponent * E>>;
 
+    template <int E>
+    using WithRoot =
+        OperationDimensional<typename Left::template WithRoot<E>, typename Right::template WithRoot<E>>;
+
     static std::ostream& Print(std::ostream& os)
     {
         if constexpr (!Name.Empty())

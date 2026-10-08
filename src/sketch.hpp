@@ -1,23 +1,16 @@
 #pragma once
-#include "Graphics/Shader/Uniforms/Vector2Uniform.hpp"
+#include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
-#include "Math/Coordinates/Polar.hpp"
-#include "Math/Equations/LinearEquation.hpp"
-#include "Math/Equations/LinearSystem.hpp"
-#include "Math/Functions/Function.hpp"
-#include "Math/Vector/Vector.hpp"
+#include "Math/Math.hpp"
 #include "Physics/DimensionalAnalysis/DerivedDimensionals.hpp"
 #include "Physics/DimensionalAnalysis/Dimension.hpp"
 #include "Physics/DimensionalAnalysis/FundamentalDimensionals.hpp"
-#include "Physics/Units.hpp"
-#include "Utilities/FixedString.hpp"
+#include "Physics/DimensionalAnalysis/OperationDimensional.hpp"
+#include "Physics/Physics.hpp"
+
 #include "Utilities/Log.hpp"
-#include <array>
-#include <cmath>
-#include <ostream>
-#include <stdexcept>
-#include <string_view>
+#include <cstdlib>
 
 namespace Sketch
 {
@@ -36,8 +29,11 @@ namespace Sketch
 // the other stuff can be extracted out of this project and still work.
 // so they dont count as "part of the architecture".
 
-//TODO: make transform system cache its own vector of the root's children thats updated on events
+//TODO: make transform system cache its own vector of the root's children that's updated on events
 // that will make it way less expensive performance-wise.
+//
+//TODO: the dimensional analysis is very inflexible when it comes to roots and fractional exponents. fix that
+//TODO: also the operation normalization is a nightmare to look at.
 
 using namespace Ivy;
 
@@ -175,24 +171,17 @@ template <unsigned int... Dimensions> struct Tensor
 
 inline void Test()
 {
-    P::Dimension<float, P::Mass<1>> m = 65 * P::Units::Gram;
-    P::Dimension<float, P::Length<1>> sL = 35.7 * P::Units::Centimeter;
-    P::Dimension<float, P::Length<1>> sW = 28 * P::Units::Centimeter;
+    M::Matrix<2, 2> inclineBasis = M::Matrix<2, 2>::Identity().Rotate(M::Rad(15));
+
+    float theta = 15;
+
     P::Dimension<float, P::Acceleration> g = 9.8;
+    P::Dimension<float, P::Acceleration> a = -g * M::DSin(theta);
+    P::Dimension<float, P::Length<1>> deltaX = 2;
 
-    float theta = M::AcosD(sW / sL);
+    P::Dimension<float, P::Velocity> v = P::Sqrt(2 * deltaX * -a);
 
-    P::Dimension<float, P::Force> T = (m * g) / M::DSin(theta);
-    P::Dimension<float, P::Force> Tx = T * M::DCos(theta);
-
-    U::Log::Info(T);
-    U::Log::Info(Tx);
-
-    M::LinearEquation<2> eq1{0, -M::DCos(theta), 1};
-    M::LinearEquation<2> eq2{0.637, M::DSin(theta), 0};
-
-    M::LinearSystem<2, 2> sys{eq1, eq2};
-
-    U::Log::Info(sys.Solve());
+    U::Log::Info(a);
+    U::Log::Info(v);
 }
 } // namespace Sketch

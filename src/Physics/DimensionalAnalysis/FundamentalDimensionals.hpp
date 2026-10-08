@@ -41,6 +41,8 @@ template <template <int> typename Derived, int Exp> struct Dimensional : IDimens
     static constexpr int Exponent = Exp;
 
     template <int E> using WithExponent = Derived<E>;
+    template <int E> requires(Exponent % E == 0)
+    using WithRoot = Derived<Exponent / E>;
 
     static std::ostream& Print(std::ostream& os)
     {

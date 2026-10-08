@@ -223,23 +223,23 @@ TEST_CASE(
     "Complex exponentials and logarithms")
 {
     Complex<> z(0, PI / 2);
-    Complex<> e = CExp(z);
+    Complex<> e = Exp(z);
     REQUIRE(e.Real == Approx(0.0f).margin(1e-6f));
     REQUIRE(e.Imaginary == Approx(1.0f));
 
-    Complex<> ln = CLn(z);
+    Complex<> ln = Ln(z);
     REQUIRE(ln.Real == Approx(Ln(PI / 2)));
     REQUIRE(ln.Imaginary == Approx(PI / 2));
 
-    Complex<> p = CPow(E, z);
+    Complex<> p = Pow(E, z);
     REQUIRE(p.Real == Approx(0.0f).margin(1e-6f));
     REQUIRE(p.Imaginary == Approx(1.0f));
 
-    Complex<> p2 = CPow(z, 2.0f);
+    Complex<> p2 = Pow(z, 2.0f);
     REQUIRE(p2.NearlyEquals(z * z));
 
     Complex<> w(1, 1);
-    Complex<> p3 = CPow(z, w);
+    Complex<> p3 = Pow(z, w);
     (void)p3;
 }
 
@@ -248,7 +248,7 @@ TEST_CASE(
     "Complex sqrt")
 {
     Complex<> z(0, 1);
-    Complex<> sqrt = CSqrt(z);
+    Complex<> sqrt = Sqrt(z);
     REQUIRE(z.NearlyEquals(sqrt * sqrt));
 }
 
@@ -1136,19 +1136,19 @@ TEST_CASE(
 {
     Quaternion<> q(1.2f, 0.5f, -0.7f, 0.8f);
 
-    Quaternion<> result = QLn(QExp(q));
+    Quaternion<> result = Ln(Exp(q));
 
     REQUIRE(result.NearlyEquals(q));
 
-    Quaternion<> sq = QSqrt(q);
+    Quaternion<> sq = Sqrt(q);
     REQUIRE((sq * sq).NearlyEquals(q));
 
-    Quaternion<> p = QPow(q, 2.0f);
+    Quaternion<> p = Pow(q, 2.0f);
     REQUIRE(p.NearlyEquals(q * q));
 
-    REQUIRE(QLn(QExp(Quaternion<>(0, 1, 0, 0))).NearlyEquals(Quaternion<>(0, 1, 0, 0)));
+    REQUIRE(Ln(Exp(Quaternion<>(0, 1, 0, 0))).NearlyEquals(Quaternion<>(0, 1, 0, 0)));
 
-    REQUIRE(QLn(QExp(Quaternion<>(0, -1, 0, 0))).NearlyEquals(Quaternion<>(0, -1, 0, 0)));
+    REQUIRE(Ln(Exp(Quaternion<>(0, -1, 0, 0))).NearlyEquals(Quaternion<>(0, -1, 0, 0)));
 }
 
 TEST_CASE(
@@ -1157,7 +1157,7 @@ TEST_CASE(
 {
     Quaternion<> q(1.2f, 0.5f, -0.7f, 0.8f);
 
-    Quaternion<> result = QLn(QExp(q));
+    Quaternion<> result = Ln(Exp(q));
 
     REQUIRE(result.NearlyEquals(q));
 }
@@ -1168,7 +1168,7 @@ TEST_CASE(
 {
     Quaternion<> q(1.2f, 2.0f, -0.7f, 3.1f);
 
-    Quaternion<> result = QLn(QExp(q));
+    Quaternion<> result = Ln(Exp(q));
 
     REQUIRE_FALSE(result.NearlyEquals(q));
 }

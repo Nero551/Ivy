@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Math/Common/Exponentials.hpp"
+#include <utility>
 namespace Ivy::M
 {
 
@@ -8,6 +10,9 @@ concept Scalar = std::same_as<T, float>;
 
 template <typename T, typename O>
 concept Additive = requires(T a, O b) { a + b; };
+
+template <typename T>
+concept SqRootable = requires(T a) { Sqrt(a); };
 
 template <typename T, typename O>
 concept Subtractive = requires(T a, O b) { a - b; };
@@ -30,6 +35,8 @@ concept Printable = requires(T a) { std::cout << a; };
 template <typename T, typename O> using AdditionResult = decltype(std::declval<T>() + std::declval<O>());
 
 template <typename T, typename O> using SubtractionResult = decltype(std::declval<T>() - std::declval<O>());
+
+template <typename T> using SqRootResult = decltype(Sqrt(std::declval<T>()));
 
 template <typename T, typename O>
 using MultiplicationResult = decltype(std::declval<T>() * std::declval<O>());

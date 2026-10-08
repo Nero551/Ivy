@@ -297,4 +297,61 @@ template <Scalar T = float> struct Complex
         return os;
     }
 };
+
+inline constexpr Complex<> I{0, 1};
+
+/** @brief Raises a real number to a complex power. */
+template <Scalar T> constexpr Complex<T> Pow(const T x, const Complex<T>& z)
+{
+    return Exp(Ln(x) * z);
+}
+
+/** @brief Raises a complex number to a real power. */
+template <Scalar T> constexpr Complex<T> Pow(const Complex<T>& z, const T power)
+{
+    Complex<T> result;
+
+    T magnitude = Pow(z.Magnitude(), power);
+    T theta = z.Argument() * power;
+
+    result.Real = magnitude * std::cos(theta);
+    result.Imaginary = magnitude * std::sin(theta);
+
+    return result;
+}
+
+/** @brief Raises a complex number to a complex power. */
+template <Scalar T> constexpr Complex<T> Pow(const Complex<T>& z, const Complex<T>& w)
+{
+    return Exp(w * Ln(z));
+}
+
+/** @brief Computes the square root of a complex number. */
+template <Scalar T> constexpr Complex<T> Sqrt(const Complex<T>& z)
+{
+    return Pow(z, T{1} / T{2});
+}
+
+/** @brief Computes the exponential of a complex number. */
+template <Scalar T> constexpr Complex<T> Exp(const Complex<T>& z)
+{
+    T magnitude = Exp(z.Real);
+    return {magnitude * std::cos(z.Imaginary), magnitude * std::sin(z.Imaginary)};
+}
+
+/** @brief Computes the natural logarithm of a complex number. */
+template <Scalar T> constexpr Complex<T> Ln(const Complex<T>& z)
+{
+    Complex<T> result;
+    result.Real = Ln(z.Magnitude());
+    result.Imaginary = z.Argument();
+
+    return result;
+}
+
+/** @brief Computes the logarithm of a complex number with a complex base. */
+template <Scalar T> constexpr Complex<T> Log(const Complex<T>& base, const Complex<T>& z)
+{
+    return Ln(z) / Ln(base);
+}
 } // namespace Ivy::M

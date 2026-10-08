@@ -533,4 +533,77 @@ template <Scalar T = float> struct Quaternion
         return Quaternion{1, 0, 0, 0};
     }
 };
+
+/** @brief Computes the exponential of a quaternion. */
+template <Scalar T> constexpr Quaternion<T> Exp(const Quaternion<T>& q)
+{
+    T r = q.Magnitude();
+    T theta = q.Angle();
+    Vector<3, T> axis = q.Axis();
+
+    T magnitude = Exp(r * std::cos(theta));
+    T rsin = r * std::sin(theta);
+
+    Quaternion<T> result;
+    result.w = magnitude * std::cos(rsin);
+    result.x = magnitude * axis.x * std::sin(rsin);
+    result.y = magnitude * axis.y * std::sin(rsin);
+    result.z = magnitude * axis.z * std::sin(rsin);
+
+    return result;
+}
+
+/** @brief Raises a real number to a quaternion power. */
+template <Scalar T> constexpr Quaternion<T> Pow(const T x, const Quaternion<T>& q)
+{
+    return Exp(Ln(x) * q);
+}
+
+/** @brief Raises a quaternion to a real power. */
+template <Scalar T> constexpr Quaternion<T> Pow(const Quaternion<T>& q, const T power)
+{
+    T magnitude = Pow(q.Magnitude(), power);
+    T theta = q.Angle();
+    Vector<3, T> axis = q.Axis();
+    T sine = std::sin(theta * power);
+
+    Quaternion<T> result;
+    result.w = magnitude * std::cos(theta * power);
+    result.x = magnitude * axis.x * sine;
+    result.y = magnitude * axis.y * sine;
+    result.z = magnitude * axis.z * sine;
+
+    return result;
+}
+
+/** @brief Raises a quaternion to a quaternion power using p * Ln(q). */
+template <Scalar T> constexpr Quaternion<T> Pow(const Quaternion<T>& q, const Quaternion<T>& p)
+{
+    return Exp(p * QLn(q));
+}
+
+/** @brief Computes the square root of a quaternion. */
+template <Scalar T> constexpr Quaternion<T> Sqrt(const Quaternion<T>& q)
+{
+    return Pow(q, T{1} / T{2});
+}
+
+template <Scalar T> constexpr Quaternion<T> Ln(const Quaternion<T>& q)
+{
+    Quaternion<T> result;
+    Vector<3, T> axis = q.Axis();
+
+    // q.w is m * cos(rsin(x))
+    // their arctan returns rsin, which is the original magnitude * sin(original angle)
+    T rsin = std::atan2(q.Magnitude() * std::sin(q.Angle()), q.w);
+
+    // axis is unchanged by exponentiation so "u" remains the same
+    // so this is u * original magnitude * sin(original angle)
+    result.w = Ln(q.Magnitude());
+    result.x = axis.x * rsin;
+    result.y = axis.y * rsin;
+    result.z = axis.z * rsin;
+
+    return result;
+}
 } // namespace Ivy::M
