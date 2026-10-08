@@ -8,18 +8,37 @@
 namespace Ivy::P
 {
 
-template <typename A, typename B>
-concept DimensionalPair = std::derived_from<A, IDimensional> && std::derived_from<B, IDimensional>;
+template <typename A, typename B, U::FixedString Name = ""> struct OperationDimensional;
 
-struct IOperationDimensional : IDimensional
+template <typename T> struct IsDimensionalType : std::false_type
+{
+};
+template <template <int> typename Derived, int Exp> struct IsDimensionalType<Derived<Exp>> : std::true_type
 {
 };
 
-template <typename A, typename B, U::FixedString Name = ""> requires DimensionalPair<A, B>
-struct OperationDimensional;
+template <typename A, typename B, U::FixedString N>
+struct IsDimensionalType<OperationDimensional<A, B, N>> : std::true_type
+{
+};
 
 template <typename T>
-concept IsOperation = std::derived_from<T, IOperationDimensional>;
+concept IsDimensional = IsDimensionalType<T>::value;
+
+template <typename A, typename B>
+concept DimensionalPair = IsDimensional<A> && IsDimensional<B>;
+
+template <typename T> struct IsOperationType : std::false_type
+{
+};
+
+template <typename A, typename B, U::FixedString Name>
+struct IsOperationType<OperationDimensional<A, B, Name>> : std::true_type
+{
+};
+
+template <typename T>
+concept IsOperation = IsOperationType<T>::value;
 
 template <typename T>
 concept IsTerm = !IsOperation<T>;
@@ -176,7 +195,7 @@ struct OperationNormalization<LeftOperation, RightOperation>
 
 /** @brief Represents a compound dimensional expression composed of two dimensional types. */
 template <typename A, typename B, U::FixedString Name> requires DimensionalPair<A, B>
-struct OperationDimensional : IOperationDimensional
+struct OperationDimensional<A, B, Name>
 {
     using Left = A::Normalized;
     using Right = B::Normalized;

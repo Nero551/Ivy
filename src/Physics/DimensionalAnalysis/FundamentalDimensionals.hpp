@@ -31,12 +31,8 @@ inline std::string Superscript(int exponent)
     return result;
 };
 
-struct IDimensional
-{
-};
-
 /** @brief Provides the common compile-time interface for a dimensional type. */
-template <template <int> typename Derived, int Exp> struct Dimensional : IDimensional
+template <template <int> typename Derived, int Exp> struct Dimensional
 {
     static constexpr int Exponent = Exp;
 

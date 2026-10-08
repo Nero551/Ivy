@@ -30,6 +30,7 @@ namespace Sketch
 //TODO: also the operation normalization is a nightmare to look at.
 //
 //TODO: a better way to do dimensional analysis, is to flatten the tree then simplify, then sort it in a canonical order.
+// USE U::TypeTree.
 
 using namespace Ivy;
 
@@ -184,9 +185,5 @@ inline void Test()
     U::Log::Info(muK);
     U::Log::Info(fk);
     U::Log::Info(vf);
-
-    U::TypeTree::Node<U::TypeTree::Node<U::TypeTree::Leaf<long>, U::TypeTree::Leaf<float>>,
-        U::TypeTree::Node<U::TypeTree::Node<U::TypeTree::Leaf<int>, U::TypeTree::Leaf<unsigned int>>,
-            U::TypeTree::Leaf<double>>>::Flatten::Append<U::TypeTree::Leaf<int>>::Rebuild b;
 }
 } // namespace Sketch

@@ -6,6 +6,7 @@ struct TypeTree
     template <typename... T> struct List;
     template <typename Left, typename Right> struct Node;
 
+  private:
     template <typename List> struct Rebuild;
 
     template <typename T> struct Rebuild<List<T>>
@@ -29,6 +30,7 @@ struct TypeTree
         using Type = List<Ts..., T>;
     };
 
+  public:
     template <typename Left, typename Right> struct Concat;
     template <typename... Ls, typename... Rs> struct Concat<List<Ls...>, List<Rs...>>
     {
@@ -49,16 +51,17 @@ struct TypeTree
         using Flatten = List<Leaf<T>>;
     };
 
-    template <typename Left, typename Right> struct Node
+    template <typename L, typename R> struct Node
     {
-        using L = Left;
-        using R = Right;
+        using Left = L;
+        using Right = R;
 
         using Flatten = typename Concat<typename Left::Flatten, typename Right::Flatten>::Type;
     };
 
     TypeTree() = delete;
     ~TypeTree() = delete;
+    TypeTree& operator=(TypeTree&) = delete;
 };
 
 } // namespace Ivy::U

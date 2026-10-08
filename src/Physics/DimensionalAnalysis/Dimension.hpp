@@ -9,9 +9,7 @@ namespace Ivy::P
 template <typename T, typename D>
 concept SameNormalized = std::same_as<typename T::Normalized, typename D::Normalized>;
 
-struct IDimensional;
-
-template <typename T, typename D> requires(std::derived_from<D, IDimensional>)
+template <typename T, typename D> requires(IsDimensional<D>)
 struct Dimension;
 
 template <typename T> struct IsDimensionType : std::false_type
@@ -35,7 +33,7 @@ concept IsDimension = IsDimensionType<std::remove_cvref_t<F>>::value;
  * Addition and subtraction require equivalent normalized dimensions, while
  * multiplication and division combine and normalize their dimensions.
  */
-template <typename T, typename D> requires(std::derived_from<D, IDimensional>)
+template <typename T, typename D> requires(IsDimensional<D>)
 struct Dimension
 {
     using Dimensional = D::Normalized;
