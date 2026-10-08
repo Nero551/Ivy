@@ -38,7 +38,7 @@ concept IsDimension = IsDimensionType<std::remove_cvref_t<F>>::value;
 template <typename T, typename D> requires(std::derived_from<D, IDimensional>)
 struct Dimension
 {
-    using Dimensional = D;
+    using Dimensional = D::Normalized;
 
     template <typename P, typename O> using AddExp = P::template WithExponent<P::Exponent + O::Exponent>;
 
@@ -207,7 +207,7 @@ P::Dimension<M::MultiplicationResult<T, T>, typename D::template WithExponent<D:
 }
 
 template <typename T, typename D>
-P::Dimension<M::SqRootResult<T>, typename D::Normalized::template WithRoot<2>> Sqrt(
+P::Dimension<M::SqRootResult<T>, typename D::Normalized::template WithRoot<2>::Normalized> Sqrt(
     const P::Dimension<T, D>& dim) requires(M::SqRootable<T>)
 {
     return M::Sqrt(dim.Value);

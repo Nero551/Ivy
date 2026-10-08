@@ -3,7 +3,7 @@
 /**
  * @namespace Ivy::M
  * @brief A math library for the Ivy game engine.
- * here. Mainly contains:
+ * Mainly contains:
  *  - Vectors
  *  - Matrices
  *  - Complex numbers
