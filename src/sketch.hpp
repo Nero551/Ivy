@@ -1,32 +1,43 @@
 #pragma once
-#include "Math/Common/Exponentials.hpp"
+#include "Graphics/Shader/Uniforms/Vector2Uniform.hpp"
+#include "Math/Common/Trigonometry.hpp"
+#include "Math/Concepts.hpp"
+#include "Math/Coordinates/Polar.hpp"
 #include "Math/Equations/LinearEquation.hpp"
 #include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Vector/Vector.hpp"
 #include "Physics/DimensionalAnalysis/DerivedDimensionals.hpp"
 #include "Physics/DimensionalAnalysis/Dimension.hpp"
 #include "Physics/DimensionalAnalysis/FundamentalDimensionals.hpp"
-#include "Protos/LogicPrototype.hpp"
+#include "Physics/Units.hpp"
+#include "Utilities/FixedString.hpp"
 #include "Utilities/Log.hpp"
+#include <array>
+#include <cmath>
+#include <ostream>
+#include <stdexcept>
+#include <string_view>
 
 namespace Sketch
 {
-//TODO - If converting a general Quaternion to a rotation quaternion proves
+//TODO: If converting a general Quaternion to a rotation quaternion proves
 // expensive in a hot path, introduce a specialized RotQuaternion (RQuaternion)
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
-//TODO - play minecraft in the redstone modpack i made for understanding logic gates.
+//TODO: play minecraft in the redstone modpack i made for understanding logic gates.
 
-//TODO - redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
+//TODO: redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
 //
-//TODO - try to make dependency injection to avoid global accessors like Engine::Get().
+//TODO: try to make dependency injection to avoid global accessors like Engine::Get().
 // try to decouple as much as possible before attempting to implement DI(dependency injection)
 
-//TODO - probably wanna rethink my entire architecture (Core + Modules + World).
+//TODO: probably wanna rethink my entire architecture (Core + Modules + World).
 // the other stuff can be extracted out of this project and still work.
 // so they dont count as "part of the architecture".
 
-//TODO - it appears that clion is not seeing my pch?
+//TODO: make transform system cache its own vector of the root's children thats updated on events
+// that will make it way less expensive performance-wise.
 
 using namespace Ivy;
 
@@ -125,7 +136,7 @@ template <unsigned int... Dimensions> struct Tensor
     static constexpr std::array<unsigned int, Order> Strides = GetStrides();
 
     static void Print(std::ostream& os, const Tensor& tensor,
-        const std::array<unsigned int, Order> dimensions, unsigned int dimension, unsigned int flatIndex,
+        const std::array<unsigned int, Order>& dimensions, unsigned int dimension, unsigned int flatIndex,
         const unsigned int indent)
     {
         os << std::string(indent, ' ') << "[\n";
@@ -164,23 +175,24 @@ template <unsigned int... Dimensions> struct Tensor
 
 inline void Test()
 {
-    ALU alu;
+    P::Dimension<float, P::Mass<1>> m = 65 * P::Units::Gram;
+    P::Dimension<float, P::Length<1>> sL = 35.7 * P::Units::Centimeter;
+    P::Dimension<float, P::Length<1>> sW = 28 * P::Units::Centimeter;
+    P::Dimension<float, P::Acceleration> g = 9.8;
 
-    uInt8 c = {34};
-    uInt8 d = {33};
-    // Ivy::U::Log::Info(alu.Add(c, d));
-    // Ivy::U::Log::Info(alu.Zero);
-    // Ivy::U::Log::Info(alu.Overflow);
+    float theta = M::AcosD(sW / sL);
 
-    P::Dimension<float, P::Mass<1>> m1{1};
-    P::Dimension<float, P::Mass<1>> m2{20};
-    P::Dimension<float, P::Acceleration> g{9.8};
+    P::Dimension<float, P::Force> T = (m * g) / M::DSin(theta);
+    P::Dimension<float, P::Force> Tx = T * M::DCos(theta);
 
-    float muk = 0.2;
+    U::Log::Info(T);
+    U::Log::Info(Tx);
 
-    P::Dimension<float, P::Acceleration> a = (((muk * m2) - m1) * g) / (m2 + m1);
+    M::LinearEquation<2> eq1{0, -M::DCos(theta), 1};
+    M::LinearEquation<2> eq2{0.637, M::DSin(theta), 0};
 
-    //
-    U::Log::Info(P::Dimension<float, P::Force>{5});
+    M::LinearSystem<2, 2> sys{eq1, eq2};
+
+    U::Log::Info(sys.Solve());
 }
 } // namespace Sketch

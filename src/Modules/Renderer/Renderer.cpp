@@ -156,7 +156,7 @@ void Renderer::BeginFrame(double dt)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-// TODO- after i learn compute shaders, i could move this entire rendering pipeline on a
+//TODO: after i learn compute shaders, i could move this entire rendering pipeline on a
 // compute shader.
 void Renderer::RenderWorld()
 {
@@ -230,7 +230,7 @@ void Renderer::OnEntityDestroyed(const C::EntityDestroyed& event)
     }
 }
 
-// TODO- if there is multiple semi-transparent objects behind each other , depth testing
+//TODO: if there is multiple semi-transparent objects behind each other , depth testing
 // breaks blending.
 //  fix this by classifying render passes by transparency, pairs well with future render
 //  batches / instancing. for ordering semi-transparent object by distance , use a map ,

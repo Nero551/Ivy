@@ -114,7 +114,7 @@ void ShaderSource::Preprocess()
     PreprocessIncludes(Path, GeneratedCode, includesProcessing);
 }
 
-// TODO- replace with line by line parsing
+//TODO: replace with line by line parsing
 void ShaderSource::PreprocessIncludes(
     const std::string& path, std::string& code, std::unordered_set<std::string>& includesProcessing)
 {

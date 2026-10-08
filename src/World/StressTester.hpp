@@ -16,7 +16,7 @@ struct StressTester : C::System
 {
     void Start() override
     {
-        FourDimensionalProjection(4);
+        ThreeDimensionalProjection(1);
     }
 
     void Update(double dt) override

@@ -1,11 +1,9 @@
 #pragma once
 
-#include <string_view>
-
-namespace Ivy::Reflection
+namespace Ivy::Meta
 {
 
-//TODO- understanding macros is the key to making reflection.
+//TODO: understanding macros is the key to making reflection.
 
 using TypeId = unsigned long;
 
@@ -117,4 +115,4 @@ template <typename T> AttributeInfo RegisterAttribute(const std::string_view nam
 #define REGISTER_ATTRIBUTE(Struct, Member)                                                                   \
     Ivy::Reflection::RegisterAttribute<decltype(Struct::Member)>(#Member, offsetof(Struct, Member))
 
-} // namespace Ivy::Reflection
+} // namespace Ivy::Meta

@@ -1,6 +1,0 @@
-Diagnostics:
-  Suppress:
-    - c2y-extensions
-
-CompileFlags:
-  Add: [-std=c++26, -Wall]

@@ -1,13 +1,10 @@
 #pragma once
-#include "../ArrayBuffer/ArrayBuffer.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
+#include "Graphics/Buffers/BufferUsage.hpp"
 #include "OpenGL.hpp"
 
 namespace Ivy::G
 {
-/**
- * @brief Represents an OpenGL Uniform Buffer Object.
- */
+/** @brief Represents an OpenGL Uniform Buffer Object. */
 struct Uniformbuffer
 {
     //TODO: Store uniforms and calculate their offsets automatically.
@@ -26,7 +23,7 @@ struct Uniformbuffer
     ~Uniformbuffer();
 
     /** @brief Gets the resource name. */
-    [[nodiscard]] const std::string& GetName() const
+    const std::string& GetName() const
     {
         return m_Name;
     }

@@ -53,7 +53,7 @@ struct Transform3DComponent : C::Component
     }
 
   private:
-    // TODO-this is temporary until i have a proper change detection system (reflection)
+    //TODO:this is temporary until i have a proper change detection system (reflection)
     C::Track<M::Vector<3>> GlobalPosition = M::Vector<3>::Zero();
     C::Track<M::Quaternion<>> GlobalRotation = M::Quaternion<>::Identity();
     C::Track<M::Vector<3>> GlobalScale = M::Vector<3>::One();

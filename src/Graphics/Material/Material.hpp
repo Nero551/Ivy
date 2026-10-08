@@ -24,7 +24,7 @@ namespace Ivy::G
  */
 struct Material
 {
-    // TODO- combine this custom textures thing with the maps , somehow.
+    //TODO: combine this custom textures thing with the maps , somehow.
 
     /** Maximum number of custom textures that can be assigned to a material. */
     static constexpr int MaxCustomTextures = 8;

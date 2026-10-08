@@ -14,7 +14,7 @@ namespace Ivy::M
  * where the magnitude represents the distance from the origin and the
  * angle represents the direction measured from the positive x-axis.
  */
-template <Scalar T> struct Polar
+template <Scalar T = float> struct Polar
 {
     /** @brief The angle in radians. */
     T Angle;

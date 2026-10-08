@@ -1,5 +1,4 @@
 #pragma once
-#include "Math/Concepts.hpp"
 
 namespace Ivy::M
 {

@@ -6,8 +6,8 @@ namespace Ivy::P
 {
 
 /** @brief Checks whether two dimensional types resolve to the same normalized type. */
-template <typename T, typename K>
-concept SameNormalized = std::same_as<typename T::Normalized, typename K::Normalized>;
+template <typename T, typename D>
+concept SameNormalized = std::same_as<typename T::Normalized, typename D::Normalized>;
 
 struct IDimensional;
 
@@ -73,7 +73,7 @@ struct Dimension
     }
 
     /**
-     * @brief Multiplies values with potentially different dimensions.
+     * @brief Multiplies values with different dimensions.
      * The resulting dimensions are combined and normalized at compile time.
      */
     template <typename V, typename O>
@@ -84,7 +84,7 @@ struct Dimension
     }
 
     /**
-     * @brief Divides values with potentially different dimensions.
+     * @brief Divides values with different dimensions.
      *
      * The divisor's exponent is negated before the dimensions are combined
      * and normalized at compile time.

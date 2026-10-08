@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Ivy::DigialLogic
+{
+
 using Bit = bool;
 
 inline Bit NOT(const Bit bit)
@@ -158,3 +161,4 @@ struct uInt8 : Bits<8>
         }
     }
 };
+} // namespace Ivy::DigialLogic

@@ -19,9 +19,9 @@ struct CameraComponent : C::Component
     float Pitch = 0;
     G::ProjectionMode ProjectionMode = G::ProjectionMode::Perspective;
 
-    [[nodiscard]] M::Matrix<4, 4> GetProjectionMatrix() const
+    M::Matrix<4, 4> GetProjectionMatrix() const
     {
-        // TODO- currently , orthographic doesn't fucking work
+        //TODO: currently , orthographic doesn't fucking work
         if (ProjectionMode == G::ProjectionMode::Orthographic)
         {
             return M::Matrix<4, 4>::Orthographic(

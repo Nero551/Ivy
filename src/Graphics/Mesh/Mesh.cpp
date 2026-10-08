@@ -60,7 +60,7 @@ void Mesh::Draw()
 
     else if (RenderMode == RenderMode::SolidWireframe)
     {
-        // TODO- apparently there is a better way to do this using geometry shaders
+        //TODO: apparently there is a better way to do this using geometry shaders
         // (search SolidWireframe opengl on yt).
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         DrawElements();

@@ -1,4 +1,4 @@
-#version 450 core
+#version 460 core
 layout (std140, binding = 0) uniform Global {
     mat4 VIEW_MATRIX;
     mat4 PROJECTION_MATRIX;
@@ -39,121 +39,91 @@ void CheckAlpha(){
     discard;
 }
 
+vec4 Kernel(sampler2D tex, vec2 uv, float kernel[9], float offset) {
+    vec2 offsets[9] = vec2[](
+            vec2(-offset, offset),
+            vec2(0.0, offset),
+            vec2(offset, offset),
+            vec2(-offset, 0.0),
+            vec2(0.0, 0.0),
+            vec2(offset, 0.0),
+            vec2(-offset, -offset),
+            vec2(0.0, -offset),
+            vec2(offset, -offset)
+    );
 
-struct Light {
-    int Type;
-    vec3 Direction;
-    vec3 Color;
-    vec3 Position;
-    vec3 Ambient;
-    vec3 Diffuse;
-    vec3 Specular;
+    vec3 samples[9];
 
-    float Intensity;
-    float Constant;
-    float Linear;
-    float Quadratic;
-
-    float InnerCutOff;
-    float OuterCutOff;
-};
-
-vec3 CalculateAmbient(Light light){
-    vec3 diffuseMap = vec3(texture(MATERIAL.DiffuseMap, FSIn.UV));
-    vec3 ambient = light.Color * diffuseMap * light.Ambient * MATERIAL.Ambient * light.Intensity;
-    return ambient;
-}
-
-vec3 CalculateDiffuse(Light light, vec3 lightDir, float attenuation, float cutOff){
-    vec3 diffuseMap = vec3(texture(MATERIAL.DiffuseMap, FSIn.UV));
-    float diff = max(dot(FSIn.Normal, lightDir), 0.0);
-    vec3 diffuse = diff * light.Color * diffuseMap * light.Diffuse * MATERIAL.Diffuse * attenuation * cutOff * light.Intensity;
-    return diffuse;
-}
-
-vec3 CalculateSpecular(Light light, vec3 lightDir, float attenuation, float cutOff){
-    vec3 specularMap = vec3(texture(MATERIAL.SpecularMap, FSIn.UV));
-    vec3 viewDir = normalize(VIEW_POSITION - vec3(FSIn.WorldPosition.xyz));
-    vec3 reflectDir = reflect(-lightDir, FSIn.Normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), MATERIAL.Shininess);
-    vec3 specular = spec * light.Color * specularMap * MATERIAL.Specular * light.Specular * attenuation * cutOff * light.Intensity;
-
-    return specular;
-}
-
-vec3 CalculateEmission(){
-    vec3 emissionMap = vec3(texture(MATERIAL.EmissionMap, FSIn.UV));
-    vec3 emission = emissionMap * MATERIAL.Emission;
-    return emission;
-}
-
-
-
-void CalculateDirectionalLight(Light light, out vec3 lightDir) {
-    lightDir = normalize(-light.Direction);
-}
-
-void CalculatePointLight(Light light, out float attenuation) {
-    float dist = length(light.Position - FSIn.WorldPosition.xyz);
-    attenuation = (1.0 / (light.Quadratic * (dist * dist) + light.Linear * dist + light.Constant)) * light.Intensity;
-}
-
-void CalculateSpotLight(Light light, vec3 lightDir, out float cutOff, out float attenuation) {
-    float dist = length(light.Position - FSIn.WorldPosition.xyz);
-    attenuation = (1.0 / (light.Constant + light.Linear * dist + light.Quadratic * (dist * dist))) * light.Intensity;
-
-    vec3 spotDir = normalize(-light.Direction);
-    float cosTheta = dot(lightDir, spotDir);
-    float epsilon = light.InnerCutOff - light.OuterCutOff;
-    cutOff = clamp((cosTheta - light.OuterCutOff) / epsilon, 0.0, 1.0f) * light.Intensity;
-}
-
-const int NR_LIGHTS = 24;
-
-layout (std140, binding = 1) uniform LightsBuffer{
-    int LIGHT_COUNT;
-    Light LIGHTS[NR_LIGHTS];
-
-};
-
-vec3 CalculateLight(Light light) {
-    vec3 lightDir = normalize(light.Position - FSIn.WorldPosition.xyz);
-    float cutOff = 1;
-    float attenuation = 1;
-
-    if (light.Type == 0) {
-        CalculateDirectionalLight(light, lightDir);
-
-    } else if (light.Type == 1) {
-        CalculatePointLight(light, attenuation);
-
-    } else if (light.Type == 2) {
-        CalculateSpotLight(light, lightDir, cutOff, attenuation);
+    for (int i = 0; i < 9; i++) {
+        samples[i] = texture(tex, uv + offsets[i]).rgb;
     }
 
-    //Phong Lighting Model
-    vec3 ambient = CalculateAmbient(light);
-    vec3 diffuse = CalculateDiffuse(light, lightDir, attenuation, cutOff);
-    vec3 specular = CalculateSpecular(light, lightDir, attenuation, cutOff);
+    vec3 color = vec3(0.0);
 
-    return ambient + diffuse + specular;
-}
-
-vec3 Lighting() {
-    vec3 result = vec3(0.0);
-    for (int i = 0; i < LIGHT_COUNT; i++) {
-        result += CalculateLight(LIGHTS[i]);
+    for (int i = 0; i < 9; i++) {
+        color += samples[i] * kernel[i];
     }
 
-    vec3 emission = CalculateEmission();
+    return vec4(color, 1.0);
+}
 
-    result += emission;
-    return result;
+vec4 SharpenKernel(sampler2D tex, vec2 uv, float offset) {
+    float kernel[9] = float[](
+            -1, -1, -1,
+            -1, 9, -1,
+            -1, -1, -1
+    );
+
+    return Kernel(tex, uv, kernel, offset);
+}
+
+vec4 BlurKernel(sampler2D tex, vec2 uv, float offset) {
+    float kernel[9] = float[](
+            1.0 / 16, 2.0 / 16, 1.0 / 16,
+            2.0 / 16, 4.0 / 16, 2.0 / 16,
+            1.0 / 16, 2.0 / 16, 1.0 / 16
+    );
+
+    return Kernel(tex, uv, kernel, offset);
+}
+
+vec4 EdgeDetectionKernel(sampler2D tex, vec2 uv, float offset) {
+    float kernel[9] = float[](
+            1, 1, 1,
+            1, -8, 1,
+            1, 1, 1
+    );
+
+    return Kernel(tex, uv, kernel, offset);
+}
+
+vec4 Inversion(sampler2D tex, vec2 uv) {
+    return 1.0 - texture(tex, uv);
+}
+
+vec4 Grayscale(sampler2D tex, vec2 uv) {
+    vec4 color = texture(tex, uv);
+
+    float red = 0.2126 * color.r;
+    float green = 0.7152 * color.g;
+    float blue = 0.0722 * color.b;
+
+    float average = red + green + blue;
+
+    return vec4(average, average, average, 1.0);
+}
+
+vec4 Pixelated(sampler2D tex, vec2 uv, vec2 pixelSize, vec2 resolution) {
+    vec2 normalizedPixelSize = pixelSize / resolution;
+    vec2 pixelUV = normalizedPixelSize * floor(uv / normalizedPixelSize);
+
+    return texture(tex, pixelUV);
 }
 
 
+uniform sampler2D COLOR_BUFFER;
 
-void main()
-{
-    FragColor = vec4(Lighting(), 1) MATERIAL.Color;
+void main() {
+    Kernel(COLOR_BUFFER, FSIn.UV);
+    FragColor = texture(COLOR_BUFFER, FSIn.UV);
 }

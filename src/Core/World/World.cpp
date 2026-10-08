@@ -69,7 +69,7 @@ U::CheckedPtr<Entity> World::TryFindEntity(const unsigned int id)
     return &m_Entities.At(id);
 }
 
-// TODO- quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
+//TODO: quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
 void World::Start()
 {
     AddSystem<Transform3DSystem>();
