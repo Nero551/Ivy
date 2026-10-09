@@ -1,12 +1,9 @@
 #pragma once
 
 #include "Math/Math.hpp"
-#include "Physics/DimensionalAnalysis/Dimension.hpp"
-#include "Physics/DimensionalAnalysis/Dimensionals.hpp"
 #include "Physics/Physics.hpp"
+#include "Utilities/Debug/Inspect.hpp"
 #include "Utilities/Utilities.hpp"
-
-#include "Utilities/Log.hpp"
 
 namespace Sketch
 {
@@ -167,8 +164,6 @@ template <unsigned int... Dimensions> struct Tensor
         }
     }
 };
-
-template <typename T> struct Inspect;
 
 inline void Test()
 {

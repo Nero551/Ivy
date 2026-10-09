@@ -1,10 +1,10 @@
 set_languages("c++26")
 set_toolchains("clang")
 
-add_rules("plugin.compile_commands.autoupdate", {lsp = "clang"})
+add_rules("plugin.compile_commands.autoupdate", { lsp = "clang" })
 
 add_rules("mode.debug", "mode.release")
-add_requires("catch2","glfw", "assimp", "glslang", "stb", "glad 0.1.36", "nlohmann_json", "magic_enum")
+add_requires("catch2", "glfw", "assimp", "glslang", "stb", "glad 0.1.36", "nlohmann_json", "magic_enum")
 
 target("Ivy")
     if is_mode("release") then
@@ -22,7 +22,7 @@ target("Ivy")
     add_includedirs("External/tracy/public")
     add_defines("TRACY_ENABLE")
 
-    on_load(function (target)
+    on_load( function (target)
 
         local umbrella = import("scripts/GenerateUmbrellas")
 
@@ -38,7 +38,7 @@ target("Ivy")
         umbrella.GenerateEngineUmbrella("Ivy")
     end)
 
-    add_packages("glfw","assimp", "glslang", "stb", "glad", "nlohmann_json", "magic_enum")
+    add_packages("glfw", "assimp", "glslang", "stb", "glad", "nlohmann_json", "magic_enum")
 
 
 target("IvyTests")
@@ -51,5 +51,3 @@ target("IvyTests")
     set_pcxxheader("src/pch.hpp")
 
     add_packages("catch2")
-
-
