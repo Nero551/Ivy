@@ -47,8 +47,8 @@ struct TypeTree
 
     template <typename T> struct Leaf
     {
-        using Value = T;
-        using Flatten = List<Leaf<T>>;
+        using Type = T;
+        using Flatten = List<T>;
     };
 
     template <typename L, typename R> struct Node

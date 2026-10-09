@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utilities/DataStructures/TypeTree.hpp"
 namespace Ivy::P
 {
 
@@ -32,7 +33,8 @@ inline std::string Superscript(int exponent)
 };
 
 /** @brief Provides the common compile-time interface for a dimensional type. */
-template <template <int> typename Derived, int Exp> struct Dimensional
+template <template <int> typename Derived, int Exp>
+struct Dimensional : U::TypeTree::Leaf<Dimensional<Derived, Exp>>
 {
     static constexpr int Exponent = Exp;
 

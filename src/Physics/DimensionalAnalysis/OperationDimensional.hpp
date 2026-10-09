@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FundamentalDimensionals.hpp"
+#include "Utilities/DataStructures/TypeTree.hpp"
 #include "Utilities/FixedString.hpp"
 #include <concepts>
 #include <type_traits>
@@ -193,14 +194,41 @@ struct OperationNormalization<LeftOperation, RightOperation>
 // Operation
 // ============================================================================
 
+template <int Remaining, typename List> struct FindAndMerge;
+
+template <typename... Ts> struct FindAndMerge<0, U::TypeTree::List<Ts...>>
+{
+    using Type = U::TypeTree::List<Ts...>;
+};
+
+template <int Remaining, typename Head, typename Target, typename... Tail>
+struct FindAndMerge<Remaining, U::TypeTree::List<Head, Target, Tail...>>
+{
+    using Type = std::conditional_t<SameTerm<Head, Target>,
+        FindAndMerge<Remaining - 1, U::TypeTree::List<AddTerms<Head, Target>, Tail...>>,
+        FindAndMerge<Remaining - 1, U::TypeTree::List<Head, Tail..., Target>>>::Type;
+};
+template <typename T> struct Merge
+{
+};
+
+template <typename Head, typename... Ts> struct Merge<U::TypeTree::List<Head, Ts...>>
+{
+    using Type = U::TypeTree::List<Head, Ts...>;
+};
+
 /** @brief Represents a compound dimensional expression composed of two dimensional types. */
 template <typename A, typename B, U::FixedString Name> requires DimensionalPair<A, B>
-struct OperationDimensional<A, B, Name>
+struct OperationDimensional<A, B, Name> : U::TypeTree::Node<typename A::Normalized, typename B::Normalized>
 {
-    using Left = A::Normalized;
-    using Right = B::Normalized;
+    using Left = U::TypeTree::Node<A, B>::Left;
+    using Right = U::TypeTree::Node<A, B>::Right;
+    using Flatten = U::TypeTree::Node<A, B>::Flatten;
+    // using Left = A::Normalized;
+    // using Right = B::Normalized;
 
     using Normalized = OperationNormalization<Left, Right>::Type;
+    using NewNormalized = Merge<typename OperationDimensional<Left, Right>::Flatten>::Type;
 
     static constexpr int Exponent = 1;
 

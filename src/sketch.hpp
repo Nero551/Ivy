@@ -177,12 +177,12 @@ inline void Test()
     P::Dimension<float, P::Acceleration> a = 2 * d / (t * t);
 
     P::Dimension<float, P::Force> fk = m * g * M::DSin(theta) - m * a;
-    float muK = fk / (m * g * M::DCos(theta));
+    // float muK = fk / (m * g * M::DCos(theta));
 
     P::Dimension<float, P::Velocity> vf = a * t;
 
     U::Log::Info(a);
-    U::Log::Info(muK);
+    // U::Log::Info(muK);
     U::Log::Info(fk);
     U::Log::Info(vf);
 }

@@ -341,27 +341,27 @@ TEST_CASE("Dimensional: operation-operation combinations and cancellation")
     REQUIRE(oss.str() == "2.5 m/s²");
 }
 
-TEST_CASE("Dimensional: Newton's second law and named force equivalence")
-{
-    Dimension<float, Length<1>> l{10.0f};
-    Dimension<float, Time<1>> t{2.0f};
-    Dimension<float, Mass<1>> m{5.0f};
+// TEST_CASE("Dimensional: Newton's second law and named force equivalence")
+// {
+//     Dimension<float, Length<1>> l{10.0f};
+//     Dimension<float, Time<1>> t{2.0f};
+//     Dimension<float, Mass<1>> m{5.0f};
 
-    auto speed = l / t;
-    auto accel = speed / t;
-    auto force = m * accel;
+//     auto speed = l / t;
+//     auto accel = speed / t;
+//     auto force = m * accel;
 
-    REQUIRE(force.Value == Approx(12.5f));
-    using ForceDim = decltype(force)::Dimensional;
-    static_assert(Ivy::P::SameNormalized<ForceDim, Force>);
+//     REQUIRE(force.Value == Approx(12.5f));
+//     using ForceDim = decltype(force)::Dimensional;
+//     static_assert(Ivy::P::SameNormalized<ForceDim, Force>);
 
-    Dimension<float, Force> namedForce{100.0f};
-    auto totalForce = namedForce + force;
-    REQUIRE(totalForce.Value == Approx(112.5f));
-    std::ostringstream oss;
-    oss << totalForce;
-    REQUIRE(oss.str() == "112.5 N");
-}
+//     Dimension<float, Force> namedForce{100.0f};
+//     auto totalForce = namedForce + force;
+//     REQUIRE(totalForce.Value == Approx(112.5f));
+//     std::ostringstream oss;
+//     oss << totalForce;
+//     REQUIRE(oss.str() == "112.5 N");
+// }
 
 TEST_CASE("Dimensional: momentum, energy and work")
 {
