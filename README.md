@@ -5,13 +5,13 @@
 Ivy is a hobby game engine project focused on learning the fundamentals of game engine development, computer graphics, mathematics, and physics.
 
 > [!WARNING]
-> Ivy is extremely WIP.
+> Ivy is very WIP.
 
 ## Features
 
+- **Architecture:** ECS-style ([`Framework.md`](Docs/Framework.md) ).
 - **Rendering:** OpenGL, shaders, textures, lighting, framebuffers, and MSAA
 - **Mathematics:** Vectors, matrices, complex, quaternions, functions, sets, linear systems
-- **Architecture:** ECS-style framework.
 - **Physics Library:** dimensional analysis
 
 ## Getting Started
@@ -49,4 +49,4 @@ xmake run IvyTests
 
 ## Development Log
 
-[`Log.md`](Log.md) for Ivy's development history and weekly progress.
+[`Log.md`](Docs/Log.md) for Ivy's development history and weekly progress.

@@ -20,7 +20,6 @@ Main
 ## Main
 
 The application's entry point.
-
 Its only responsibility is to create and run the **Engine**.
 
 ---
@@ -28,7 +27,6 @@ Its only responsibility is to create and run the **Engine**.
 ## Engine
 
 The central object of the framework.
-
 It owns and updates:
 
 - The **World**
@@ -41,7 +39,6 @@ The engine is responsible for driving the application's lifecycle (startup, upda
 ## Modules
 
 Modules are large, self-contained parts of the engine.
-
 Examples include:
 
 - Renderer
@@ -51,17 +48,14 @@ Examples include:
 - Networking
 
 Each module owns one or more **Systems**. The module handles the lifecycle of all related **Systems**.
-
-It can also contain premade **Entities** & **Components** (in the folder hierarchy)
+It can also contain premade **Entities** & **Components**.
 
 ---
 
 ## Systems
 
 Systems contain behavior and logic.
-
 They perform work every frame, either independently or by operating on entities and their components.
-
 Examples include:
 
 - Camera System
@@ -72,7 +66,6 @@ Examples include:
 ## World
 
 The world owns every entity in the application.
-
 It is responsible for creating, storing & removing entities.
 
 ---
@@ -80,7 +73,6 @@ It is responsible for creating, storing & removing entities.
 ## Entities
 
 Entities are lightweight objects.
-
 An entity is simply:
 
 - A unique ID
@@ -93,7 +85,6 @@ Entities contain no game logic.
 ## Components
 
 Components are pure data blocks.
-
 They describe an entity's properties without containing behavior.
 
 Examples include:
@@ -105,17 +96,12 @@ Examples include:
 - LightComponent
 
 Systems read and modify component data to produce behavior.
-
----
-
-## Design Philosophy
-
-The framework follows a component-based architecture:
-
-- **Modules** organize major engine features.
-- **Systems** implement behavior.
-- **Worlds** manage entities.
-- **Entities** group components.
-- **Components** store data only.
-
 This separation keeps data independent of behavior while making systems reusable and easy to extend.
+
+### Coordinate Conventions
+
+Engine uses a right-handed Cartesian coordinate system:
+
+- **+X** points right.
+- **+Y** points up.
+- **-Z** points forward.
