@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Concepts.hpp"
-#include "OperationDimensional.hpp"
+#include "Physics/DimensionalAnalysis/Dimensional.hpp"
 
 namespace Ivy::P
 {

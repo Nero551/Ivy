@@ -1,15 +1,110 @@
 #pragma once
 
-#include "FundamentalDimensionals.hpp"
-#include "Utilities/DataStructures/TypeTree.hpp"
 #include "Utilities/FixedString.hpp"
-#include <concepts>
-#include <type_traits>
-
 namespace Ivy::P
 {
+/** @brief Converts an integer exponent to its Unicode superscript representation. */
+inline std::string Superscript(int exponent)
+{
+    static constexpr std::string_view Digits[] = {"⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
 
+    if (exponent == 1)
+    {
+        return "";
+    }
+
+    std::string result;
+
+    if (exponent < 0)
+    {
+        result += "⁻";
+        exponent = -exponent;
+    }
+
+    std::string digits = std::to_string(exponent);
+
+    for (char digit : digits)
+    {
+        result += Digits[digit - '0'];
+    }
+
+    return result;
+};
+template <typename... Ts> struct List;
 template <typename A, typename B, U::FixedString Name = ""> struct OperationDimensional;
+template <typename List> struct RebuildType;
+
+template <typename T> struct RebuildType<List<T>>
+{
+    using Type = T;
+};
+
+template <typename First, typename Second, typename... Rest> struct RebuildType<List<First, Second, Rest...>>
+{
+  private:
+    using Tail = typename RebuildType<List<Second, Rest...>>::Type;
+
+  public:
+    using Type = OperationDimensional<First, Tail>;
+};
+
+template <typename... Ts> struct List
+{
+    static constexpr std::size_t Size = sizeof...(Ts);
+    using Rebuild = RebuildType<List<Ts...>>::Type;
+};
+
+template <typename Left, typename Right> struct Concat;
+template <typename... Ls, typename... Rs> struct Concat<List<Ls...>, List<Rs...>>
+{
+
+    using Type = List<Ls..., Rs...>;
+};
+
+/** @brief Provides the common compile-time interface for a dimensional type. */
+template <template <int> typename Derived, int Exp> struct Dimensional
+{
+    static constexpr int Exponent = Exp;
+
+    template <int E> using WithExponent = Derived<E>;
+    template <int E> requires(Exponent % E == 0)
+    using WithRoot = Derived<Exponent / E>;
+
+    // static std::ostream& Print(std::ostream& os)
+    // {
+    // return Derived<Exp>::Print(os);
+    // }
+
+    //these are here just so my program doesn't bomb at compile-time (see OperationDimensional.hpp for context)
+    using Left = Derived<Exp>;
+    using Right = Derived<Exp>;
+    using Normalized = Derived<Exp>;
+    using Flatten = List<Derived<Exp>>;
+};
+
+template <int Exp> struct Time : Dimensional<Time, Exp>
+{
+    static std::ostream& Print(std::ostream& os)
+    {
+        return os << "s" << Superscript(Exp);
+    }
+};
+
+template <int Exp> struct Length : Dimensional<Length, Exp>
+{
+    static std::ostream& Print(std::ostream& os)
+    {
+        return os << "m" << Superscript(Exp);
+    }
+};
+
+template <int Exp> struct Mass : Dimensional<Mass, Exp>
+{
+    static std::ostream& Print(std::ostream& os)
+    {
+        return os << "kg" << Superscript(Exp);
+    }
+};
 
 template <typename T> struct IsDimensionalType : std::false_type
 {
@@ -195,20 +290,72 @@ struct OperationNormalization<LeftOperation, RightOperation>
                                                     OperationDimensional<L, R>>>>>>>>>>>>>;
 };
 
+template <int Remaining, typename List> struct FindAndMerge;
+
+template <typename Head, typename... Ts> struct FindAndMerge<0, List<Head, Ts...>>
+{
+    using Type = List<Ts..., Head>;
+};
+
+template <int Remaining, typename Head> requires(Remaining > 0)
+struct FindAndMerge<Remaining, List<Head>>
+{
+    using Type = List<Head>;
+};
+
+template <int Remaining, typename Head, typename Target, typename... Tail> requires(Remaining > 0)
+struct FindAndMerge<Remaining, List<Head, Target, Tail...>>
+{
+    using Type = std::conditional_t<SameTerm<Head, Target>,
+        FindAndMerge<Remaining - 1, List<AddTerms<Head, Target>, Tail...>>,
+        FindAndMerge<Remaining - 1, List<Head, Tail..., Target>>>::Type;
+};
+
+template <int Remaining, typename List> struct FindAndMergeAll;
+template <typename... Ts> struct FindAndMergeAll<0, List<Ts...>>
+{
+    using Type = List<Ts...>;
+};
+
+template <int Remaining, typename Head> requires(Remaining > 0)
+struct FindAndMergeAll<Remaining, List<Head>>
+{
+    using Type = List<Head>;
+};
+
+template <int Remaining, typename Head, typename... Tail> requires(Remaining > 0)
+struct FindAndMergeAll<Remaining, List<Head, Tail...>>
+{
+
+    using Type = FindAndMergeAll<Remaining - 1,
+        typename FindAndMerge<List<Head, Tail...>::Size, List<Head, Tail...>>::Type>::Type;
+};
+
+template <typename T> struct Merge
+{
+};
+
+template <typename... Ts> struct Merge<List<Ts...>>
+{
+    using Type = FindAndMergeAll<List<Ts...>::Size, List<Ts...>>::Type;
+};
+
 // ============================================================================
 // Operation
 // ============================================================================
 
 /** @brief Represents a compound dimensional expression composed of two dimensional types. */
 template <typename A, typename B, U::FixedString Name> requires DimensionalPair<A, B>
-struct OperationDimensional<A, B, Name> : U::TypeTree::Node<typename A::Normalized, typename B::Normalized>
+struct OperationDimensional<A, B, Name>
 {
-    using Left = U::TypeTree::Node<typename A::Normalized, typename B::Normalized>::Left;
-    using Right = U::TypeTree::Node<typename A::Normalized, typename B::Normalized>::Right;
-    using Flatten = U::TypeTree::Node<typename A::Normalized, typename B::Normalized>::Flatten;
+    using Left = A::Normalized;
+    using Right = B::Normalized;
 
-    // using Normalized = typename ListToDimensional<typename Merge<Flatten>::Type>::Type;
-    using Normalized = OperationNormalization<Left, Right>::Type;
+    //TODO: it appears i can't use TypeTree for this. so just define a Flatten and Rebuild specifically for this.
+
+    using Flatten = Concat<typename Left::Flatten, typename Right::Flatten>::Type;
+    using Normalized = Merge<Flatten>::Type::Rebuild;
+    // using Normalized = OperationNormalization<Left, Right>::Type;
     static constexpr int Exponent = 1;
 
     template <int E>
@@ -263,68 +410,4 @@ struct OperationDimensional<A, B, Name> : U::TypeTree::Node<typename A::Normaliz
         }
     }
 };
-
-template <int Remaining, typename List> struct FindAndMerge;
-
-template <typename... Ts> struct FindAndMerge<0, U::TypeTree::List<Ts...>>
-{
-    using Type = U::TypeTree::List<Ts...>;
-};
-
-template <int Remaining, typename Head> requires(Remaining > 0)
-struct FindAndMerge<Remaining, U::TypeTree::List<Head>>
-{
-    using Type = U::TypeTree::List<Head>;
-};
-
-template <int Remaining, typename Head, typename Target, typename... Tail> requires(Remaining > 0)
-struct FindAndMerge<Remaining, U::TypeTree::List<Head, Target, Tail...>>
-{
-    using Type = std::conditional_t<SameTerm<Head, Target>,
-        FindAndMerge<Remaining - 1, U::TypeTree::List<AddTerms<Head, Target>, Tail...>>,
-        FindAndMerge<Remaining - 1, U::TypeTree::List<Head, Tail..., Target>>>::Type;
-};
-
-template <int Remaining, typename List> struct FindAndMergeAll;
-template <typename... Ts> struct FindAndMergeAll<0, U::TypeTree::List<Ts...>>
-{
-    using Type = U::TypeTree::List<Ts...>;
-};
-
-template <int Remaining, typename Head> requires(Remaining > 0)
-struct FindAndMergeAll<Remaining, U::TypeTree::List<Head>>
-{
-    using Type = U::TypeTree::List<Head>;
-};
-
-template <int Remaining, typename Head, typename... Tail> requires(Remaining > 0)
-struct FindAndMergeAll<Remaining, U::TypeTree::List<Head, Tail...>>
-{
-
-    using Type = FindAndMergeAll<Remaining - 1,
-        typename FindAndMerge<U::TypeTree::List<Head, Tail...>::Size,
-            U::TypeTree::List<Head, Tail...>>::Type>::Type;
-};
-
-template <typename T> struct Merge
-{
-};
-
-template <typename... Ts> struct Merge<U::TypeTree::List<Ts...>>
-{
-    using Type = FindAndMergeAll<U::TypeTree::List<Ts...>::Size, U::TypeTree::List<Ts...>>::Type;
-};
-
-template <typename List> struct ListToDimensional;
-
-template <typename T> struct ListToDimensional<U::TypeTree::List<T>>
-{
-    using Type = T;
-};
-
-template <typename A, typename B, typename... Rest> struct ListToDimensional<U::TypeTree::List<A, B, Rest...>>
-{
-    using Type = typename ListToDimensional<U::TypeTree::List<OperationDimensional<A, B>, Rest...>>::Type;
-};
-
 } // namespace Ivy::P

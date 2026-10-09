@@ -1,6 +1,5 @@
 #pragma once
-#include "FundamentalDimensionals.hpp"
-#include "OperationDimensional.hpp"
+#include "Dimensional.hpp"
 namespace Ivy::P
 {
 using Velocity = OperationDimensional<Length<1>, Time<-1>>;

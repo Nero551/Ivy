@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Math/Math.hpp"
+#include "Physics/DimensionalAnalysis/Dimension.hpp"
+#include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Physics/Physics.hpp"
 #include "Utilities/Utilities.hpp"
 
@@ -166,6 +168,8 @@ template <unsigned int... Dimensions> struct Tensor
     }
 };
 
+template <typename T> struct Inspect;
+
 inline void Test()
 {
     P::Dimension<float, P::Acceleration> g = 9.8;
@@ -174,16 +178,18 @@ inline void Test()
     P::Dimension<float, P::Time<1>> t = 1.5;
     float theta = 30;
 
-    P::Dimension<float, P::Acceleration> a = 2 * d / (t * t);
+    // P::Dimension<float, P::Acceleration> a = 2 * d / (t * t);
 
-    P::Dimension<float, P::Force> fk = m * g * M::DSin(theta) - m * a;
+    // P::Dimension<float, P::Force> fk = m * g * M::DSin(theta) - m * a;
     // float muK = fk / (m * g * M::DCos(theta));
 
-    P::Dimension<float, P::Velocity> vf = a * t;
+    // P::Dimension<float, P::Velocity> vf = a * t;
 
-    U::Log::Info(a);
+    P::Dimension<float, P::OperationDimensional<P::Length<1>, P::Time<-2>>> b;
+    Inspect<decltype(g)::Dimensional::Normalized>{};
+    // U::Log::Info();
     // U::Log::Info(muK);
-    U::Log::Info(fk);
-    U::Log::Info(vf);
+    // U::Log::Info(fk);
+    // U::Log::Info(vf);
 }
 } // namespace Sketch
