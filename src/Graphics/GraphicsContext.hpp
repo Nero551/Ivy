@@ -1,6 +1,6 @@
 #pragma once
+#include "../Utilities/Debug/Log.hpp"
 #include "OpenGL.hpp"
-#include "Utilities/Log.hpp"
 #include <glslang/Public/ShaderLang.h>
 
 /** @brief Handles initialization and termination of graphics specific things

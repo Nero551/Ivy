@@ -1,14 +1,16 @@
 #pragma once
 namespace Ivy::U
 {
-template <typename T, int N> constexpr void Swap(std::array<T, N>& arr, size_t a, size_t b)
+template <typename T, int N>
+constexpr void Swap(std::array<T, N>& arr, size_t a, size_t b) requires std::totally_ordered<T>
 {
     T value = arr[a];
     arr[a] = arr[b];
     arr[b] = value;
 }
 
-template <typename T, size_t N> constexpr std::array<T, N> BubbleSort(const std::array<T, N>& arr)
+template <typename T, size_t N>
+constexpr std::array<T, N> BubbleSort(const std::array<T, N>& arr) requires std::totally_ordered<T>
 {
     std::array<T, N> result = arr;
 
@@ -34,7 +36,8 @@ template <typename T, size_t N> constexpr std::array<T, N> BubbleSort(const std:
     return result;
 }
 
-template <typename T, size_t N> constexpr std::array<T, N> InsertionSort(const std::array<T, N>& arr)
+template <typename T, size_t N>
+constexpr std::array<T, N> InsertionSort(const std::array<T, N>& arr) requires std::totally_ordered<T>
 {
     std::array<T, N> result = arr;
 
@@ -55,7 +58,8 @@ template <typename T, size_t N> constexpr std::array<T, N> InsertionSort(const s
     return result;
 }
 
-template <typename T, size_t N> constexpr std::array<T, N> SelectionSort(const std::array<T, N>& arr)
+template <typename T, size_t N>
+constexpr std::array<T, N> SelectionSort(const std::array<T, N>& arr) requires std::totally_ordered<T>
 {
     std::array<T, N> result = arr;
 
@@ -81,6 +85,7 @@ template <typename T, size_t N> constexpr std::array<T, N> SelectionSort(const s
 }
 template <typename T, size_t N, size_t M>
 constexpr std::array<T, N + M> MergeSort(const std::array<T, N>& left, const std::array<T, M>& right)
+    requires std::totally_ordered<T>
 {
     std::array<T, N + M> result{};
     size_t i = 0;

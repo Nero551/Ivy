@@ -4,10 +4,10 @@
 #include <unordered_set>
 #include <utility>
 
+#include "../../Utilities/Debug/Log.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "ShaderSourceValidator.hpp"
 #include "Utilities/FileSystem.hpp"
-#include "Utilities/Log.hpp"
 
 namespace Ivy::G
 {

@@ -62,7 +62,7 @@ struct Log
     }
 
     /** @brief Validates a raw pointer and returns the dereferenced object. */
-    template <typename T, typename... Args> static T& Require(T* rawPtr, Args... args)
+    template <typename T, typename... Args> static T& Require(T* rawPtr, Args&... args)
     {
         if (!rawPtr)
         {
@@ -72,13 +72,17 @@ struct Log
     }
 
     /** @brief its assert but cleaner. */
-    template <typename... Args> static constexpr void Assert(const bool condition, Args... args)
+    template <typename... Args> static constexpr void Assert(const bool condition, Args&... args)
     {
         if (!condition)
         {
             Fatal(args...);
         }
     }
+
+    Log() = delete;
+    ~Log() = delete;
+    Log& operator=(Log&) = delete;
 
   private:
     /** @brief Resets the console text color. */

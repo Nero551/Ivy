@@ -1,7 +1,7 @@
 #include "Texture2D.hpp"
 #include "OpenGL.hpp"
 
-#include "Utilities/Log.hpp"
+#include "../../Utilities/Debug/Log.hpp"
 
 namespace Ivy::G
 {

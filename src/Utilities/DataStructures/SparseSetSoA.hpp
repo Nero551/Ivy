@@ -1,5 +1,5 @@
 #pragma once
-#include "Utilities/Log.hpp"
+#include "../Debug/Log.hpp"
 
 #include <vector>
 namespace Ivy::U

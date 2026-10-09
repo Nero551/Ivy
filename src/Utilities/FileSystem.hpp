@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "Utilities/Log.hpp"
+#include "Debug/Log.hpp"
 
 namespace Ivy::U::FileSystem
 {

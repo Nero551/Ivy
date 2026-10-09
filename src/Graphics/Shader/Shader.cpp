@@ -2,8 +2,8 @@
 
 #include <OpenGL.hpp>
 
+#include "../../Utilities/Debug/Log.hpp"
 #include "Uniforms/FloatUniform.hpp"
-#include "Utilities/Log.hpp"
 
 namespace Ivy::G
 {

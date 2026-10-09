@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utilities/Log.hpp"
+#include "../Debug/Log.hpp"
 
 namespace Ivy::U
 {

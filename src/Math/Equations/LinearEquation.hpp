@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Math/Concepts.hpp"
-#include "Utilities/Log.hpp"
+#include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M
 {

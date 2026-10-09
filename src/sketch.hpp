@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Math/Math.hpp"
+#include "Physics/DimensionalAnalysis/Dimension.hpp"
+#include "Physics/DimensionalAnalysis/Dimensionals.hpp"
 #include "Physics/Physics.hpp"
-#include "Utilities/Debug/Inspect.hpp"
+#include "Utilities/Debug/Inspector.hpp"
+#include "Utilities/Debug/Log.hpp"
 #include "Utilities/Utilities.hpp"
 
 namespace Sketch
@@ -24,12 +27,6 @@ namespace Sketch
 
 //TODO: make transform system cache its own vector of the root's children that's updated on events
 // that will make it way less expensive performance-wise.
-//
-//TODO: the dimensional analysis is very inflexible when it comes to roots and fractional exponents. fix that
-//TODO: also the operation normalization is a nightmare to look at.
-//
-//TODO: a better way to do dimensional analysis, is to flatten the tree then simplify, then sort it in a canonical order.
-// USE U::TypeTree.
 
 using namespace Ivy;
 
@@ -167,23 +164,10 @@ template <unsigned int... Dimensions> struct Tensor
 
 inline void Test()
 {
-    P::Dimension<float, P::Acceleration> g = 9.8;
-    P::Dimension<float, P::Mass<1>> m = 3;
-    P::Dimension<float, P::Length<1>> d = 2;
-    P::Dimension<float, P::Time<1>> t = 1.5;
-    float theta = 30;
+    P::Dimension<float, P::Velocity> v{20};
+    P::Dimension<float, P::Length<1>> p{2};
+    P::Dimension<float, P::AngularSpeed> k = v / p;
 
-    P::Dimension<float, P::Acceleration> a = 2 * d / (t * t);
-
-    P::Dimension<float, P::Force> fk = m * g * M::DSin(theta) - m * a;
-    float muK = fk / (m * g * M::DCos(theta));
-
-    P::Dimension<float, P::Velocity> vf = a * t;
-
-    P::Dimension<float, P::OperationDimensional<P::Length<1>, P::Time<-2>>> b;
-    U::Log::Info(a);
-    U::Log::Info(muK);
-    U::Log::Info(fk);
-    U::Log::Info(vf);
+    U::Inspector::Inspect(k);
 }
 } // namespace Sketch

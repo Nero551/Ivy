@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../../Utilities/Debug/Log.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/Polar.hpp"
-#include "Utilities/Log.hpp"
 #include "Vector.hpp"
 
 namespace Ivy::M

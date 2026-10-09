@@ -1,5 +1,7 @@
 #pragma once
 #include "Dimensional.hpp"
+#include "Physics/DimensionalAnalysis/Dimensional.hpp"
+#include "Utilities/StringUtils.hpp"
 namespace Ivy::P
 {
 template <int Exp> struct Mass : Dimensional<Mass, Exp, 1>
@@ -27,6 +29,7 @@ template <int Exp> struct Time : Dimensional<Time, Exp, 3>
 };
 
 using Velocity = OperationDimensional<Length<1>, Time<-1>>;
+using AngularSpeed = OperationDimensional<Dimensionless, Time<-1>, "ꞷ">;
 using Acceleration = OperationDimensional<Velocity, Time<-1>>;
 using Force = OperationDimensional<Mass<1>, Acceleration, "N">;
 

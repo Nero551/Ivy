@@ -1,6 +1,6 @@
 #include "Cubemap.hpp"
 
-#include "Utilities/Log.hpp"
+#include "../../Utilities/Debug/Log.hpp"
 
 namespace Ivy::G
 {

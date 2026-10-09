@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Utilities/FixedString.hpp"
-#include "Utilities/StringUtils.hpp"
 namespace Ivy::P
 {
 

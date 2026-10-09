@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "Utilities/Log.hpp"
+#include "Debug/Log.hpp"
 
 namespace Ivy::U
 {

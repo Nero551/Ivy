@@ -1,12 +1,12 @@
 #include "Material.hpp"
 
 #include "../../Modules/Renderer/Primitives/Primitives.hpp"
+#include "../../Utilities/Debug/Log.hpp"
 #include "../Shader/Uniforms/FloatUniform.hpp"
 #include "../Shader/Uniforms/IntUniform.hpp"
 #include "../Shader/Uniforms/Vector3Uniform.hpp"
 #include "../Shader/Uniforms/Vector4Uniform.hpp"
 #include "../Texture/Texture2D.hpp"
-#include "Utilities/Log.hpp"
 
 namespace Ivy::G
 {

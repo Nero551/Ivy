@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Math/Common/Exponentials.hpp"
+#include <concepts>
 #include <utility>
 namespace Ivy::M
 {
@@ -31,6 +32,9 @@ concept Indexable = requires(T object, unsigned int i) { object(i); };
 
 template <typename T>
 concept Printable = requires(T a) { std::cout << a; };
+
+template <typename T>
+concept Comparable = std::totally_ordered<T>;
 
 template <typename T, typename O> using AdditionResult = decltype(std::declval<T>() + std::declval<O>());
 

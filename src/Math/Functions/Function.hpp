@@ -1,10 +1,10 @@
 #pragma once
+#include "../../Utilities/Debug/Log.hpp"
 #include "DifferentiationMethod.hpp"
 #include "IntegrationMethod.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Concepts.hpp"
-#include "Utilities/Log.hpp"
 
 namespace Ivy::M
 {

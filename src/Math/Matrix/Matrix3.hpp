@@ -4,7 +4,7 @@
 #include "Math/Matrix/Matrix2.hpp"
 #include "Math/Vector/Vector3.hpp"
 
-#include "Utilities/Log.hpp"
+#include "../../Utilities/Debug/Log.hpp"
 
 namespace Ivy::M
 {

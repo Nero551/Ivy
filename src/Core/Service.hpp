@@ -1,7 +1,7 @@
 #pragma once
+#include "../Utilities/Debug/Log.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
-#include "Utilities/Log.hpp"
 
 namespace Ivy::C
 {

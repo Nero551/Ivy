@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../../Utilities/Debug/Log.hpp"
 #include "Math/Matrix/Matrix.hpp"
 #include "Math/Matrix/Matrix3.hpp"
 #include "Math/Vector/Vector4.hpp"
-#include "Utilities/Log.hpp"
 
 namespace Ivy::M
 {

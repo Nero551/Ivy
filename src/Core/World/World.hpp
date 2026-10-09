@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../../Utilities/Debug/Log.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/SystemOwner.hpp"
 #include "Core/World/ECS/ComponentPoolQuery.hpp"
-#include "Utilities/Log.hpp"
 
 namespace Ivy::C
 {
