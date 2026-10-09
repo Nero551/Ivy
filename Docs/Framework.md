@@ -1,6 +1,6 @@
 @mainpage Ivy
 
-# Framework (ECS-hybrid)
+# Framework (ECS)
 
 ## Architecture
 
@@ -14,7 +14,7 @@ Main
     └── World
         ├── Systems
         └── Entities
-                └── Components
+        └── Components
 ```
 
 ## Main
@@ -31,8 +31,8 @@ The central object of the framework.
 
 It owns and updates:
 
-* The **World**
-* All **Modules**
+- The **World**
+- All **Modules**
 
 The engine is responsible for driving the application's lifecycle (startup, update loop, rendering, shutdown).
 
@@ -44,15 +44,15 @@ Modules are large, self-contained parts of the engine.
 
 Examples include:
 
-* Renderer
-* Input
-* Physics
-* Audio
-* Networking
+- Renderer
+- Input
+- Physics
+- Audio
+- Networking
 
 Each module owns one or more **Systems**. The module handles the lifecycle of all related **Systems**.
 
-It can also contain **Resources**, premade **Entities** & **Components** (in the folder hierarchy)
+It can also contain premade **Entities** & **Components** (in the folder hierarchy)
 
 ---
 
@@ -64,8 +64,8 @@ They perform work every frame, either independently or by operating on entities 
 
 Examples include:
 
-* Camera System
-* Transform System
+- Camera System
+- Transform System
 
 ---
 
@@ -83,8 +83,8 @@ Entities are lightweight objects.
 
 An entity is simply:
 
-* A unique ID
-* Ids of children and parent
+- A unique ID
+- Ids of children and parent
 
 Entities contain no game logic.
 
@@ -98,11 +98,11 @@ They describe an entity's properties without containing behavior.
 
 Examples include:
 
-* TransformComponent
-* MeshComponent
-* MaterialComponent
-* CameraComponent
-* LightComponent
+- TransformComponent
+- MeshComponent
+- MaterialComponent
+- CameraComponent
+- LightComponent
 
 Systems read and modify component data to produce behavior.
 
@@ -112,10 +112,10 @@ Systems read and modify component data to produce behavior.
 
 The framework follows a component-based architecture:
 
-* **Modules** organize major engine features.
-* **Systems** implement behavior.
-* **Worlds** manage entities.
-* **Entities** group components.
-* **Components** store data only.
+- **Modules** organize major engine features.
+- **Systems** implement behavior.
+- **Worlds** manage entities.
+- **Entities** group components.
+- **Components** store data only.
 
 This separation keeps data independent of behavior while making systems reusable and easy to extend.

@@ -1,135 +1,52 @@
-# Ivy (2026-06-26) 3D game engine hobby project
+# Ivy (2026-06-26)
 
-## Installing System Dependencies for Linux.
+**A 3D game engine in C++26.**
 
-- ./scripts.setup-linux.sh
+Ivy is a hobby game engine project focused on learning the fundamentals of game engine development, computer graphics, mathematics, and physics.
 
-## Building & Running Engine
+> [!WARNING]
+> Ivy is extremely WIP.
 
-- xmake Ivy
-- xmake run Ivy
+## Features
 
-## Building & Running Tests
+- **Rendering:** OpenGL, shaders, textures, lighting, framebuffers, and MSAA
+- **Mathematics:** Vectors, matrices, complex, quaternions, functions, sets, linear systems
+- **Architecture:** ECS-style framework.
+- **Physics Library:** dimensional analysis
 
-- xmake IvyTests
-- xmake run IvyTests
+## Getting Started
 
-## Loading Docs
+### Prerequisites
 
-- ./scripts/docs.sh
+- Linux
+- [xmake](https://xmake.io/)
 
-## Progress
+### Install Dependencies
 
-### Week 1 — June 26–July 2
+```bash
+./scripts/setup-linux.sh
+```
 
-- Vectors
-- Shaders
-- First Triangle
-- EBO , VBO & VAO
-- Color Vertex data
+### Build and Run
 
-![Colored Quad](Docs/Screenshots/Colored%20Quad.png)
+```bash
+xmake Ivy
+xmake run Ivy
+```
 
-### Week 2 — July 3–9
+### Run Tests
 
-- Shader class
-- Textures & texture class
-- UV / Texture Coordinates
-- Mipmaps
-- Texture Filtering
-- Transformations
-- Matrices
-- Coordinate systems
+```bash
+xmake IvyTests
+xmake run IvyTests
+```
 
-![Textured Quad](Docs/Screenshots/Textured%20Quad.png)
+### Generate Documentation
 
-### Week 3 — July 10–16
+```bash
+./scripts/docs.sh
+```
 
-- Complete Architecture redesign
-- ECS-style framework
-- Camera
-- LookAt Matrix
-- Arbitrary Axis Rotation
-- Input
+## Development Log
 
-![3D Cube](Docs/Screenshots/3D%20Cube.png)
-
-### Week 4 — July 17–23
-
-- Ambient, Diffuse & Specular lighting
-- Normals & Normal Matrix
-- Light entity
-- Material properties
-- Emission
-- Diffuse , Specular & Emission maps
-- Unit Tests
-- Directional Lights , Point Lights & Spot Lights
-- Entity hierarchy (Entities can have child entities)
-- Multiple Lights
-- Event Bus
-
-![Cube](Docs/Screenshots/MaybeACube.png)
-
-### Week 5 — July 24–30
-
-- Assimp model loading
-- Shader Include preprocessing
-- Parent Child transform relations
-
-![Backpack](Docs/Screenshots/Backpack.png)
-
-### Week 6 — July 31–August 6
-
-- Basic calc 1 derivatives
-
-### Week 7 — August 7–13
-
-- Added Doxygen for docs
-- basic limits
-
-### Week 8 — August 14–20
-
-- vcpkg package management
-- basic calc 1 integration
-
-### Week 9 — August 21–28
-
-- complex arithmetic
-- Quaternion arithmetic & rotation conversions
-- depth, stencil & blending added as per material configurations
-- per mesh face culling configurations
-- redesigned texture system
-- Framebuffers & Renderbuffers
-- Cubemaps
-- Uniform buffers
-
-![Post-Processed Cube](Docs/Screenshots/Post-ProccesedCube.png)
-
-### Week 10 — August 29–September 4
-
-- Geometry shaders
-- Instancing
-- MSAA (Multisample anti-aliasing)
-- DSA (Direct State Access)
-
-![4D Projection (10k entities)](Docs/Screenshots/4D%20Projection.png)
-
-### Week 11 — September 5–11
-
-- Optimizations (CPU can now handle ~370k entities 40fps)
-
-### Week 12 — September 12–18
-
-- Compile-time dimensional analysis
-
-### Week 13 — September 19–26
-
-- generic matrices and vectors
-
-### Week 14 — September 26–October 3
-
-- Infinite Sets and Finite Sets.
-
-### Week 15 — October 3–10
-
-- Linear system of equations solver.
+[`Log.md`](Log.md) for Ivy's development history and weekly progress.
