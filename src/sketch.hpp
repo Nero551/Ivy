@@ -20,6 +20,12 @@ namespace Sketch
 //
 //TODO: try to make dependency injection to avoid global accessors like Engine::Get().
 // try to decouple as much as possible before attempting to implement DI(dependency injection)
+//
+//TODO: keep Engine a global accessor but make world be passed down via DI.
+// that way an engine can have multiple worlds and
+// give modules the ability to do operations engine globally, world locally or on every world.
+
+//TODO: rethink the render pipeline(look at bevy's render graph. bevy's is pretty nice)
 
 //TODO: probably wanna rethink my entire architecture (Core + Modules + World).
 // the other stuff can be extracted out of this project and still work.
@@ -168,6 +174,6 @@ inline void Test()
     P::Dimension<float, P::Length<1>> p{2};
     P::Dimension<float, P::AngularSpeed> k = v / p;
 
-    U::Inspector::Inspect(k);
+    U::Inspector::Inspect(v * p);
 }
 } // namespace Sketch

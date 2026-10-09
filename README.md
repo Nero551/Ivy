@@ -6,13 +6,13 @@
 
 ## Building & Running Engine
 
-- ./scripts/build.sh
-- ./scripts/run.sh
+- xmake Ivy
+- xmake run Ivy
 
 ## Building & Running Tests
 
-- ./scripts/build-tests.sh
-- ./scripts/run-tests.sh
+- xmake IvyTests
+- xmake run IvyTests
 
 ## Loading Docs
 
