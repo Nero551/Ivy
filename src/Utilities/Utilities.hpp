@@ -13,4 +13,5 @@
 #include "Image.hpp"
 #include "Log.hpp"
 #include "Namespace.hpp"
+#include "StringUtils.hpp"
 #include "Track.hpp"
