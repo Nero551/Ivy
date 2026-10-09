@@ -3,6 +3,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "Math/Math.hpp"
+#include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Physics/Physics.hpp"
 
 using Catch::Approx;
@@ -187,12 +188,12 @@ TEST_CASE("Dimensional: dimensionless conversion and zero-exponent normalization
     Dimension<float, Time<1>> t{2.0f};
 
     auto lengthRatio = l / l;
-    REQUIRE((std::is_same_v<decltype(lengthRatio), Dimension<float, Length<0>>>));
+    REQUIRE((std::is_same_v<decltype(lengthRatio), Dimension<float, Dimensionless>>));
     float lengthRatioValue = lengthRatio;
     REQUIRE(lengthRatioValue == Approx(1.0f));
 
     auto timeRatio = t / t;
-    REQUIRE((std::is_same_v<decltype(timeRatio), Dimension<float, Time<0>>>));
+    REQUIRE((std::is_same_v<decltype(timeRatio), Dimension<float, Dimensionless>>));
     float timeRatioValue = timeRatio;
     REQUIRE(timeRatioValue == Approx(1.0f));
 
@@ -341,27 +342,27 @@ TEST_CASE("Dimensional: operation-operation combinations and cancellation")
     REQUIRE(oss.str() == "2.5 m/s²");
 }
 
-// TEST_CASE("Dimensional: Newton's second law and named force equivalence")
-// {
-//     Dimension<float, Length<1>> l{10.0f};
-//     Dimension<float, Time<1>> t{2.0f};
-//     Dimension<float, Mass<1>> m{5.0f};
+TEST_CASE("Dimensional: Newton's second law and named force equivalence")
+{
+    Dimension<float, Length<1>> l{10.0f};
+    Dimension<float, Time<1>> t{2.0f};
+    Dimension<float, Mass<1>> m{5.0f};
 
-//     auto speed = l / t;
-//     auto accel = speed / t;
-//     auto force = m * accel;
+    auto speed = l / t;
+    auto accel = speed / t;
+    auto force = m * accel;
 
-//     REQUIRE(force.Value == Approx(12.5f));
-//     using ForceDim = decltype(force)::Dimensional;
-//     static_assert(Ivy::P::SameNormalized<ForceDim, Force>);
+    REQUIRE(force.Value == Approx(12.5f));
+    using ForceDim = decltype(force)::Dimensional;
+    static_assert(Ivy::P::SameNormalized<ForceDim, Force>);
 
-//     Dimension<float, Force> namedForce{100.0f};
-//     auto totalForce = namedForce + force;
-//     REQUIRE(totalForce.Value == Approx(112.5f));
-//     std::ostringstream oss;
-//     oss << totalForce;
-//     REQUIRE(oss.str() == "112.5 N");
-// }
+    Dimension<float, Force> namedForce{100.0f};
+    auto totalForce = namedForce + force;
+    REQUIRE(totalForce.Value == Approx(112.5f));
+    std::ostringstream oss;
+    oss << totalForce;
+    REQUIRE(oss.str() == "112.5 N");
+}
 
 TEST_CASE("Dimensional: momentum, energy and work")
 {
@@ -570,11 +571,9 @@ TEST_CASE("Dimensional: roots with negative exponents")
     // Value: sqrt(9 * 16 * 64) = sqrt(9216) = 96
     REQUIRE(root.Value == Approx(96.0f));
 
-    // The exact nested shape may depend on normalization, but the
-    // mathematical exponents must be correct.
-    // using RootDim = decltype(root)::Dimensional;
-    // static_assert(Ivy::P::SameNormalized<RootDim,
-    //     OperationDimensional<Mass<-1>, OperationDimensional<Time<-3>, Length<2>>>>);
+    using RootDim = decltype(root)::Dimensional;
+    static_assert(Ivy::P::SameNormalized<RootDim,
+        OperationDimensional<Mass<-1>, OperationDimensional<Time<-3>, Length<2>>>>);
 }
 
 TEST_CASE("Dimensional: extreme exponents")
@@ -587,7 +586,7 @@ TEST_CASE("Dimensional: extreme exponents")
     Dimension<float, Length<-5>> lNeg5{3.0f};
     Dimension<float, Length<5>> l5{3.0f};
     auto dimensionless = lNeg5 * l5;
-    static_assert(std::is_same_v<decltype(dimensionless)::Dimensional, Length<0>>);
+    static_assert(std::is_same_v<decltype(dimensionless)::Dimensional, Dimensionless>);
     REQUIRE(dimensionless.Value == Approx(9.0f));
 
     // Print large exponents
@@ -614,7 +613,7 @@ TEST_CASE("Dimensional: ugly algebraic expression (runtime)")
 
     // The type may not be canonical yet, but mathematically it is T^-1.
     // Uncomment after canonical normalization:
-    // static_assert(Ivy::P::SameNormalized<decltype(x)::Dimensional, Time<-1>>);
+    static_assert(Ivy::P::SameNormalized<decltype(x)::Dimensional, Time<-1>>);
 }
 
 //==============================================================================
@@ -639,23 +638,23 @@ TEST_CASE("Dimensional: normalization is independent of expression shape (advers
     auto d = (l / t) * m;
 
     // These should all normalize to M L T^-1.
-    // static_assert(Ivy::P::SameNormalized<decltype(a)::Dimensional, decltype(b)::Dimensional>);
-    // static_assert(Ivy::P::SameNormalized<decltype(a)::Dimensional, decltype(c)::Dimensional>);
-    // static_assert(Ivy::P::SameNormalized<decltype(a)::Dimensional, decltype(d)::Dimensional>);
+    static_assert(Ivy::P::SameNormalized<decltype(a)::Dimensional, decltype(b)::Dimensional>);
+    static_assert(Ivy::P::SameNormalized<decltype(a)::Dimensional, decltype(c)::Dimensional>);
+    static_assert(Ivy::P::SameNormalized<decltype(a)::Dimensional, decltype(d)::Dimensional>);
 
     // Division shape independence
     auto e = (l / t) / t;
     auto f = l / (t * t);
-    // static_assert(Ivy::P::SameNormalized<decltype(e)::Dimensional, decltype(f)::Dimensional>);
+    static_assert(Ivy::P::SameNormalized<decltype(e)::Dimensional, decltype(f)::Dimensional>);
 
     // Mixed cancellation
     auto g = (l * t) / t;
     auto h = l * (t / t);
-    // static_assert(Ivy::P::SameNormalized<decltype(g)::Dimensional, decltype(h)::Dimensional>);
+    static_assert(Ivy::P::SameNormalized<decltype(g)::Dimensional, decltype(h)::Dimensional>);
 
     // Ugly nested expression: should be T^-1
     auto ugly = ((m * l) / (t * t)) * ((t * l) / m) / (l * l);
-    // static_assert(Ivy::P::SameNormalized<decltype(ugly)::Dimensional, Time<-1>>);
+    static_assert(Ivy::P::SameNormalized<decltype(ugly)::Dimensional, Time<-1>>);
 
     // Keep the compiler from warning about unused variables.
     (void)a;

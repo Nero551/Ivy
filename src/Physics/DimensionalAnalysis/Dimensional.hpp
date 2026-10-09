@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Utilities/FixedString.hpp"
+#include <type_traits>
 namespace Ivy::P
 {
+
 /** @brief Converts an integer exponent to its Unicode superscript representation. */
 inline std::string Superscript(int exponent)
 {
@@ -30,7 +32,29 @@ inline std::string Superscript(int exponent)
 
     return result;
 };
+
 template <typename... Ts> struct List;
+
+struct Dimensionless
+{
+    static constexpr int Exponent = 0;
+    static constexpr int Order = 0;
+
+    template <int E> using WithExponent = Dimensionless;
+
+    template <int E> using WithRoot = Dimensionless;
+
+    using Left = Dimensionless;
+    using Right = Dimensionless;
+    using Normalized = Dimensionless;
+    using Flattenend = List<>;
+
+    static std::ostream& Print(std::ostream& os)
+    {
+        return os << "1";
+    }
+};
+
 template <typename A, typename B, U::FixedString Name = ""> struct OperationDimensional;
 template <typename List> struct RebuildType;
 
@@ -48,6 +72,11 @@ template <typename First, typename Second, typename... Rest> struct RebuildType<
     using Type = OperationDimensional<First, Tail>;
 };
 
+template <> struct RebuildType<List<>>
+{
+    using Type = Dimensionless;
+};
+
 template <typename... Ts> struct List
 {
     static constexpr std::size_t Size = sizeof...(Ts);
@@ -62,9 +91,10 @@ template <typename... Ls, typename... Rs> struct Concat<List<Ls...>, List<Rs...>
 };
 
 /** @brief Provides the common compile-time interface for a dimensional type. */
-template <template <int> typename Derived, int Exp> struct Dimensional
+template <template <int> typename Derived, int Exp, int Ord> struct Dimensional
 {
     static constexpr int Exponent = Exp;
+    static constexpr int Order = Ord;
 
     template <int E> using WithExponent = Derived<E>;
     template <int E> requires(Exponent % E == 0)
@@ -79,18 +109,18 @@ template <template <int> typename Derived, int Exp> struct Dimensional
     using Left = Derived<Exp>;
     using Right = Derived<Exp>;
     using Normalized = Derived<Exp>;
-    using Flatten = List<Derived<Exp>>;
+    using Flattenend = List<Derived<Exp>>;
 };
 
-template <int Exp> struct Time : Dimensional<Time, Exp>
+template <int Exp> struct Mass : Dimensional<Mass, Exp, 1>
 {
     static std::ostream& Print(std::ostream& os)
     {
-        return os << "s" << Superscript(Exp);
+        return os << "kg" << Superscript(Exp);
     }
 };
 
-template <int Exp> struct Length : Dimensional<Length, Exp>
+template <int Exp> struct Length : Dimensional<Length, Exp, 2>
 {
     static std::ostream& Print(std::ostream& os)
     {
@@ -98,11 +128,11 @@ template <int Exp> struct Length : Dimensional<Length, Exp>
     }
 };
 
-template <int Exp> struct Mass : Dimensional<Mass, Exp>
+template <int Exp> struct Time : Dimensional<Time, Exp, 3>
 {
     static std::ostream& Print(std::ostream& os)
     {
-        return os << "kg" << Superscript(Exp);
+        return os << "s" << Superscript(Exp);
     }
 };
 
@@ -113,8 +143,12 @@ template <template <int> typename Derived, int Exp> struct IsDimensionalType<Der
 {
 };
 
-template <template <int> typename Derived, int Exp>
-struct IsDimensionalType<Dimensional<Derived, Exp>> : std::true_type
+template <template <int> typename Derived, int Exp, int Ord>
+struct IsDimensionalType<Dimensional<Derived, Exp, Ord>> : std::true_type
+{
+};
+
+template <> struct IsDimensionalType<Dimensionless> : std::true_type
 {
 };
 
@@ -340,6 +374,73 @@ template <typename... Ts> struct Merge<List<Ts...>>
     using Type = FindAndMergeAll<List<Ts...>::Size, List<Ts...>>::Type;
 };
 
+template <typename T, typename O> static constexpr bool LowerThan = T::Order < O::Order;
+
+template <typename T> struct FindSmallest;
+
+template <typename Head> struct FindSmallest<List<Head>>
+{
+    using Type = Head;
+};
+
+template <typename Head, typename Next, typename... Tail> struct FindSmallest<List<Head, Next, Tail...>>
+{
+  private:
+    using Candidate = typename FindSmallest<List<Next, Tail...>>::Type;
+
+  public:
+    // Lower Order comes first: Mass (1), Length (2), Time (3).
+    using Type = std::conditional_t<LowerThan<Candidate, Head>, Candidate, Head>;
+};
+template <typename List, typename Target> struct RemoveFirst;
+
+template <typename Target, typename... Tail> struct RemoveFirst<List<Target, Tail...>, Target>
+{
+    using Type = List<Tail...>;
+};
+
+template <typename Head, typename... Tail, typename Target> requires(!std::same_as<Head, Target>)
+struct RemoveFirst<List<Head, Tail...>, Target>
+{
+  private:
+    using Remaining = typename RemoveFirst<List<Tail...>, Target>::Type;
+
+  public:
+    using Type = typename Concat<List<Head>, Remaining>::Type;
+};
+template <typename T> struct Sort;
+
+template <> struct Sort<List<>>
+{
+    using Type = List<>;
+};
+
+template <typename Head, typename... Tail> struct Sort<List<Head, Tail...>>
+{
+  private:
+    using Input = List<Head, Tail...>;
+    using First = typename FindSmallest<Input>::Type;
+    using Remaining = typename RemoveFirst<Input, First>::Type;
+    using SortedTail = typename Sort<Remaining>::Type;
+
+  public:
+    using Type = typename Concat<List<First>, SortedTail>::Type;
+};
+
+template <int Remaining, typename T> struct RemoveZeroExponents;
+
+template <typename... Ts> struct RemoveZeroExponents<0, List<Ts...>>
+{
+    using Type = List<Ts...>;
+};
+
+template <int Remaining, typename Head, typename... Ts> requires(Remaining > 0)
+struct RemoveZeroExponents<Remaining, List<Head, Ts...>>
+{
+    using Type = std::conditional_t<ZeroExponent<Head>, RemoveZeroExponents<Remaining - 1, List<Ts...>>,
+        RemoveZeroExponents<Remaining - 1, List<Ts..., Head>>>::Type;
+};
+
 // ============================================================================
 // Operation
 // ============================================================================
@@ -351,11 +452,12 @@ struct OperationDimensional<A, B, Name>
     using Left = A::Normalized;
     using Right = B::Normalized;
 
-    //TODO: it appears i can't use TypeTree for this. so just define a Flatten and Rebuild specifically for this.
+    using Flattenend = Concat<typename Left::Flattenend, typename Right::Flattenend>::Type;
+    using Merged = Merge<Flattenend>::Type;
+    using ZeroExpRemoved = RemoveZeroExponents<Merged::Size, Merged>::Type;
+    using Sorted = Sort<ZeroExpRemoved>::Type;
+    using Normalized = Sorted::Rebuild;
 
-    using Flatten = Concat<typename Left::Flatten, typename Right::Flatten>::Type;
-    using Normalized = Merge<Flatten>::Type::Rebuild;
-    // using Normalized = OperationNormalization<Left, Right>::Type;
     static constexpr int Exponent = 1;
 
     template <int E>
