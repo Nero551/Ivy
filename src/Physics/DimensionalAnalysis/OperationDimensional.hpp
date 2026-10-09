@@ -201,20 +201,48 @@ template <typename... Ts> struct FindAndMerge<0, U::TypeTree::List<Ts...>>
     using Type = U::TypeTree::List<Ts...>;
 };
 
-template <int Remaining, typename Head, typename Target, typename... Tail>
+template <int Remaining, typename Head> requires(Remaining > 0)
+struct FindAndMerge<Remaining, U::TypeTree::List<Head>>
+{
+    using Type = U::TypeTree::List<Head>;
+};
+
+template <int Remaining, typename Head, typename Target, typename... Tail> requires(Remaining > 0)
 struct FindAndMerge<Remaining, U::TypeTree::List<Head, Target, Tail...>>
 {
     using Type = std::conditional_t<SameTerm<Head, Target>,
         FindAndMerge<Remaining - 1, U::TypeTree::List<AddTerms<Head, Target>, Tail...>>,
         FindAndMerge<Remaining - 1, U::TypeTree::List<Head, Tail..., Target>>>::Type;
 };
+
+template <int Remaining, typename List> struct FindAndMergeAll;
+template <typename... Ts> struct FindAndMergeAll<0, U::TypeTree::List<Ts...>>
+{
+    using Type = U::TypeTree::List<Ts...>;
+};
+
+template <int Remaining, typename Head> requires(Remaining > 0)
+struct FindAndMergeAll<Remaining, U::TypeTree::List<Head>>
+{
+    using Type = U::TypeTree::List<Head>;
+};
+
+template <int Remaining, typename Head, typename... Tail> requires(Remaining > 0)
+struct FindAndMergeAll<Remaining, U::TypeTree::List<Head, Tail...>>
+{
+
+    using Type = FindAndMergeAll<Remaining - 1,
+        typename FindAndMerge<U::TypeTree::List<Head, Tail...>::Size,
+            U::TypeTree::List<Head, Tail...>>::Type>::Type;
+};
+
 template <typename T> struct Merge
 {
 };
 
-template <typename Head, typename... Ts> struct Merge<U::TypeTree::List<Head, Ts...>>
+template <typename... Ts> struct Merge<U::TypeTree::List<Ts...>>
 {
-    using Type = U::TypeTree::List<Head, Ts...>;
+    using Type = FindAndMergeAll<U::TypeTree::List<Ts...>::Size, U::TypeTree::List<Ts...>>::Type;
 };
 
 /** @brief Represents a compound dimensional expression composed of two dimensional types. */
@@ -224,11 +252,9 @@ struct OperationDimensional<A, B, Name> : U::TypeTree::Node<typename A::Normaliz
     using Left = U::TypeTree::Node<A, B>::Left;
     using Right = U::TypeTree::Node<A, B>::Right;
     using Flatten = U::TypeTree::Node<A, B>::Flatten;
-    // using Left = A::Normalized;
-    // using Right = B::Normalized;
 
     using Normalized = OperationNormalization<Left, Right>::Type;
-    using NewNormalized = Merge<typename OperationDimensional<Left, Right>::Flatten>::Type;
+    using NewNormalized = Merge<typename OperationDimensional<Left, Right>::Flatten>::Type::Rebuild;
 
     static constexpr int Exponent = 1;
 
