@@ -4,7 +4,7 @@ set_toolchains("clang")
 add_rules("plugin.compile_commands.autoupdate", { lsp = "clang" })
 add_rules("mode.debug", "mode.release")
 
-add_requires("tracy", { system = false })
+add_requires("tracy v0.13.1", { system = false })
 add_requires("catch2", { system = false })
 add_requires("glfw", { system = false })
 add_requires("assimp", { system = false })
@@ -22,6 +22,8 @@ target("Ivy")
         add_files("src/**.cpp|src/TracyMemory.cpp")
         set_policy("build.optimization.lto", true)
     else
+        add_defines("TRACY_ENABLE")
+        add_defines("TRACY_PROFILE_MEMORY")
         add_files("src/**.cpp")
     end
 

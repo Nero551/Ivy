@@ -1,17 +1,19 @@
 #pragma once
 
 #include "Component.hpp"
-
+#include "Core/Service.hpp"
 #include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/World/ECS/Events/ComponentAdded.hpp"
 #include "Core/World/ECS/Events/ComponentRemoved.hpp"
 #include "Core/World/ECS/Events/EntityDestroyed.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
 
-#include "Utilities/DataStructures/SparseSetAoS.hpp"
+#include <concepts>
+#include <cstddef>
+#include <utility>
 
 namespace Ivy::C
 {
-
 struct World;
 
 struct IComponentPool
@@ -24,15 +26,15 @@ template <typename T>
 concept ComponentType = std::derived_from<T, Component>;
 
 /**
- * @brief Stores components using a sparse set.
- *
- * Provides O(1) component lookup by entity ID while keeping components
- * densely packed for efficient iteration.
- *
- * Automatically removes components when their associated entity is destroyed.
- *
- * @tparam T Component type stored by the pool.
- */
+     * @brief Stores components using a sparse set.
+     *
+     * Provides O(1) component lookup by entity ID while keeping components
+     * densely packed for efficient iteration.
+     *
+     * Automatically removes components when their associated entity is destroyed.
+     *
+     * @tparam T Component type stored by the pool.
+     */
 template <ComponentType T> struct ComponentPool : IComponentPool
 {
     ComponentAdded ComponentAdded{};
@@ -46,7 +48,7 @@ template <ComponentType T> struct ComponentPool : IComponentPool
         /** @brief Returns the entity ID and corresponding component. */
         std::pair<unsigned int, T&> operator*() const
         {
-            return {Pool->m_Components.SparseIndexOf(Index), Pool->m_Components.AtDense(Index).Value};
+            return {Pool->m_Components.SparseIndexOf(Index), Pool->m_Components.AtDense(Index)};
         }
 
         /** @brief Advances the iterator to the next component. */
@@ -88,19 +90,19 @@ template <ComponentType T> struct ComponentPool : IComponentPool
     }
 
     /**
-     * @brief Constructs and adds a component for an entity.
-     *
-     * @param entityId ID of the entity receiving the component.
-     * @return Reference to the stored component.
-     */
+         * @brief Constructs and adds a component for an entity.
+         *
+         * @param entityId ID of the entity receiving the component.
+         * @return Reference to the stored component.
+         */
     T& Add(const unsigned int entityId)
     {
-        auto& component = m_Components.Emplace(entityId)->Value;
+        auto component = m_Components.Emplace(entityId);
 
         ComponentAdded.EntityId = entityId;
         ComponentAdded.Fire();
 
-        return component;
+        return *component;
     }
 
     /** @brief Returns whether the specified entity has this component. */
@@ -110,11 +112,11 @@ template <ComponentType T> struct ComponentPool : IComponentPool
     }
 
     /**
-     * @brief Returns the component belonging to an entity.
-     *
-     * @param entityId ID of the entity.
-     * @return Reference to the stored component.
-     */
+         * @brief Returns the component belonging to an entity.
+         *
+         * @param entityId ID of the entity.
+         * @return Reference to the stored component.
+         */
     T& GetComponentById(const unsigned int entityId)
     {
         return m_Components.At(entityId);
@@ -133,32 +135,32 @@ template <ComponentType T> struct ComponentPool : IComponentPool
     }
 
     /**
-     * @brief Returns the entity ID at a dense storage index.
-     *
-     * @param index Dense index of the component.
-     * @return Entity ID associated with the component.
-     */
+         * @brief Returns the entity ID at a dense storage index.
+         *
+         * @param index Dense index of the component.
+         * @return Entity ID associated with the component.
+         */
     unsigned int GetIdByIndex(const size_t index) const
     {
         return m_Components.GetSparseIndex(index);
     }
 
     /**
-     * @brief Returns the component at a dense storage index.
-     *
-     * @param index Dense index of the component.
-     * @return Reference to the stored component.
-     */
+         * @brief Returns the component at a dense storage index.
+         *
+         * @param index Dense index of the component.
+         * @return Reference to the stored component.
+         */
     T& GetComponentByIndex(const unsigned int index)
     {
         return m_Components.GetByIndex(index);
     }
 
     /**
-     * @brief Removes the component belonging to an entity.
-     *
-     * @param entityId ID of the entity whose component should be removed.
-     */
+         * @brief Removes the component belonging to an entity.
+         *
+         * @param entityId ID of the entity whose component should be removed.
+         */
     void Remove(const unsigned int entityId)
     {
         m_Components.Erase(entityId);
@@ -181,7 +183,6 @@ template <ComponentType T> struct ComponentPool : IComponentPool
 
   private:
     /** @brief Stores components with dense storage and sparse entity ID lookup. */
-    U::SparseSetAoS<T> m_Components{};
+    U::SparseSetSoA<T> m_Components{};
 };
-
 } // namespace Ivy::C

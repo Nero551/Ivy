@@ -1,132 +1,50 @@
 #!/usr/bin/env python3
 
 import argparse
-import json
-import os
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DATABASE = ROOT / "compile_commands.json"
+SOURCE_DIR = ROOT / "src"
 
 
-def IsProjectSource(entry: dict) -> bool:
-    directory = Path(entry["directory"])
-    source = Path(entry["file"])
-
-    if not source.is_absolute():
-        source = directory / source
-
-    try:
-        relative = source.resolve().relative_to(ROOT)
-    except ValueError:
-        return False
-
-    return relative.parts[0] == "src"
-
-
-def AnalyzeSource(source: str, fix: bool) -> tuple[str, int, str]:
-    command = [
-        "clang-tidy",
-        f"-p={DATABASE.parent}",
-        "--quiet",
-    ]
+def analyze(file: Path, fix: bool) -> None:
+    command = ["clang-tidy"]
 
     if fix:
         command.append("-fix")
 
-    command.append(source)
+    command.append(str(file))
 
-    result = subprocess.run(
-        command,
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
+    print(f"Analyzing {file.relative_to(ROOT)}", flush=True)
 
-    output = result.stdout + result.stderr
-    return source, result.returncode, output
+    result = subprocess.run(command, cwd=ROOT)
+
+    if result.returncode != 0:
+        print(f"Failed: {file.relative_to(ROOT)}", flush=True)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Run clang-tidy on Ivy sources in parallel."
-    )
-    parser.add_argument(
-        "-fix",
-        action="store_true",
-        help="Automatically apply suggested fixes.",
-    )
-    parser.add_argument(
-        "-j",
-        "--jobs",
-        type=int,
-        default=None,
-        help="Number of parallel jobs (default: CPU count; 1 when fixing).",
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-fix", action="store_true")
+    parser.add_argument("-j", type=int, default=4, help="Number of parallel jobs")
     args = parser.parse_args()
 
-    if not DATABASE.exists():
-        sys.exit(f"Compilation database not found: {DATABASE}")
-
-    if args.jobs is not None and args.jobs < 1:
-        sys.exit("The number of jobs must be at least 1.")
-
-    with DATABASE.open(encoding="utf-8") as file:
-        database = json.load(file)
-
-    sources = sorted(
-        {
-            str(
-                (
-                    Path(entry["directory"]) / entry["file"]
-                    if not Path(entry["file"]).is_absolute()
-                    else Path(entry["file"])
-                ).resolve()
-            )
-            for entry in database
-            if IsProjectSource(entry)
-        }
+    files = sorted(
+        path
+        for path in SOURCE_DIR.rglob("*")
+        if path.is_file() and path.suffix in {".cpp", ".hpp"}
     )
 
-    if not sources:
-        sys.exit("No Ivy source files found in the compilation database.")
+    if not files:
+        sys.exit("No .cpp or .hpp files found.")
 
-    default_jobs = 1 if args.fix else (os.cpu_count() or 1)
-    jobs = args.jobs if args.jobs is not None else default_jobs
-    jobs = min(jobs, len(sources))
+    with ThreadPoolExecutor(max_workers=args.j) as executor:
+        list(executor.map(lambda file: analyze(file, args.fix), files))
 
-    print(
-        f"Analyzing {len(sources)} Ivy translation units using {jobs} parallel job(s).",
-        flush=True,
-    )
-
-    failures = 0
-
-    with ThreadPoolExecutor(max_workers=jobs) as executor:
-        futures = {
-            executor.submit(AnalyzeSource, source, args.fix): source
-            for source in sources
-        }
-
-        for future in as_completed(futures):
-            source, returncode, output = future.result()
-            relative = Path(source).relative_to(ROOT)
-
-            print(f"[{'OK' if returncode == 0 else 'FAILED'}] {relative}")
-
-            if output:
-                print(output, end="" if output.endswith("\n") else "\n")
-
-            if returncode != 0:
-                failures += 1
-
-    if failures:
-        sys.exit(f"{failures} translation unit(s) failed.")
-
-    print("clang-tidy completed successfully.")
+    print("Done.")
 
 
 if __name__ == "__main__":
