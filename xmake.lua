@@ -2,25 +2,34 @@ set_languages("c++26")
 set_toolchains("clang")
 
 add_rules("plugin.compile_commands.autoupdate", { lsp = "clang" })
-
 add_rules("mode.debug", "mode.release")
-add_requires("catch2", "glfw", "assimp", "glslang", "stb", "glad 0.1.36", "nlohmann_json", "magic_enum")
+
+add_requires("tracy", { system = false })
+add_requires("catch2", { system = false })
+add_requires("glfw", { system = false })
+add_requires("assimp", { system = false })
+add_requires("glslang", { system = false })
+add_requires("stb", { system = false })
+add_requires("glad 0.1.36", { system = false })
 
 target("Ivy")
-    if is_mode("release") then
-        set_policy("build.optimization.lto", true)
-    end
-
     set_kind("binary")
     set_rundir(os.projectdir())
-    add_files("src/**.cpp")
     add_includedirs("src")
-
     set_pcxxheader("src/pch.hpp")
 
-    add_files("External/tracy/public/TracyClient.cpp")
-    add_includedirs("External/tracy/public")
-    add_defines("TRACY_ENABLE")
+    if is_mode("release") then
+        add_files("src/**.cpp|src/TracyMemory.cpp")
+        set_policy("build.optimization.lto", true)
+    else
+        add_files("src/**.cpp")
+    end
+
+    if is_mode("debug") then
+        add_links("TracyClient")
+        add_defines("TRACY_ENABLE")
+        add_defines("TRACY_PROFILE_MEMORY")
+    end
 
     on_load( function (target)
 
@@ -38,7 +47,8 @@ target("Ivy")
         umbrella.GenerateEngineUmbrella("Ivy")
     end)
 
-    add_packages("glfw", "assimp", "glslang", "stb", "glad", "nlohmann_json", "magic_enum")
+    add_links("glslang-default-resource-limits")
+    add_packages("tracy", "glfw", "assimp", "glslang", "stb", "glad")
 
 
 target("IvyTests")

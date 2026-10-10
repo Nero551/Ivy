@@ -1,8 +1,8 @@
 #include "ShaderSourceValidator.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "ShaderSource.hpp"
+#include "glslang/Public/ShaderLang.h"
 #include <glslang/Public/ResourceLimits.h>
-#include <glslang/Public/ShaderLang.h>
 #include <string>
 
 namespace Ivy::G
