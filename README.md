@@ -1,6 +1,6 @@
 # Ivy (2026-06-26)
 
-**A 3D game engine in C++26.**
+**A game engine in C++26.**
 
 Ivy is a hobby game engine project focused on learning the fundamentals of game engine development, computer graphics, mathematics, and physics.
 
@@ -10,9 +10,9 @@ Ivy is a hobby game engine project focused on learning the fundamentals of game 
 ## Features
 
 - **Architecture:** ECS-style ([`Framework.md`](Docs/Framework.md) ).
-- **Rendering:** OpenGL, shaders, textures, lighting, framebuffers, and MSAA
-- **Mathematics:** Vectors, matrices, complex, quaternions, functions, sets, linear systems
-- **Physics Library:** dimensional analysis
+- **Graphics:** OpenGL, shaders, textures, lighting, framebuffers, and MSAA
+- **Math:** Vectors, matrices, complex, quaternions, functions, sets, linear systems
+- **Physics:** dimensional analysis
 
 ## Getting Started
 
@@ -24,7 +24,7 @@ Ivy is a hobby game engine project focused on learning the fundamentals of game 
 ### Install Dependencies
 
 ```bash
-./scripts/setup-linux.sh
+sudo ./scripts/setup-linux.sh
 ```
 
 ### Build and Run
@@ -49,4 +49,4 @@ xmake run IvyTests
 
 ## Development Log
 
-[`Log.md`](Docs/Log.md) for Ivy's development history and weekly progress.
+[`Log.md`](Docs/Log.md) for development history and weekly progress.

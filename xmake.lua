@@ -24,7 +24,7 @@ target("Ivy")
 
     on_load( function (target)
 
-        local umbrella = import("scripts/GenerateUmbrellas")
+        local umbrella = import("scripts/generate-umbrellas")
 
         umbrella.GenerateUmbrellaHeader("Core", "Core")
         umbrella.GenerateUmbrellaHeader("World", "World")
