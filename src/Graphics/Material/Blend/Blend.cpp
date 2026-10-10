@@ -1,4 +1,5 @@
 #include "Blend.hpp"
+#include "OpenGL.hpp"
 
 namespace Ivy::G
 {

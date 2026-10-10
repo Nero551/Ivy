@@ -3,12 +3,19 @@
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/World.hpp"
+#include "Graphics/Material/Material.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
+#include "Math/Vector/Vector3.hpp"
+#include "Modules/Renderer/Components/MaterialComponent.hpp"
+#include "Modules/Renderer/Components/MeshComponent.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
+#include "World/Components/Transform3DComponent.hpp"
 #include "World/Nodes/Node.hpp"
 
 namespace Ivy
@@ -60,57 +67,58 @@ void Grid::CreateGridLine(const M::Quaternion<> rotation, const M::Vector<3> pos
 
 void Grid::CreateXY()
 {
-    for (float x = -20; x < 20; ++x)
+    for (int x = -20; x < 20; ++x)
     {
         if (x != 0)
         {
-            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, 0}), {x, 0, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, 0}), {static_cast<float>(x), 0, 0});
         }
     }
 
-    for (float y = -20; y < 20; ++y)
+    for (int y = -20; y < 20; ++y)
     {
         if (y != 0)
         {
-            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0}), {0, y, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0}), {0, static_cast<float>(y), 0});
         }
     }
 }
 
 void Grid::CreateXZ()
 {
-    for (float x = -20; x < 20; ++x)
+    for (int x = -20; x < 20; ++x)
     {
         if (x != 0)
         {
-            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)}), {x, 0, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)}), {static_cast<float>(x), 0, 0});
         }
     }
 
-    for (float z = -20; z < 20; ++z)
+    for (int z = -20; z < 20; ++z)
     {
         if (z != 0)
         {
-            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, M::Rad(90)}), {0, 0, z});
+            CreateGridLine(
+                M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, M::Rad(90)}), {0, 0, static_cast<float>(z)});
         }
     }
 }
 
 void Grid::CreateYZ()
 {
-    for (float y = -20; y < 20; ++y)
+    for (int y = -20; y < 20; ++y)
     {
         if (y != 0)
         {
-            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, 0}), {0, y, 0});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, 0}), {0, static_cast<float>(y), 0});
         }
     }
 
-    for (float z = -20; z < 20; ++z)
+    for (int z = -20; z < 20; ++z)
     {
         if (z != 0)
         {
-            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, 0}), {0, 0, z});
+            CreateGridLine(M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, 0}), {0, 0, static_cast<float>(z)});
         }
     }
 }

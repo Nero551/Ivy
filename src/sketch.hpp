@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Math/Math.hpp"
+#include "Math/Functions/Function.hpp"
 #include "Physics/DimensionalAnalysis/Dimension.hpp"
 #include "Physics/DimensionalAnalysis/Dimensionals.hpp"
-#include "Physics/Physics.hpp"
-#include "Utilities/Debug/Inspector.hpp"
+#include "Physics/Units.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include "Utilities/Utilities.hpp"
+#include <dlfcn.h>
 
 namespace Sketch
 {
@@ -25,7 +24,7 @@ namespace Sketch
 // that way an engine can have multiple worlds and
 // give modules the ability to do operations engine globally, world locally or on every world.
 
-//TODO: rethink the render pipeline(look at bevy's render graph. bevy's is pretty nice)
+//TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
 
 //TODO: probably wanna rethink my entire architecture (Core + Modules + World).
 // the other stuff can be extracted out of this project and still work.
@@ -81,7 +80,7 @@ template <unsigned int... Dimensions> struct Tensor
     static constexpr unsigned int Order = sizeof...(Dimensions);
     static constexpr unsigned int Size = (Dimensions * ...);
 
-    constexpr Tensor() {}
+    constexpr Tensor() = default;
     constexpr explicit Tensor(float all)
     {
         m_Data.fill(all);
@@ -170,10 +169,11 @@ template <unsigned int... Dimensions> struct Tensor
 
 inline void Test()
 {
-    P::Dimension<float, P::Velocity> v{20};
-    P::Dimension<float, P::Length<1>> p{2};
-    P::Dimension<float, P::AngularSpeed> k = v / p;
+    P::Dimension<float, P::Mass<1>> m = 0.500;
+    P::Dimension<float, P::Force> T = 50.0;
+    P::Dimension<float, P::Length<1>> r = 1.50;
 
-    U::Inspector::Inspect(v * p);
+    P::Dimension<float, P::Velocity> v = Sqrt((T * r) / m);
+    U::Log::Info(v);
 }
 } // namespace Sketch

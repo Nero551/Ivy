@@ -1,6 +1,8 @@
 #pragma once
 #include "Math/Concepts.hpp"
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
+#include <concepts>
+#include <utility>
 
 namespace Ivy::P
 {
@@ -37,15 +39,16 @@ template <typename T, typename D> requires(IsDimensional<D>)
 struct Dimension
 {
     using Dimensional = D::Normalized;
+    template <typename P> using NegateExp = Exponentiate<P, -P::Exponent>;
 
-    template <typename P, typename O> using AddExp = P::template WithExponent<P::Exponent + O::Exponent>;
+    T Value{};
 
-    template <typename P> using NegateExp = P::template WithExponent<-P::Exponent>;
-
-    T Value{0};
-
-    constexpr Dimension() {}
+    constexpr Dimension() = default;
     constexpr Dimension(const T& value) : Value(value) {}
+    template <typename... Args> requires(std::constructible_from<T, Args...>)
+    constexpr Dimension(Args&&... args) : Value(std::forward<Args>(args)...)
+    {
+    }
 
     template <typename V, typename O>
     constexpr Dimension(const Dimension<V, O>& other)
@@ -193,7 +196,7 @@ struct Dimension
 };
 
 template <int N, typename T, typename D>
-P::Dimension<M::MultiplicationResult<T, T>, typename D::template WithExponent<D::Exponent * N>> Pow(
+P::Dimension<M::MultiplicationResult<T, T>, Exponentiate<D, D::Exponent * N>> Pow(
     const P::Dimension<T, D>& dim)
 {
     T result = dim.Value;

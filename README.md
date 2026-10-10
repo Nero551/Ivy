@@ -30,14 +30,14 @@ sudo ./scripts/setup-linux.sh
 ### Build and Run
 
 ```bash
-xmake Ivy
+xmake build Ivy
 xmake run Ivy
 ```
 
 ### Run Tests
 
 ```bash
-xmake IvyTests
+xmake build IvyTests
 xmake run IvyTests
 ```
 

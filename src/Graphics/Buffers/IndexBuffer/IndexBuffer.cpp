@@ -1,8 +1,10 @@
 #include "IndexBuffer.hpp"
+#include "OpenGL.hpp"
+#include <vector>
 
 namespace Ivy::G
 {
-IndexBuffer::IndexBuffer() {}
+IndexBuffer::IndexBuffer() = default;
 
 void IndexBuffer::Generate()
 {

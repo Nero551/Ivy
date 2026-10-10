@@ -5,15 +5,15 @@
 #include <utility>
 
 #include "../../Utilities/Debug/Log.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
-#include "ShaderSourceValidator.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
+#include "OpenGL.hpp"
 #include "Utilities/FileSystem.hpp"
 
 namespace Ivy::G
 {
 ShaderSource::ShaderSource(
-    const std::string& name, const std::string& path, const ShaderStage stage, const std::string& version)
-    : Path(path), Version(version), m_Name(name), m_Stage(stage)
+    std::string name, const std::string& path, const ShaderStage stage, std::string version)
+    : Path(path), Version(std::move(version)), m_Name(std::move(name)), m_Stage(stage)
 {
     SourceCode = U::FileSystem::ReadFile(path);
 }

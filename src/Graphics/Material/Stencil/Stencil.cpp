@@ -1,4 +1,5 @@
 #include "Stencil.hpp"
+#include "OpenGL.hpp"
 
 namespace Ivy::G
 {

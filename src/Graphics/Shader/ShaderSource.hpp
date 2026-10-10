@@ -28,8 +28,8 @@ struct ShaderSource
     //  lineNumber) although, all this requires a more advanced parser , like maybe line
     //  by line and storing which line has which code.
 
-    ShaderSource(const std::string& name, const std::string& path, ShaderStage stage,
-        const std::string& version = "version 460 core");
+    ShaderSource(std::string name, const std::string& path, ShaderStage stage,
+        std::string version = "version 460 core");
 
     ~ShaderSource();
     unsigned int GetId() const;

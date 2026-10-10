@@ -1,5 +1,10 @@
 #include "Window.hpp"
 #include "../Utilities/Debug/Log.hpp"
+#include "Graphics/GLFWPlatform.hpp"
+#include "OpenGL.hpp"
+#include "Utilities/Image.hpp"
+#include <GLFW/glfw3.h>
+#include <string>
 
 namespace Ivy::G
 {

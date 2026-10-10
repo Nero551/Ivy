@@ -1,7 +1,10 @@
+#include "Core/Service.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Texture/Texture2D.hpp"
 #include "Primitives.hpp"
+#include "Utilities/Image.hpp"
+#include <vector>
 
 namespace Ivy::R
 {

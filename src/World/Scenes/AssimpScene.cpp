@@ -1,17 +1,37 @@
 #include "AssimpScene.hpp"
 
 #include <assimp/Importer.hpp>
+#include <assimp/material.h>
+#include <assimp/mesh.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <assimp/types.h>
+#include <filesystem>
+#include <string>
+#include <vector>
 
-#include "Core/Engine.hpp"
+#include "Core/Service.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/ECS/Entity.hpp"
+#include "Core/World/World.hpp"
+#include "Graphics/Material/Material.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Mesh/Vertex.hpp"
+#include "Graphics/Shader/Shader.hpp"
+#include "Graphics/Shader/ShaderSource.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
 #include "Graphics/Texture/Texture2D.hpp"
-#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
+#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vector4.hpp"
+#include "Modules/Renderer/Components/MaterialComponent.hpp"
+#include "Modules/Renderer/Components/MeshComponent.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include "World/Nodes/Node3D.hpp"
 
 namespace Ivy
 {
-static Assimp::Importer importer;
 
 static void ProcessVertices(std::vector<G::Vertex>& vertices, const aiMesh* mesh)
 {
@@ -127,6 +147,7 @@ static void ProcessNode(
 
 AssimpScene::AssimpScene(const std::string& filepath)
 {
+    Assimp::Importer importer;
     SetRoot(C::World::Get().CreateEntity<Node3D>());
 
     const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs);

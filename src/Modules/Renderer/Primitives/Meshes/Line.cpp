@@ -1,7 +1,15 @@
 #include "../Primitives.hpp"
-#include "Core/Engine.hpp"
+#include "Core/Service.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Math/Color/Color.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Mesh/Topology.hpp"
+#include "Graphics/Mesh/Vertex.hpp"
+#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vector4.hpp"
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace Ivy::R
 {

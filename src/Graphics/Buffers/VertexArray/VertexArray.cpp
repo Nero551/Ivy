@@ -2,8 +2,12 @@
 
 #include "../ArrayBuffer/ArrayBuffer.hpp"
 #include "../IndexBuffer/IndexBuffer.hpp"
+#include "Graphics/DataType.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Math/Vector/Vector4.hpp"
+#include "OpenGL.hpp"
+#include <cstddef>
+#include <utility>
 
 namespace Ivy::G
 {

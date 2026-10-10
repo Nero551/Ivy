@@ -29,6 +29,7 @@ Its only responsibility is to create and run the **Engine**.
 The central object of the framework.
 It owns and updates:
 
+- The **Window**
 - The **World**
 - All **Modules**
 
@@ -38,14 +39,12 @@ The engine is responsible for driving the application's lifecycle (startup, upda
 
 ## Modules
 
-Modules are large, self-contained parts of the engine.
+Modules are large, self-contained parts of the engine that participate in the runtime loop.
 Examples include:
 
 - Renderer
 - Input
-- Physics
-- Audio
-- Networking
+- Physics simulation
 
 Each module owns one or more **Systems**. The module handles the lifecycle of all related **Systems**.
 It can also contain premade **Entities** & **Components**.
@@ -65,7 +64,7 @@ Examples include:
 
 ## World
 
-The world owns every entity in the application.
+The world owns the entities and the component query (which owns component pools).
 It is responsible for creating, storing & removing entities.
 
 ---

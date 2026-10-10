@@ -1,5 +1,4 @@
 #pragma once
-#include "Debug/Log.hpp"
 
 namespace Ivy::U
 {
@@ -13,26 +12,26 @@ template <typename T> struct CheckedPtr
     CheckedPtr() = default;
 
     /** @brief Constructs a CheckedPtr from a raw pointer. */
-    CheckedPtr(T* objectPtr)
+    CheckedPtr(T* objectPtr) noexcept
     {
         m_Ptr = objectPtr;
     }
 
     /** @brief Constructs a null CheckedPtr with a custom error message. */
-    CheckedPtr(const std::string_view nullMessage)
+    CheckedPtr(const std::string_view nullMessage) noexcept
     {
         this->m_NullMessage = nullMessage;
     }
 
     /** @brief Constructs a CheckedPtr from a pointer with a custom error message. */
-    CheckedPtr(T* objectPtr, const std::string_view nullMessage)
+    CheckedPtr(T* objectPtr, const std::string_view nullMessage) noexcept
     {
         m_Ptr = objectPtr;
         this->m_NullMessage = nullMessage;
     }
 
     /** @brief Assigns a raw pointer to the CheckedPtr. */
-    CheckedPtr& operator=(T* objectPtr)
+    CheckedPtr& operator=(T* objectPtr) noexcept
     {
         m_Ptr = objectPtr;
         return *this;

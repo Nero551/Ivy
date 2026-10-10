@@ -1,13 +1,16 @@
 #include "Engine.hpp"
-#include <OpenGL.hpp>
+#include <GLFW/glfw3.h>
+#include <algorithm>
 
 #include "Core/Service.hpp"
+#include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Graphics/Graphics.hpp"
+#include "Graphics/GraphicsContext.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Physics/Physics.hpp"
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
+#include "Utilities/Debug/Log.hpp"
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
 

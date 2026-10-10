@@ -1,4 +1,6 @@
 #include "Texture2DMultisample.hpp"
+#include "Graphics/Texture/Texture.hpp"
+#include "OpenGL.hpp"
 
 namespace Ivy::G
 {

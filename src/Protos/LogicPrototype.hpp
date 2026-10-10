@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Ivy::DigialLogic
+namespace Ivy::DigitalLogic
 {
 
 using Bit = bool;
@@ -161,4 +161,4 @@ struct uInt8 : Bits<8>
         }
     }
 };
-} // namespace Ivy::DigialLogic
+} // namespace Ivy::DigitalLogic

@@ -1,5 +1,6 @@
 #include "Core/World/Scene.hpp"
 
+#include "Core/World/ECS/Entity.hpp"
 #include "Core/World/World.hpp"
 
 namespace Ivy::C

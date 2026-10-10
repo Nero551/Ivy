@@ -1,7 +1,6 @@
 #include "Transform3DSystem.hpp"
 
-#include "Core/Engine.hpp"
-#include "Core/World/ECS/Entity.hpp"
+#include "Core/World/World.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
 namespace Ivy

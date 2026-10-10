@@ -24,7 +24,7 @@ struct GIndexPool
         IndexType Index = 0;
         GenType Generation = 0;
 
-        Handle() {}
+        Handle() = default;
 
         Handle(IndexType index, GenType gen) : Index(index), Generation(gen) {}
 

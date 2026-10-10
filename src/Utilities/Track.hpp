@@ -6,7 +6,7 @@ namespace Ivy::C
 
 template <typename T> struct Track
 {
-    Track() {}
+    Track() = default;
     Track(const T& value) : m_Value(value) {}
 
     const T& Get() const

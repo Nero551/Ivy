@@ -1,16 +1,19 @@
 #include "Material.hpp"
 
+#include <string>
+#include <utility>
+
 #include "../../Modules/Renderer/Primitives/Primitives.hpp"
 #include "../../Utilities/Debug/Log.hpp"
 #include "../Shader/Uniforms/FloatUniform.hpp"
 #include "../Shader/Uniforms/IntUniform.hpp"
 #include "../Shader/Uniforms/Vector3Uniform.hpp"
 #include "../Shader/Uniforms/Vector4Uniform.hpp"
-#include "../Texture/Texture2D.hpp"
+#include "Graphics/Texture/Texture.hpp"
 
 namespace Ivy::G
 {
-Material::Material(const std::string& name) : m_Name(name)
+Material::Material(std::string name) : m_Name(std::move(name))
 {
     auto& whiteTexture = R::Primitives::CreateWhiteTexture();
 

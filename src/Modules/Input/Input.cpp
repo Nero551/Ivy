@@ -1,8 +1,12 @@
 #include "Input.hpp"
 
-#include <OpenGL.hpp>
+#include <GLFW/glfw3.h>
 
 #include "Core/Engine.hpp"
+#include "Math/Vector/Vector2.hpp"
+#include "Modules/Input/Enums/Keys.hpp"
+#include "Modules/Input/Enums/MouseButton.hpp"
+#include "Modules/Input/Enums/MouseMode.hpp"
 
 namespace Ivy::I
 {

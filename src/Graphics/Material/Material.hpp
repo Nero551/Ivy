@@ -1,9 +1,8 @@
 #pragma once
 
 #include "../Shader/Shader.hpp"
-#include "../Texture/Texture.hpp"
+#include "../Texture/Texture2D.hpp"
 #include "Blend/Blend.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Depth/Depth.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Math/Vector/Vector4.hpp"
@@ -60,13 +59,13 @@ struct Material
     float Shininess = 32;
 
     /** Texture used for the material's diffuse map. */
-    U::CheckedPtr<Texture> DiffuseMap;
+    U::CheckedPtr<Texture2D> DiffuseMap;
 
     /** Texture used for the material's specular map. */
-    U::CheckedPtr<Texture> SpecularMap;
+    U::CheckedPtr<Texture2D> SpecularMap;
 
     /** Texture used for the material's emission map. */
-    U::CheckedPtr<Texture> EmissionMap;
+    U::CheckedPtr<Texture2D> EmissionMap;
 
     /**
      * @brief Creates a material with default properties.
@@ -75,7 +74,7 @@ struct Material
      *
      * @param name Resource name.
      */
-    explicit Material(const std::string& name);
+    explicit Material(std::string name);
 
     /** @brief Gets the resource name. */
     [[nodiscard]] const std::string& GetName() const;

@@ -1,9 +1,6 @@
 #include "FirstScene.hpp"
 
-#include "AssimpScene.hpp"
-
-#include "Graphics/Shader/Uniforms/Vector3Uniform.hpp"
-#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
+#include "World/Nodes/Node3D.hpp"
 namespace Ivy
 {
 FirstScene::FirstScene()

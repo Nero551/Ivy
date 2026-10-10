@@ -1,5 +1,7 @@
 #pragma once
+#include <exception>
 #include <iostream>
+#include <stdexcept>
 
 namespace Ivy::U
 {
@@ -58,7 +60,7 @@ struct Log
         std::cout << m_Red << "💀 [FATAL] " << m_Reset;
         (..., (std::cout << args));
         std::cout << '\n';
-        throw "";
+        throw std::exception();
     }
 
     /** @brief Validates a raw pointer and returns the dereferenced object. */

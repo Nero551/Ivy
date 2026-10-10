@@ -37,7 +37,7 @@ struct Texture
      * @param name Resource name.
      * @param target OpenGL texture target represented by this texture.
      */
-    Texture(const std::string& name, TextureTarget target);
+    Texture(std::string name, TextureTarget target);
 
     /** @brief Releases the underlying OpenGL texture object. */
     ~Texture();

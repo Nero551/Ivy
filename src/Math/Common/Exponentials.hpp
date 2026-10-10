@@ -18,16 +18,11 @@ constexpr float Exp(const float x)
     return std::exp(x);
 }
 
-constexpr float Factorial(const int x)
+constexpr unsigned int Factorial(const unsigned int x)
 {
-    if (x < 0)
-    {
-        U::Log::Error("Factorial requires a non-negative integer");
-    }
+    unsigned int result = 1;
 
-    int result = 1;
-
-    for (int i = x; i > 0; i--)
+    for (unsigned int i = x; i > 0; i--)
     {
         result *= i;
     }

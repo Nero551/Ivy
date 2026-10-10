@@ -1,0 +1,26 @@
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-unchecked-optional-access,
+  -bugprone-signed-bitwise,
+  -bugprone-implicit-widening-of-multiplication-result,
+    -bugprone-reserved-identifier,
+
+
+  performance-*,
+  -performance-enum-size,
+
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  -modernize-avoid-c-arrays,
+  -modernize-use-auto,
+
+  misc-include-cleaner,
+
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*/Ivy/src/.*'
+ExcludeHeaderFilterRegex: '.*/Ivy/External/.*'
+FormatStyle: file

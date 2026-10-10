@@ -1,9 +1,13 @@
 #include "Texture.hpp"
+
+#include "Graphics/Texture/TextureTarget.hpp"
 #include "OpenGL.hpp"
+#include <string>
+#include <utility>
 
 namespace Ivy::G
 {
-Texture::Texture(const std::string& name, const TextureTarget target) : m_Name(name), m_Target(target) {}
+Texture::Texture(std::string name, const TextureTarget target) : m_Name(std::move(name)), m_Target(target) {}
 
 Texture::~Texture()
 {

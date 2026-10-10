@@ -1,7 +1,7 @@
 #pragma once
 namespace Ivy::M
 {
-inline static std::mt19937 rng(std::random_device{}());
+inline std::mt19937 rng(std::random_device{}());
 
 inline float Random()
 {

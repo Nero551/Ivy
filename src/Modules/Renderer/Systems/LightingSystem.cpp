@@ -2,10 +2,11 @@
 
 #include "../../../World/Components/Transform3DComponent.hpp"
 #include "../Components/LightComponent.hpp"
-#include "../Components/MaterialComponent.hpp"
+#include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Graphics/Shader/Uniforms/IntUniform.hpp"
-#include "Graphics/Shader/Uniforms/Vector3Uniform.hpp"
+#include "Core/World/World.hpp"
+#include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
+#include <cstddef>
 
 namespace Ivy::R
 {

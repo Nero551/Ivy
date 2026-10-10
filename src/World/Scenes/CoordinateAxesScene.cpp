@@ -1,16 +1,23 @@
 #include "CoordinateAxesScene.hpp"
 
-#include "Core/Engine.hpp"
+#include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/World.hpp"
+#include "Graphics/Material/Material.hpp"
+#include "Graphics/Shader/Shader.hpp"
+#include "Graphics/Shader/ShaderSource.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
 #include "Grid.hpp"
 #include "Math/Color/Color.hpp"
+#include "Math/Common/Trigonometry.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
+#include "Math/Vector/Vector3.hpp"
 #include "Modules/Renderer/Components/MaterialComponent.hpp"
 #include "Modules/Renderer/Components/MeshComponent.hpp"
-#include "Modules/Renderer/Nodes/Camera.hpp"
 #include "Modules/Renderer/Nodes/Light.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
-#include "World/Nodes/Node3D.hpp"
+#include "World/Nodes/Node.hpp"
 
 namespace Ivy
 {

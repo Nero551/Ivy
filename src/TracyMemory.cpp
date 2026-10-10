@@ -1,3 +1,6 @@
+#include <cstddef>
+#include <cstdlib>
+#include <new>
 #include <tracy/Tracy.hpp>
 // ============================================================================
 // Standard new

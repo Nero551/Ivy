@@ -1,11 +1,17 @@
 #include "Mesh.hpp"
+#include "Graphics/DataType.hpp"
+#include "Graphics/Mesh/CullMode.hpp"
+#include "Graphics/Mesh/RenderMode.hpp"
+#include "Graphics/Mesh/Vertex.hpp"
 
 #include <OpenGL.hpp>
+#include <cstddef>
+#include <string>
 
 namespace Ivy::G
 {
 
-Mesh::~Mesh() {}
+Mesh::~Mesh() = default;
 
 const std::string& Mesh::GetName() const
 {

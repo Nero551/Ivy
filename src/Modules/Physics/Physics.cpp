@@ -2,15 +2,23 @@
 
 #include "Components/BodyComponent.hpp"
 #include "Core/Engine.hpp"
+#include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/ECS/Entity.hpp"
 #include "Core/World/World.hpp"
-#include "Math/Complex/Complex.hpp"
+#include "Graphics/Material/Material.hpp"
+#include "Graphics/Shader/Shader.hpp"
+#include "Graphics/Shader/ShaderSource.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
+#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vector4.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components/MaterialComponent.hpp"
 #include "Modules/Renderer/Components/MeshComponent.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
 #include "World/Components/Transform3DComponent.hpp"
+#include <format>
 
 namespace Ivy
 {

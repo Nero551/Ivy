@@ -16,7 +16,7 @@ enum class SolutionType
 };
 
 /** @brief Represents the result of solving a linear system. */
-template <int Variables, Scalar T = float> requires(Variables != 0)
+template <unsigned int Variables, Scalar T = float> requires(Variables != 0)
 struct LinearSolution
 {
     /** @brief Creates a linear solution containing a unique solution vector. */

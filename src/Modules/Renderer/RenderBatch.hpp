@@ -59,7 +59,7 @@ struct RenderBatch
             const std::size_t h1 = std::hash<struct G::Material*>{}(key.first);
             const std::size_t h2 = std::hash<struct G::Mesh*>{}(key.second);
 
-            return h1 ^ (h2 << 1);
+            return h1 ^ (h2 << 1U);
         }
     };
 };

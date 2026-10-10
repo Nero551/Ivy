@@ -1,6 +1,13 @@
 #include "Framebuffer.hpp"
 
 #include "../BufferBit.hpp"
+#include "Graphics/Buffers/Framebuffer/FramebufferAttachment.hpp"
+#include "Graphics/Buffers/Renderbuffer/Renderbuffer.hpp"
+#include "Graphics/Texture/Texture.hpp"
+#include "Graphics/Texture/TextureFilter.hpp"
+#include "OpenGL.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <string>
 
 namespace Ivy::G
 {

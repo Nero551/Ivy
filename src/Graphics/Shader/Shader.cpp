@@ -1,9 +1,12 @@
 #include "Shader.hpp"
 
 #include <OpenGL.hpp>
+#include <string>
+#include <vector>
 
 #include "../../Utilities/Debug/Log.hpp"
-#include "Uniforms/FloatUniform.hpp"
+#include "Graphics/Shader/ShaderSource.hpp"
+#include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::G
 {

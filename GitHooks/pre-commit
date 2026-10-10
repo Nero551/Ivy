@@ -3,6 +3,7 @@ set -e
 
 ROOT="$(git rev-parse --show-toplevel)"
 
+python "$ROOT"/scripts/clangd-tidy.py -fix -j 8
 "$ROOT/scripts/format-code.sh"
 xmake build -P "$ROOT" Ivy
 xmake run -P "$ROOT" IvyTests

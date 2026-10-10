@@ -1,5 +1,12 @@
 #include "Entity.hpp"
 #include "Core/World/World.hpp"
+#include "Utilities/CheckedPtr.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <cstddef>
+#include <format>
+#include <functional>
+#include <string>
+#include <vector>
 
 namespace Ivy::C
 {

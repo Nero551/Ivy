@@ -1,6 +1,7 @@
 #include "Profiling.hpp"
 
 #include "Core/Engine.hpp"
+#include <string>
 
 namespace Ivy
 {
