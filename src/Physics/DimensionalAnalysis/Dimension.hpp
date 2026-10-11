@@ -1,7 +1,12 @@
 #pragma once
+#include "Math/Common/Exponentials.hpp"
+#include "Math/Complex/Complex.hpp"
 #include "Math/Concepts.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include <concepts>
+#include <ostream>
+#include <type_traits>
 #include <utility>
 
 namespace Ivy::P
@@ -186,32 +191,27 @@ struct Dimension
     /** @brief Prints the value followed by its dimensional representation. */
     friend std::ostream& operator<<(std::ostream& os, Dimension dimension) requires(M::Printable<T>)
     {
-        os << dimension.Value << ' ';
+        os << dimension.Value;
         if (D::Exponent == 0)
         {
             return os;
         }
+        os << ' ';
         return D::Print(os);
     }
 };
 
 template <int N, typename T, typename D>
 P::Dimension<M::MultiplicationResult<T, T>, Exponentiate<D, D::Exponent * N>> Pow(
-    const P::Dimension<T, D>& dim)
+    const P::Dimension<T, D>& dim) requires(M::Power<T, float>)
 {
-    T result = dim.Value;
-    for (int i = 1; i < N; ++i)
-    {
-        result *= dim.Value;
-    }
-    return result;
+    return M::Pow(dim.Value, N);
 }
 
 template <typename T, typename D>
 P::Dimension<M::SqRootResult<T>, typename D::Normalized::template WithRoot<2>::Normalized> Sqrt(
-    const P::Dimension<T, D>& dim) requires(M::SqRootable<T>)
+    const P::Dimension<T, D>& dim) requires(M::SquareRoot<T>)
 {
     return M::Sqrt(dim.Value);
 }
-
 } // namespace Ivy::P

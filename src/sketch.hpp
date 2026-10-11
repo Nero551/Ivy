@@ -1,11 +1,19 @@
 #pragma once
 
+#include "Math/Common/Trigonometry.hpp"
+#include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Physics/DimensionalAnalysis/Dimension.hpp"
+#include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Physics/DimensionalAnalysis/Dimensionals.hpp"
-#include "Physics/Units.hpp"
+#include "Utilities/Debug/Inspector.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include <array>
+#include <concepts>
+#include <cstdlib>
 #include <dlfcn.h>
+#include <ostream>
+#include <string>
 
 namespace Sketch
 {
@@ -167,13 +175,60 @@ template <unsigned int... Dimensions> struct Tensor
     }
 };
 
+template <M::Scalar T> struct Dual
+{
+    T Real{0};
+    T Epsilon{0};
+
+    constexpr Dual() = default;
+
+    constexpr explicit Dual(T all) : Real(all), Epsilon(all) {}
+
+    constexpr Dual(T real, T epsilon) : Real(real), Epsilon(epsilon) {}
+
+    constexpr Dual operator+(const Dual& other)
+    {
+        return {Real + other.Real, Epsilon + other.Epsilon};
+    }
+
+    constexpr Dual operator-(const Dual& other)
+    {
+        return {Real - other.Real, Epsilon - other.Epsilon};
+    }
+
+    constexpr Dual operator*(const Dual& other)
+    {
+        return {Real * other.Real, (Real * other.Epsilon) + (Epsilon * other.Real)};
+    }
+
+    constexpr Dual Conjugate()
+    {
+        return {Real, -Epsilon};
+    }
+
+    constexpr T MagnitudeSquared()
+    {
+        return Real * Real;
+    }
+
+    constexpr T Magnitude()
+    {
+        return std::abs(Real);
+    }
+
+    constexpr Dual Inverse()
+    {
+        U::Log::Assert(Real == 0, "[Dual] An Inverse Exists Only If Real Part a != 0");
+        return Conjugate() / MagnitudeSquared();
+    }
+};
+
 inline void Test()
 {
-    P::Dimension<float, P::Mass<1>> m = 0.500;
-    P::Dimension<float, P::Force> T = 50.0;
-    P::Dimension<float, P::Length<1>> r = 1.50;
+    P::Dimension<float, P::Acceleration> g = 9.8;
+    P::Dimension<float, P::Length<1>> r = 10;
+    P::Dimension<float, P::Velocity> v = P::Sqrt(g * r);
 
-    P::Dimension<float, P::Velocity> v = Sqrt((T * r) / m);
-    U::Log::Info(v);
+    U::Log::Info((-1 / g) * ((P::Pow<2>(v) / r) - g));
 }
 } // namespace Sketch

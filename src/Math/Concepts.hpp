@@ -13,7 +13,13 @@ template <typename T, typename O>
 concept Additive = requires(T a, O b) { a + b; };
 
 template <typename T>
-concept SqRootable = requires(T a) { Sqrt(a); };
+concept SquareRoot = requires(T a) { Sqrt(a); };
+
+template <typename T>
+concept CubicRoot = requires(T a) { Cqrt(a); };
+
+template <typename T, typename O>
+concept Power = requires(T a, O b) { Pow(a, b); };
 
 template <typename T, typename O>
 concept Subtractive = requires(T a, O b) { a - b; };

@@ -145,5 +145,6 @@ void Window::SetConfiguration()
     glfwWindowHint(GLFW_DEPTH_BITS, Config.DepthBits);
     glfwWindowHint(GLFW_STENCIL_BITS, Config.StencilBits);
     glfwWindowHint(GLFW_SAMPLES, Config.Samples);
+    glfwWindowHint(GLFW_VISIBLE, Config.Visibility);
 }
 } // namespace Ivy::G

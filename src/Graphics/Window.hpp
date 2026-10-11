@@ -29,6 +29,7 @@ struct Window
         int DepthBits = 24;
         int StencilBits = 8;
         int Samples = 4;
+        bool Visibility = true;
     };
 
     Configuration Config;

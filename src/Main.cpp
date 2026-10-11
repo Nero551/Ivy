@@ -1,4 +1,5 @@
 #include "Core/Engine.hpp"
+#include "sketch.hpp"
 #include <string_view>
 
 int main(const int argc, char* argv[])
@@ -15,8 +16,8 @@ int main(const int argc, char* argv[])
         //? ex: "Ivy --renderer vulkan"
     }
 
-    // Sketch::Test();
-    // return 0;
+    Sketch::Test();
+    return 0;
 
     Ivy::C::Engine engine;
     engine.Run();

@@ -22,7 +22,7 @@ struct Dimensionless
 
     static std::ostream& Print(std::ostream& os)
     {
-        return os << "1";
+        return os;
     }
 };
 
