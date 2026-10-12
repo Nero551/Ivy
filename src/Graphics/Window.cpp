@@ -137,6 +137,21 @@ GLFWPlatform Window::GetPlatform() const
     return m_Platform;
 }
 
+void Window::SetScrollCallback(GLFWscrollfun f)
+{
+    glfwSetScrollCallback(m_GlfwWindow, f);
+}
+
+void Window::SetCursorPosCallback(GLFWcursorposfun f)
+{
+    glfwSetCursorPosCallback(m_GlfwWindow, f);
+}
+
+void Window::SetFrameBufferSizeCallback(GLFWframebuffersizefun f)
+{
+    glfwSetFramebufferSizeCallback(m_GlfwWindow, f);
+}
+
 void Window::SetConfiguration()
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Config.Major);

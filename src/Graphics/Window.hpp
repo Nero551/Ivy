@@ -1,8 +1,10 @@
 #pragma once
+#include "GLFW/glfw3.h"
 #include "GLFWPlatform.hpp"
 #include "Graphics/OpenGLProfile.hpp"
 
 #include <OpenGL.hpp>
+#include <functional>
 #include <string>
 
 #include "Utilities/Image.hpp"
@@ -94,6 +96,20 @@ struct Window
     GLFWwindow* GetGlfwWindow() const;
 
     GLFWPlatform GetPlatform() const;
+
+    template <typename T> void SetUserPointer(T* object)
+    {
+        glfwSetWindowUserPointer(m_GlfwWindow, object);
+    }
+
+    template <typename T> T* GetUserPointer()
+    {
+        return static_cast<T*>(glfwGetWindowUserPointer(m_GlfwWindow));
+    }
+
+    void SetScrollCallback(GLFWscrollfun f);
+    void SetCursorPosCallback(GLFWcursorposfun f);
+    void SetFrameBufferSizeCallback(GLFWframebuffersizefun f);
 
   private:
     GLFWwindow* m_GlfwWindow;

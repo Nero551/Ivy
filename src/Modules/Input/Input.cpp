@@ -85,19 +85,21 @@ constexpr unsigned int Input::ToIndex(MouseButton button)
 void Input::Start()
 {
     G::Window& window = m_Engine.Window;
-    // glfwSetCursorPosCallback(window.GetGlfwWindow(),
-    //     [](GLFWwindow*, const double xPos, const double yPos)
-    //     {
-    //         m_Engine.GetModule<Input>().m_MousePosition = {
-    //             static_cast<float>(xPos), static_cast<float>(yPos)};
-    //     });
+    window.SetCursorPosCallback(
+        [](GLFWwindow* w, const double xPos, const double yPos)
+        {
+            C::Engine* engine = static_cast<C::Engine*>(glfwGetWindowUserPointer(w));
+            engine->GetModule<Input>().m_MousePosition = {static_cast<float>(xPos), static_cast<float>(yPos)};
+        });
+    ;
 
-    // glfwSetScrollCallback(window.GetGlfwWindow(),
-    //     [](GLFWwindow*, const double xOffset, const double yOffset)
-    //     {
-    //         m_Engine.GetModule<Input>().m_ScrollOffset = {
-    //             static_cast<float>(xOffset), static_cast<float>(yOffset)};
-    //     });
+    glfwSetScrollCallback(window.GetGlfwWindow(),
+        [](GLFWwindow* w, const double xOffset, const double yOffset)
+        {
+            C::Engine* engine = static_cast<C::Engine*>(glfwGetWindowUserPointer(w));
+            engine->GetModule<Input>().m_ScrollOffset = {
+                static_cast<float>(xOffset), static_cast<float>(yOffset)};
+        });
 }
 
 void Input::BeginFrame(double dt)

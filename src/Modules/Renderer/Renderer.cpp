@@ -86,14 +86,15 @@ void Renderer::SetupFramebuffer()
 
     Framebuffer->Get().AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
 
-    // glfwSetFramebufferSizeCallback(m_Engine.Window.GetGlfwWindow(),
-    //     [](GLFWwindow*, const int w, const int h)
-    //     {
-    //         glViewport(0, 0, w, h);
-    //         auto& graphics = m_Engine.GetModule<Renderer>();
-    //         graphics.MSAAFramebuffer->Get().Resize(w, h);
-    //         graphics.Framebuffer->Get().Resize(w, h);
-    //     });
+    m_Engine.Window.SetFrameBufferSizeCallback(
+        [](GLFWwindow* win, const int w, const int h)
+        {
+            C::Engine* engine = static_cast<C::Engine*>(glfwGetWindowUserPointer(win));
+            glViewport(0, 0, w, h);
+            auto& graphics = engine->GetModule<Renderer>();
+            graphics.MSAAFramebuffer->Get().Resize(w, h);
+            graphics.Framebuffer->Get().Resize(w, h);
+        });
 }
 
 void Renderer::SetupMSAAFrameBuffer()
