@@ -2,12 +2,15 @@
 
 #include "Core/ECS/ComponentPool.hpp"
 #include "Core/ECS/Scene.hpp"
+#include "Core/Engine.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components/Transform3DComponent.hpp"
 #include "Core/World/Nodes/Node.hpp"
 #include "Core/World/Scenes/Grid.hpp"
 #include "Graphics/Material/Material.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
@@ -19,7 +22,6 @@
 #include "Modules/Renderer/Components/MeshComponent.hpp"
 #include "Modules/Renderer/Nodes/Light.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
-#include "Modules/Renderer/Primitives/Primitives.hpp"
 
 namespace Ivy
 {
@@ -28,10 +30,10 @@ struct CoordinateAxesScene : C::Scene
     using C::Scene::Scene;
     void Initialize() override
     {
-        auto& query = m_ECS.Query;
-        auto& resourceManager = C::Service::Get<C::ResourceManager>();
+        auto& query = m_Engine.ECS.Query;
+        auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
 
-        SetRoot(m_ECS.CreateEntity<Node>());
+        SetRoot(m_Engine.ECS.CreateEntity<Node>());
 
         auto& lightShader = resourceManager.Load<G::Shader>("lightShader");
         lightShader().AssignSource(resourceManager.Load<G::ShaderSource>(
@@ -42,12 +44,12 @@ struct CoordinateAxesScene : C::Scene
         auto& lightMaterial = resourceManager.Load<G::Material>("lightMaterial");
         lightMaterial().Shader = &lightShader();
 
-        auto& light = m_ECS.CreateEntity<R::Light>();
+        auto& light = m_Engine.ECS.CreateEntity<R::Light>();
         query.Pool<Transform3DComponent>().GetComponentById(light.GetId()).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5)});
         light.SetParent(GetRoot());
 
-        auto& light2 = m_ECS.CreateEntity<R::Light>();
+        auto& light2 = m_Engine.ECS.CreateEntity<R::Light>();
         query.Pool<Transform3DComponent>().GetComponentById(light2.GetId()).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5)});
         light2.SetParent(GetRoot());
@@ -58,9 +60,10 @@ struct CoordinateAxesScene : C::Scene
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
             "axisVert", "Assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
-        auto& line = R::Primitives::CreateLine("Line");
+        G::Mesh m = G::Primitives::CreateLine("Line");
+        auto& line = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
 
-        auto& xAxis = m_ECS.CreateEntity<R::MeshInstance3D>();
+        auto& xAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
         query.Pool<R::MeshComponent>().GetComponentById(xAxis.GetId()).Mesh = &line;
         auto& xMaterial = query.Pool<R::MaterialComponent>().GetComponentById(xAxis.GetId());
         xMaterial.Material = &resourceManager.Load<G::Material>("X-Axis Material");
@@ -73,7 +76,7 @@ struct CoordinateAxesScene : C::Scene
 
         xAxis.SetParent(GetRoot());
 
-        auto& yAxis = m_ECS.CreateEntity<R::MeshInstance3D>();
+        auto& yAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
         query.Pool<R::MeshComponent>().GetComponentById(yAxis.GetId()).Mesh = &line;
         auto& yMaterial = query.Pool<R::MaterialComponent>().GetComponentById(yAxis.GetId());
         yMaterial.Material = &resourceManager.Load<G::Material>("Y-Axis Material");
@@ -86,7 +89,7 @@ struct CoordinateAxesScene : C::Scene
 
         yAxis.SetParent(GetRoot());
 
-        auto& zAxis = m_ECS.CreateEntity<R::MeshInstance3D>();
+        auto& zAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
         query.Pool<R::MeshComponent>().GetComponentById(zAxis.GetId()).Mesh = &line;
         auto& zMaterial = query.Pool<R::MaterialComponent>().GetComponentById(zAxis.GetId());
         zMaterial.Material = &resourceManager.Load<G::Material>("Z-Axis Material");
@@ -97,8 +100,8 @@ struct CoordinateAxesScene : C::Scene
 
         zAxis.SetParent(GetRoot());
 
-        Grid grid = m_ECS.CreateScene<Grid>();
-        m_ECS.FindEntity(GetRoot()).AttachChild(grid.GetRoot());
+        Grid grid = m_Engine.World.CreateScene<Grid>();
+        m_Engine.ECS.FindEntity(GetRoot()).AttachChild(grid.GetRoot());
     }
 };
 } // namespace Ivy

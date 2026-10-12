@@ -72,14 +72,6 @@ struct EntityComponentSystem
         return m_Entities[id];
     }
 
-    template <typename T, typename... Args> T CreateScene(Args&&... args)
-
-    {
-        T scene{*this};
-        scene.Initialize(args...);
-        return scene;
-    }
-
     U::CheckedPtr<Entity> TryFindEntity(unsigned int id)
     {
         if (!m_Entities.Contains(id))

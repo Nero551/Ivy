@@ -31,6 +31,7 @@
 #include "Mesh/Vertex.hpp"
 #include "Namespace.hpp"
 #include "OpenGLProfile.hpp"
+#include "Primitives/Primitives.hpp"
 #include "Shader/Shader.hpp"
 #include "Shader/ShaderSource.hpp"
 #include "Shader/ShaderSourceValidator.hpp"

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Core/ECS/Scene.hpp"
-#include "Core/Service.hpp"
+#include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Nodes/Node.hpp"
 #include "Graphics/Material/Material.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
@@ -14,7 +16,7 @@
 #include "Modules/Renderer/Components/MaterialComponent.hpp"
 #include "Modules/Renderer/Components/MeshComponent.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
-#include "Modules/Renderer/Primitives/Primitives.hpp"
+#include <utility>
 
 namespace Ivy
 {
@@ -23,7 +25,7 @@ struct Grid : C::Scene
     using C::Scene::Scene;
     void Initialize() override
     {
-        SetRoot(m_ECS.CreateEntity<Node>());
+        SetRoot(m_Engine.ECS.CreateEntity<Node>());
 
         CreateXY();
         // CreateXZ();
@@ -41,8 +43,8 @@ struct Grid : C::Scene
   private:
     void CreateGridLine(const M::Quaternion<> rotation, M::Vector<3> position)
     {
-        auto& resourceManager = C::Service::Get<C::ResourceManager>();
-        auto& shader = C::Service::Get<C::ResourceManager>().Load<G::Shader>("AxisShader");
+        auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+        auto& shader = m_Engine.GetService<C::ResourceManager>().Load<G::Shader>("AxisShader");
 
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
             "axisFrag", "Assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
@@ -50,12 +52,14 @@ struct Grid : C::Scene
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
             "axisVert", "Assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
-        auto& line = R::Primitives::CreateLine("Line");
+        G::Mesh m = G::Primitives::CreateLine("Line");
+        auto& line = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
 
-        auto& l = m_ECS.CreateEntity<R::MeshInstance3D>();
-        auto& materialComponent = m_ECS.Query.Pool<R::MaterialComponent>().GetComponentById(l.GetId());
-        auto& meshComponent = m_ECS.Query.Pool<R::MeshComponent>().GetComponentById(l.GetId());
-        auto& transformComponent = m_ECS.Query.Pool<Transform3DComponent>().GetComponentById(l.GetId());
+        auto& l = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        auto& materialComponent = m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponentById(l.GetId());
+        auto& meshComponent = m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponentById(l.GetId());
+        auto& transformComponent =
+            m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(l.GetId());
         meshComponent.Mesh = &line;
         materialComponent.Material = &resourceManager.Load<G::Material>("GridLine Material");
         materialComponent.Material->Get().Shader = &shader();

@@ -58,15 +58,6 @@ struct Material
     /** Specular shininess exponent. */
     float Shininess = 32;
 
-    /** Texture used for the material's diffuse map. */
-    U::CheckedPtr<Texture2D> DiffuseMap;
-
-    /** Texture used for the material's specular map. */
-    U::CheckedPtr<Texture2D> SpecularMap;
-
-    /** Texture used for the material's emission map. */
-    U::CheckedPtr<Texture2D> EmissionMap;
-
     /**
      * @brief Creates a material with default properties.
      *
@@ -77,7 +68,7 @@ struct Material
     explicit Material(std::string name);
 
     /** @brief Gets the resource name. */
-    [[nodiscard]] const std::string& GetName() const;
+    const std::string& GetName() const;
 
     /**
      * @brief Assigns a custom texture to a texture slot.

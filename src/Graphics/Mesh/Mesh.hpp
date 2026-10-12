@@ -9,6 +9,7 @@
 #include "RenderMode.hpp"
 #include "Topology.hpp"
 #include "Vertex.hpp"
+#include <utility>
 
 namespace Ivy::G
 {
@@ -52,7 +53,13 @@ struct Mesh
      * @brief Creates a mesh resource.
      * @param name Resource name.
      */
-    explicit Mesh(const std::string& name) : m_Name(name) {}
+    Mesh(const std::string& name) : m_Name(name) {}
+
+    Mesh(const std::string& name, std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+        G::Topology topology = G::Topology::Triangles)
+        : Topology(topology), Vertices(std::move(vertices)), Indices(std::move(indices)), m_Name(name)
+    {
+    }
 
     /** Releases the OpenGL resources owned by the mesh. */
     ~Mesh();
@@ -61,10 +68,10 @@ struct Mesh
      * @brief Gets the OpenGL vertex array object ID.
      * @return OpenGL VAO ID, or 0 if the mesh has not been generated.
      */
-    [[nodiscard]] unsigned int GetId() const;
+    unsigned int GetId() const;
 
     /** @brief Gets the resource name. */
-    [[nodiscard]] const std::string& GetName() const;
+    const std::string& GetName() const;
 
     /** @return Whether the mesh's OpenGL resources have been generated. */
     bool IsGenerated() const;

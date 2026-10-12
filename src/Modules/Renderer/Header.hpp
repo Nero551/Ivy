@@ -8,7 +8,6 @@
 #include "Nodes/Camera.hpp"
 #include "Nodes/Light.hpp"
 #include "Nodes/MeshInstance3D.hpp"
-#include "Primitives/Primitives.hpp"
 #include "ProjectionMode.hpp"
 #include "RenderBatch.hpp"
 #include "Renderer.hpp"

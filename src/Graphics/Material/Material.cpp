@@ -3,24 +3,17 @@
 #include <string>
 #include <utility>
 
-#include "../../Modules/Renderer/Primitives/Primitives.hpp"
 #include "../../Utilities/Debug/Log.hpp"
 #include "../Shader/Uniforms/FloatUniform.hpp"
 #include "../Shader/Uniforms/IntUniform.hpp"
 #include "../Shader/Uniforms/Vector3Uniform.hpp"
 #include "../Shader/Uniforms/Vector4Uniform.hpp"
+#include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Texture/Texture.hpp"
 
 namespace Ivy::G
 {
-Material::Material(std::string name) : m_Name(std::move(name))
-{
-    auto& whiteTexture = R::Primitives::CreateWhiteTexture();
-
-    DiffuseMap = &whiteTexture();
-    SpecularMap = &whiteTexture();
-    EmissionMap = &whiteTexture();
-}
+Material::Material(std::string name) : m_Name(std::move(name)) {}
 
 const std::string& Material::GetName() const
 {
@@ -66,13 +59,13 @@ void Material::SetProperties() const
     Shader->SetUniform(FloatUniform("MATERIAL.Shininess", Shininess));
     Shader->SetUniform(Vector4Uniform("MATERIAL.Color", Color));
 
-    Shader->SetUniform(IntUniform("MATERIAL.DiffuseMap", 16));
-    DiffuseMap->Bind(16);
+    // Shader->SetUniform(IntUniform("MATERIAL.DiffuseMap", 16));
+    // DiffuseMap->Bind(16);
 
-    Shader->SetUniform(IntUniform("MATERIAL.SpecularMap", 15));
-    SpecularMap->Bind(15);
+    // Shader->SetUniform(IntUniform("MATERIAL.SpecularMap", 15));
+    // SpecularMap->Bind(15);
 
-    Shader->SetUniform(IntUniform("MATERIAL.EmissionMap", 14));
-    EmissionMap->Bind(14);
+    // Shader->SetUniform(IntUniform("MATERIAL.EmissionMap", 14));
+    // EmissionMap->Bind(14);
 }
 } // namespace Ivy::G

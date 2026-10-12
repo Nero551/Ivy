@@ -21,6 +21,7 @@
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
+#include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
@@ -30,7 +31,6 @@
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "OpenGL.hpp"
-#include "Primitives/Primitives.hpp"
 #include "RenderBatch.hpp"
 #include "Systems/CameraSystem.hpp"
 #include "Systems/LightingSystem.hpp"
@@ -50,7 +50,7 @@ void Renderer::SetupFramebuffer()
         G::Vertex({-1.0f, 1.0f, 0.0f, 1.0f}, {}, {0.0f, 1.0f}, {})};
 
     const std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
-    auto& resources = C::Service::Get<C::ResourceManager>();
+    auto& resources = m_Engine.GetService<C::ResourceManager>();
     auto& window = m_Engine.Window;
 
     Framebuffer = &resources.Load<struct G::Framebuffer>("[Graphics] Framebuffer");
@@ -100,7 +100,7 @@ void Renderer::SetupFramebuffer()
 
 void Renderer::SetupMSAAFrameBuffer()
 {
-    auto& resources = C::Service::Get<C::ResourceManager>();
+    auto& resources = m_Engine.GetService<C::ResourceManager>();
     auto& window = m_Engine.Window;
 
     MSAAFramebuffer = &resources.Load<struct G::Framebuffer>("[Graphics] MSAA Framebuffer");
@@ -148,7 +148,7 @@ void Renderer::PresentFramebuffer()
 
 void Renderer::Start()
 {
-    C::Service::Get<C::EventBus>().Sub<C::EntityDestroyed>(
+    m_Engine.GetService<C::EventBus>().Sub<C::EntityDestroyed>(
         [this](const C::EntityDestroyed& event) { OnEntityDestroyed(event); });
 
     AddSystem<CameraSystem>();
@@ -163,7 +163,7 @@ void Renderer::Start()
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
 
-    auto& resources = C::Service::Get<C::ResourceManager>();
+    auto& resources = m_Engine.GetService<C::ResourceManager>();
     GUniformbuffer = &resources.Load<G::Uniformbuffer>("[Graphics] Global Uniform buffer");
     GUniformbuffer->Get().Size = 160;
 

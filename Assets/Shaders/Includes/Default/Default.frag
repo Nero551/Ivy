@@ -19,15 +19,11 @@ struct Material {
     vec3 Emission;
 
     float Shininess;
-
-    sampler2D DiffuseMap;
-    sampler2D SpecularMap;
-    sampler2D EmissionMap;
 };
 
 uniform Material MATERIAL;
 
-void CheckAlpha(){
+void CheckAlpha() {
     if (FragColor.a < 0.1)
-    discard;
+        discard;
 }

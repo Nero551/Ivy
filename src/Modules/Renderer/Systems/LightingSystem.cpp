@@ -12,7 +12,7 @@ namespace Ivy::R
 {
 void LightingSystem::Start()
 {
-    auto& resources = C::Service::Get<C::ResourceManager>();
+    auto& resources = m_Engine.GetService<C::ResourceManager>();
 
     LightingBuffer = &resources.Load<G::Uniformbuffer>("[Graphics] Lighting Buffer")();
     LightingBuffer->Binding = 1;

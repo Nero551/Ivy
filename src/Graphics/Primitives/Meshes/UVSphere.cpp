@@ -1,7 +1,5 @@
 #include "../Primitives.hpp"
-#include "Core/Service.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
 #include "Math/Color/Color.hpp"
@@ -13,14 +11,8 @@
 
 namespace Ivy::R
 {
-C::Resource<G::Mesh>& Primitives::CreateUVSphere(
-    const std::string& name, const float radius, const int sectors, const int stacks)
+G::Mesh CreateUVSphere(const std::string& name, const float radius, const int sectors, const int stacks)
 {
-
-    if (C::Service::Get<C::ResourceManager>().Exists<G::Mesh>(name))
-    {
-        return C::Service::Get<C::ResourceManager>().Acquire<G::Mesh>(name);
-    }
 
     std::vector<G::Vertex> vertices;
     std::vector<unsigned int> indices;
@@ -76,11 +68,6 @@ C::Resource<G::Mesh>& Primitives::CreateUVSphere(
         }
     }
 
-    auto& mesh = C::Service::Get<C::ResourceManager>().Load<G::Mesh>(name);
-
-    mesh().Vertices = std::move(vertices);
-    mesh().Indices = std::move(indices);
-
-    return mesh;
+    return G::Mesh{name, std::move(vertices), std::move(indices)};
 }
 } // namespace Ivy::R

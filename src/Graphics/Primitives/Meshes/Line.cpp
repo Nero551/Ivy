@@ -1,0 +1,24 @@
+#include "../Primitives.hpp"
+
+#include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Mesh/Topology.hpp"
+#include "Graphics/Mesh/Vertex.hpp"
+#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vector4.hpp"
+#include <string>
+#include <utility>
+#include <vector>
+
+namespace Ivy::G::Primitives
+{
+G::Mesh CreateLine(const std::string& name)
+{
+    std::vector<G::Vertex> vertices = {
+        G::Vertex({0, 0, -0.5f, 1}, M::Vector<4>{1}, M::Vector<2>{0}, {0, 0, 1}),
+        G::Vertex({0, 0, 0.5f, 1}, M::Vector<4>{1}, M::Vector<2>{0}, {0, 0, 1})};
+
+    std::vector<unsigned int> indices = {0, 1};
+
+    return G::Mesh{name, std::move(vertices), std::move(indices), G::Topology::Lines};
+}
+} // namespace Ivy::G::Primitives

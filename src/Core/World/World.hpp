@@ -34,6 +34,13 @@ struct World : SystemOwner
 
     Entity& GetCamera();
 
+    template <typename T, typename... Args> T CreateScene(Args&&... args)
+    {
+        T scene{m_Engine};
+        scene.Initialize(args...);
+        return scene;
+    }
+
   protected:
     void Start();
 

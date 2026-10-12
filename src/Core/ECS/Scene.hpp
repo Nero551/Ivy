@@ -4,15 +4,12 @@
 namespace Ivy::C
 {
 
-struct EntityComponentSystem;
-/**
- * @brief Temporary container for a group of entities.
- */
+struct Engine;
+/** @brief Temporary container for a group of entities. */
 struct Scene
 {
     /** @brief Root entity of the scene hierarchy. */
-
-    Scene(EntityComponentSystem& ecs) : m_ECS(ecs) {};
+    Scene(Engine& engine) : m_Engine(engine) {};
     virtual ~Scene() = default;
 
     Scene(const Scene&) = delete;
@@ -37,6 +34,6 @@ struct Scene
 
   protected:
     unsigned int m_Root;
-    EntityComponentSystem& m_ECS;
+    Engine& m_Engine;
 };
 } // namespace Ivy::C

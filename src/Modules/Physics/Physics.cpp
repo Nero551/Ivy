@@ -8,6 +8,8 @@
 #include "Core/World/Components/Transform3DComponent.hpp"
 #include "Core/World/World.hpp"
 #include "Graphics/Material/Material.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
@@ -17,15 +19,16 @@
 #include "Modules/Renderer/Components/MaterialComponent.hpp"
 #include "Modules/Renderer/Components/MeshComponent.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
-#include "Modules/Renderer/Primitives/Primitives.hpp"
 #include <format>
+#include <utility>
 
 namespace Ivy
 {
 C::Entity& Physics::CreatePoint(M::Vector<4> col)
 {
-    auto& resourceManager = C::Service::Get<C::ResourceManager>();
-    auto& mesh = R::Primitives::CreateCube("point");
+    auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+    G::Mesh m = G::Primitives::CreateCube("point");
+    auto& mesh = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
     auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
     material().Color = col;
     auto& shader = resourceManager.Load<G::Shader>("pointShader");
@@ -62,9 +65,10 @@ static unsigned int cubeId = 0;
 
 void Physics::Start()
 {
-    auto& resourceManager = C::Service::Get<C::ResourceManager>();
+    auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
     auto& query = m_Engine.ECS.Query;
-    auto& mesh = R::Primitives::CreateCube("mesh");
+    G::Mesh m = G::Primitives::CreateCube("mesh");
+    auto& mesh = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
     auto& objectShader = resourceManager.Load<G::Shader>("objectShader");
 
     objectShader().AssignSource(resourceManager.Load<G::ShaderSource>(
@@ -92,7 +96,7 @@ void Physics::FixedUpdate(const double fdt)
 
     float g = -9.8;
 
-    auto& resourceManager = C::Service::Get<C::ResourceManager>();
+    auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
     auto& input = m_Engine.GetModule<I::Input>();
     auto& query = m_Engine.ECS.Query;
     auto& transform = query.Pool<Transform3DComponent>().GetComponentById(cubeId);

@@ -3,7 +3,6 @@
 #include "Core/Engine.hpp"
 #include "Core/World/Nodes/Node.hpp"
 #include "Core/World/Scenes/CoordinateAxesScene.hpp"
-#include "Core/World/Scenes/FirstScene.hpp"
 #include "Core/World/Systems/StressTester.hpp"
 #include "Core/World/Systems/Transform3DSystem.hpp"
 #include "Modules/Input/Enums/Keys.hpp"
@@ -50,13 +49,8 @@ void World::Start()
     GetRoot().AttachChild(camera);
     SetCamera(camera.GetId());
 
-    CoordinateAxesScene coordinateAxes = m_Engine.ECS.CreateScene<CoordinateAxesScene>();
+    CoordinateAxesScene coordinateAxes = CreateScene<CoordinateAxesScene>();
     GetRoot().AttachChild(coordinateAxes.GetRoot());
-
-    GetRoot().AttachChild(coordinateAxes.GetRoot());
-
-    FirstScene firstScene = m_Engine.ECS.CreateScene<FirstScene>();
-    m_Engine.ECS.FindEntity(coordinateAxes.GetRoot()).AttachChild(firstScene.GetRoot());
 
     for (auto& system : m_Systems)
     {

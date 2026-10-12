@@ -53,13 +53,13 @@ void Engine::Configure()
     // Window.SetSize(1920, 1200);
     glfwSwapInterval(0);
 
-    Service::Add<EventBus>();
-    Service::Add<ResourceManager>();
+    AddService<EventBus>();
+    AddService<ResourceManager>();
 
     AddModule<I::Input>();
     AddModule<R::Renderer>();
-    AddModule<Profiling>();
-    AddModule<Physics>();
+    // AddModule<Profiling>();
+    // AddModule<Physics>();
 }
 
 void Engine::Start()
@@ -73,7 +73,7 @@ void Engine::Start()
     ZoneScopedN("Start");
     TracyGpuZone("Start");
 
-    for (auto& service : Service::GetAll())
+    for (auto& service : m_Services)
     {
         service->Start();
     }
@@ -100,7 +100,7 @@ void Engine::BeginFrame()
         module->BeginFrame(m_TimeHandler.GetDelta());
     }
 
-    for (auto& service : Service::GetAll())
+    for (auto& service : m_Services)
     {
         service->BeginFrame(m_TimeHandler.GetDelta());
     }
@@ -117,7 +117,7 @@ void Engine::FixedUpdate()
         module->FixedUpdate(m_TimeHandler.GetFixedDelta());
     }
 
-    for (auto& service : Service::GetAll())
+    for (auto& service : m_Services)
     {
         service->FixedUpdate(m_TimeHandler.GetFixedDelta());
     }
@@ -135,7 +135,7 @@ void Engine::Update()
         module->Update(m_TimeHandler.GetDelta());
     }
 
-    for (auto& service : Service::GetAll())
+    for (auto& service : m_Services)
     {
         service->Update(m_TimeHandler.GetDelta());
     }
@@ -152,7 +152,7 @@ void Engine::Render()
         module->Render();
     }
 
-    for (auto& service : Service::GetAll())
+    for (auto& service : m_Services)
     {
         service->Render();
     }
@@ -171,7 +171,7 @@ void Engine::EndFrame()
         module->EndFrame(m_TimeHandler.GetDelta());
     }
 
-    for (auto& service : Service::GetAll())
+    for (auto& service : m_Services)
     {
         service->EndFrame(m_TimeHandler.GetDelta());
     }
@@ -184,7 +184,7 @@ void Engine::Stop()
 {
     ZoneScopedN("Stop");
     TracyGpuZone("Stop");
-    auto& services = Service::GetAll();
+    auto& services = m_Services;
     World.Stop();
 
     for (auto& module : m_Modules)
@@ -192,7 +192,7 @@ void Engine::Stop()
         module->Stop();
     }
 
-    for (auto& service : Service::GetAll())
+    for (auto& service : m_Services)
     {
         service->Stop();
     }
@@ -204,6 +204,5 @@ void Engine::Stop()
 
     Window.Terminate();
     G::GraphicsContext::Terminate();
-    Service::TerminateServices();
 }
 } // namespace Ivy::C
