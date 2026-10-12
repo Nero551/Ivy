@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/TimeHandler.hpp"
 #include "Graphics/Window.hpp"
 #include "Module.hpp"
 #include "Utilities/CheckedPtr.hpp"
@@ -8,7 +9,7 @@
 namespace Ivy::C
 {
 template <typename T>
-concept ModuleType = std::derived_from<T, Module>;
+concept IsModule = std::derived_from<T, Module>;
 
 /**
  * @brief Main Ivy engine and game loop. Manages the window, world, modules, and frame lifecycle.
@@ -43,7 +44,7 @@ struct Engine
     double GetTime() const;
 
     /** @brief Returns a registered module by type. */
-    template <ModuleType T> T& GetModule()
+    template <IsModule T> T& GetModule()
     {
         auto module = m_Modules.Find<T>();
         if (module == m_Modules.end())
@@ -64,18 +65,15 @@ struct Engine
 
     /** @brief Registered engine modules. */
     U::TypedVector<std::unique_ptr<Module>> m_Modules;
+    TimeHandler m_TimeHandler;
 
-    double m_LastFrame = 0;
     bool m_Running = false;
-    double m_Time = 0;
-    double m_DeltaTime = 0;
-    double m_FixedDeltaTime = 1.0 / 60.0;
 
     /** @brief Initializes engine services, modules & custom configurations. */
     void Configure();
 
     /** @brief Creates and registers a module. */
-    template <ModuleType T> T& AddModule()
+    template <IsModule T> T& AddModule()
     {
         auto module = std::make_unique<T>();
         m_Modules.Emplace<T>(std::move(module));

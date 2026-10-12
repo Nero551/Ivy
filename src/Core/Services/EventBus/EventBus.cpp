@@ -20,7 +20,7 @@ void EventBus::EmptyFireQueue()
     m_FireQueue.clear();
 }
 
-void EventBus::EndFrame()
+void EventBus::EndFrame(double dt)
 {
     EmptyFireQueue();
 }

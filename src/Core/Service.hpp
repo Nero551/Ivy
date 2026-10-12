@@ -48,7 +48,7 @@ struct Service
     virtual void FixedUpdate(double fdt) {}
     virtual void Update(double dt) {}
     virtual void Render() {}
-    virtual void EndFrame() {}
+    virtual void EndFrame(double dt) {}
     virtual void Stop() {}
 
   private:

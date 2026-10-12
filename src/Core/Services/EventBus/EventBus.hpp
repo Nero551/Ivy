@@ -94,6 +94,6 @@ struct EventBus : Service
     size_t m_NextSubscription = 0;
 
   protected:
-    void EndFrame() override;
+    void EndFrame(double dt) override;
 };
 } // namespace Ivy::C

@@ -9,6 +9,7 @@
 #include "Services/ResourceManager/Resource.hpp"
 #include "Services/ResourceManager/ResourceManager.hpp"
 #include "SystemOwner.hpp"
+#include "TimeHandler.hpp"
 #include "World/ECS/Component.hpp"
 #include "World/ECS/ComponentPool.hpp"
 #include "World/ECS/ComponentPoolQuery.hpp"

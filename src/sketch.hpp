@@ -21,11 +21,9 @@ namespace Sketch
 // expensive in a hot path, introduce a specialized RotQuaternion (RQuaternion)
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
-//TODO: play minecraft in the redstone modpack i made for understanding logic gates.
-
 //TODO: redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
 //
-//TODO: try to make dependency injection to avoid global accessors like Engine::Get().
+//TODO: try to make dependency injection to avoid global accessors like World::Get().
 // try to decouple as much as possible before attempting to implement DI(dependency injection)
 //
 //TODO: keep Engine a global accessor but make world be passed down via DI.
@@ -42,7 +40,7 @@ namespace Sketch
 // that will make it way less expensive performance-wise.
 //
 //TODO: make a genuine 2D system for the engine (support for 2D).
-// transforms will be vector2 for pos & scale and complex number for rotation.
+// transforms will be vector2 for pos & scale and complex number or a float for rotation.
 // u will probably discover alot of issues with the current framework. fix those.
 // support for 2D will open up alot of paths for simulations and such.
 // also need a way to even show 2D? will the camera be ortho?
