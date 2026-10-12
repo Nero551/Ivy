@@ -5,15 +5,14 @@
 
 namespace Ivy::C
 {
-/** @brief Concept constraining types that can be dispatched through the event system. */
 template <typename T>
-concept EventType = std::derived_from<T, IEvent>;
+concept IsEvent = std::derived_from<T, IEvent>;
 
 /** @brief Global event dispatcher and deferred event queue. */
 struct EventBus : Service
 {
     /** @brief Constructs and immediately dispatches a global event. */
-    template <EventType T, typename... Args>
+    template <IsEvent T, typename... Args>
     void Fire(Args&&... args) requires(std::constructible_from<T, Args...>)
     {
         auto listeners = m_Listeners.find(typeid(T));
@@ -30,7 +29,7 @@ struct EventBus : Service
     }
 
     /** @brief Queues a global event for deferred dispatch at the end of the frame. */
-    template <EventType T, typename... Args>
+    template <IsEvent T, typename... Args>
     void Queue(Args&&... args) requires(std::constructible_from<T, Args...>)
     {
         auto event = std::make_unique<T>(std::forward<Args>(args)...);
@@ -42,7 +41,7 @@ struct EventBus : Service
 
     /** @brief Subscribes a callback to a global event type and returns its subscription
      * ID. */
-    template <EventType T, typename F> requires std::invocable<F, const T&>
+    template <IsEvent T, typename F> requires std::invocable<F, const T&>
     std::size_t Sub(F&& callback)
     {
         auto method = [callback = std::forward<F>(callback)](IEvent& e) mutable
@@ -54,7 +53,7 @@ struct EventBus : Service
     }
 
     /** @brief Removes a global event subscription by its subscription ID. */
-    template <EventType T> void Unsub(const std::size_t subscription)
+    template <IsEvent T> void Unsub(const std::size_t subscription)
     {
         auto it = m_Listeners.find(typeid(T));
         if (it != m_Listeners.end())

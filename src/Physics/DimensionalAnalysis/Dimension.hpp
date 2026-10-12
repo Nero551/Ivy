@@ -12,7 +12,6 @@
 namespace Ivy::P
 {
 
-/** @brief Checks whether two dimensional types resolve to the same normalized type. */
 template <typename T, typename D>
 concept SameNormalized = std::same_as<typename T::Normalized, typename D::Normalized>;
 

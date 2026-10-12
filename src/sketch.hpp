@@ -40,6 +40,19 @@ namespace Sketch
 
 //TODO: make transform system cache its own vector of the root's children that's updated on events
 // that will make it way less expensive performance-wise.
+//
+//TODO: make a genuine 2D system for the engine (support for 2D).
+// transforms will be vector2 for pos & scale and complex number for rotation.
+// u will probably discover alot of issues with the current framework. fix those.
+// support for 2D will open up alot of paths for simulations and such.
+// also need a way to even show 2D? will the camera be ortho?
+// or just a perspective but flat (no x or y just z (front and back) ) ?
+//
+//TODO: do i even need World? i might just change the name to ECS.
+// since world suggests u can have multiple worlds in 1 engine, but what would that even mean?
+// i can add the ability for multiple engines, each contain services, modules, windows & ECS.
+// and i can make services be owned by the engine instead of being statics.
+// i can have multiple engines by passing engine down using DI.
 
 using namespace Ivy;
 
@@ -227,7 +240,7 @@ inline void Test()
 {
     P::Dimension<float, P::Acceleration> g = 9.8;
     P::Dimension<float, P::Length<1>> r = 10;
-    P::Dimension<float, P::Velocity> v = P::Sqrt(g * r);
+    P::Dimension<float, P::Velocity> v = P::Sqrt(g * r) * 0.3;
 
     U::Log::Info((-1 / g) * ((P::Pow<2>(v) / r) - g));
 }

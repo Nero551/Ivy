@@ -5,7 +5,6 @@
 
 namespace Ivy::C
 {
-/** @brief Restricts types to classes derived from System. */
 template <typename T>
 concept SystemType = std::derived_from<T, System>;
 

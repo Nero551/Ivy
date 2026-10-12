@@ -27,7 +27,7 @@ struct ComponentPoolQuery
      * @tparam T Component type.
      * @return Iterator to the newly created pool.
      */
-    template <ComponentType T> auto AddPool()
+    template <IsComponent T> auto AddPool()
     {
         auto it = m_ComponentPools.Emplace<T>(std::make_unique<ComponentPool<T>>());
         ComponentPool<T>& pool = static_cast<ComponentPool<T>&>(**it);
@@ -44,7 +44,7 @@ struct ComponentPoolQuery
      * @tparam T Component type.
      * @return Reference to the component pool.
      */
-    template <ComponentType T> ComponentPool<T>& Pool()
+    template <IsComponent T> ComponentPool<T>& Pool()
     {
         auto it = m_ComponentPools.Find<T>();
 
@@ -69,7 +69,7 @@ struct ComponentPoolQuery
      *
      * @param callback Function invoked with the entity ID and component references.
      */
-    template <ComponentType First, ComponentType... Rest, typename Function>
+    template <IsComponent First, IsComponent... Rest, typename Function>
     requires std::invocable<Function, unsigned int, First&, Rest&...>
     void ForEach(Function&& callback)
     {
@@ -126,7 +126,7 @@ struct ComponentPoolQuery
      * @tparam Args Component types to retrieve.
      * @return Tuple containing references to the requested component pools.
      */
-    template <ComponentType... Args> std::tuple<ComponentPool<Args>&...> GetPools()
+    template <IsComponent... Args> std::tuple<ComponentPool<Args>&...> GetPools()
     {
         return {Pool<Args>()...};
     }

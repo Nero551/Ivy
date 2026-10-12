@@ -21,9 +21,8 @@ struct IComponentPool
     virtual ~IComponentPool() = default;
 };
 
-/** @brief Defines a valid component type. */
 template <typename T>
-concept ComponentType = std::derived_from<T, Component>;
+concept IsComponent = std::derived_from<T, Component>;
 
 /**
      * @brief Stores components using a sparse set.
@@ -35,7 +34,7 @@ concept ComponentType = std::derived_from<T, Component>;
      *
      * @tparam T Component type stored by the pool.
      */
-template <ComponentType T> struct ComponentPool : IComponentPool
+template <IsComponent T> struct ComponentPool : IComponentPool
 {
     ComponentAdded ComponentAdded{};
     ComponentRemoved ComponentRemoved{};
