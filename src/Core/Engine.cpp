@@ -58,8 +58,8 @@ void Engine::Configure()
 
     AddModule<I::Input>();
     AddModule<R::Renderer>();
-    // AddModule<Profiling>();
-    // AddModule<Physics>();
+    AddModule<Profiling>();
+    AddModule<Physics>();
 }
 
 void Engine::Start()

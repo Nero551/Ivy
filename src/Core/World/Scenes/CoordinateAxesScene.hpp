@@ -10,6 +10,7 @@
 #include "Core/World/Scenes/Grid.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Mesh/Topology.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
@@ -22,6 +23,8 @@
 #include "Modules/Renderer/Components/MeshComponent.hpp"
 #include "Modules/Renderer/Nodes/Light.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
+#include <assimp/postprocess.h>
+#include <utility>
 
 namespace Ivy
 {
@@ -61,7 +64,8 @@ struct CoordinateAxesScene : C::Scene
             "axisVert", "Assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
         G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
+        auto& line = resourceManager.Load<G::Mesh>(
+            m.GetName(), std::move(m.Vertices), std::move(m.Indices), G::Topology::Lines);
 
         auto& xAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
         query.Pool<R::MeshComponent>().GetComponentById(xAxis.GetId()).Mesh = &line;

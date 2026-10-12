@@ -25,10 +25,6 @@ namespace Sketch
 
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
 
-//TODO: probably wanna rethink my entire architecture (Core + Modules + World).
-// the other stuff can be extracted out of this project and still work.
-// so they dont count as "part of the architecture".
-
 //TODO: make transform system cache its own vector of the root's children that's updated on events
 // that will make it way less expensive performance-wise.
 //
@@ -38,8 +34,9 @@ namespace Sketch
 // support for 2D will open up alot of paths for simulations and such.
 // also need a way to even show 2D? will the camera be ortho?
 // or just a perspective but flat (no x or y just z (front and back) ) ?
+//
+//TODO: i need genuine move and copy semantics/constructors for everything in Graphics section.
 
-//TODO: make services be owned by the engine instead of being statics.
 using namespace Ivy;
 
 using Index = unsigned int;
