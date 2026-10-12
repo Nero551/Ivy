@@ -1,8 +1,8 @@
 #pragma once
-#include "Core/ECS.hpp"
-#include "Core/World/ECS/Entity.hpp"
+#include "Core/ECS/ECS.hpp"
+#include "Core/ECS/Entity.hpp"
+#include "Core/World/Components/Transform3DComponent.hpp"
 #include "Node.hpp"
-#include "World/Components/Transform3DComponent.hpp"
 
 namespace Ivy
 {

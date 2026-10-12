@@ -1,9 +1,12 @@
 #pragma once
 
+#include "Core/ECS/ComponentPool.hpp"
+#include "Core/ECS/Scene.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/ECS/ComponentPool.hpp"
-#include "Core/World/Scene.hpp"
+#include "Core/World/Components/Transform3DComponent.hpp"
+#include "Core/World/Nodes/Node.hpp"
+#include "Core/World/Scenes/Grid.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
@@ -17,9 +20,6 @@
 #include "Modules/Renderer/Nodes/Light.hpp"
 #include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
 #include "Modules/Renderer/Primitives/Primitives.hpp"
-#include "World/Components/Transform3DComponent.hpp"
-#include "World/Nodes/Node.hpp"
-#include "World/Scenes/Grid.hpp"
 
 namespace Ivy
 {

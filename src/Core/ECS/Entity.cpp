@@ -1,10 +1,12 @@
 #include "Entity.hpp"
-#include "Core/ECS.hpp"
+#include "Core/ECS/ECS.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstddef>
 #include <format>
 #include <functional>
+#include <iostream>
+#include <source_location>
 #include <string>
 #include <vector>
 

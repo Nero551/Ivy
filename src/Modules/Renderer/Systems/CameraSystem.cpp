@@ -1,8 +1,9 @@
 #include "CameraSystem.hpp"
 
 #include "../Components/CameraComponent.hpp"
+#include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
-#include "Core/World/ECS/Entity.hpp"
+#include "Core/World/Components/Transform3DComponent.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
@@ -10,7 +11,6 @@
 #include "Modules/Input/Enums/Keys.hpp"
 #include "Modules/Input/Enums/MouseMode.hpp"
 #include "Modules/Input/Input.hpp"
-#include "World/Components/Transform3DComponent.hpp"
 #include <algorithm>
 
 namespace Ivy::R

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../Utilities/Debug/Log.hpp"
+#include "Core/ECS/Entity.hpp"
+#include "Core/ECS/Scene.hpp"
 #include "Core/SystemOwner.hpp"
-#include "Core/World/ECS/Entity.hpp"
-#include "Core/World/Scene.hpp"
+#include "Utilities/Debug/Log.hpp"
 #include <concepts>
 
 namespace Ivy::C

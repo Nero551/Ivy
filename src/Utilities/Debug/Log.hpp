@@ -1,6 +1,7 @@
 #pragma once
 #include <exception>
 #include <iostream>
+#include <source_location>
 #include <stdexcept>
 
 namespace Ivy::U
@@ -23,6 +24,11 @@ template <typename T> std::ostream& operator<<(std::ostream& os, const std::vect
 /** @brief Provides formatted console logging and pointer validation. */
 struct Log
 {
+
+#define LOG()                                                                                                \
+    std::cout << source.file_name() << " " << source.function_name() << " " << source.line() << " "          \
+              << source.column() << "\n";
+
     /** @brief Prints a message to the console. */
     template <typename... Args> static void Print(const Args&... args)
     {

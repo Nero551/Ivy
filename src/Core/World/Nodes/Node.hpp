@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/World/ECS/Entity.hpp"
+#include "Core/ECS/Entity.hpp"
 namespace Ivy
 {
 struct Node : C::Entity

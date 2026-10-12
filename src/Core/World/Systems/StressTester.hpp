@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Core/ECS/Entity.hpp"
+#include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/ECS/Entity.hpp"
-#include "Core/World/ECS/System.hpp"
 #include "Math/Vector/Vector.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components/MeshComponent.hpp"

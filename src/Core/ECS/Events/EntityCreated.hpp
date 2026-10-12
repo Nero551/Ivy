@@ -1,14 +1,15 @@
 #pragma once
+#include "Core/ECS/Entity.hpp"
 #include "Core/Services/EventBus/Event.hpp"
-#include "Core/World/ECS/Entity.hpp"
 
 namespace Ivy::C
 {
-struct EntityDestroyed : Event<EntityDestroyed>
+struct EntityCreated : Event<EntityCreated>
 {
+
     using Event::Event;
     unsigned int EntityId;
 
-    EntityDestroyed(unsigned int entityId) : EntityId(entityId) {}
+    EntityCreated(unsigned int entityId) : EntityId(entityId) {}
 };
 } // namespace Ivy::C

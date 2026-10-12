@@ -1,6 +1,6 @@
 #pragma once
 #include "../Components/LightComponent.hpp"
-#include "World/Nodes/Node3D.hpp"
+#include "Core/World/Nodes/Node3D.hpp"
 
 namespace Ivy::R
 {

@@ -1,10 +1,10 @@
 #include "LightingSystem.hpp"
 
-#include "../../../World/Components/Transform3DComponent.hpp"
 #include "../Components/LightComponent.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/Components/Transform3DComponent.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include <cstddef>
 

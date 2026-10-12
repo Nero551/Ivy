@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/World/ECS/System.hpp"
+#include "Core/ECS/System.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 
 namespace Ivy::R

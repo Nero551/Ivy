@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/World/Scene.hpp"
-#include "World/Nodes/Node3D.hpp"
+#include "Core/ECS/Scene.hpp"
+#include "Core/World/Nodes/Node3D.hpp"
 
 namespace Ivy
 {

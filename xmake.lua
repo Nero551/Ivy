@@ -38,7 +38,6 @@ target("Ivy")
         local umbrella = import("scripts/generate-umbrellas")
 
         umbrella.GenerateUmbrellaHeader("Core", "Core")
-        umbrella.GenerateUmbrellaHeader("World", "World")
         umbrella.GenerateUmbrellaHeader("Modules/Renderer", "Header")
         umbrella.GenerateUmbrellaHeader("Modules/Input", "Header")
 

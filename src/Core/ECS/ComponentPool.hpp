@@ -3,9 +3,9 @@
 #include "Component.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/EventBus/EventBus.hpp"
-#include "Core/World/ECS/Events/ComponentAdded.hpp"
-#include "Core/World/ECS/Events/ComponentRemoved.hpp"
-#include "Core/World/ECS/Events/EntityDestroyed.hpp"
+#include "Events/ComponentAdded.hpp"
+#include "Events/ComponentRemoved.hpp"
+#include "Events/EntityDestroyed.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 
 #include <concepts>

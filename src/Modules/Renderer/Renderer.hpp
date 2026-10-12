@@ -2,15 +2,15 @@
 
 #include "Components/MaterialComponent.hpp"
 #include "Components/MeshComponent.hpp"
+#include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Module.hpp"
-#include "Core/World/ECS/Events/EntityDestroyed.hpp"
+#include "Core/World/Components/Transform3DComponent.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "RenderBatch.hpp"
 #include "Utilities/DataStructures/Indirect2DVector.hpp"
-#include "World/Components/Transform3DComponent.hpp"
 
 namespace Ivy::R
 {

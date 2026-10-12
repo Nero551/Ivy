@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ComponentPool.hpp"
-#include "Core/World/ECS/Events/EntityCreated.hpp"
+#include "Core/ECS/Events/EntityCreated.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 
 namespace Ivy::C

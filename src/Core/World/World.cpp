@@ -1,17 +1,17 @@
 #include "World.hpp"
+#include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
-#include "Core/World/ECS/Entity.hpp"
+#include "Core/World/Nodes/Node.hpp"
+#include "Core/World/Scenes/CoordinateAxesScene.hpp"
+#include "Core/World/Scenes/FirstScene.hpp"
+#include "Core/World/Systems/StressTester.hpp"
+#include "Core/World/Systems/Transform3DSystem.hpp"
 #include "Modules/Input/Enums/Keys.hpp"
 #include "Modules/Input/Enums/MouseMode.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Nodes/Camera.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include "World/Nodes/Node.hpp"
-#include "World/Scenes/CoordinateAxesScene.hpp"
-#include "World/Scenes/FirstScene.hpp"
-#include "World/StressTester.hpp"
-#include "World/Systems/Transform3DSystem.hpp"
 
 namespace Ivy::C
 {

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Core/ECS/Entity.hpp"
 #include "Core/Module.hpp"
-#include "Core/World/ECS/Entity.hpp"
 #include "Math/Vector/Vector4.hpp"
 
 namespace Ivy

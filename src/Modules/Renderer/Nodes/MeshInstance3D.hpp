@@ -1,7 +1,7 @@
 #pragma once
 #include "../Components/MaterialComponent.hpp"
 #include "../Components/MeshComponent.hpp"
-#include "World/Nodes/Node3D.hpp"
+#include "Core/World/Nodes/Node3D.hpp"
 
 namespace Ivy::R
 {

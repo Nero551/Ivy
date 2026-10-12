@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/World/ECS/Component.hpp"
+#include "Core/ECS/Component.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Utilities/CheckedPtr.hpp"
 

@@ -1,12 +1,12 @@
 #pragma once
-#include "Core/ECS.hpp"
 #include "Core/TimeHandler.hpp"
+#include "Core/World/World.hpp"
+#include "ECS/ECS.hpp"
 #include "Graphics/Window.hpp"
 #include "Module.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include "World/World.hpp"
 #include <format>
 #include <memory>
 #include <optional>

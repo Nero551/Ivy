@@ -1,8 +1,8 @@
 #pragma once
 #include "../Components/CameraComponent.hpp"
-#include "Core/ECS.hpp"
-#include "World/Nodes/Node.hpp"
-#include "World/Nodes/Node3D.hpp"
+#include "Core/ECS/ECS.hpp"
+#include "Core/World/Nodes/Node.hpp"
+#include "Core/World/Nodes/Node3D.hpp"
 
 namespace Ivy::R
 {

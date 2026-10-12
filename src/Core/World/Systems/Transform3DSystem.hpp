@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/World/ECS/System.hpp"
+#include "Core/ECS/System.hpp"
 
 namespace Ivy
 {
