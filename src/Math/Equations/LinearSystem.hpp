@@ -1,5 +1,6 @@
 #pragma once
 #include "LinearEquation.hpp"
+#include "Math/Common/Comparison.hpp"
 #include "Math/Matrix/Matrix.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
@@ -96,9 +97,9 @@ struct LinearSolution
     }
 
   private:
-    const std::optional<Vector<Variables, T>> m_Solution;
-    const std::optional<Set<Vector<Variables, T>>> m_SolutionSet;
-    const SolutionType m_Type;
+    std::optional<Vector<Variables, T>> m_Solution;
+    std::optional<Set<Vector<Variables, T>>> m_SolutionSet;
+    SolutionType m_Type;
 };
 
 /** @brief Represents a system of linear equations. */
@@ -205,7 +206,7 @@ struct LinearSystem
                         result += equation(variable) * x(variable);
                     }
 
-                    if (result != 0)
+                    if (!NearlyEquals(result, T{0}))
                     {
                         return false;
                     }

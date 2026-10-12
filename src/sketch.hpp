@@ -2,7 +2,11 @@
 
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
+#include "Math/Equations/LinearEquation.hpp"
+#include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Set.hpp"
+#include "Math/Vector/Vector.hpp"
 #include "Physics/DimensionalAnalysis/Dimension.hpp"
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Physics/DimensionalAnalysis/Dimensionals.hpp"
