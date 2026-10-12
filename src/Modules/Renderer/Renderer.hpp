@@ -16,6 +16,8 @@ namespace Ivy::R
 {
 struct Renderer : C::Module
 {
+    using C::Module::Module;
+
     U::CheckedPtr<C::Resource<G::Framebuffer>> Framebuffer{"Graphics module has no Framebuffer to use"};
     U::CheckedPtr<C::Resource<G::Framebuffer>> MSAAFramebuffer{
         "Graphics module has no MSAA Framebuffer to use"};

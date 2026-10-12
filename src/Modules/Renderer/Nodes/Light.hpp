@@ -6,10 +6,11 @@ namespace Ivy::R
 {
 struct Light : Node3D
 {
+    using Node3D::Node3D;
     void Initialize() override
     {
         Node3D::Initialize();
-        C::World::Get().Query.Pool<LightComponent>().Add(GetId());
+        m_ECS.Query.Pool<LightComponent>().Add(GetId());
     }
 };
 } // namespace Ivy::R

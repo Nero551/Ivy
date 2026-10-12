@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utilities/Debug/Log.hpp"
 namespace Ivy::C
 {
 struct TimeHandler
@@ -30,7 +31,7 @@ struct TimeHandler
     void Initialize(double currentTime)
     {
         m_LastFrame = currentTime;
-        m_Time = currentTime;
+        m_Time = 0.0;
         m_DeltaTime = 0.0;
         m_Accumulator = 0.0;
     }
@@ -39,7 +40,7 @@ struct TimeHandler
     {
         m_DeltaTime = currentTime - m_LastFrame;
         m_LastFrame = currentTime;
-        m_Time = currentTime;
+        m_Time += m_DeltaTime;
 
         m_Accumulator += m_DeltaTime;
         m_Accumulator = std::min(m_Accumulator, 1.0);

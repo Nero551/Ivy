@@ -1,9 +1,15 @@
 #pragma once
+#include "Core/ECS.hpp"
 #include "Core/TimeHandler.hpp"
 #include "Graphics/Window.hpp"
 #include "Module.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/TypedVector.hpp"
+#include "Utilities/Debug/Log.hpp"
 #include "World/World.hpp"
+#include <format>
+#include <memory>
+#include <optional>
 
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
@@ -16,24 +22,19 @@ concept IsModule = std::derived_from<T, Module>;
  */
 struct Engine
 {
-    G::Window Window;
-    std::optional<World> World;
+    G::Window Window{};
+    World World{*this};
+    std::optional<EntityComponentSystem> ECS;
 
+    Engine() {}
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
     Engine(Engine&&) = delete;
     Engine& operator=(Engine&&) = delete;
 
-    /** @brief Constructs the engine and registers it as the global instance. */
-    Engine();
-
-    /** @brief Returns the global engine instance. */
-    static Engine& Get();
-
     /**
      * @brief Runs the engine's main loop.
-     * @remark Order: Start -> BeginFrame -> FixedUpdate -> Update -> Render -> EndFrame
-     * -> Stop
+     * @remark Order: Start -> BeginFrame -> FixedUpdate -> Update -> Render -> EndFrame -> Stop
      */
     void Run();
 
@@ -75,8 +76,7 @@ struct Engine
     /** @brief Creates and registers a module. */
     template <IsModule T> T& AddModule()
     {
-        auto module = std::make_unique<T>();
-        m_Modules.Emplace<T>(std::move(module));
+        m_Modules.Emplace<T>(std::make_unique<T>(*this));
         return static_cast<T&>(*m_Modules.Get<T>());
     }
 

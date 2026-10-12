@@ -1,23 +1,30 @@
 #pragma once
 
 #include "Utilities/CheckedPtr.hpp"
-#include "Utilities/DataStructures/SparseSetAoS.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include <utility>
+#include <vector>
 
 namespace Ivy::C
 {
+struct EntityComponentSystem;
+
 /** @brief Represents an entity and its parent-child hierarchy. */
 struct Entity
 {
     virtual ~Entity() = default;
 
-    Entity() = default;
+    Entity(C::EntityComponentSystem& ecs) : m_ECS(ecs) {};
 
     Entity(const Entity&) = delete;
     Entity& operator=(const Entity&) = delete;
 
     Entity(Entity&&) = default;
-    Entity& operator=(Entity&&) = default;
+    Entity& operator=(Entity&& other) noexcept
+    {
+        Entity::operator=(std::move(other));
+        return *this;
+    }
 
     /** @brief Returns the entity's unique ID. */
     unsigned int GetId() const;
@@ -30,6 +37,8 @@ struct Entity
      * Detaches it from its previous parent if necessary.
      */
     void AttachChild(Entity& child);
+
+    void AttachChild(const unsigned int id);
 
     /** @brief Detaches a direct child by ID. */
     void DetachChild(unsigned int id);
@@ -104,6 +113,8 @@ struct Entity
     /** @brief Sets the entity's parent. */
     void SetParent(Entity& parent);
 
+    void SetParent(unsigned int parent);
+
     /** @brief Removes the entity from its current parent. */
     void ClearParent();
 
@@ -119,6 +130,9 @@ struct Entity
     /** @brief Initializes the entity. */
     virtual void Initialize() {}
 
+  protected:
+    EntityComponentSystem& m_ECS;
+
   private:
     void RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity);
 
@@ -126,6 +140,6 @@ struct Entity
     unsigned int m_Id = 0;
     unsigned int m_Parent = 0;
 
-    friend struct World;
+    friend struct EntityComponentSystem;
 };
 } // namespace Ivy::C

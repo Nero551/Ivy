@@ -50,7 +50,7 @@ void Renderer::SetupFramebuffer()
 
     const std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
     auto& resources = C::Service::Get<C::ResourceManager>();
-    auto& window = C::Engine::Get().Window;
+    auto& window = m_Engine.Window;
 
     Framebuffer = &resources.Load<struct G::Framebuffer>("[Graphics] Framebuffer");
 
@@ -86,20 +86,20 @@ void Renderer::SetupFramebuffer()
 
     Framebuffer->Get().AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
 
-    glfwSetFramebufferSizeCallback(C::Engine::Get().Window.GetGlfwWindow(),
-        [](GLFWwindow*, const int w, const int h)
-        {
-            glViewport(0, 0, w, h);
-            auto& graphics = C::Engine::Get().GetModule<Renderer>();
-            graphics.MSAAFramebuffer->Get().Resize(w, h);
-            graphics.Framebuffer->Get().Resize(w, h);
-        });
+    // glfwSetFramebufferSizeCallback(m_Engine.Window.GetGlfwWindow(),
+    //     [](GLFWwindow*, const int w, const int h)
+    //     {
+    //         glViewport(0, 0, w, h);
+    //         auto& graphics = m_Engine.GetModule<Renderer>();
+    //         graphics.MSAAFramebuffer->Get().Resize(w, h);
+    //         graphics.Framebuffer->Get().Resize(w, h);
+    //     });
 }
 
 void Renderer::SetupMSAAFrameBuffer()
 {
     auto& resources = C::Service::Get<C::ResourceManager>();
-    auto& window = C::Engine::Get().Window;
+    auto& window = m_Engine.Window;
 
     MSAAFramebuffer = &resources.Load<struct G::Framebuffer>("[Graphics] MSAA Framebuffer");
     MSAAFramebuffer->Get().Target = G::FrameBufferTarget::ReadDraw;
@@ -122,7 +122,7 @@ void Renderer::SetupMSAAFrameBuffer()
 
 void Renderer::PresentFramebuffer()
 {
-    auto& window = C::Engine::Get().Window;
+    auto& window = m_Engine.Window;
     int width = window.GetWidth();
     int height = window.GetHeight();
 
@@ -183,8 +183,8 @@ void Renderer::BeginFrame(double dt)
 // compute shader.
 void Renderer::RenderWorld()
 {
-    const auto& camera = C::World::Get().GetCamera();
-    auto& query = C::World::Get().Query;
+    const auto& camera = m_Engine.World.GetCamera();
+    auto& query = m_Engine.ECS->Query;
 
     const M::Matrix<4, 4> projection =
         query.Pool<CameraComponent>().GetComponentById(camera.GetId()).GetProjectionMatrix();
@@ -193,7 +193,7 @@ void Renderer::RenderWorld()
 
     GUniformbuffer->Get().Set(view, 0);
     GUniformbuffer->Get().Set(projection, 64);
-    GUniformbuffer->Get().Set(C::Engine::Get().GetTime(), 128);
+    GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
     GUniformbuffer->Get().Set(
         query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).GlobalPosition, 144);
     GUniformbuffer->Get().Bind();

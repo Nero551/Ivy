@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ECS.hpp"
 #include "Engine.hpp"
 #include "Module.hpp"
 #include "Namespace.hpp"

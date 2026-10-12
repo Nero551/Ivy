@@ -8,6 +8,7 @@ namespace Ivy
 {
 struct Profiling : C::Module
 {
+    using C::Module::Module;
     double FrameMs;
     int FrameCount;
 

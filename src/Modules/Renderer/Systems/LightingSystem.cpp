@@ -2,9 +2,9 @@
 
 #include "../../../World/Components/Transform3DComponent.hpp"
 #include "../Components/LightComponent.hpp"
+#include "Core/Engine.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/World.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include <cstddef>
 
@@ -20,19 +20,19 @@ void LightingSystem::Start()
     constexpr size_t LightStride = 144;
     constexpr size_t HeaderSize = 16;
 
-    LightingBuffer->Size = HeaderSize + C::World::Get().MaxLights * LightStride;
+    LightingBuffer->Size = HeaderSize + m_Engine.World.MaxLights * LightStride;
 }
 
 void LightingSystem::Render()
 {
-    auto& world = C::World::Get();
+    auto& world = m_Engine.World;
 
-    LightingBuffer->Set(static_cast<int>(world.Query.Pool<LightComponent>().Size()), 0);
+    LightingBuffer->Set(static_cast<int>(m_Engine.ECS->Query.Pool<LightComponent>().Size()), 0);
 
     int i = 0;
 
     constexpr unsigned int LightStride = 144;
-    world.Query.ForEach<LightComponent, Transform3DComponent>(
+    m_Engine.ECS->Query.ForEach<LightComponent, Transform3DComponent>(
         [&](unsigned int entityId, LightComponent& lightComponent, Transform3DComponent& transform)
         {
             const unsigned int LightOffset = 16 + i * LightStride;

@@ -1,8 +1,6 @@
 #include "World.hpp"
-
 #include "Core/Engine.hpp"
-#include "Core/Service.hpp"
-#include "Core/World/ECS/Events/EntityDestroyed.hpp"
+#include "Core/World/ECS/Entity.hpp"
 #include "Modules/Input/Enums/Keys.hpp"
 #include "Modules/Input/Enums/MouseMode.hpp"
 #include "Modules/Input/Input.hpp"
@@ -14,65 +12,27 @@
 #include "World/Scenes/FirstScene.hpp"
 #include "World/StressTester.hpp"
 #include "World/Systems/Transform3DSystem.hpp"
-#include <cstddef>
 
 namespace Ivy::C
 {
-World& World::Get()
+Entity& World::GetRoot()
 {
-    return *Engine::Get().World;
-}
-void World::RemoveEntity(const unsigned int id)
-{
-    auto entity = TryFindEntity(id);
-    if (!entity)
+    auto root = m_Engine.ECS->TryFindEntity(m_Root);
+    if (!root)
     {
-        return;
+        U::Log::Fatal("No Root Is Set Or Root Is Not An Entity");
     }
-    const auto descendants = entity->GetDescendants();
-
-    if (entity->HasParent())
-    {
-        entity->ClearParent();
-    }
-
-    Service::Get<EventBus>().Fire<EntityDestroyed>(id);
-    m_Entities.Erase(id);
-
-    for (auto& descendant : descendants)
-    {
-        Service::Get<EventBus>().Fire<EntityDestroyed>(descendant->GetId());
-        m_Entities.Erase(descendant->GetId());
-    }
-}
-void World::ReserveEntities(const size_t count)
-{
-    m_Entities.ReserveDense(count);
-    m_Entities.ReserveSparse(count);
+    return *root;
 }
 
-Entity& World::GetEntity(const unsigned int id)
+Entity& World::GetCamera()
 {
-    return m_Entities[id];
-}
-
-Entity& World::FindEntity(const unsigned int id)
-{
-    if (!m_Entities.Contains(id))
+    auto camera = m_Engine.ECS->TryFindEntity(m_ActiveCamera);
+    if (!camera)
     {
-        U::Log::Fatal("Entity Not Found: ", id);
+        U::Log::Fatal("No Active Camera Is Set Or Active Camera Is Not An Entity");
     }
-    return m_Entities[id];
-}
-
-U::CheckedPtr<Entity> World::TryFindEntity(const unsigned int id)
-{
-
-    if (!m_Entities.Contains(id))
-    {
-        return nullptr;
-    }
-    return &m_Entities.At(id);
+    return *camera;
 }
 
 //TODO: quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
@@ -81,22 +41,24 @@ void World::Start()
     AddSystem<Transform3DSystem>();
     AddSystem<StressTester>();
 
-    Engine::Get().GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
+    m_Engine.GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
 
-    SetRoot(CreateEntity<Node>().GetId());
+    SetRoot(m_Engine.ECS->CreateEntity<Node>().GetId());
 
-    auto& camera = CreateEntity<R::Camera>();
-    Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
+    auto& camera = m_Engine.ECS->CreateEntity<R::Camera>();
+    m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
     GetRoot().AttachChild(camera);
     SetCamera(camera.GetId());
 
-    CoordinateAxesScene coordinateAxes;
+    CoordinateAxesScene coordinateAxes = m_Engine.ECS->CreateScene<CoordinateAxesScene>();
     GetRoot().AttachChild(coordinateAxes.GetRoot());
 
-    FirstScene firstScene;
-    coordinateAxes.GetRoot().AttachChild(firstScene.GetRoot());
+    GetRoot().AttachChild(coordinateAxes.GetRoot());
 
-    for (auto& system : Systems)
+    FirstScene firstScene = m_Engine.ECS->CreateScene<FirstScene>();
+    m_Engine.ECS->FindEntity(coordinateAxes.GetRoot()).AttachChild(firstScene.GetRoot());
+
+    for (auto& system : m_Systems)
     {
         system->Start();
     }
@@ -104,29 +66,29 @@ void World::Start()
 
 void World::Update(const double dt)
 {
-    if (Engine::Get().GetModule<I::Input>().IsKeyHeld(I::Key::Escape))
+    if (m_Engine.GetModule<I::Input>().IsKeyHeld(I::Key::Escape))
     {
-        Engine::Get().Shutdown();
+        m_Engine.Shutdown();
     }
 
-    if (Engine::Get().GetModule<I::Input>().IsKeyReleased(I::Key::Q))
+    if (m_Engine.GetModule<I::Input>().IsKeyReleased(I::Key::Q))
     {
-        if (Engine::Get().GetModule<I::Input>().GetMouseMode() == I::MouseMode::Disabled)
+        if (m_Engine.GetModule<I::Input>().GetMouseMode() == I::MouseMode::Disabled)
         {
-            Engine::Get().GetModule<I::Input>().SetMouseMode(I::MouseMode::Normal);
+            m_Engine.GetModule<I::Input>().SetMouseMode(I::MouseMode::Normal);
         }
         else
         {
-            Engine::Get().GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
+            m_Engine.GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
         }
     }
 
-    if (Engine::Get().GetModule<I::Input>().IsKeyPressed(I::Key::T))
+    if (m_Engine.GetModule<I::Input>().IsKeyPressed(I::Key::T))
     {
-        U::Log::Info(m_Entities.Size());
+        U::Log::Info(m_Engine.ECS->EntityAmount());
     }
 
-    for (auto& system : Systems)
+    for (auto& system : m_Systems)
     {
         system->Update(dt);
     }
@@ -134,7 +96,7 @@ void World::Update(const double dt)
 
 void World::FixedUpdate(const double fdt)
 {
-    for (auto& system : Systems)
+    for (auto& system : m_Systems)
     {
         system->FixedUpdate(fdt);
     }
@@ -142,7 +104,7 @@ void World::FixedUpdate(const double fdt)
 
 void World::Stop()
 {
-    for (auto& system : Systems)
+    for (auto& system : m_Systems)
     {
         system->Stop();
     }
@@ -150,7 +112,7 @@ void World::Stop()
 
 void World::BeginFrame(const double dt)
 {
-    for (auto& system : Systems)
+    for (auto& system : m_Systems)
     {
         system->BeginFrame(dt);
     }
@@ -158,7 +120,7 @@ void World::BeginFrame(const double dt)
 
 void World::EndFrame(const double dt)
 {
-    for (auto& system : Systems)
+    for (auto& system : m_Systems)
     {
         system->EndFrame(dt);
     }
@@ -166,7 +128,7 @@ void World::EndFrame(const double dt)
 
 void World::Render()
 {
-    for (auto& system : Systems)
+    for (auto& system : m_Systems)
     {
         system->Render();
     }

@@ -7,6 +7,7 @@ namespace Ivy::R
 {
 struct LightingSystem : C::System
 {
+    using C::System::System;
     U::CheckedPtr<G::Uniformbuffer> LightingBuffer;
 
     void Start() override;

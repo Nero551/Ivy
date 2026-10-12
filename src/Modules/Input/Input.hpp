@@ -10,6 +10,7 @@ namespace Ivy::I
 {
 struct Input : C::Module
 {
+    using C::Module::Module;
     bool IsKeyHeld(Key key);
 
     bool IsKeyPressed(Key key);

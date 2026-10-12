@@ -9,25 +9,11 @@
 #include "Modules/Physics/Physics.hpp"
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
-#include "Utilities/Debug/Log.hpp"
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
 
 namespace Ivy::C
 {
-Engine::Engine()
-{
-    if (Instance)
-    {
-        U::Log::Fatal("Only one Engine may exist.");
-    }
-    Instance = this;
-}
-
-Engine& Engine::Get()
-{
-    return *Instance;
-}
 
 void Engine::Run()
 {
@@ -81,7 +67,7 @@ void Engine::Start()
     G::GraphicsContext::Initialize();
     Window.Generate(800, 600, "Ivy");
     Configure();
-    World.emplace();
+    ECS.emplace();
 
     TracyGpuContext;
     ZoneScopedN("Start");
@@ -92,7 +78,7 @@ void Engine::Start()
         service->Start();
     }
 
-    World->Start();
+    World.Start();
 
     for (auto& module : m_Modules)
     {
@@ -108,7 +94,7 @@ void Engine::BeginFrame()
     m_TimeHandler.CalculateTime(glfwGetTime());
     Window.PollEvents();
 
-    World->BeginFrame(m_TimeHandler.GetDelta());
+    World.BeginFrame(m_TimeHandler.GetDelta());
     for (auto& module : m_Modules)
     {
         module->BeginFrame(m_TimeHandler.GetDelta());
@@ -125,7 +111,7 @@ void Engine::FixedUpdate()
     ZoneScopedN("Fixed Update");
     TracyGpuZone("Fixed Update");
 
-    World->FixedUpdate(m_TimeHandler.GetFixedDelta());
+    World.FixedUpdate(m_TimeHandler.GetFixedDelta());
     for (auto& module : m_Modules)
     {
         module->FixedUpdate(m_TimeHandler.GetFixedDelta());
@@ -142,7 +128,7 @@ void Engine::Update()
     ZoneScopedN("Update");
     TracyGpuZone("Update");
 
-    World->Update(m_TimeHandler.GetDelta());
+    World.Update(m_TimeHandler.GetDelta());
 
     for (auto& module : m_Modules)
     {
@@ -160,7 +146,7 @@ void Engine::Render()
     ZoneScopedN("Render");
     TracyGpuZone("Render");
 
-    World->Render();
+    World.Render();
     for (auto& module : m_Modules)
     {
         module->Render();
@@ -178,7 +164,7 @@ void Engine::EndFrame()
     TracyGpuZone("End Frame");
 
     Window.SwapBuffers();
-    World->EndFrame(m_TimeHandler.GetDelta());
+    World.EndFrame(m_TimeHandler.GetDelta());
 
     for (auto& module : m_Modules)
     {
@@ -199,7 +185,7 @@ void Engine::Stop()
     ZoneScopedN("Stop");
     TracyGpuZone("Stop");
     auto& services = Service::GetAll();
-    World->Stop();
+    World.Stop();
 
     for (auto& module : m_Modules)
     {

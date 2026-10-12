@@ -132,6 +132,11 @@ GLFWwindow* Window::GetGlfwWindow() const
     return m_GlfwWindow;
 }
 
+GLFWPlatform Window::GetPlatform() const
+{
+    return m_Platform;
+}
+
 void Window::SetConfiguration()
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Config.Major);

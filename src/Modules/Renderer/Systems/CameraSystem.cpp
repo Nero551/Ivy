@@ -17,15 +17,15 @@ namespace Ivy::R
 {
 void CameraSystem::Update(const double dt)
 {
-    auto& world = C::World::Get();
-    auto& query = world.Query;
-    auto& input = C::Engine::Get().GetModule<I::Input>();
+    auto& world = m_Engine.World;
+    auto& query = m_Engine.ECS->Query;
+    auto& input = m_Engine.GetModule<I::Input>();
     auto& camera = world.GetCamera();
 
     auto& transform = query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
     auto& cameraComponent = query.Pool<CameraComponent>().GetComponentById(camera.GetId());
 
-    cameraComponent.AspectRatio = C::Engine::Get().Window.GetAspectRatio();
+    cameraComponent.AspectRatio = m_Engine.Window.GetAspectRatio();
 
     if (input.GetMouseMode() == I::MouseMode::Disabled)
     {
@@ -79,9 +79,9 @@ void CameraSystem::Update(const double dt)
 
 M::Matrix<4, 4> CameraSystem::GetViewMatrix()
 {
-    auto& world = C::World::Get();
+    auto& world = m_Engine.World;
     auto& camera = world.GetCamera();
-    auto& transform = world.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
+    auto& transform = m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
 
     const M::Vector<3> pos = transform.Position;
     const M::Vector<3> forward = transform.GetForward();

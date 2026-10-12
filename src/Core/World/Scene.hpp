@@ -1,9 +1,10 @@
 #pragma once
 
-#include "ECS/Entity.hpp"
-
+#include "Core/World/ECS/Entity.hpp"
 namespace Ivy::C
 {
+
+struct EntityComponentSystem;
 /**
  * @brief Temporary container for a group of entities.
  */
@@ -11,7 +12,7 @@ struct Scene
 {
     /** @brief Root entity of the scene hierarchy. */
 
-    Scene() = default;
+    Scene(EntityComponentSystem& ecs) : m_ECS(ecs) {};
     virtual ~Scene() = default;
 
     Scene(const Scene&) = delete;
@@ -19,11 +20,23 @@ struct Scene
 
     Scene(Scene&&) = default;
 
-    Entity& GetRoot() const;
-    void SetRoot(const Entity& entity);
-    void SetRoot(unsigned int entityId);
+    unsigned int GetRoot() const
+    {
+        return m_Root;
+    }
+    void SetRoot(const Entity& entity)
+    {
+        m_Root = entity.GetId();
+    }
+    void SetRoot(unsigned int entityId)
+    {
+        m_Root = entityId;
+    }
 
-  private:
+    virtual void Initialize() {}
+
+  protected:
     unsigned int m_Root;
+    EntityComponentSystem& m_ECS;
 };
 } // namespace Ivy::C

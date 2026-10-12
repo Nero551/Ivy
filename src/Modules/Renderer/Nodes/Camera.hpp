@@ -1,15 +1,18 @@
 #pragma once
 #include "../Components/CameraComponent.hpp"
+#include "Core/ECS.hpp"
+#include "World/Nodes/Node.hpp"
 #include "World/Nodes/Node3D.hpp"
 
 namespace Ivy::R
 {
 struct Camera : Node3D
 {
+    using Node3D::Node3D;
     void Initialize() override
     {
         Node3D::Initialize();
-        C::World::Get().Query.Pool<CameraComponent>().Add(GetId());
+        m_ECS.Query.Pool<CameraComponent>().Add(GetId());
     }
 };
 } // namespace Ivy::R

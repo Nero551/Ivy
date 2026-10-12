@@ -14,6 +14,8 @@ namespace Ivy
 {
 struct StressTester : C::System
 {
+    using C::System::System;
+
     void Start() override
     {
         ThreeDimensionalProjection(1);
@@ -21,7 +23,7 @@ struct StressTester : C::System
 
     void Update(double dt) override
     {
-        auto& input = C::Engine::Get().GetModule<I::Input>();
+        auto& input = m_Engine.GetModule<I::Input>();
 
         if (input.IsKeyHeld(I::Key::Left))
         {
@@ -36,7 +38,7 @@ struct StressTester : C::System
         {
             for (auto& point : points)
             {
-                auto& transform = C::World::Get().Query.Pool<Transform3DComponent>().GetComponentById(point);
+                auto& transform = m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(point);
                 transform.Position *= multiplier;
             }
         }
@@ -80,7 +82,7 @@ struct StressTester : C::System
     {
         points.reserve(M::Pow(360.0f / increase, 3));
         U::Log::Info(M::Pow(360.0f / increase, 3));
-        C::World::Get().ReserveEntities(M::Pow(360.0f / increase, 3));
+        m_Engine.ECS->ReserveEntities(M::Pow(360.0f / increase, 3));
         for (int theta = -180; theta < 180; theta += increase)
         {
             for (int phi = -180; phi < 180; phi += increase)
@@ -102,15 +104,15 @@ struct StressTester : C::System
         auto& resourceManager = C::Service::Get<C::ResourceManager>();
         auto& mesh = R::Primitives::CreateQuad("point");
 
-        auto& point = C::World::Get().CreateEntity<R::MeshInstance3D>();
-        C::World::Get().Query.Pool<R::MeshComponent>().GetComponentById(point.GetId()).Mesh = &mesh;
-        C::World::Get().Query.Pool<Transform3DComponent>().GetComponentById(point.GetId()).Scale =
+        auto& point = m_Engine.ECS->CreateEntity<R::MeshInstance3D>();
+        m_Engine.ECS->Query.Pool<R::MeshComponent>().GetComponentById(point.GetId()).Mesh = &mesh;
+        m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(point.GetId()).Scale =
             M::Vector<3>{0.2};
 
         if (resourceManager.Exists<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y)))
         {
             auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
-            C::World::Get().Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material =
+            m_Engine.ECS->Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material =
                 &material;
         }
         else
@@ -124,18 +126,18 @@ struct StressTester : C::System
             shader().AssignSource(resourceManager.Load<G::ShaderSource>(
                 "pointFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
             material().Shader = &shader();
-            C::World::Get().Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material =
+            m_Engine.ECS->Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material =
                 &material;
         }
 
-        C::World::Get().GetRoot().AttachChild(point);
+        m_Engine.World.GetRoot().AttachChild(point);
         return point;
     }
 
     C::Entity& Plot(const M::Vector<3> vec3, const M::Vector<4> col = {1, 1, 1, 1})
     {
         auto& point = CreatePoint(col);
-        auto& transform = C::World::Get().Query.Pool<Transform3DComponent>().GetComponentById(point.GetId());
+        auto& transform = m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(point.GetId());
         transform.Position().x = vec3.x;
         transform.Position().y = vec3.y;
         transform.Position().z = vec3.z;

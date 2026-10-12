@@ -68,7 +68,7 @@ MouseMode Input::GetMouseMode() const
 void Input::SetMouseMode(MouseMode mode)
 {
     m_MouseMode = mode;
-    glfwSetInputMode(C::Engine::Get().Window.GetGlfwWindow(), GLFW_CURSOR, static_cast<int>(mode));
+    glfwSetInputMode(m_Engine.Window.GetGlfwWindow(), GLFW_CURSOR, static_cast<int>(mode));
     m_PreviousMousePosition = m_MousePosition;
 }
 
@@ -84,20 +84,20 @@ constexpr unsigned int Input::ToIndex(MouseButton button)
 
 void Input::Start()
 {
-    G::Window& window = C::Engine::Get().Window;
-    glfwSetCursorPosCallback(window.GetGlfwWindow(),
-        [](GLFWwindow*, const double xPos, const double yPos)
-        {
-            C::Engine::Get().GetModule<Input>().m_MousePosition = {
-                static_cast<float>(xPos), static_cast<float>(yPos)};
-        });
+    G::Window& window = m_Engine.Window;
+    // glfwSetCursorPosCallback(window.GetGlfwWindow(),
+    //     [](GLFWwindow*, const double xPos, const double yPos)
+    //     {
+    //         m_Engine.GetModule<Input>().m_MousePosition = {
+    //             static_cast<float>(xPos), static_cast<float>(yPos)};
+    //     });
 
-    glfwSetScrollCallback(window.GetGlfwWindow(),
-        [](GLFWwindow*, const double xOffset, const double yOffset)
-        {
-            C::Engine::Get().GetModule<Input>().m_ScrollOffset = {
-                static_cast<float>(xOffset), static_cast<float>(yOffset)};
-        });
+    // glfwSetScrollCallback(window.GetGlfwWindow(),
+    //     [](GLFWwindow*, const double xOffset, const double yOffset)
+    //     {
+    //         m_Engine.GetModule<Input>().m_ScrollOffset = {
+    //             static_cast<float>(xOffset), static_cast<float>(yOffset)};
+    //     });
 }
 
 void Input::BeginFrame(double dt)
@@ -108,7 +108,7 @@ void Input::BeginFrame(double dt)
         m_FirstMouse = false;
     }
 
-    GLFWwindow* window = C::Engine::Get().Window.GetGlfwWindow();
+    GLFWwindow* window = m_Engine.Window.GetGlfwWindow();
     for (int key = GLFW_KEY_SPACE; key <= GLFW_KEY_LAST; ++key)
     {
         m_CurrentKeys[key] = glfwGetKey(window, key) == GLFW_PRESS;

@@ -1,20 +1,21 @@
 #include "Transform3DSystem.hpp"
 
-#include "Core/World/World.hpp"
+#include "Core/Engine.hpp"
 #include "World/Components/Transform3DComponent.hpp"
 
 namespace Ivy
 {
 void Transform3DSystem::Update(double fdt)
 {
-    auto& world = C::World::Get();
-    auto& query = world.Query;
+    auto& world = m_Engine.World;
+    auto& ecs = m_Engine.ECS;
+    auto& query = m_Engine.ECS->Query;
     auto& transformPool = query.Pool<Transform3DComponent>();
 
     world.GetRoot().ForEachDescendant(
         [&](const unsigned int entityId)
         {
-            auto& entity = world.GetEntity(entityId);
+            auto& entity = ecs->GetEntity(entityId);
 
             if (!transformPool.HasId(entityId))
             {

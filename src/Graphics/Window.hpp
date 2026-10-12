@@ -3,6 +3,7 @@
 #include "Graphics/OpenGLProfile.hpp"
 
 #include <OpenGL.hpp>
+#include <string>
 
 #include "Utilities/Image.hpp"
 
@@ -92,10 +93,7 @@ struct Window
 
     GLFWwindow* GetGlfwWindow() const;
 
-    GLFWPlatform GetPlatform() const
-    {
-        return m_Platform;
-    }
+    GLFWPlatform GetPlatform() const;
 
   private:
     GLFWwindow* m_GlfwWindow;

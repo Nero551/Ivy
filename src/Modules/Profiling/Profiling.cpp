@@ -35,7 +35,7 @@ void Profiling::Update(const double dt)
 
         double averageFrameMs = sum / FrameTimes.size();
 
-        C::Engine::Get().Window.SetTitle("FPS: " + std::to_string(FrameCount) + " | " +
+        m_Engine.Window.SetTitle("FPS: " + std::to_string(FrameCount) + " | " +
             "AVG: " + std::to_string(averageFrameMs) + " ms" + " | " + std::to_string(FrameMs) + " ms");
 
         // Ivy::U::Logger::Info(

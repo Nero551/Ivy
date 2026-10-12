@@ -4,6 +4,7 @@
 
 namespace Ivy::C
 {
+
 /**
  * @brief Base class for all engine modules.
  * Modules provide engine-specific functionality and participate in the
@@ -16,15 +17,14 @@ namespace Ivy::C
  */
 struct Module : SystemOwner
 {
-    Module() = default;
-
+    using SystemOwner::SystemOwner;
     Module(const Module&) = delete;
 
     Module& operator=(const Module&) = delete;
 
-    Module(Module&&) = default;
+    Module(Module&&) = delete;
 
-    Module& operator=(Module&&) = default;
+    Module& operator=(Module&&) = delete;
 
   protected:
     /**
