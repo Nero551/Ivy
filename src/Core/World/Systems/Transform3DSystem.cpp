@@ -9,13 +9,13 @@ void Transform3DSystem::Update(double fdt)
 {
     auto& world = m_Engine.World;
     auto& ecs = m_Engine.ECS;
-    auto& query = m_Engine.ECS->Query;
+    auto& query = m_Engine.ECS.Query;
     auto& transformPool = query.Pool<Transform3DComponent>();
 
     world.GetRoot().ForEachDescendant(
         [&](const unsigned int entityId)
         {
-            auto& entity = ecs->GetEntity(entityId);
+            auto& entity = ecs.GetEntity(entityId);
 
             if (!transformPool.HasId(entityId))
             {

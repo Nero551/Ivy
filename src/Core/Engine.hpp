@@ -24,7 +24,7 @@ struct Engine
 {
     G::Window Window{};
     World World{*this};
-    std::optional<EntityComponentSystem> ECS;
+    EntityComponentSystem ECS{};
 
     Engine() {}
     Engine(const Engine&) = delete;

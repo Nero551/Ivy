@@ -186,7 +186,7 @@ void Renderer::BeginFrame(double dt)
 void Renderer::RenderWorld()
 {
     const auto& camera = m_Engine.World.GetCamera();
-    auto& query = m_Engine.ECS->Query;
+    auto& query = m_Engine.ECS.Query;
 
     const M::Matrix<4, 4> projection =
         query.Pool<CameraComponent>().GetComponentById(camera.GetId()).GetProjectionMatrix();

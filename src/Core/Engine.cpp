@@ -68,7 +68,6 @@ void Engine::Start()
     Window.Generate(800, 600, "Ivy");
     Window.SetUserPointer(this);
     Configure();
-    ECS.emplace();
 
     TracyGpuContext;
     ZoneScopedN("Start");

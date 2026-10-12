@@ -40,8 +40,6 @@ namespace Sketch
 // or just a perspective but flat (no x or y just z (front and back) ) ?
 
 //TODO: make services be owned by the engine instead of being statics.
-//TODO: make ECS fire local events not global events.
-
 using namespace Ivy;
 
 using Index = unsigned int;

@@ -27,12 +27,12 @@ void LightingSystem::Render()
 {
     auto& world = m_Engine.World;
 
-    LightingBuffer->Set(static_cast<int>(m_Engine.ECS->Query.Pool<LightComponent>().Size()), 0);
+    LightingBuffer->Set(static_cast<int>(m_Engine.ECS.Query.Pool<LightComponent>().Size()), 0);
 
     int i = 0;
 
     constexpr unsigned int LightStride = 144;
-    m_Engine.ECS->Query.ForEach<LightComponent, Transform3DComponent>(
+    m_Engine.ECS.Query.ForEach<LightComponent, Transform3DComponent>(
         [&](unsigned int entityId, LightComponent& lightComponent, Transform3DComponent& transform)
         {
             const unsigned int LightOffset = 16 + i * LightStride;

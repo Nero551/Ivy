@@ -36,11 +36,10 @@ C::Entity& Physics::CreatePoint(M::Vector<4> col)
         "pointFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
     material().Shader = &shader();
 
-    auto& point = m_Engine.ECS->CreateEntity<R::MeshInstance3D>();
-    m_Engine.ECS->Query.Pool<R::MeshComponent>().GetComponentById(point.GetId()).Mesh = &mesh;
-    m_Engine.ECS->Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material = &material;
-    m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(point.GetId()).Scale =
-        M::Vector<3>{0.2};
+    auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+    m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponentById(point.GetId()).Mesh = &mesh;
+    m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material = &material;
+    m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(point.GetId()).Scale = M::Vector<3>{0.2};
     m_Engine.World.GetRoot().AttachChild(point);
 
     return point;
@@ -52,7 +51,7 @@ void Physics::Plot(const M::Vector<3> vec3, const M::Vector<4> col)
     if (vec3.x < max && vec3.y < max && vec3.z < max)
     {
         auto& point = CreatePoint(col);
-        auto& transform = m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(point.GetId());
+        auto& transform = m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(point.GetId());
         transform.Position().x = vec3.x;
         transform.Position().y = vec3.y;
         transform.Position().z = vec3.z;
@@ -64,7 +63,7 @@ static unsigned int cubeId = 0;
 void Physics::Start()
 {
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
-    auto& query = m_Engine.ECS->Query;
+    auto& query = m_Engine.ECS.Query;
     auto& mesh = R::Primitives::CreateCube("mesh");
     auto& objectShader = resourceManager.Load<G::Shader>("objectShader");
 
@@ -76,7 +75,7 @@ void Physics::Start()
     auto& objectMaterial = resourceManager.Load<G::Material>("cubeMaterial");
     objectMaterial().Shader = &objectShader();
 
-    auto& cube = m_Engine.ECS->CreateEntity<R::MeshInstance3D>();
+    auto& cube = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
     query.Pool<R::MeshComponent>().GetComponentById(cube.GetId()).Mesh = &mesh;
     query.Pool<R::MaterialComponent>().GetComponentById(cube.GetId()).Material = &objectMaterial;
     query.Pool<BodyComponent>().Add(cube.GetId());
@@ -95,7 +94,7 @@ void Physics::FixedUpdate(const double fdt)
 
     auto& resourceManager = C::Service::Get<C::ResourceManager>();
     auto& input = m_Engine.GetModule<I::Input>();
-    auto& query = m_Engine.ECS->Query;
+    auto& query = m_Engine.ECS.Query;
     auto& transform = query.Pool<Transform3DComponent>().GetComponentById(cubeId);
     auto& body = query.Pool<BodyComponent>().GetComponentById(cubeId);
 

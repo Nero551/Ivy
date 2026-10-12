@@ -18,7 +18,7 @@ namespace Ivy::R
 void CameraSystem::Update(const double dt)
 {
     auto& world = m_Engine.World;
-    auto& query = m_Engine.ECS->Query;
+    auto& query = m_Engine.ECS.Query;
     auto& input = m_Engine.GetModule<I::Input>();
     auto& camera = world.GetCamera();
 
@@ -81,7 +81,7 @@ M::Matrix<4, 4> CameraSystem::GetViewMatrix()
 {
     auto& world = m_Engine.World;
     auto& camera = world.GetCamera();
-    auto& transform = m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
+    auto& transform = m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
 
     const M::Vector<3> pos = transform.Position;
     const M::Vector<3> forward = transform.GetForward();

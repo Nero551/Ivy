@@ -17,7 +17,7 @@ namespace Ivy::C
 {
 Entity& World::GetRoot()
 {
-    auto root = m_Engine.ECS->TryFindEntity(m_Root);
+    auto root = m_Engine.ECS.TryFindEntity(m_Root);
     if (!root)
     {
         U::Log::Fatal("No Root Is Set Or Root Is Not An Entity");
@@ -27,7 +27,7 @@ Entity& World::GetRoot()
 
 Entity& World::GetCamera()
 {
-    auto camera = m_Engine.ECS->TryFindEntity(m_ActiveCamera);
+    auto camera = m_Engine.ECS.TryFindEntity(m_ActiveCamera);
     if (!camera)
     {
         U::Log::Fatal("No Active Camera Is Set Or Active Camera Is Not An Entity");
@@ -43,20 +43,20 @@ void World::Start()
 
     m_Engine.GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
 
-    SetRoot(m_Engine.ECS->CreateEntity<Node>().GetId());
+    SetRoot(m_Engine.ECS.CreateEntity<Node>().GetId());
 
-    auto& camera = m_Engine.ECS->CreateEntity<R::Camera>();
-    m_Engine.ECS->Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
+    auto& camera = m_Engine.ECS.CreateEntity<R::Camera>();
+    m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
     GetRoot().AttachChild(camera);
     SetCamera(camera.GetId());
 
-    CoordinateAxesScene coordinateAxes = m_Engine.ECS->CreateScene<CoordinateAxesScene>();
+    CoordinateAxesScene coordinateAxes = m_Engine.ECS.CreateScene<CoordinateAxesScene>();
     GetRoot().AttachChild(coordinateAxes.GetRoot());
 
     GetRoot().AttachChild(coordinateAxes.GetRoot());
 
-    FirstScene firstScene = m_Engine.ECS->CreateScene<FirstScene>();
-    m_Engine.ECS->FindEntity(coordinateAxes.GetRoot()).AttachChild(firstScene.GetRoot());
+    FirstScene firstScene = m_Engine.ECS.CreateScene<FirstScene>();
+    m_Engine.ECS.FindEntity(coordinateAxes.GetRoot()).AttachChild(firstScene.GetRoot());
 
     for (auto& system : m_Systems)
     {
@@ -85,7 +85,7 @@ void World::Update(const double dt)
 
     if (m_Engine.GetModule<I::Input>().IsKeyPressed(I::Key::T))
     {
-        U::Log::Info(m_Engine.ECS->EntityAmount());
+        U::Log::Info(m_Engine.ECS.EntityAmount());
     }
 
     for (auto& system : m_Systems)
