@@ -22,13 +22,6 @@ namespace Sketch
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
 //TODO: redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
-//
-//TODO: try to make dependency injection to avoid global accessors like World::Get().
-// try to decouple as much as possible before attempting to implement DI(dependency injection)
-//
-//TODO: keep Engine a global accessor but make world be passed down via DI.
-// that way an engine can have multiple worlds and
-// give modules the ability to do operations engine globally, world locally or on every world.
 
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
 
@@ -45,12 +38,9 @@ namespace Sketch
 // support for 2D will open up alot of paths for simulations and such.
 // also need a way to even show 2D? will the camera be ortho?
 // or just a perspective but flat (no x or y just z (front and back) ) ?
-//
-//TODO: do i even need World? i might just change the name to ECS.
-// since world suggests u can have multiple worlds in 1 engine, but what would that even mean?
-// i can add the ability for multiple engines, each contain services, modules, windows & ECS.
-// and i can make services be owned by the engine instead of being statics.
-// i can have multiple engines by passing engine down using DI.
+
+//TODO: make services be owned by the engine instead of being statics.
+//TODO: make ECS fire local events not global events.
 
 using namespace Ivy;
 

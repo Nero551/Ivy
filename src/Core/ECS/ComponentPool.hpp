@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Component.hpp"
-#include "Core/Service.hpp"
-#include "Core/Services/EventBus/EventBus.hpp"
 #include "Events/ComponentAdded.hpp"
 #include "Events/ComponentRemoved.hpp"
 #include "Events/EntityDestroyed.hpp"
@@ -14,8 +12,6 @@
 
 namespace Ivy::C
 {
-struct World;
-
 struct IComponentPool
 {
     virtual ~IComponentPool() = default;
@@ -76,9 +72,9 @@ template <IsComponent T> struct ComponentPool : IComponentPool
         return {.Pool = this, .Index = m_Components.Size()};
     }
 
-    ComponentPool()
+    ComponentPool(EntityDestroyed& entityDestroyed)
     {
-        Service::Get<EventBus>().Sub<EntityDestroyed>(
+        entityDestroyed.Sub(
             [this](const EntityDestroyed& event)
             {
                 if (HasId(event.EntityId))

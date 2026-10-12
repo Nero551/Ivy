@@ -1,17 +1,18 @@
 #pragma once
-#include "ComponentPoolQuery.hpp"
+#include "Core/ECS/ComponentPoolQuery.hpp"
 #include "Core/ECS/Entity.hpp"
 #include "Core/ECS/Events/EntityCreated.hpp"
 #include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/ECS/Scene.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include <cstddef>
-#include <source_location>
 namespace Ivy::C
 {
 struct EntityComponentSystem
 {
-    ComponentPoolQuery Query{};
+    EntityDestroyed EntityDestroyed{};
+    EntityCreated EntityCreated{};
+    ComponentPoolQuery Query{EntityCreated, EntityDestroyed};
+
     void RemoveEntity(unsigned int id)
     {
         auto entity = TryFindEntity(id);
@@ -26,12 +27,14 @@ struct EntityComponentSystem
             entity->ClearParent();
         }
 
-        Service::Get<EventBus>().Fire<EntityDestroyed>(id);
+        EntityDestroyed.EntityId = id;
+        EntityDestroyed.Fire();
         m_Entities.Erase(id);
 
         for (auto& descendant : descendants)
         {
-            Service::Get<EventBus>().Fire<EntityDestroyed>(descendant->GetId());
+            EntityDestroyed.EntityId = descendant->GetId();
+            EntityDestroyed.Fire();
             m_Entities.Erase(descendant->GetId());
         }
     }
@@ -53,7 +56,8 @@ struct EntityComponentSystem
         entity.Initialize();
 
         auto it = m_Entities.Emplace(id, std::move(entity));
-        Service::Get<EventBus>().Fire<EntityCreated>(id);
+        EntityCreated.EntityId = id;
+        EntityCreated.Fire();
 
         return *it;
     }

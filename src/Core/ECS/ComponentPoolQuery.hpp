@@ -1,12 +1,14 @@
 #pragma once
 
-#include "ComponentPool.hpp"
+#include "Core/ECS/ComponentPool.hpp"
+#include "Core/ECS/Events/ComponentAdded.hpp"
+#include "Core/ECS/Events/ComponentRemoved.hpp"
 #include "Core/ECS/Events/EntityCreated.hpp"
+#include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 
 namespace Ivy::C
 {
-
 /**
  * @brief Provides cached queries over component pools.
  *
@@ -15,10 +17,12 @@ namespace Ivy::C
  */
 struct ComponentPoolQuery
 {
-    ComponentPoolQuery()
+    ComponentPoolQuery(EntityCreated& entityCreated, EntityDestroyed& entityDestroyed)
+        : m_EntityCreated(entityCreated), m_EntityDestroyed(entityDestroyed)
     {
-        Service::Get<EventBus>().Sub<EntityDestroyed>([this](const EntityDestroyed&) { ++m_QueryVersion; });
-        Service::Get<EventBus>().Sub<EntityCreated>([this](const EntityCreated&) { ++m_QueryVersion; });
+
+        m_EntityDestroyed.Sub([this](const EntityDestroyed&) { ++m_QueryVersion; });
+        m_EntityCreated.Sub([this](const EntityCreated&) { ++m_QueryVersion; });
     }
 
     /**
@@ -29,7 +33,7 @@ struct ComponentPoolQuery
      */
     template <IsComponent T> auto AddPool()
     {
-        auto it = m_ComponentPools.Emplace<T>(std::make_unique<ComponentPool<T>>());
+        auto it = m_ComponentPools.Emplace<T>(std::make_unique<ComponentPool<T>>(m_EntityDestroyed));
         ComponentPool<T>& pool = static_cast<ComponentPool<T>&>(**it);
 
         pool.ComponentAdded.Sub([this](const ComponentAdded&) { ++m_QueryVersion; });
@@ -139,6 +143,9 @@ struct ComponentPoolQuery
 
     /** @brief Stores cached results for each component query. */
     U::TypedVector<QueryCache> m_CachedQueries{};
+
+    EntityCreated& m_EntityCreated;
+    EntityDestroyed& m_EntityDestroyed;
 };
 
 } // namespace Ivy::C
