@@ -27,6 +27,11 @@ inline void Disable(Capability capability)
     glDisable(static_cast<GLenum>(capability));
 }
 
+inline void SetViewport(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
+{
+    glViewport(x1, y1, x2, y2);
+}
+
 inline bool IsEnabled(Capability capability)
 {
     return glIsEnabled(static_cast<GLenum>(capability));
