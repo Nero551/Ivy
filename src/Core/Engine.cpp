@@ -49,6 +49,7 @@ double Engine::GetTime() const
 void Engine::Configure()
 {
     Window.SetIcon({"Assets/icon.png"});
+    Window.SetCursor({"Assets/cursor.png"});
     // Window.SetSize(1920, 1200);
     G::Context::SwapInterval(0);
 

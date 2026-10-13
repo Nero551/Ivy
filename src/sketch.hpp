@@ -32,7 +32,7 @@ namespace Sketch
 //TODO: make transform system cache its own vector of the root's children that's updated on events
 // that will make it way less expensive performance-wise.
 //
-//TODO: make a genuine 2D system for the engine (support for 2D).
+//TODO: make a 2D system for the engine (support for 2D).
 // transforms will be vector2 for pos & scale and complex number or a float for rotation.
 // u will probably discover alot of issues with the current framework. fix those.
 // support for 2D will open up alot of paths for simulations and such.

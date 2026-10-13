@@ -1,5 +1,6 @@
 #include "Window.hpp"
 #include "../Utilities/Debug/Log.hpp"
+#include "GLFW/glfw3.h"
 #include "Graphics/GLFWPlatform.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "OpenGL.hpp"
@@ -136,6 +137,22 @@ GLFWPlatform Window::GetPlatform() const
 void Window::SetCursorMode(CursorMode mode)
 {
     glfwSetInputMode(m_GlfwWindow, GLFW_CURSOR, static_cast<int>(mode));
+}
+
+void Window::SetCursor(const U::Image& icon)
+{
+    GLFWimage image;
+    image.height = icon.Height;
+    image.width = icon.Width;
+    image.pixels = const_cast<unsigned char*>(icon.Pixels.data());
+
+    GLFWcursor* cursor = glfwCreateCursor(&image, 0, 0);
+    glfwSetCursor(m_GlfwWindow, cursor);
+}
+
+void Window::SetDefaultCursor()
+{
+    glfwSetCursor(m_GlfwWindow, nullptr);
 }
 
 void Window::SetConfiguration()

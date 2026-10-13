@@ -1,4 +1,5 @@
 #pragma once
+#include "GLFW/glfw3.h"
 #include "GLFWPlatform.hpp"
 #include "Graphics/OpenGLProfile.hpp"
 #include "InputEnums/Action.hpp"
@@ -184,7 +185,25 @@ struct Window
             });
     };
 
+    template <typename F>
+    void SetCursorEnterCallback(F&& f) requires(std::same_as<std::invoke_result_t<F, Window&, bool>, void>)
+    {
+        m_CursorEnteredCallback = std::forward<F>(f);
+        glfwSetCursorEnterCallback(m_GlfwWindow,
+            [](GLFWwindow* w, bool entered)
+            {
+                Window* win = static_cast<Window*>(glfwGetWindowUserPointer(w));
+                if (win == nullptr || !win->m_CursorEnteredCallback)
+                {
+                    return;
+                }
+                win->m_CursorEnteredCallback(*win, entered);
+            });
+    }
+
     void SetCursorMode(CursorMode mode);
+    void SetCursor(const U::Image& icon);
+    void SetDefaultCursor();
 
   private:
     GLFWwindow* m_GlfwWindow = nullptr;
@@ -195,6 +214,8 @@ struct Window
     std::function<void(Window&, int, int)> m_FramebufferSizeCallback;
     std::function<void(Window&, Key, int, Action, int)> m_KeyCallback;
     std::function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
+
+    std::function<void(Window&, bool)> m_CursorEnteredCallback;
 
     void SetConfiguration();
 };

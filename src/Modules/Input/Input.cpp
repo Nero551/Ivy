@@ -82,15 +82,15 @@ constexpr unsigned int Input::ToIndex(G::MouseButton button)
 void Input::Start()
 {
     G::Window& window = m_Engine.Window;
-    window.SetCursorPosCallback([&](G::Window& win, const double xPos, const double yPos)
+    window.SetCursorPosCallback([&](G::Window&, const double xPos, const double yPos)
         { m_MousePosition = {static_cast<float>(xPos), static_cast<float>(yPos)}; });
     ;
 
-    window.SetScrollCallback([&](G::Window& win, const double xOffset, const double yOffset)
+    window.SetScrollCallback([&](G::Window&, const double xOffset, const double yOffset)
         { m_ScrollOffset = {static_cast<float>(xOffset), static_cast<float>(yOffset)}; });
 
     window.SetKeyCallback(
-        [&](G::Window& win, G::Key key, int scancode, G::Action action, int mod)
+        [&](G::Window&, G::Key key, int scancode, G::Action action, int mod)
         {
             if (action == G::Action::Press || action == G::Action::Repeat)
             {
@@ -103,7 +103,7 @@ void Input::Start()
         });
 
     window.SetMouseButtonCallback(
-        [&](G::Window& win, G::MouseButton button, G::Action action, int mods)
+        [&](G::Window&, G::MouseButton button, G::Action action, int mods)
         {
             if (action == G::Action::Press)
             {

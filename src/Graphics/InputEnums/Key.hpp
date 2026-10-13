@@ -1,5 +1,6 @@
 #pragma once
 #include "../OpenGL.hpp"
+#include <string>
 
 namespace Ivy::G
 {
@@ -154,4 +155,10 @@ enum class Key
     F24 = GLFW_KEY_F24,
     F25 = GLFW_KEY_F25,
 };
+
+inline std::string GetKeyName(Key key)
+{
+    return glfwGetKeyName(static_cast<GLenum>(key), 0);
+}
+
 } // namespace Ivy::G

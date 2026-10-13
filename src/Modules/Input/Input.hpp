@@ -5,6 +5,7 @@
 #include "../../Graphics/InputEnums/MouseButton.hpp"
 #include "Core/Module.hpp"
 #include "Math/Vector/Vector2.hpp"
+#include <array>
 
 namespace Ivy::I
 {
@@ -37,11 +38,11 @@ struct Input : C::Module
 
   private:
     G::CursorMode m_MouseMode = G::CursorMode::Normal;
-    M::Vector<2> m_MousePosition = M::Vector<2>::Zero();
-    M::Vector<2> m_PreviousMousePosition = M::Vector<2>::Zero();
+    M::Vector<2> m_MousePosition{0};
+    M::Vector<2> m_PreviousMousePosition{0};
     bool m_FirstMouse = true;
 
-    M::Vector<2> m_ScrollOffset = M::Vector<2>::Zero();
+    M::Vector<2> m_ScrollOffset{0};
 
     constexpr unsigned int ToIndex(G::Key key);
 
