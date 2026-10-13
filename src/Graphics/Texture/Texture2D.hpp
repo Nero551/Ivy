@@ -6,6 +6,7 @@
 #include "TextureFormat.hpp"
 #include "TextureWrap.hpp"
 #include "Utilities/Image.hpp"
+#include <vector>
 
 namespace Ivy::G
 {
@@ -73,6 +74,8 @@ struct Texture2D : Texture
      * for the difference between image and OpenGL texture coordinates.
      */
     void UseImage(const U::Image& image);
+
+    std::vector<unsigned char> ReadPixels() const;
 
   private:
     /** @brief Configures the texture's wrapping and filtering parameters. */

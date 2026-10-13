@@ -1,13 +1,11 @@
 #include "Renderer.hpp"
 
-#include "../../Graphics/OpenGL.hpp"
 #include "Components/CameraComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/MeshComponent.hpp"
 #include "Core/ECS/Entity.hpp"
 #include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Engine.hpp"
-#include "Core/Service.hpp"
 #include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components/Transform3DComponent.hpp"
@@ -38,8 +36,6 @@
 #include "Systems/CameraSystem.hpp"
 #include "Systems/LightingSystem.hpp"
 #include "Utilities/Image.hpp"
-#include <GLFW/glfw3.h>
-#include <cstddef>
 #include <ranges>
 #include <vector>
 
@@ -272,15 +268,10 @@ void Renderer::FixedUpdate(double fdt) {}
 
 void Renderer::Stop()
 {
-    const auto& texture = Framebuffer->Get().TextureAttachments.at(G::FramebufferAttachment::Color0);
+    const G::Texture2D& texture =
+        static_cast<G::Texture2D&>(Framebuffer->Get().GetTexture(G::FramebufferAttachment::Color0));
 
-    std::vector<unsigned char> pixels(
-        static_cast<size_t>(texture->Width) * static_cast<size_t>(texture->Height) * 3);
-
-    glBindTexture(GL_TEXTURE_2D, texture->GetId());
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
-
-    U::Image image = {texture->Width, texture->Height, U::Image::ColorChannels::RGB, pixels};
+    U::Image image = {texture.Width, texture.Height, U::Image::ColorChannels::RGB, texture.ReadPixels()};
     image.SaveToDiskPNG("Assets/LastFrame.png", true);
 }
 } // namespace Ivy::R

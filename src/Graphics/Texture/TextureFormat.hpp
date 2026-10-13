@@ -1,4 +1,5 @@
 #pragma once
+#include "Graphics/OpenGL.hpp"
 
 namespace Ivy::G
 {
@@ -70,4 +71,34 @@ enum class TextureFormat
     /** Stencil component only. */
     Stencil = GL_STENCIL_INDEX
 };
+constexpr unsigned int GetChannelCount(const TextureFormat format)
+{
+    switch (format)
+    {
+    case TextureFormat::Red:
+    case TextureFormat::RedInteger:
+    case TextureFormat::Depth:
+    case TextureFormat::Stencil:
+        return 1;
+
+    case TextureFormat::RG:
+    case TextureFormat::RGInteger:
+    case TextureFormat::DepthStencil:
+        return 2;
+
+    case TextureFormat::RGB:
+    case TextureFormat::BGR:
+    case TextureFormat::RGBInteger:
+    case TextureFormat::BGRInteger:
+        return 3;
+
+    case TextureFormat::RGBA:
+    case TextureFormat::BGRA:
+    case TextureFormat::RGBAInteger:
+    case TextureFormat::BGRAInteger:
+        return 4;
+    }
+
+    return 0;
+}
 } // namespace Ivy::G

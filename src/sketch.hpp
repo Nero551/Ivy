@@ -40,11 +40,6 @@ namespace Sketch
 // or just a perspective but flat (no x or y just z (front and back) ) ?
 //
 //TODO: i need genuine move and copy semantics/constructors for everything in Graphics section.
-//TODO: completely remove direct glfw/gl usage across the engine. everything should use the graphics API
-
-//TODO: the only 2 uses of gl/glfw in the engine now is in Input.cpp and Renderer::Stop() wrap those.
-//TODO: after am done with that, move OpenGL.hpp to Graphics section.
-// TODO: rename GraphicsContext to just Context.
 
 using namespace Ivy;
 

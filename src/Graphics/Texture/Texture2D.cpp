@@ -9,6 +9,8 @@
 #include "Utilities/Image.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
+#include <vector>
 
 namespace Ivy::G
 {
@@ -68,6 +70,18 @@ void Texture2D::UseImage(const U::Image& image)
     default:
         U::Log::Error("Unsupported Texture Channel Count");
     }
+}
+
+std::vector<unsigned char> Texture2D::ReadPixels() const
+{
+    GLsizei bufferSize = static_cast<size_t>(Width) * static_cast<size_t>(Height) * GetChannelCount(Format) *
+        GetBytesPerComponent(DataType);
+
+    std::vector<unsigned char> pixels(bufferSize);
+
+    glGetTextureImage(
+        m_Id, 0, static_cast<GLenum>(Format), static_cast<GLenum>(DataType), bufferSize, pixels.data());
+    return pixels;
 }
 
 void Texture2D::SetParameters() const

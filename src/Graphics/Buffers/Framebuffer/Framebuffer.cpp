@@ -68,6 +68,11 @@ void Framebuffer::AttachTexture(FramebufferAttachment textureAttachment, Texture
     glNamedFramebufferTexture(m_Id, static_cast<GLenum>(textureAttachment), texture.GetId(), 0);
 }
 
+Texture& Framebuffer::GetTexture(FramebufferAttachment textureAttachment)
+{
+    return *TextureAttachments.at(textureAttachment);
+}
+
 void Framebuffer::Blit(Framebuffer& dst, const int srcW, const int srcH, const int dstW, const int dstH,
     BufferBit buffer, TextureFilter filter)
 {

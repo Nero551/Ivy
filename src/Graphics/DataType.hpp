@@ -50,4 +50,35 @@ enum class DataType
     /** Packed unsigned 32-bit depth/stencil data. */
     Float32UnsignedInt248Rev = GL_FLOAT_32_UNSIGNED_INT_24_8_REV
 };
+
+constexpr unsigned int GetBytesPerComponent(const DataType type)
+{
+    switch (type)
+    {
+    case DataType::UnsignedByte:
+    case DataType::Byte:
+        return 1;
+
+    case DataType::UnsignedShort:
+    case DataType::Short:
+    case DataType::HalfFloat:
+        return 2;
+
+    case DataType::UnsignedInt:
+    case DataType::Int:
+    case DataType::Float:
+    case DataType::UnsignedInt248:
+        return 4;
+
+    case DataType::UnsignedShort565:
+    case DataType::UnsignedShort4444:
+    case DataType::UnsignedShort5551:
+        return 2;
+
+    case DataType::Float32UnsignedInt248Rev:
+        return 8;
+    }
+
+    return 0;
+}
 } // namespace Ivy::G

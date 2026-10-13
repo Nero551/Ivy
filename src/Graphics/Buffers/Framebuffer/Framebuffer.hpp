@@ -101,6 +101,8 @@ struct Framebuffer
      */
     void AttachTexture(FramebufferAttachment textureAttachment, Texture& texture);
 
+    Texture& GetTexture(FramebufferAttachment textureAttachment);
+
     /**
      * @brief Copies selected framebuffer buffers to another framebuffer.
      *
