@@ -2,6 +2,7 @@
 #include "../Utilities/Debug/Log.hpp"
 #include "Core/ECS/System.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
+#include <concepts>
 #include <memory>
 
 namespace Ivy::C

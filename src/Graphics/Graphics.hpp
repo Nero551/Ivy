@@ -11,6 +11,7 @@
 #include "Buffers/Renderbuffer/Renderbuffer.hpp"
 #include "Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Buffers/VertexArray/VertexArray.hpp"
+#include "Capability.hpp"
 #include "DataType.hpp"
 #include "GLFWPlatform.hpp"
 #include "GraphicsContext.hpp"

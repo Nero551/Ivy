@@ -40,7 +40,10 @@ namespace Sketch
 // or just a perspective but flat (no x or y just z (front and back) ) ?
 //
 //TODO: i need genuine move and copy semantics/constructors for everything in Graphics section.
-
+//TODO: completely remove direct glfw/gl usage across the engine. everything should use the graphics API
+// figure out how to remove GLFWwindow usage in callback (input & framebuffer size callbacks).
+// remove usage of glEnable in Renderer.cpp, use custom enums and a static Enable().
+//
 using namespace Ivy;
 
 using Index = unsigned int;

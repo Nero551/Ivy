@@ -36,7 +36,7 @@ concept IsDimension = IsDimensionType<std::remove_cvref_t<F>>::value;
  * @tparam D The dimensional type associated with the value.
  *
  * Arithmetic operations preserve dimensional correctness at compile time.
- * Addition and subtraction require equivalent normalized dimensions, while
+ * Addition and subtraction require equivalent dimensions, while
  * multiplication and division combine and normalize their dimensions.
  */
 template <typename T, typename D> requires(IsDimensional<D>)

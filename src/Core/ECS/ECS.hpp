@@ -3,8 +3,11 @@
 #include "Core/ECS/Entity.hpp"
 #include "Core/ECS/Events/EntityCreated.hpp"
 #include "Core/ECS/Events/EntityDestroyed.hpp"
-#include "Core/ECS/Scene.hpp"
+#include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include <concepts>
+#include <cstddef>
 namespace Ivy::C
 {
 struct EntityComponentSystem
@@ -61,12 +64,10 @@ struct EntityComponentSystem
 
         return *it;
     }
-    Entity& FindEntity(unsigned int id, std::source_location source = std::source_location::current())
+    Entity& FindEntity(unsigned int id)
     {
         if (!m_Entities.Contains(id))
         {
-            U::Log::Error(
-                source.file_name(), " ", source.function_name(), " ", source.column(), " ", source.line());
             U::Log::Fatal("Entity Not Found: ", id);
         }
         return m_Entities[id];

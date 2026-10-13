@@ -16,7 +16,9 @@
 #include "Graphics/Buffers/Framebuffer/FramebufferTarget.hpp"
 #include "Graphics/Buffers/Renderbuffer/Renderbuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
+#include "Graphics/Capability.hpp"
 #include "Graphics/DataType.hpp"
+#include "Graphics/GraphicsContext.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -132,8 +134,8 @@ void Renderer::PresentFramebuffer()
 
     MSAAFramebuffer->Get().Unbind();
 
-    glClearColor(0.08, 0.05, 0.1, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    G::GraphicsContext::ClearColor(0.08, 0.05, 0.1, 1);
+    G::GraphicsContext::Clear(G::BufferBit::Color);
 
     int i = 0;
     for (auto& texture : Framebuffer->Get().TextureAttachments | std::views::values)
@@ -154,14 +156,8 @@ void Renderer::Start()
     AddSystem<CameraSystem>();
     AddSystem<LightingSystem>();
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glEnable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glFrontFace(GL_CCW);
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    glEnable(GL_MULTISAMPLE);
+    G::GraphicsContext::Enable(G::Capability::ProgramPointSize);
+    G::GraphicsContext::Enable(G::Capability::Multisample);
 
     auto& resources = m_Engine.GetService<C::ResourceManager>();
     GUniformbuffer = &resources.Load<G::Uniformbuffer>("[Graphics] Global Uniform buffer");
@@ -177,8 +173,8 @@ void Renderer::BeginFrame(double dt)
 {
     MSAAFramebuffer->Get().Bind();
 
-    glClearColor(0.08, 0.05, 0.1, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    G::GraphicsContext::ClearColor(0.08, 0.05, 0.1, 1);
+    G::GraphicsContext::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
 }
 
 //TODO: after i learn compute shaders, i could move this entire rendering pipeline on a

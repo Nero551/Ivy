@@ -4,8 +4,10 @@
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
+#include "Math/Concepts.hpp"
 #include "Math/Coordinates/Polar.hpp"
 #include "Vector.hpp"
+#include <ostream>
 
 namespace Ivy::M
 {

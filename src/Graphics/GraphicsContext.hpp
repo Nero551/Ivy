@@ -1,13 +1,37 @@
 #pragma once
 #include "../Utilities/Debug/Log.hpp"
+#include "Graphics/Buffers/BufferBit.hpp"
+#include "Graphics/Capability.hpp"
 #include "OpenGL.hpp"
 #include <glslang/Public/ShaderLang.h>
 
-/** @brief Handles initialization and termination of graphics specific things
- * that need to run before window creation and everything else.
- */
+/** @brief Handles initialization, modification and termination of graphics state */
 namespace Ivy::G::GraphicsContext
 {
+inline void ClearColor(float r, float g, float b, float a)
+{
+    glClearColor(r, g, b, a);
+}
+
+inline void Clear(BufferBit b)
+{
+    glClear(static_cast<GLbitfield>(b));
+}
+inline void Enable(Capability capability)
+{
+    glEnable(static_cast<GLenum>(capability));
+}
+
+inline void Disable(Capability capability)
+{
+    glDisable(static_cast<GLenum>(capability));
+}
+
+inline bool IsEnabled(Capability capability)
+{
+    return glIsEnabled(static_cast<GLenum>(capability));
+}
+
 inline void Initialize()
 {
     glfwSetErrorCallback(

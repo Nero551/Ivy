@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utilities/Debug/Log.hpp"
+#include <algorithm>
 namespace Ivy::C
 {
 struct TimeHandler

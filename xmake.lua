@@ -17,14 +17,14 @@ target("Ivy")
     set_rundir(os.projectdir())
     add_includedirs("src")
     set_pcxxheader("src/pch.hpp")
+    add_files("src/**.cpp")
 
     if is_mode("release") then
-        add_files("src/**.cpp|src/TracyMemory.cpp")
+        remove_files("src/TracyMemory.cpp")
         set_policy("build.optimization.lto", true)
     else
         add_defines("TRACY_ENABLE")
         add_defines("TRACY_PROFILE_MEMORY")
-        add_files("src/**.cpp")
     end
 
     if is_mode("debug") then
