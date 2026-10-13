@@ -20,7 +20,7 @@ namespace Ivy::G
 /**
  * @brief Wrapper around a GLFW window.
  * Owns the underlying GLFW window and provides window
- * management and event handling.
+ * management and input/event handling.
  */
 struct Window
 {
@@ -98,11 +98,7 @@ struct Window
 
     void Close();
 
-    GLFWwindow* GetGlfwWindow() const;
-
     GLFWPlatform GetPlatform() const;
-
-    void SetInputMode() {}
 
     template <typename F>
     void SetScrollCallback(F&& f)
@@ -188,10 +184,7 @@ struct Window
             });
     };
 
-    void SetCursorMode(CursorMode mode)
-    {
-        glfwSetInputMode(m_GlfwWindow, GLFW_CURSOR, static_cast<int>(mode));
-    }
+    void SetCursorMode(CursorMode mode);
 
   private:
     GLFWwindow* m_GlfwWindow = nullptr;

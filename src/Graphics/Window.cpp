@@ -1,9 +1,9 @@
 #include "Window.hpp"
 #include "../Utilities/Debug/Log.hpp"
 #include "Graphics/GLFWPlatform.hpp"
+#include "Graphics/InputEnums/CursorMode.hpp"
 #include "OpenGL.hpp"
 #include "Utilities/Image.hpp"
-#include <functional>
 #include <string>
 
 namespace Ivy::G
@@ -128,14 +128,14 @@ void Window::Close()
     glfwSetWindowShouldClose(m_GlfwWindow, GL_TRUE);
 }
 
-GLFWwindow* Window::GetGlfwWindow() const
-{
-    return m_GlfwWindow;
-}
-
 GLFWPlatform Window::GetPlatform() const
 {
     return m_Platform;
+}
+
+void Window::SetCursorMode(CursorMode mode)
+{
+    glfwSetInputMode(m_GlfwWindow, GLFW_CURSOR, static_cast<int>(mode));
 }
 
 void Window::SetConfiguration()
