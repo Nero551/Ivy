@@ -1,9 +1,9 @@
 #include "Texture2D.hpp"
+#include "../OpenGL.hpp"
 #include "Graphics/DataType.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Texture/TextureFormat.hpp"
 #include "Graphics/Texture/TextureInternalFormat.hpp"
-#include "OpenGL.hpp"
 
 #include "../../Utilities/Debug/Log.hpp"
 #include "Utilities/Image.hpp"

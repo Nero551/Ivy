@@ -1,13 +1,24 @@
 #pragma once
 #include "../Utilities/Debug/Log.hpp"
+#include "GLFW/glfw3.h"
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Capability.hpp"
 #include "OpenGL.hpp"
 #include <glslang/Public/ShaderLang.h>
 
 /** @brief Handles initialization, modification and termination of graphics state */
-namespace Ivy::G::GraphicsContext
+namespace Ivy::G::Context
 {
+inline double GetTime()
+{
+    return glfwGetTime();
+}
+
+inline void SwapInterval(int interval)
+{
+    glfwSwapInterval(interval);
+}
+
 inline void ClearColor(float r, float g, float b, float a)
 {
     glClearColor(r, g, b, a);
@@ -58,4 +69,4 @@ inline void Terminate()
     glslang::FinalizeProcess();
     glfwTerminate();
 }
-} // namespace Ivy::G::GraphicsContext
+} // namespace Ivy::G::Context

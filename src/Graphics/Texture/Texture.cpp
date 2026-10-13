@@ -1,7 +1,7 @@
 #include "Texture.hpp"
 
+#include "../OpenGL.hpp"
 #include "Graphics/Texture/TextureTarget.hpp"
-#include "OpenGL.hpp"
 #include <string>
 #include <utility>
 

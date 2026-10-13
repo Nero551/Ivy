@@ -5,8 +5,8 @@
 #include <utility>
 
 #include "../../Utilities/Debug/Log.hpp"
+#include "../OpenGL.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
-#include "OpenGL.hpp"
 #include "Utilities/FileSystem.hpp"
 
 namespace Ivy::G

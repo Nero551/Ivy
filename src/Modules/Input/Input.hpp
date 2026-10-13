@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../../Graphics/InputEnums/CursorMode.hpp"
+#include "../../Graphics/InputEnums/Key.hpp"
+#include "../../Graphics/InputEnums/MouseButton.hpp"
 #include "Core/Module.hpp"
-#include "Enums/Keys.hpp"
-#include "Enums/MouseButton.hpp"
-#include "Enums/MouseMode.hpp"
 #include "Math/Vector/Vector2.hpp"
 
 namespace Ivy::I
@@ -11,17 +11,17 @@ namespace Ivy::I
 struct Input : C::Module
 {
     using C::Module::Module;
-    bool IsKeyHeld(Key key);
+    bool IsKeyHeld(G::Key key);
 
-    bool IsKeyPressed(Key key);
+    bool IsKeyPressed(G::Key key);
 
-    bool IsKeyReleased(Key key);
+    bool IsKeyReleased(G::Key key);
 
-    bool IsMouseButtonHeld(MouseButton button);
+    bool IsMouseButtonHeld(G::MouseButton button);
 
-    bool IsMouseButtonPressed(MouseButton button);
+    bool IsMouseButtonPressed(G::MouseButton button);
 
-    bool IsMouseButtonReleased(MouseButton button);
+    bool IsMouseButtonReleased(G::MouseButton button);
 
     M::Vector<2> GetMousePosition() const;
 
@@ -31,30 +31,27 @@ struct Input : C::Module
 
     bool IsScrolling() const;
 
-    MouseMode GetMouseMode() const;
+    G::CursorMode GetMouseMode() const;
 
-    void SetMouseMode(MouseMode mode);
+    void SetMouseMode(G::CursorMode mode);
 
   private:
-    MouseMode m_MouseMode = MouseMode::Normal;
+    G::CursorMode m_MouseMode = G::CursorMode::Normal;
     M::Vector<2> m_MousePosition = M::Vector<2>::Zero();
     M::Vector<2> m_PreviousMousePosition = M::Vector<2>::Zero();
     bool m_FirstMouse = true;
 
     M::Vector<2> m_ScrollOffset = M::Vector<2>::Zero();
 
-    static constexpr unsigned int MouseButtonCount = GLFW_MOUSE_BUTTON_LAST + 1;
-    static constexpr unsigned int KeyCount = GLFW_KEY_LAST + 1;
+    constexpr unsigned int ToIndex(G::Key key);
 
-    constexpr unsigned int ToIndex(Key key);
+    constexpr unsigned int ToIndex(G::MouseButton button);
 
-    constexpr unsigned int ToIndex(MouseButton button);
+    std::array<bool, G::KeyCount> m_CurrentKeys{};
+    std::array<bool, G::KeyCount> m_PreviousKeys{};
 
-    std::array<bool, KeyCount> m_CurrentKeys{};
-    std::array<bool, KeyCount> m_PreviousKeys{};
-
-    std::array<bool, MouseButtonCount> m_CurrentMouseButtons{};
-    std::array<bool, MouseButtonCount> m_PreviousMouseButtons{};
+    std::array<bool, G::MouseButtonCount> m_CurrentMouseButtons{};
+    std::array<bool, G::MouseButtonCount> m_PreviousMouseButtons{};
 
   protected:
     void Start() override;

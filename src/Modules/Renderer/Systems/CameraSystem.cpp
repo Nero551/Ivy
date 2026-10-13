@@ -1,5 +1,7 @@
 #include "CameraSystem.hpp"
 
+#include "../../../Graphics/InputEnums/CursorMode.hpp"
+#include "../../../Graphics/InputEnums/Key.hpp"
 #include "../Components/CameraComponent.hpp"
 #include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
@@ -8,8 +10,6 @@
 #include "Math/Matrix/Matrix4.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector3.hpp"
-#include "Modules/Input/Enums/Keys.hpp"
-#include "Modules/Input/Enums/MouseMode.hpp"
 #include "Modules/Input/Input.hpp"
 #include <algorithm>
 
@@ -27,7 +27,7 @@ void CameraSystem::Update(const double dt)
 
     cameraComponent.AspectRatio = m_Engine.Window.GetAspectRatio();
 
-    if (input.GetMouseMode() == I::MouseMode::Disabled)
+    if (input.GetMouseMode() == G::CursorMode::Disabled)
     {
         cameraComponent.Speed += input.GetScrollDelta().y / 3;
         cameraComponent.Speed = std::clamp(cameraComponent.Speed, 1.0f, 50.0f);
@@ -46,32 +46,32 @@ void CameraSystem::Update(const double dt)
 
     const float speed = cameraComponent.Speed * static_cast<float>(dt);
 
-    if (input.IsKeyHeld(I::Key::W))
+    if (input.IsKeyHeld(G::Key::W))
     {
         transform.Position += speed * transform.GetForward();
     }
 
-    if (input.IsKeyHeld(I::Key::S))
+    if (input.IsKeyHeld(G::Key::S))
     {
         transform.Position -= speed * transform.GetForward();
     }
 
-    if (input.IsKeyHeld(I::Key::A))
+    if (input.IsKeyHeld(G::Key::A))
     {
         transform.Position -= speed * transform.GetRight();
     }
 
-    if (input.IsKeyHeld(I::Key::D))
+    if (input.IsKeyHeld(G::Key::D))
     {
         transform.Position += speed * transform.GetRight();
     }
 
-    if (input.IsKeyHeld(I::Key::Space))
+    if (input.IsKeyHeld(G::Key::Space))
     {
         transform.Position += speed * M::Vector<3>(0, 1, 0);
     }
 
-    if (input.IsKeyHeld(I::Key::LeftShift))
+    if (input.IsKeyHeld(G::Key::LeftShift))
     {
         transform.Position -= speed * M::Vector<3>(0, 1, 0);
     }

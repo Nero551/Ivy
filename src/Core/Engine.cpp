@@ -3,7 +3,7 @@
 #include "Core/Service.hpp"
 #include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Graphics/GraphicsContext.hpp"
+#include "Graphics/Context.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Physics/Physics.hpp"
 #include "Modules/Profiling/Profiling.hpp"
@@ -16,7 +16,7 @@ namespace Ivy::C
 
 void Engine::Run()
 {
-    m_TimeHandler.Initialize(glfwGetTime());
+    m_TimeHandler.Initialize(G::Context::GetTime());
     m_Running = true;
 
     Start();
@@ -50,7 +50,7 @@ void Engine::Configure()
 {
     Window.SetIcon({"Assets/icon.png"});
     // Window.SetSize(1920, 1200);
-    glfwSwapInterval(0);
+    G::Context::SwapInterval(0);
 
     AddService<EventBus>();
     AddService<ResourceManager>();
@@ -63,7 +63,7 @@ void Engine::Configure()
 
 void Engine::Start()
 {
-    G::GraphicsContext::Initialize();
+    G::Context::Initialize();
     Window.Generate(800, 600, "Ivy");
     Configure();
 
@@ -89,7 +89,7 @@ void Engine::BeginFrame()
     ZoneScopedN("Begin Frame");
     TracyGpuZone("Begin Frame");
 
-    m_TimeHandler.CalculateTime(glfwGetTime());
+    m_TimeHandler.CalculateTime(G::Context::GetTime());
     Window.PollEvents();
 
     World.BeginFrame(m_TimeHandler.GetDelta());
@@ -201,6 +201,6 @@ void Engine::Stop()
     }
 
     Window.Terminate();
-    G::GraphicsContext::Terminate();
+    G::Context::Terminate();
 }
 } // namespace Ivy::C

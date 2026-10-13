@@ -1,8 +1,10 @@
 #pragma once
-#include "OpenGL.hpp"
+#include "../OpenGL.hpp"
 
-namespace Ivy::I
+namespace Ivy::G
 {
+
+static constexpr unsigned int KeyCount = GLFW_KEY_LAST + 1;
 
 /** @brief Keyboard keys for input */
 enum class Key
@@ -152,4 +154,4 @@ enum class Key
     F24 = GLFW_KEY_F24,
     F25 = GLFW_KEY_F25,
 };
-} // namespace Ivy::I
+} // namespace Ivy::G

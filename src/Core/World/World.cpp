@@ -5,8 +5,8 @@
 #include "Core/World/Scenes/CoordinateAxesScene.hpp"
 #include "Core/World/Systems/StressTester.hpp"
 #include "Core/World/Systems/Transform3DSystem.hpp"
-#include "Modules/Input/Enums/Keys.hpp"
-#include "Modules/Input/Enums/MouseMode.hpp"
+#include "Graphics/InputEnums/CursorMode.hpp"
+#include "Graphics/InputEnums/Key.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Nodes/Camera.hpp"
 #include "Utilities/CheckedPtr.hpp"
@@ -40,7 +40,7 @@ void World::Start()
     AddSystem<Transform3DSystem>();
     AddSystem<StressTester>();
 
-    m_Engine.GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
+    m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
 
     SetRoot(m_Engine.ECS.CreateEntity<Node>().GetId());
 
@@ -60,24 +60,24 @@ void World::Start()
 
 void World::Update(const double dt)
 {
-    if (m_Engine.GetModule<I::Input>().IsKeyHeld(I::Key::Escape))
+    if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::Escape))
     {
         m_Engine.Shutdown();
     }
 
-    if (m_Engine.GetModule<I::Input>().IsKeyReleased(I::Key::Q))
+    if (m_Engine.GetModule<I::Input>().IsKeyReleased(G::Key::Q))
     {
-        if (m_Engine.GetModule<I::Input>().GetMouseMode() == I::MouseMode::Disabled)
+        if (m_Engine.GetModule<I::Input>().GetMouseMode() == G::CursorMode::Disabled)
         {
-            m_Engine.GetModule<I::Input>().SetMouseMode(I::MouseMode::Normal);
+            m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Normal);
         }
         else
         {
-            m_Engine.GetModule<I::Input>().SetMouseMode(I::MouseMode::Disabled);
+            m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
         }
     }
 
-    if (m_Engine.GetModule<I::Input>().IsKeyPressed(I::Key::T))
+    if (m_Engine.GetModule<I::Input>().IsKeyPressed(G::Key::T))
     {
         U::Log::Info(m_Engine.ECS.EntityAmount());
     }

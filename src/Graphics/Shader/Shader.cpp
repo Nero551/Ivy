@@ -1,6 +1,6 @@
 #include "Shader.hpp"
 
-#include <OpenGL.hpp>
+#include "Graphics/OpenGL.hpp"
 #include <string>
 #include <vector>
 

@@ -1,12 +1,12 @@
 #include "Mesh.hpp"
 #include "Graphics/Capability.hpp"
+#include "Graphics/Context.hpp"
 #include "Graphics/DataType.hpp"
-#include "Graphics/GraphicsContext.hpp"
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/RenderMode.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
 
-#include <OpenGL.hpp>
+#include "Graphics/OpenGL.hpp"
 #include <cstddef>
 #include <string>
 
@@ -114,13 +114,13 @@ void Mesh::ApplyCulling() const
 
     if (CullMode == CullMode::None)
     {
-        GraphicsContext::Disable(Capability::CullFace);
+        Context::Disable(Capability::CullFace);
     }
     else
     {
-        if (!GraphicsContext::IsEnabled(Capability::CullFace))
+        if (!Context::IsEnabled(Capability::CullFace))
         {
-            GraphicsContext::Enable(Capability::CullFace);
+            Context::Enable(Capability::CullFace);
         }
         glCullFace(static_cast<GLenum>(CullMode));
     }

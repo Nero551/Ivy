@@ -1,5 +1,5 @@
 #include "ArrayBuffer.hpp"
-#include "OpenGL.hpp"
+#include "../../OpenGL.hpp"
 #include <utility>
 
 namespace Ivy::G

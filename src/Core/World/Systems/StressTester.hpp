@@ -4,6 +4,7 @@
 #include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Math/Vector/Vector.hpp"
@@ -27,11 +28,11 @@ struct StressTester : C::System
     {
         auto& input = m_Engine.GetModule<I::Input>();
 
-        if (input.IsKeyHeld(I::Key::Left))
+        if (input.IsKeyHeld(G::Key::Left))
         {
             multiplier -= 5 * dt;
         }
-        if (input.IsKeyHeld(I::Key::Right))
+        if (input.IsKeyHeld(G::Key::Right))
         {
             multiplier += 5 * dt;
         }

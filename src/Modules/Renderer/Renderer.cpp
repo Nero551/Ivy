@@ -1,5 +1,6 @@
 #include "Renderer.hpp"
 
+#include "../../Graphics/OpenGL.hpp"
 #include "Components/CameraComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/MeshComponent.hpp"
@@ -17,8 +18,8 @@
 #include "Graphics/Buffers/Renderbuffer/Renderbuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Graphics/Capability.hpp"
+#include "Graphics/Context.hpp"
 #include "Graphics/DataType.hpp"
-#include "Graphics/GraphicsContext.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -33,7 +34,6 @@
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 #include "Graphics/Window.hpp"
 #include "Math/Matrix/Matrix4.hpp"
-#include "OpenGL.hpp"
 #include "RenderBatch.hpp"
 #include "Systems/CameraSystem.hpp"
 #include "Systems/LightingSystem.hpp"
@@ -93,7 +93,7 @@ void Renderer::SetupFramebuffer()
     m_Engine.Window.SetFramebufferSizeCallback(
         [&](G::Window& win, const int w, const int h)
         {
-            G::GraphicsContext::SetViewport(0, 0, w, h);
+            G::Context::SetViewport(0, 0, w, h);
             auto& graphics = m_Engine.GetModule<Renderer>();
             graphics.MSAAFramebuffer->Get().Resize(w, h);
             graphics.Framebuffer->Get().Resize(w, h);
@@ -134,8 +134,8 @@ void Renderer::PresentFramebuffer()
 
     MSAAFramebuffer->Get().Unbind();
 
-    G::GraphicsContext::ClearColor(0.08, 0.05, 0.1, 1);
-    G::GraphicsContext::Clear(G::BufferBit::Color);
+    G::Context::ClearColor(0.08, 0.05, 0.1, 1);
+    G::Context::Clear(G::BufferBit::Color);
 
     int i = 0;
     for (auto& texture : Framebuffer->Get().TextureAttachments | std::views::values)
@@ -156,8 +156,8 @@ void Renderer::Start()
     AddSystem<CameraSystem>();
     AddSystem<LightingSystem>();
 
-    G::GraphicsContext::Enable(G::Capability::ProgramPointSize);
-    G::GraphicsContext::Enable(G::Capability::Multisample);
+    G::Context::Enable(G::Capability::ProgramPointSize);
+    G::Context::Enable(G::Capability::Multisample);
 
     auto& resources = m_Engine.GetService<C::ResourceManager>();
     GUniformbuffer = &resources.Load<G::Uniformbuffer>("[Graphics] Global Uniform buffer");
@@ -173,8 +173,8 @@ void Renderer::BeginFrame(double dt)
 {
     MSAAFramebuffer->Get().Bind();
 
-    G::GraphicsContext::ClearColor(0.08, 0.05, 0.1, 1);
-    G::GraphicsContext::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
+    G::Context::ClearColor(0.08, 0.05, 0.1, 1);
+    G::Context::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
 }
 
 //TODO: after i learn compute shaders, i could move this entire rendering pipeline on a

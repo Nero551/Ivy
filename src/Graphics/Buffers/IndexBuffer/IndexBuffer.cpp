@@ -1,5 +1,5 @@
 #include "IndexBuffer.hpp"
-#include "OpenGL.hpp"
+#include "../../OpenGL.hpp"
 #include <vector>
 
 namespace Ivy::G

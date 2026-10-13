@@ -1,13 +1,16 @@
 #pragma once
-#include "GLFW/glfw3.h"
 #include "GLFWPlatform.hpp"
 #include "Graphics/OpenGLProfile.hpp"
-
-#include <OpenGL.hpp>
+#include "InputEnums/Action.hpp"
+#include "InputEnums/CursorMode.hpp"
+#include "InputEnums/Key.hpp"
+#include "InputEnums/MouseButton.hpp"
+#include "OpenGL.hpp"
 #include <concepts>
 #include <functional>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 #include "Utilities/Image.hpp"
 
@@ -99,6 +102,8 @@ struct Window
 
     GLFWPlatform GetPlatform() const;
 
+    void SetInputMode() {}
+
     template <typename F>
     void SetScrollCallback(F&& f)
         requires(std::same_as<std::invoke_result_t<F, Window&, double, double>, void>)
@@ -148,13 +153,55 @@ struct Window
             });
     }
 
+    template <typename F>
+    void SetKeyCallback(F&& f)
+        requires(std::same_as<std::invoke_result_t<F, Window&, Key, int, Action, int>, void>)
+    {
+        m_KeyCallback = std::forward<F>(f);
+        glfwSetKeyCallback(m_GlfwWindow,
+            [](GLFWwindow* w, int key, int scancode, int action, int mods)
+            {
+                Window* win = static_cast<Window*>(glfwGetWindowUserPointer(w));
+                if (win == nullptr || !win->m_KeyCallback)
+                {
+                    return;
+                }
+                win->m_KeyCallback(*win, static_cast<Key>(key), scancode, static_cast<Action>(action), mods);
+            });
+    }
+
+    template <typename F>
+    void SetMouseButtonCallback(F&& f)
+        requires(std::same_as<std::invoke_result_t<F, Window&, MouseButton, Action, int>, void>)
+    {
+        m_MouseButtonCallback = std::forward<F>(f);
+        glfwSetMouseButtonCallback(m_GlfwWindow,
+            [](GLFWwindow* w, int button, int action, int mods)
+            {
+                Window* win = static_cast<Window*>(glfwGetWindowUserPointer(w));
+                if (win == nullptr || !win->m_MouseButtonCallback)
+                {
+                    return;
+                }
+                win->m_MouseButtonCallback(
+                    *win, static_cast<MouseButton>(button), static_cast<Action>(action), mods);
+            });
+    };
+
+    void SetCursorMode(CursorMode mode)
+    {
+        glfwSetInputMode(m_GlfwWindow, GLFW_CURSOR, static_cast<int>(mode));
+    }
+
   private:
-    GLFWwindow* m_GlfwWindow;
-    GLFWPlatform m_Platform;
+    GLFWwindow* m_GlfwWindow = nullptr;
+    GLFWPlatform m_Platform = GLFWPlatform::Null;
 
     std::function<void(Window&, double, double)> m_ScrollCallback;
     std::function<void(Window&, double, double)> m_CursorPosCallback;
     std::function<void(Window&, int, int)> m_FramebufferSizeCallback;
+    std::function<void(Window&, Key, int, Action, int)> m_KeyCallback;
+    std::function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
 
     void SetConfiguration();
 };

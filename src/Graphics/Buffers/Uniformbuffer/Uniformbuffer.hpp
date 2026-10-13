@@ -1,6 +1,6 @@
 #pragma once
+#include "../../OpenGL.hpp"
 #include "Graphics/Buffers/BufferUsage.hpp"
-#include "OpenGL.hpp"
 
 namespace Ivy::G
 {

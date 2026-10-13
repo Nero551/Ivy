@@ -1,8 +1,8 @@
 #include "Cubemap.hpp"
 
 #include "../../Utilities/Debug/Log.hpp"
+#include "../OpenGL.hpp"
 #include "Graphics/Texture/Texture.hpp"
-#include "OpenGL.hpp"
 #include <algorithm>
 #include <cmath>
 

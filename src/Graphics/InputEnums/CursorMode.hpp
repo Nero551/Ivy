@@ -1,9 +1,10 @@
 #pragma once
+#include "../OpenGL.hpp"
 
-namespace Ivy::I
+namespace Ivy::G
 {
 /** @brief Specifies how the mouse cursor is handled by the window. */
-enum class MouseMode
+enum class CursorMode
 {
     /** @brief The cursor is visible and unrestricted. */
     Normal = GLFW_CURSOR_NORMAL,
@@ -17,4 +18,4 @@ enum class MouseMode
     /** @brief The cursor is visible and confined to the window. */
     Captured = GLFW_CURSOR_CAPTURED
 };
-} // namespace Ivy::I
+} // namespace Ivy::G
