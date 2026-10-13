@@ -4,8 +4,10 @@
 #include "Graphics/OpenGLProfile.hpp"
 
 #include <OpenGL.hpp>
+#include <concepts>
 #include <functional>
 #include <string>
+#include <type_traits>
 
 #include "Utilities/Image.hpp"
 
@@ -14,7 +16,7 @@ namespace Ivy::G
 
 /**
  * @brief Wrapper around a GLFW window.
- * Owns the underlying GLFW window and provides basic window
+ * Owns the underlying GLFW window and provides window
  * management and event handling.
  */
 struct Window
@@ -52,7 +54,7 @@ struct Window
     bool IsTerminated() const;
 
     /** @brief Returns the window's width-to-height ratio. */
-    [[nodiscard]] float GetAspectRatio() const;
+    float GetAspectRatio() const;
 
     void MakeCurrentContext();
 
@@ -97,23 +99,62 @@ struct Window
 
     GLFWPlatform GetPlatform() const;
 
-    template <typename T> void SetUserPointer(T* object)
+    template <typename F>
+    void SetScrollCallback(F&& f)
+        requires(std::same_as<std::invoke_result_t<F, Window&, double, double>, void>)
     {
-        glfwSetWindowUserPointer(m_GlfwWindow, object);
+        m_ScrollCallback = std::forward<F>(f);
+        glfwSetScrollCallback(m_GlfwWindow,
+            [](GLFWwindow* w, const double x, const double y)
+            {
+                Window* win = static_cast<Window*>(glfwGetWindowUserPointer(w));
+                if (win == nullptr || !win->m_ScrollCallback)
+                {
+                    return;
+                }
+                win->m_ScrollCallback(*win, x, y);
+            });
     }
-
-    template <typename T> T* GetUserPointer()
+    template <typename F>
+    void SetCursorPosCallback(F&& f)
+        requires(std::same_as<std::invoke_result_t<F, Window&, double, double>, void>)
     {
-        return static_cast<T*>(glfwGetWindowUserPointer(m_GlfwWindow));
+        m_CursorPosCallback = std::forward<F>(f);
+        glfwSetCursorPosCallback(m_GlfwWindow,
+            [](GLFWwindow* w, const double x, const double y)
+            {
+                Window* win = static_cast<Window*>(glfwGetWindowUserPointer(w));
+                if (win == nullptr || !win->m_CursorPosCallback)
+                {
+                    return;
+                }
+                win->m_CursorPosCallback(*win, x, y);
+            });
     }
-
-    void SetScrollCallback(GLFWscrollfun f);
-    void SetCursorPosCallback(GLFWcursorposfun f);
-    void SetFrameBufferSizeCallback(GLFWframebuffersizefun f);
+    template <typename F>
+    void SetFramebufferSizeCallback(F&& f)
+        requires(std::same_as<std::invoke_result_t<F, Window&, int, int>, void>)
+    {
+        m_FramebufferSizeCallback = std::forward<F>(f);
+        glfwSetFramebufferSizeCallback(m_GlfwWindow,
+            [](GLFWwindow* w, const int x, const int y)
+            {
+                Window* win = static_cast<Window*>(glfwGetWindowUserPointer(w));
+                if (win == nullptr || !win->m_FramebufferSizeCallback)
+                {
+                    return;
+                }
+                win->m_FramebufferSizeCallback(*win, x, y);
+            });
+    }
 
   private:
     GLFWwindow* m_GlfwWindow;
     GLFWPlatform m_Platform;
+
+    std::function<void(Window&, double, double)> m_ScrollCallback;
+    std::function<void(Window&, double, double)> m_CursorPosCallback;
+    std::function<void(Window&, int, int)> m_FramebufferSizeCallback;
 
     void SetConfiguration();
 };

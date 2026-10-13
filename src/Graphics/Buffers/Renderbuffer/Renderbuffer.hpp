@@ -37,7 +37,7 @@ struct Renderbuffer
     explicit Renderbuffer(const std::string& name) : m_Name(name) {}
 
     /** @brief Gets the resource name. */
-    [[nodiscard]] const std::string& GetName() const
+    const std::string& GetName() const
     {
         return m_Name;
     }

@@ -1,8 +1,6 @@
 #include "Input.hpp"
-
-#include <GLFW/glfw3.h>
-
 #include "Core/Engine.hpp"
+#include "Graphics/Window.hpp"
 #include "Math/Vector/Vector2.hpp"
 #include "Modules/Input/Enums/Keys.hpp"
 #include "Modules/Input/Enums/MouseButton.hpp"
@@ -86,18 +84,17 @@ void Input::Start()
 {
     G::Window& window = m_Engine.Window;
     window.SetCursorPosCallback(
-        [](GLFWwindow* w, const double xPos, const double yPos)
+        [&](G::Window& win, const double xPos, const double yPos)
         {
-            C::Engine* engine = static_cast<C::Engine*>(glfwGetWindowUserPointer(w));
-            engine->GetModule<Input>().m_MousePosition = {static_cast<float>(xPos), static_cast<float>(yPos)};
+            m_Engine.GetModule<Input>().m_MousePosition = {
+                static_cast<float>(xPos), static_cast<float>(yPos)};
         });
     ;
 
-    glfwSetScrollCallback(window.GetGlfwWindow(),
-        [](GLFWwindow* w, const double xOffset, const double yOffset)
+    window.SetScrollCallback(
+        [&](G::Window& win, const double xOffset, const double yOffset)
         {
-            C::Engine* engine = static_cast<C::Engine*>(glfwGetWindowUserPointer(w));
-            engine->GetModule<Input>().m_ScrollOffset = {
+            m_Engine.GetModule<Input>().m_ScrollOffset = {
                 static_cast<float>(xOffset), static_cast<float>(yOffset)};
         });
 }

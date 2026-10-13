@@ -47,17 +47,17 @@ struct Texture
      *
      * @return Texture target used when binding and configuring the texture.
      */
-    [[nodiscard]] TextureTarget GetTarget() const;
+    TextureTarget GetTarget() const;
 
     /** @brief Gets the resource name. */
-    [[nodiscard]] const std::string& GetName() const;
+    const std::string& GetName() const;
 
     /**
      * @brief Gets the OpenGL texture object ID.
      *
      * @return OpenGL texture ID, or 0 if no texture object has been generated.
      */
-    [[nodiscard]] unsigned int GetId() const;
+    unsigned int GetId() const;
 
     /**
      * @brief Releases the current OpenGL texture object.
@@ -71,7 +71,7 @@ struct Texture
      *
      * @return true if an OpenGL texture object exists, otherwise false.
      */
-    [[nodiscard]] bool IsGenerated() const;
+    bool IsGenerated() const;
 
     /**
      * @brief Generates the OpenGL texture object and its storage.

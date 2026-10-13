@@ -3,7 +3,7 @@
 #include "Graphics/GLFWPlatform.hpp"
 #include "OpenGL.hpp"
 #include "Utilities/Image.hpp"
-#include <GLFW/glfw3.h>
+#include <functional>
 #include <string>
 
 namespace Ivy::G
@@ -34,6 +34,7 @@ void Window::Generate(const int width, const int height, const std::string& titl
     U::Log::Info(glGetString(GL_VERSION));
 
     glViewport(0, 0, width, height);
+    glfwSetWindowUserPointer(m_GlfwWindow, this);
 }
 void Window::Terminate()
 {
@@ -135,21 +136,6 @@ GLFWwindow* Window::GetGlfwWindow() const
 GLFWPlatform Window::GetPlatform() const
 {
     return m_Platform;
-}
-
-void Window::SetScrollCallback(GLFWscrollfun f)
-{
-    glfwSetScrollCallback(m_GlfwWindow, f);
-}
-
-void Window::SetCursorPosCallback(GLFWcursorposfun f)
-{
-    glfwSetCursorPosCallback(m_GlfwWindow, f);
-}
-
-void Window::SetFrameBufferSizeCallback(GLFWframebuffersizefun f)
-{
-    glfwSetFramebufferSizeCallback(m_GlfwWindow, f);
 }
 
 void Window::SetConfiguration()

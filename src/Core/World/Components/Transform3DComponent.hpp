@@ -37,17 +37,17 @@ struct Transform3DComponent : C::Component
         return GetModelMatrix().ToMatrix3().Inverse().Transpose();
     }
 
-    [[nodiscard]] M::Vector<3> GetRight() const
+    M::Vector<3> GetRight() const
     {
         return GlobalRotation().Transform({1, 0, 0});
     }
 
-    [[nodiscard]] M::Vector<3> GetUp() const
+    M::Vector<3> GetUp() const
     {
         return GlobalRotation().Transform({0, 1, 0});
     }
 
-    [[nodiscard]] M::Vector<3> GetForward() const
+    M::Vector<3> GetForward() const
     {
         return GlobalRotation().Transform({0, 0, -1});
     }

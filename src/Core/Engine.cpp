@@ -1,5 +1,4 @@
 #include "Engine.hpp"
-#include <GLFW/glfw3.h>
 
 #include "Core/Service.hpp"
 #include "Core/Services/EventBus/EventBus.hpp"
@@ -66,7 +65,6 @@ void Engine::Start()
 {
     G::GraphicsContext::Initialize();
     Window.Generate(800, 600, "Ivy");
-    Window.SetUserPointer(this);
     Configure();
 
     TracyGpuContext;

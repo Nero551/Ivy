@@ -75,13 +75,13 @@ template <typename T> struct CheckedPtr
     }
 
     /** @brief Returns the stored raw pointer without validation. */
-    [[nodiscard]] T* Get() const
+    T* Get() const
     {
         return m_Ptr;
     }
 
     /** @brief Checks whether the pointer is null. */
-    [[nodiscard]] bool IsNull() const
+    bool IsNull() const
     {
         return m_Ptr == nullptr;
     }

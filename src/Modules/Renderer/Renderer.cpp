@@ -31,6 +31,7 @@
 #include "Graphics/Texture/TextureFilter.hpp"
 #include "Graphics/Texture/TextureFormat.hpp"
 #include "Graphics/Texture/TextureInternalFormat.hpp"
+#include "Graphics/Window.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "OpenGL.hpp"
 #include "RenderBatch.hpp"
@@ -89,12 +90,11 @@ void Renderer::SetupFramebuffer()
 
     Framebuffer->Get().AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
 
-    m_Engine.Window.SetFrameBufferSizeCallback(
-        [](GLFWwindow* win, const int w, const int h)
+    m_Engine.Window.SetFramebufferSizeCallback(
+        [&](G::Window& win, const int w, const int h)
         {
-            C::Engine* engine = static_cast<C::Engine*>(glfwGetWindowUserPointer(win));
             G::GraphicsContext::SetViewport(0, 0, w, h);
-            auto& graphics = engine->GetModule<Renderer>();
+            auto& graphics = m_Engine.GetModule<Renderer>();
             graphics.MSAAFramebuffer->Get().Resize(w, h);
             graphics.Framebuffer->Get().Resize(w, h);
         });
