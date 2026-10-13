@@ -40,6 +40,8 @@ namespace Sketch
 // or just a perspective but flat (no x or y just z (front and back) ) ?
 //
 //TODO: i need genuine move and copy semantics/constructors for everything in Graphics section.
+//
+//TODO: syncthing, zed, blender, inkscape, krita, davinci resolve, material maker, obsidian, git, lmms, penpot, audacity
 
 using namespace Ivy;
 
