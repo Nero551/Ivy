@@ -1,5 +1,5 @@
 #pragma once
-#include "OpenGL.hpp"
+#include "Graphics/OpenGL.hpp"
 #include "Uniform.hpp"
 
 namespace Ivy::G
@@ -8,7 +8,7 @@ struct BoolUniform : Uniform
 {
     bool Value;
 
-    BoolUniform(const std::string& name, bool value) : Uniform(name), Value(value) {}
+    BoolUniform(std::string_view name, bool value) : Uniform(name), Value(value) {}
 
     void Upload(int location) override
     {

@@ -8,7 +8,7 @@ struct FloatUniform : Uniform
 {
     float Value;
 
-    FloatUniform(const std::string& name, const float value) : Uniform(name), Value(value) {}
+    FloatUniform(std::string_view name, const float value) : Uniform(name), Value(value) {}
 
     void Upload(const int location) override
     {

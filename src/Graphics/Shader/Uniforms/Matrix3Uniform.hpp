@@ -9,7 +9,7 @@ struct Matrix3Uniform : Uniform
 {
     M::Matrix<3, 3> Value;
 
-    Matrix3Uniform(const std::string& name, const M::Matrix<3, 3>& value) : Uniform(name), Value(value) {}
+    Matrix3Uniform(std::string_view name, const M::Matrix<3, 3>& value) : Uniform(name), Value(value) {}
 
     void Upload(const int location) override
     {

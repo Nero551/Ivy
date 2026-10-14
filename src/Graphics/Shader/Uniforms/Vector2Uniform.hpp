@@ -8,7 +8,7 @@ struct Vector2Uniform : Uniform
 {
     M::Vector<2> Value;
 
-    Vector2Uniform(const std::string& name, const M::Vector<2>& value) : Uniform(name), Value(value) {}
+    Vector2Uniform(std::string_view name, const M::Vector<2>& value) : Uniform(name), Value(value) {}
 
     void Upload(int location) override
     {

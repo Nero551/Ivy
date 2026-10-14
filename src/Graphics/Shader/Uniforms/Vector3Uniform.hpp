@@ -9,7 +9,7 @@ struct Vector3Uniform : Uniform
 {
     M::Vector<3> Value;
 
-    Vector3Uniform(const std::string& name, const M::Vector<3>& value) : Uniform(name), Value(value) {}
+    Vector3Uniform(std::string_view name, const M::Vector<3>& value) : Uniform(name), Value(value) {}
 
     void Upload(const int location) override
     {

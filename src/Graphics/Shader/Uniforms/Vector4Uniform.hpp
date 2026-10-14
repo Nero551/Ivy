@@ -1,4 +1,5 @@
 #pragma once
+#include "Graphics/OpenGL.hpp"
 #include "Math/Vector/Vector4.hpp"
 #include "Uniform.hpp"
 
@@ -8,7 +9,7 @@ struct Vector4Uniform : Uniform
 {
     M::Vector<4> Value;
 
-    Vector4Uniform(const std::string& name, const M::Vector<4>& value) : Uniform(name), Value(value) {}
+    Vector4Uniform(std::string_view name, const M::Vector<4>& value) : Uniform(name), Value(value) {}
 
     void Upload(const int location) override
     {

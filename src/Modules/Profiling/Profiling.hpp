@@ -9,8 +9,8 @@ namespace Ivy
 struct Profiling : C::Module
 {
     using C::Module::Module;
-    double FrameMs;
-    int FrameCount;
+    double FrameMs{0};
+    int FrameCount{0};
 
   protected:
     void Start() override;
@@ -19,5 +19,6 @@ struct Profiling : C::Module
 
   private:
     std::deque<double> FrameTimes;
+    double m_Elapsed{0};
 };
 } // namespace Ivy

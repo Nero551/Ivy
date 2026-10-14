@@ -109,7 +109,7 @@ void Shader::CreateProgram()
     }
 }
 
-int Shader::GetUniformLocation(const std::string& name)
+int Shader::GetUniformLocation(std::string_view name)
 {
     int location;
 

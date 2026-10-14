@@ -1,17 +1,17 @@
 #include "Profiling.hpp"
 
 #include "Core/Engine.hpp"
-#include <string>
+
+#include <array>
+#include <format>
 
 namespace Ivy
 {
 void Profiling::Start() {}
 
-static double elapsed = 0;
-
 void Profiling::Update(const double dt)
 {
-    elapsed += dt;
+    m_Elapsed += dt;
 
     FrameMs = dt * 1000.0;
     ++FrameCount;
@@ -20,28 +20,31 @@ void Profiling::Update(const double dt)
     {
         FrameTimes.pop_front();
     }
-    FrameTimes.push_back(dt * 1000.0);
 
-    if (elapsed >= 1.0)
+    FrameTimes.push_back(FrameMs);
+
+    if (m_Elapsed >= 1.0)
     {
-        elapsed = 0.0;
+        m_Elapsed = 0.0;
 
         double sum = 0.0;
 
-        for (double frame : FrameTimes)
+        for (const double frame : FrameTimes)
         {
             sum += frame;
         }
 
-        double averageFrameMs = sum / FrameTimes.size();
+        const double averageFrameMs = sum / FrameTimes.size();
 
-        m_Engine.Window.SetTitle("FPS: " + std::to_string(FrameCount) + " | " +
-            "AVG: " + std::to_string(averageFrameMs) + " ms" + " | " + std::to_string(FrameMs) + " ms");
+        std::array<char, 128> buffer;
 
-        // Ivy::U::Logger::Info(
-        //     "FPS: " + std::to_string(FrameCount) + " | " + "AVG: " +
-        //     std::to_string(averageFrameMs) + " ms" + " | " +
-        //     std::to_string(FrameMs) + " ms");
+        const auto end = std::format_to(
+            buffer.begin(), "FPS: {} | AVG: {:.2f} ms | {:.2f} ms", FrameCount, averageFrameMs, FrameMs);
+
+        *end = '\0';
+
+        m_Engine.Window.SetTitle(buffer.data());
+
         FrameCount = 0;
     }
 }

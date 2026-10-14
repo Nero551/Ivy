@@ -4,9 +4,9 @@ namespace Ivy::G
 {
 struct Uniform
 {
-    std::string Name;
+    std::string_view Name;
 
-    Uniform(const std::string& name) : Name(name) {};
+    Uniform(std::string_view name) : Name(name) {};
     virtual ~Uniform() {}
 
     virtual void Upload(int location) {};
