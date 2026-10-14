@@ -230,6 +230,6 @@ inline void Test()
     P::Dimension<float, P::Length<1>> r = 10;
     P::Dimension<float, P::Velocity> v = P::Sqrt(g * r) * 0.3;
 
-    // U::Log::Info((-1 / g) * ((P::Pow<2>(v) / r) - g));
+    U::Log::Info((-1 / g) * ((P::Pow<2>(v) / r) - g));
 }
 } // namespace Sketch

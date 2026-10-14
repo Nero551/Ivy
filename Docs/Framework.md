@@ -11,10 +11,12 @@ Main
 └── Engine
     ├── Modules
     │   └── Systems
+    ├── ECS
+    │   └── Entities
+    │   └── Components
     └── World
-        ├── Systems
-        └── Entities
-        └── Components
+        └── Systems
+
 ```
 
 ## Main
@@ -31,6 +33,7 @@ It owns and updates:
 
 - The **Window**
 - The **World**
+- The **ECS**
 - All **Modules**
 
 The engine is responsible for driving the application's lifecycle (startup, update loop, rendering, shutdown).
@@ -47,7 +50,7 @@ Examples include:
 - Physics simulation
 
 Each module owns one or more **Systems**. The module handles the lifecycle of all related **Systems**.
-It can also contain premade **Entities** & **Components**.
+It can also contain pre-made **Entities** & **Components**.
 
 ---
 
@@ -64,7 +67,13 @@ Examples include:
 
 ## World
 
-The world owns the entities and the component query (which owns component pools).
+owns core systems (ex: transform system).
+
+---
+
+## ECS (Entity Component System)
+
+Owns the entities and the component pool query (which owns component pools and those own components).
 It is responsible for creating, storing & removing entities.
 
 ---
