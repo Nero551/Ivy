@@ -6,6 +6,7 @@
 #include "DataStructures/Indirect2DVector.hpp"
 #include "DataStructures/SparseSetAoS.hpp"
 #include "DataStructures/SparseSetSoA.hpp"
+#include "DataStructures/StringMap.hpp"
 #include "DataStructures/TypedVector.hpp"
 #include "DataStructures/TypeTree.hpp"
 #include "Debug/Inspector.hpp"

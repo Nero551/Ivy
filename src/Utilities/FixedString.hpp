@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 namespace Ivy::U
 {
 
@@ -27,6 +28,22 @@ template <std::size_t N> struct FixedString
     constexpr bool Empty() const
     {
         return Data[0] == '\0';
+    }
+
+#include <cstdint>
+#include <string_view>
+
+    constexpr std::uint64_t HashString(const std::string_view value)
+    {
+        std::uint64_t hash = 14695981039346656037ULL;
+
+        for (const char character : value)
+        {
+            hash ^= static_cast<unsigned char>(character);
+            hash *= 1099511628211ULL;
+        }
+
+        return hash;
     }
 };
 

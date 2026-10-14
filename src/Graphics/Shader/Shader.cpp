@@ -68,7 +68,11 @@ void Shader::Reload()
         source->Reload();
     }
 
-    m_UniformLocations.clear();
+    for (UniformPair& uniPair : m_PendingUniforms)
+    {
+        uniPair.Location = -1;
+    }
+
     glDeleteProgram(m_Id);
     m_Id = 0;
 }
@@ -119,38 +123,30 @@ void Shader::CreateProgram()
     }
 }
 
-int Shader::GetUniformLocation(const std::string& name)
+int Shader::GetUniformLocation(std::string_view name)
 {
     int location;
 
-    if (m_UniformLocations.contains(name))
+    if (m_PendingUniforms.Contains(name) && m_PendingUniforms[name].Location > 0)
     {
-        location = m_UniformLocations[name];
+        location = m_PendingUniforms[name].Location;
     }
     else
     {
         location = glGetUniformLocation(m_Id, name.data());
-
         if (location == -1)
         {
             // U::Logger::Warning("Shader: " + Name + " Uniform Not Found: " + name);
-            return -1;
         }
-
-        m_UniformLocations[name] = location;
     }
     return location;
 }
 
 void Shader::UploadUniforms()
 {
-    for (auto& [uniformName, uniform] : m_PendingUniforms)
+    for (UniformPair& uniPair : m_PendingUniforms)
     {
-        int location = GetUniformLocation(uniformName);
-        if (location != -1)
-        {
-            UploadUniform(uniform, location);
-        }
+        UploadUniform(uniPair.Uniform, uniPair.Location);
     }
 }
 

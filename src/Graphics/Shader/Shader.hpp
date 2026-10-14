@@ -10,7 +10,9 @@
 #include "Math/Vector/Vector4.hpp"
 #include "ShaderSource.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/StringMap.hpp"
 #include <string>
+#include <string_view>
 #include <variant>
 
 namespace Ivy::G
@@ -22,8 +24,6 @@ namespace Ivy::G
  */
 struct Shader
 {
-    using Uniform = std::variant<bool, int, float, M::Vector<2>, M::Vector<3>, M::Vector<4>, M::Matrix<3, 3>,
-        M::Matrix<4, 4>>;
     /**
      * @brief Whether the shader supports hot reloading.
      * When enabled, the shader can be reloaded when its source changes.
@@ -64,9 +64,19 @@ struct Shader
      *
      * @note The uniform is uploaded the next time the shader is used.
      */
-    void SetUniform(const std::string& name, const Uniform& uniform)
+
+    using Uniform = std::variant<bool, int, float, M::Vector<2>, M::Vector<3>, M::Vector<4>, M::Matrix<3, 3>,
+        M::Matrix<4, 4>>;
+
+    struct UniformPair
     {
-        m_PendingUniforms.insert_or_assign(name, uniform);
+        Uniform Uniform;
+        int Location;
+    };
+
+    void SetUniform(std::string_view name, const Uniform& uniform)
+    {
+        m_PendingUniforms[name] = UniformPair{.Uniform = uniform, .Location = GetUniformLocation(name)};
     }
 
     void AssignSource(ShaderSource& source);
@@ -83,14 +93,12 @@ struct Shader
     /** @brief OpenGL handle for the shader program. */
     unsigned int m_Id = 0;
 
-    std::unordered_map<std::string, int> m_UniformLocations;
-
     /**
      * @brief Uniform values waiting to be uploaded to the GPU.
      * Uniforms are stored by name and resolved to OpenGL locations
      * when they are uploaded.
      */
-    std::unordered_map<std::string, Uniform> m_PendingUniforms;
+    U::StringMap<UniformPair> m_PendingUniforms;
 
     std::vector<U::CheckedPtr<ShaderSource>> m_Sources;
 
@@ -101,7 +109,7 @@ struct Shader
      * @param name Name of the shader uniform.
      * @return OpenGL uniform location.
      */
-    int GetUniformLocation(const std::string& name);
+    int GetUniformLocation(std::string_view name);
 
     void UploadUniforms();
 
