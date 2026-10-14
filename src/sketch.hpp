@@ -224,9 +224,6 @@ template <M::Scalar T> struct Dual
     }
 };
 
-//TODO: switch out the whole shader uniforms system
-//TODO: for std::variant.
-
 inline void Test()
 {
     P::Dimension<float, P::Acceleration> g = 9.8;

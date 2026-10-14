@@ -18,15 +18,17 @@
 namespace Ivy::G
 {
 /**
- * @brief Represents an OpenGL shader program.
- * manages the lifetime and use of an OpenGL shader program,
- * including its source files and pending uniform values.
+ * @brief Represents an OpenGL shader program resource.
+ *
+ * Manages shader sources, program creation and reloading, and uniform values.
+ * Uniform values are stored by name and uploaded when the program is activated.
  */
 struct Shader
 {
     /**
-     * @brief Whether the shader supports hot reloading.
-     * When enabled, the shader can be reloaded when its source changes.
+     * @brief Enables automatic reloading when shader source changes.
+     *
+     * @note The reload mechanism must be triggered externally.
      */
     bool HotReload = false;
 
@@ -36,83 +38,135 @@ struct Shader
      */
     explicit Shader(const std::string& name) : m_Name(name) {}
 
-    /** @brief Destroys the shader and releases its OpenGL program. */
+    /** @brief Deletes the OpenGL program when the resource is destroyed. */
     ~Shader();
 
     /**
-     * @brief Gets the OpenGL shader program ID.
-     * @return OpenGL program ID.
+     * @brief Gets the OpenGL program handle.
+     * @return The program ID, or zero if no program has been created.
      */
     unsigned int GetId() const;
 
-    /** @brief Gets the resource name. */
+    /**
+     * @brief Gets the shader resource name.
+     * @return The resource name.
+     */
     const std::string& GetName() const;
 
-    /** @brief Activates the shader and uploads pending uniforms. */
+    /**
+     * @brief Activates the program and uploads its pending uniform values.
+     *
+     * Creates and links the program on first use if necessary.
+     */
     void Use();
 
-    /** @brief Checks if the shader program exists.
-     * @return  true if exists , false if not.
+    /**
+     * @brief Checks whether an OpenGL program has been created.
+     * @return True if the program handle is nonzero.
      */
     bool IsProgramCreated() const;
 
     /**
-     * @brief Queues a uniform value for upload.
+     * @brief Represents a value supported by the uniform upload mechanism.
      *
-     * @tparam T Uniform type derived from @ref Uniform.
-     * @param uniform Uniform value to queue.
-     *
-     * @note The uniform is uploaded the next time the shader is used.
+     * Supports Boolean, integer, and floating-point scalars; 2D, 3D, and 4D
+     * vectors; and 3x3 and 4x4 matrices.
      */
-
     using Uniform = std::variant<bool, int, float, M::Vector<2>, M::Vector<3>, M::Vector<4>, M::Matrix<3, 3>,
         M::Matrix<4, 4>>;
 
+    /**
+     * @brief Stores a uniform value and its resolved OpenGL location.
+     */
     struct UniformPair
     {
+        /** @brief Value to upload to the shader program. */
         Uniform Uniform;
+
+        /**
+         * @brief OpenGL location of the uniform in the linked program.
+         *
+         * A value of -1 indicates that the location is invalid or has not
+         * been resolved successfully.
+         */
         int Location;
     };
 
+    /**
+     * @brief Sets or replaces a pending uniform value.
+     *
+     * Resolves the uniform location and stores the value for upload by Use().
+     *
+     * @param name Name of the uniform in the shader.
+     * @param uniform Value to upload.
+     *
+     * @note The uniform name must be null-terminated when passed to OpenGL.
+     */
     void SetUniform(std::string_view name, const Uniform& uniform)
     {
         m_PendingUniforms[name] = UniformPair{.Uniform = uniform, .Location = GetUniformLocation(name)};
     }
 
+    /**
+     * @brief Associates a shader source with this program.
+     *
+     * Sources with a stage already assigned to this program are ignored.
+     *
+     * @param source Shader source to associate.
+     */
     void AssignSource(ShaderSource& source);
 
-    /** @brief deletes the current shader program and uniform locations , which
-     * causes them to be recreated on Use() */
+    /**
+     * @brief Reloads the shader sources and invalidates the current program.
+     *
+     * Deletes the linked program and invalidates cached uniform locations.
+     * The program is recreated on the next call to Use().
+     */
     void Reload();
 
+    /**
+     * @brief Gets the shader sources associated with this program.
+     * @return Mutable references to the checked source pointers.
+     */
     std::vector<U::CheckedPtr<ShaderSource>>& GetSources();
 
   private:
+    /** @brief Name used to identify this shader resource. */
     std::string m_Name;
 
-    /** @brief OpenGL handle for the shader program. */
+    /** @brief OpenGL handle for the linked shader program. */
     unsigned int m_Id = 0;
 
     /**
-     * @brief Uniform values waiting to be uploaded to the GPU.
-     * Uniforms are stored by name and resolved to OpenGL locations
-     * when they are uploaded.
+     * @brief Uniform values and their OpenGL locations, indexed by uniform name.
+     * Locations are cached alongside values and invalidated when the program is reloaded.
      */
     U::StringMap<UniformPair> m_PendingUniforms;
 
+    /** @brief Shader sources attached to this program. */
     std::vector<U::CheckedPtr<ShaderSource>> m_Sources;
 
+    /**
+     * @brief Creates and links the OpenGL program from the assigned sources.
+     * Does nothing if a program already exists or no sources are assigned.
+     */
     void CreateProgram();
 
     /**
-     * @brief Gets and caches the OpenGL location of a uniform.
-     * @param name Name of the shader uniform.
-     * @return OpenGL uniform location.
+     * @brief Resolves the OpenGL location of a uniform.
+     * @param name Name of the uniform in the shader.
+     * @return The uniform location, or -1 if it cannot be found.
      */
     int GetUniformLocation(std::string_view name);
 
+    /** @brief Uploads all stored uniform values to the active program. */
     void UploadUniforms();
 
-    void UploadUniform(const Uniform& uniform, const int location);
+    /**
+     * @brief Uploads a uniform value using its corresponding OpenGL function.
+     * @param uniform Value to upload.
+     * @param location OpenGL location of the uniform.
+     */
+    void UploadUniform(const Uniform& uniform, int location);
 };
 } // namespace Ivy::G
