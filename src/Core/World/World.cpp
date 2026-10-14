@@ -37,7 +37,7 @@ Entity& World::GetCamera()
 //TODO: quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
 void World::Start()
 {
-    AddSystem<Transform3DSystem>();
+    // AddSystem<Transform3DSystem>();
     AddSystem<StressTester>();
 
     m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);

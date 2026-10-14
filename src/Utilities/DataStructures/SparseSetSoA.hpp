@@ -55,9 +55,8 @@ struct SparseSetSoA
 
         bool operator==(const BasicIterator& other) const
         {
-            return Index == other.Index;
+            return Set == other.Set && Index == other.Index;
         }
-
         bool operator!=(const BasicIterator& other) const
         {
             return !(*this == other);

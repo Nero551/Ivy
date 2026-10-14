@@ -64,7 +64,6 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 
 ### Week 05 · July 24–30
 
-- Assimp model loading
 - Shader `#include` preprocessing
 - Parent-child transform relationships
 
@@ -145,3 +144,9 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 
 - Linear system of equations solver
 - xmake build system
+
+---
+
+### Week 16 · October 11–18
+
+- Core framework redesign & cleanup

@@ -23,7 +23,7 @@ void Entity::DestroyChild(const unsigned int id)
         return;
     }
 
-    auto& child = m_ECS.FindEntity(id);
+    auto& child = m_ECS.GetEntity(id);
     child.Destroy();
 }
 
@@ -71,11 +71,16 @@ void Entity::DetachChild(const unsigned int id)
 {
     if (m_Children.Erase(id))
     {
-        m_ECS.FindEntity(id).m_Parent = 0;
+        m_ECS.GetEntity(id).m_Parent = 0;
     }
 }
 
 Entity& Entity::GetChild(const unsigned int id)
+{
+    return m_ECS.GetEntity(id);
+}
+
+Entity& Entity::FindChild(const unsigned int id)
 {
     if (HasChild(id))
     {
@@ -85,7 +90,7 @@ Entity& Entity::GetChild(const unsigned int id)
     U::Log::Fatal(std::format("Entity {} has no child {}", m_Id, id));
 }
 
-U::CheckedPtr<Entity> Entity::TryGetChild(const unsigned int id)
+U::CheckedPtr<Entity> Entity::TryFindChild(const unsigned int id)
 {
     if (HasChild(id))
     {
@@ -112,7 +117,7 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetChildren()
 
     for (auto id : m_Children)
     {
-        children.emplace_back(&m_ECS.FindEntity(id));
+        children.emplace_back(&m_ECS.GetEntity(id));
     }
 
     return children;
@@ -151,7 +156,7 @@ bool Entity::IsDescendantOf(const unsigned int id) const
             return true;
         }
 
-        current = m_ECS.FindEntity(current).m_Parent;
+        current = m_ECS.GetEntity(current).m_Parent;
     }
 
     return false;
@@ -165,7 +170,7 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetAncestors() const
 
     while (current != 0)
     {
-        Entity& entity = m_ECS.FindEntity(current);
+        Entity& entity = m_ECS.GetEntity(current);
         ancestors.emplace_back(&entity);
         current = entity.m_Parent;
     }
@@ -180,7 +185,7 @@ void Entity::ForEachAncestor(const std::function<void(unsigned int)>& callback) 
     while (current != 0)
     {
         callback(current);
-        const Entity& entity = m_ECS.FindEntity(current);
+        const Entity& entity = m_ECS.GetEntity(current);
         current = entity.m_Parent;
     }
 }
@@ -193,7 +198,7 @@ bool Entity::IsAncestorOf(const unsigned int entityId) const
             return true;
         }
 
-        const Entity& child = m_ECS.FindEntity(id);
+        const Entity& child = m_ECS.GetEntity(id);
 
         if (child.IsAncestorOf(entityId))
         {
@@ -209,13 +214,13 @@ bool Entity::HasAncestor(const unsigned int id) const
     return IsDescendantOf(id);
 }
 
-U::CheckedPtr<Entity> Entity::TryGetParent() const
+U::CheckedPtr<Entity> Entity::TryFindParent() const
 {
     if (m_Parent == 0)
     {
         return nullptr;
     }
-    return &m_ECS.FindEntity(m_Parent);
+    return m_ECS.TryFindEntity(m_Parent);
 }
 
 Entity& Entity::GetParent() const
@@ -257,7 +262,7 @@ Entity& Entity::GetRoot()
 
     while (current->HasParent())
     {
-        current = &m_ECS.FindEntity(current->m_Parent);
+        current = &m_ECS.GetEntity(current->m_Parent);
     }
 
     return *current;
@@ -267,7 +272,7 @@ void Entity::RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, con
 {
     for (auto id : entity.m_Children)
     {
-        Entity& child = m_ECS.FindEntity(id);
+        Entity& child = m_ECS.GetEntity(id);
 
         entities.emplace_back(&child);
         RecursiveChildren(entities, child);

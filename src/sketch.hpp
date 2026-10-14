@@ -31,6 +31,9 @@ namespace Sketch
 
 //TODO: make transform system cache its own vector of the root's children that's updated on events
 // that will make it way less expensive performance-wise.
+//TODO: not running renderer module sends fps from 15 to 34 (on 1.7m entities).
+//TODO: not running renderer + transform system sends fps from 34 to 6500 (on 1.7m entities).
+//TODO: its the ForEachDescendant thing.
 //
 //TODO: make a 2D system for the engine (support for 2D).
 // transforms will be vector2 for pos & scale and complex number or a float for rotation.

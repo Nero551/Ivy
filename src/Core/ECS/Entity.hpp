@@ -43,11 +43,13 @@ struct Entity
     /** @brief Detaches a direct child by ID. */
     void DetachChild(unsigned int id);
 
+    Entity& GetChild(const unsigned int id);
+
     /** @brief Returns a direct child by ID. */
-    Entity& GetChild(unsigned int id);
+    Entity& FindChild(unsigned int id);
 
     /** @brief Returns a direct child by ID, or null if it does not exist. */
-    U::CheckedPtr<Entity> TryGetChild(unsigned int id);
+    U::CheckedPtr<Entity> TryFindChild(unsigned int id);
 
     /** @brief Returns whether the entity has the specified direct child. */
     bool HasChild(unsigned int id) const;
@@ -62,7 +64,7 @@ struct Entity
     template <typename F> requires std::invocable<F&, unsigned int>
     void ForEachChild(F&& callback)
     {
-        for (const auto id : m_Children)
+        for (const unsigned int id : m_Children)
         {
             callback(id);
         }
@@ -105,7 +107,7 @@ struct Entity
     bool HasAncestor(unsigned int id) const;
 
     /** @brief Returns the entity's parent, or null if it has none. */
-    U::CheckedPtr<Entity> TryGetParent() const;
+    U::CheckedPtr<Entity> TryFindParent() const;
 
     /** @brief Returns the entity's parent. */
     Entity& GetParent() const;
