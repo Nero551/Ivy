@@ -1,15 +1,25 @@
 #include "Shader.hpp"
 
 #include "Graphics/OpenGL.hpp"
+#include <concepts>
 #include <string>
+#include <string_view>
+#include <type_traits>
 #include <vector>
 
 #include "../../Utilities/Debug/Log.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
+#include "Math/Matrix/Matrix3.hpp"
+#include "Math/Matrix/Matrix4.hpp"
+#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vector4.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include "Utilities/Debug/Inspector.hpp"
 
 namespace Ivy::G
 {
+
 Shader::~Shader()
 {
     glDeleteProgram(m_Id);
@@ -109,7 +119,7 @@ void Shader::CreateProgram()
     }
 }
 
-int Shader::GetUniformLocation(std::string_view name)
+int Shader::GetUniformLocation(const std::string& name)
 {
     int location;
 
@@ -139,8 +149,50 @@ void Shader::UploadUniforms()
         int location = GetUniformLocation(uniformName);
         if (location != -1)
         {
-            uniform->Upload(location);
+            UploadUniform(uniform, location);
         }
     }
+}
+
+void Shader::UploadUniform(const Uniform& uniform, const int location)
+{
+    uniform.visit(
+        [location](const auto& value)
+        {
+            using T = std::remove_cvref_t<decltype(value)>;
+
+            if constexpr (std::same_as<T, int> || std::same_as<T, bool>)
+            {
+                glUniform1i(location, value);
+            }
+            else if constexpr (std::same_as<T, float>)
+            {
+                glUniform1f(location, value);
+            }
+            else if constexpr (std::same_as<T, Ivy::M::Vector<2>>)
+            {
+                glUniform2fv(location, 1, &value.x);
+            }
+            else if constexpr (std::same_as<T, M::Vector<3>>)
+            {
+                glUniform3fv(location, 1, &value.x);
+            }
+            else if constexpr (std::same_as<T, M::Vector<4>>)
+            {
+                glUniform4fv(location, 1, &value.x);
+            }
+            else if constexpr (std::same_as<T, M::Matrix<3, 3>>)
+            {
+                glUniformMatrix3fv(location, 1, GL_FALSE, &value.Data()[0][0]);
+            }
+            else if constexpr (std::same_as<T, Ivy::M::Matrix<4, 4>>)
+            {
+                glUniformMatrix4fv(location, 1, GL_FALSE, &value.Data()[0][0]);
+            }
+            else
+            {
+                static_assert(U::Inspector::TInspect<T>{}, "Unsupported uniform type");
+            }
+        });
 }
 } // namespace Ivy::G

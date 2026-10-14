@@ -4,10 +4,6 @@
 #include <utility>
 
 #include "../../Utilities/Debug/Log.hpp"
-#include "../Shader/Uniforms/FloatUniform.hpp"
-#include "../Shader/Uniforms/IntUniform.hpp"
-#include "../Shader/Uniforms/Vector3Uniform.hpp"
-#include "../Shader/Uniforms/Vector4Uniform.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Texture/Texture.hpp"
 
@@ -38,7 +34,7 @@ void Material::Use()
     {
         if (m_CustomTextures[slot])
         {
-            Shader->SetUniform(IntUniform(m_CustomTextures[slot]->GetName(), slot));
+            Shader->SetUniform(m_CustomTextures[slot]->GetName(), slot);
             m_CustomTextures[slot]->Bind(slot);
         }
     }
@@ -52,12 +48,12 @@ void Material::Use()
 
 void Material::SetProperties() const
 {
-    Shader->SetUniform(Vector3Uniform("MATERIAL.Ambient", Ambient));
-    Shader->SetUniform(Vector3Uniform("MATERIAL.Diffuse", Diffuse));
-    Shader->SetUniform(Vector3Uniform("MATERIAL.Specular", Specular));
-    Shader->SetUniform(Vector3Uniform("MATERIAL.Emission", Emission));
-    Shader->SetUniform(FloatUniform("MATERIAL.Shininess", Shininess));
-    Shader->SetUniform(Vector4Uniform("MATERIAL.Color", Color));
+    Shader->SetUniform("MATERIAL.Ambient", Ambient);
+    Shader->SetUniform("MATERIAL.Diffuse", Diffuse);
+    Shader->SetUniform("MATERIAL.Specular", Specular);
+    Shader->SetUniform("MATERIAL.Emission", Emission);
+    Shader->SetUniform("MATERIAL.Shininess", Shininess);
+    Shader->SetUniform("MATERIAL.Color", Color);
 
     // Shader->SetUniform(IntUniform("MATERIAL.DiffuseMap", 16));
     // DiffuseMap->Bind(16);

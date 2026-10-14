@@ -1,9 +1,17 @@
 #pragma once
 
 #include "Core/Services/ResourceManager/Resource.hpp"
+#include "Math/Matrix/Matrix.hpp"
+#include "Math/Matrix/Matrix3.hpp"
+#include "Math/Matrix/Matrix4.hpp"
+#include "Math/Vector/Vector.hpp"
+#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vector4.hpp"
 #include "ShaderSource.hpp"
-#include "Uniforms/Uniform.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include <string>
+#include <variant>
 
 namespace Ivy::G
 {
@@ -14,6 +22,8 @@ namespace Ivy::G
  */
 struct Shader
 {
+    using Uniform = std::variant<bool, int, float, M::Vector<2>, M::Vector<3>, M::Vector<4>, M::Matrix<3, 3>,
+        M::Matrix<4, 4>>;
     /**
      * @brief Whether the shader supports hot reloading.
      * When enabled, the shader can be reloaded when its source changes.
@@ -54,18 +64,9 @@ struct Shader
      *
      * @note The uniform is uploaded the next time the shader is used.
      */
-    template <typename T> void SetUniform(const T& uniform) requires(std::derived_from<T, Uniform>)
+    void SetUniform(const std::string& name, const Uniform& uniform)
     {
-        auto it = m_PendingUniforms.find(uniform.Name);
-
-        if (it == m_PendingUniforms.end())
-        {
-            m_PendingUniforms.emplace(uniform.Name, std::make_unique<T>(uniform));
-        }
-        else
-        {
-            *static_cast<T*>(it->second.get()) = uniform;
-        }
+        m_PendingUniforms.insert_or_assign(name, uniform);
     }
 
     void AssignSource(ShaderSource& source);
@@ -82,14 +83,14 @@ struct Shader
     /** @brief OpenGL handle for the shader program. */
     unsigned int m_Id = 0;
 
-    std::unordered_map<std::string_view, int> m_UniformLocations;
+    std::unordered_map<std::string, int> m_UniformLocations;
 
     /**
      * @brief Uniform values waiting to be uploaded to the GPU.
      * Uniforms are stored by name and resolved to OpenGL locations
      * when they are uploaded.
      */
-    std::unordered_map<std::string_view, std::unique_ptr<Uniform>> m_PendingUniforms;
+    std::unordered_map<std::string, Uniform> m_PendingUniforms;
 
     std::vector<U::CheckedPtr<ShaderSource>> m_Sources;
 
@@ -100,8 +101,10 @@ struct Shader
      * @param name Name of the shader uniform.
      * @return OpenGL uniform location.
      */
-    int GetUniformLocation(std::string_view name);
+    int GetUniformLocation(const std::string& name);
 
     void UploadUniforms();
+
+    void UploadUniform(const Uniform& uniform, const int location);
 };
 } // namespace Ivy::G
