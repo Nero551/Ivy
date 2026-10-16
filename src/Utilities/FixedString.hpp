@@ -30,9 +30,6 @@ template <std::size_t N> struct FixedString
         return Data[0] == '\0';
     }
 
-#include <cstdint>
-#include <string_view>
-
     constexpr std::uint64_t HashString(const std::string_view value)
     {
         std::uint64_t hash = 14695981039346656037ULL;
@@ -44,6 +41,23 @@ template <std::size_t N> struct FixedString
         }
 
         return hash;
+    }
+
+    template <std::size_t M> constexpr FixedString<N + M - 1> operator+(const FixedString<M>& other) const
+    {
+        FixedString<N + M - 1> result{""};
+
+        for (std::size_t i = 0; i < N - 1; ++i)
+        {
+            result.Data[i] = Data[i];
+        }
+
+        for (std::size_t i = 0; i < M; ++i)
+        {
+            result.Data[N - 1 + i] = other.Data[i];
+        }
+
+        return result;
     }
 };
 

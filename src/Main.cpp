@@ -17,7 +17,7 @@ int main(const int argc, char* argv[])
     }
 
     Sketch::Test();
-    // return 0;
+    return 0;
 
     Ivy::C::Engine engine;
     engine.Run();
