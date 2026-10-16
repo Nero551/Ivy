@@ -1,7 +1,7 @@
 #include "Transform3DSystem.hpp"
 
 #include "Core/Engine.hpp"
-#include "Core/World/Components/Transform3DComponent.hpp"
+#include "Core/World/Components.hpp"
 
 namespace Ivy
 {
@@ -32,16 +32,16 @@ void Transform3DSystem::Update(double fdt)
                 {
                     auto& parentTransform = transformPool[parent.GetId()];
 
-                    transform.GlobalPosition = parentTransform.GlobalPosition + transform.Position;
-                    transform.GlobalRotation = parentTransform.GlobalRotation * transform.Rotation;
-                    transform.GlobalScale = parentTransform.GlobalScale * transform.Scale;
+                    transform.m_GlobalPosition = parentTransform.m_GlobalPosition + transform.Position;
+                    transform.m_GlobalRotation = parentTransform.m_GlobalRotation * transform.Rotation;
+                    transform.m_GlobalScale = parentTransform.m_GlobalScale * transform.Scale;
 
                     return;
                 }
             }
-            transform.GlobalPosition = transform.Position;
-            transform.GlobalRotation = transform.Rotation;
-            transform.GlobalScale = transform.Scale;
+            transform.m_GlobalPosition = transform.Position;
+            transform.m_GlobalRotation = transform.Rotation;
+            transform.m_GlobalScale = transform.Scale;
         });
 }
 } // namespace Ivy

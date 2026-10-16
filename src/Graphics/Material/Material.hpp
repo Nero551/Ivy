@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../Shader/Shader.hpp"
-#include "../Texture/Texture2D.hpp"
 #include "Blend/Blend.hpp"
 #include "Depth/Depth.hpp"
+#include "Graphics/Texture/Texture.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Math/Vector/Vector4.hpp"
 #include "Stencil/Stencil.hpp"

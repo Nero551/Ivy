@@ -68,7 +68,6 @@ struct Shader
 
     /**
      * @brief Represents a value supported by the uniform upload mechanism.
-     *
      * Supports Boolean, integer, and floating-point scalars; 2D, 3D, and 4D
      * vectors; and 3x3 and 4x4 matrices.
      */
@@ -86,7 +85,7 @@ struct Shader
         /**
          * @brief OpenGL location of the uniform in the linked program.
          *
-         * A value of -1 indicates that the location is invalid or has not
+         * A value less than 0 indicates that the location is invalid or has not
          * been resolved successfully.
          */
         int Location;
@@ -109,9 +108,7 @@ struct Shader
 
     /**
      * @brief Associates a shader source with this program.
-     *
      * Sources with a stage already assigned to this program are ignored.
-     *
      * @param source Shader source to associate.
      */
     void AssignSource(ShaderSource& source);

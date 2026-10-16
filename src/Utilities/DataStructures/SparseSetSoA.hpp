@@ -247,7 +247,7 @@ struct SparseSetSoA
 
         for (DenseIndexType& index : m_Sparse)
         {
-            index = InvalidSparseIndex;
+            index = InvalidDenseIndex;
         }
     }
 

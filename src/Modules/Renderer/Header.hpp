@@ -1,13 +1,8 @@
 #pragma once
 
-#include "Components/CameraComponent.hpp"
-#include "Components/LightComponent.hpp"
-#include "Components/MaterialComponent.hpp"
-#include "Components/MeshComponent.hpp"
+#include "Components.hpp"
 #include "LightType.hpp"
-#include "Nodes/Camera.hpp"
-#include "Nodes/Light.hpp"
-#include "Nodes/MeshInstance3D.hpp"
+#include "Nodes.hpp"
 #include "ProjectionMode.hpp"
 #include "RenderBatch.hpp"
 #include "Renderer.hpp"

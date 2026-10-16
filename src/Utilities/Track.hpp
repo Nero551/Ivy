@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Concepts.hpp"
 
-namespace Ivy::C
+namespace Ivy::U
 {
 
 template <typename T> struct Track
@@ -143,4 +143,4 @@ template <typename T> struct Track
     bool m_Changed = false;
 };
 
-} // namespace Ivy::C
+} // namespace Ivy::U

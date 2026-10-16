@@ -5,8 +5,8 @@
 #include "Core/Engine.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/Components/Transform3DComponent.hpp"
-#include "Core/World/Nodes/Node.hpp"
+#include "Core/World/Components.hpp"
+#include "Core/World/Nodes.hpp"
 #include "Core/World/Scenes/Grid.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -19,10 +19,8 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector3.hpp"
-#include "Modules/Renderer/Components/MaterialComponent.hpp"
-#include "Modules/Renderer/Components/MeshComponent.hpp"
-#include "Modules/Renderer/Nodes/Light.hpp"
-#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
+#include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/Nodes.hpp"
 #include <assimp/postprocess.h>
 #include <utility>
 
@@ -47,12 +45,12 @@ struct CoordinateAxesScene : C::Scene
         auto& lightMaterial = resourceManager.Load<G::Material>("lightMaterial");
         lightMaterial().Shader = &lightShader();
 
-        auto& light = m_Engine.ECS.CreateEntity<R::Light>();
+        auto& light = m_Engine.ECS.CreateEntity<R::Light3D>();
         query.Pool<Transform3DComponent>().GetComponentById(light.GetId()).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5)});
         light.SetParent(GetRoot());
 
-        auto& light2 = m_Engine.ECS.CreateEntity<R::Light>();
+        auto& light2 = m_Engine.ECS.CreateEntity<R::Light3D>();
         query.Pool<Transform3DComponent>().GetComponentById(light2.GetId()).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5)});
         light2.SetParent(GetRoot());

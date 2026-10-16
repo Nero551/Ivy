@@ -6,7 +6,7 @@
 #include "OpenGL.hpp"
 #include <glslang/Public/ShaderLang.h>
 
-/** @brief Handles initialization, modification and termination of graphics state */
+/** @brief Handles initialization, modification and termination of the graphics state */
 namespace Ivy::G::Context
 {
 inline double GetTime()

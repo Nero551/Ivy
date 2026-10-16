@@ -5,7 +5,7 @@
 #include "Core/Engine.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/Components/Transform3DComponent.hpp"
+#include "Core/World/Components.hpp"
 #include "Core/World/World.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -16,9 +16,8 @@
 #include "Math/Vector/Vector3.hpp"
 #include "Math/Vector/Vector4.hpp"
 #include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Components/MaterialComponent.hpp"
-#include "Modules/Renderer/Components/MeshComponent.hpp"
-#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
+#include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/Nodes.hpp"
 #include <format>
 #include <utility>
 

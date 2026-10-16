@@ -1,14 +1,14 @@
 #include "World.hpp"
 #include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
-#include "Core/World/Nodes/Node.hpp"
+#include "Core/World/Nodes.hpp"
 #include "Core/World/Scenes/CoordinateAxesScene.hpp"
 #include "Core/World/Systems/StressTester.hpp"
 #include "Core/World/Systems/Transform3DSystem.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Nodes/Camera.hpp"
+#include "Modules/Renderer/Nodes.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/Debug/Log.hpp"
 
@@ -37,14 +37,14 @@ Entity& World::GetCamera()
 //TODO: quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
 void World::Start()
 {
-    // AddSystem<Transform3DSystem>();
-    AddSystem<StressTester>();
+    AddSystem<Transform3DSystem>();
+    // AddSystem<StressTester>();
 
     m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
 
     SetRoot(m_Engine.ECS.CreateEntity<Node>().GetId());
 
-    auto& camera = m_Engine.ECS.CreateEntity<R::Camera>();
+    auto& camera = m_Engine.ECS.CreateEntity<R::Camera3D>();
     m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
     GetRoot().AttachChild(camera);
     SetCamera(camera.GetId());

@@ -74,6 +74,11 @@ template <Scalar T> struct Vector<2, T>
         return Vector{0};
     }
 
+    static constexpr Vector One()
+    {
+        return Vector{1};
+    }
+
     /** @brief Returns the squared length of the vector. */
     constexpr T LengthSquared() const
     {

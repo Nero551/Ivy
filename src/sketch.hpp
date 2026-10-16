@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/ECS/Component.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
 #include "Math/Equations/LinearEquation.hpp"
@@ -12,6 +13,7 @@
 #include "Physics/DimensionalAnalysis/Dimensionals.hpp"
 #include "Utilities/Debug/Inspector.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/Track.hpp"
 #include <array>
 #include <concepts>
 #include <cstdlib>
@@ -43,6 +45,15 @@ namespace Sketch
 // or just a perspective but flat (no x or y just z (front and back) ) ?
 //
 //TODO: i need genuine move and copy semantics/constructors for everything in Graphics section.
+//
+// TODO: split renderer into Renderer2DSystem & Renderer3DSystem and group common methods.
+// TODO: add Transform2D and Transform2DSystem
+//
+// TODO: put all components under namespace CMP and drop the Component suffix
+// TODO: do same for systems, maybe even entities.
+//
+// TODO: As for camera, remove the controls fromm CameraSystem and put them in world
+// TODO: Make a Camera2D and Camera3D Entities that both use the same camera component but different transform components
 //
 
 using namespace Ivy;
@@ -230,9 +241,5 @@ template <M::Scalar T> struct Dual
 inline void Test()
 {
     P::Dimension<float, P::Acceleration> g = 9.8;
-    P::Dimension<float, P::Length<1>> r = 10;
-    P::Dimension<float, P::Velocity> v = P::Sqrt(g * r) * 0.3;
-
-    U::Log::Info((-1 / g) * ((P::Pow<2>(v) / r) - g));
 }
 } // namespace Sketch

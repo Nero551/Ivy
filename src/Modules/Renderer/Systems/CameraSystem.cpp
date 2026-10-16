@@ -2,10 +2,10 @@
 
 #include "../../../Graphics/InputEnums/CursorMode.hpp"
 #include "../../../Graphics/InputEnums/Key.hpp"
-#include "../Components/CameraComponent.hpp"
+#include "../Components.hpp"
 #include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
-#include "Core/World/Components/Transform3DComponent.hpp"
+#include "Core/World/Components.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
@@ -15,11 +15,13 @@
 
 namespace Ivy::R
 {
+using I::Input;
+
 void CameraSystem::Update(const double dt)
 {
     auto& world = m_Engine.World;
     auto& query = m_Engine.ECS.Query;
-    auto& input = m_Engine.GetModule<I::Input>();
+    auto& input = m_Engine.GetModule<Input>();
     auto& camera = world.GetCamera();
 
     auto& transform = query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
@@ -77,16 +79,4 @@ void CameraSystem::Update(const double dt)
     }
 }
 
-M::Matrix<4, 4> CameraSystem::GetViewMatrix()
-{
-    auto& world = m_Engine.World;
-    auto& camera = world.GetCamera();
-    auto& transform = m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
-
-    const M::Vector<3> pos = transform.Position;
-    const M::Vector<3> forward = transform.GetForward();
-    const M::Vector<3> up = transform.GetUp();
-
-    return M::Matrix<4, 4>::LookAt(pos, pos + forward, up);
-}
 } // namespace Ivy::R

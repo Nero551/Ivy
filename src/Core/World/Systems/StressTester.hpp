@@ -9,8 +9,8 @@
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Math/Vector/Vector.hpp"
 #include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Components/MeshComponent.hpp"
-#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
+#include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/Nodes.hpp"
 #include <utility>
 
 namespace Ivy

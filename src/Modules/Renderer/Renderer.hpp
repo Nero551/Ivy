@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Components/MaterialComponent.hpp"
-#include "Components/MeshComponent.hpp"
+#include "Components.hpp"
 #include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Module.hpp"
-#include "Core/World/Components/Transform3DComponent.hpp"
+#include "Core/World/Components.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Graphics/Material/Material.hpp"

@@ -3,7 +3,7 @@
 #include "Core/ECS/Scene.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/Nodes/Node.hpp"
+#include "Core/World/Nodes.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
@@ -13,9 +13,8 @@
 #include "Math/Color/Color.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector3.hpp"
-#include "Modules/Renderer/Components/MaterialComponent.hpp"
-#include "Modules/Renderer/Components/MeshComponent.hpp"
-#include "Modules/Renderer/Nodes/MeshInstance3D.hpp"
+#include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/Nodes.hpp"
 #include <utility>
 
 namespace Ivy

@@ -1,18 +1,20 @@
 #include "LightingSystem.hpp"
 
-#include "../Components/LightComponent.hpp"
+#include "../Components.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/Components/Transform3DComponent.hpp"
+#include "Core/World/Components.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include <cstddef>
 
 namespace Ivy::R
 {
+using C::ResourceManager;
+
 void LightingSystem::Start()
 {
-    auto& resources = m_Engine.GetService<C::ResourceManager>();
+    auto& resources = m_Engine.GetService<ResourceManager>();
 
     LightingBuffer = &resources.Load<G::Uniformbuffer>("[Graphics] Lighting Buffer")();
     LightingBuffer->Binding = 1;

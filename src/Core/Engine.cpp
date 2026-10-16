@@ -48,6 +48,8 @@ double Engine::GetTime() const
 
 void Engine::Configure()
 {
+    Window.Config.X11ClassName = "ivy_engine";
+    Window.Config.WaylandAppId = "ivy_engine";
     Window.SetIcon({"Assets/icon.png"});
     Window.SetCursor({"Assets/cursor.png"});
     // Window.SetSize(1920, 1200);

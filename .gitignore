@@ -1,6 +1,4 @@
 /.cache
-/.vscode/
-/.idea/
 /.xmake/
 /compile_commands.json
 /.agent/
@@ -8,5 +6,6 @@
 /build/
 /Docs/API/
 /Traces/
-/External/
 /.zed/
+/.idea/
+/.vscode/

@@ -1,14 +1,12 @@
 #include "Renderer.hpp"
 
-#include "Components/CameraComponent.hpp"
-#include "Components/MaterialComponent.hpp"
-#include "Components/MeshComponent.hpp"
+#include "Components.hpp"
 #include "Core/ECS/Entity.hpp"
 #include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
-#include "Core/World/Components/Transform3DComponent.hpp"
+#include "Core/World/Components.hpp"
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Framebuffer/FramebufferAttachment.hpp"
@@ -32,6 +30,7 @@
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 #include "Graphics/Window.hpp"
 #include "Math/Matrix/Matrix4.hpp"
+#include "Math/Vector/Vector3.hpp"
 #include "RenderBatch.hpp"
 #include "Systems/CameraSystem.hpp"
 #include "Systems/LightingSystem.hpp"
@@ -183,13 +182,18 @@ void Renderer::RenderWorld()
     const M::Matrix<4, 4> projection =
         query.Pool<CameraComponent>().GetComponentById(camera.GetId()).GetProjectionMatrix();
 
-    const M::Matrix<4, 4> view = GetSystem<CameraSystem>().GetViewMatrix();
+    //View Matrix
+    auto& transform = m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
+    const M::Vector<3> pos = transform.Position;
+    const M::Vector<3> forward = transform.GetForward();
+    const M::Vector<3> up = transform.GetUp();
+    M::Matrix<4, 4> view = M::Matrix<4, 4>::LookAt(pos, pos + forward, up);
 
     GUniformbuffer->Get().Set(view, 0);
     GUniformbuffer->Get().Set(projection, 64);
     GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
     GUniformbuffer->Get().Set(
-        query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).GlobalPosition, 144);
+        query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).m_GlobalPosition, 144);
     GUniformbuffer->Get().Bind();
 
     query.ForEach<MaterialComponent, Transform3DComponent, MeshComponent>(
@@ -222,14 +226,14 @@ void Renderer::FillBatches(unsigned int entityId, Transform3DComponent& transfor
         batch = Batches.Emplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
     }
 
-    if (!batch->Instances.Contains(entityId) || transformComponent.GlobalPosition.IsChanged() ||
-        transformComponent.GlobalRotation.IsChanged() || transformComponent.GlobalScale.IsChanged())
+    if (!batch->Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
+        transformComponent.m_GlobalRotation.IsChanged() || transformComponent.m_GlobalScale.IsChanged())
     {
         batch->Instances.EmplaceOrReplace(
             entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
-        transformComponent.GlobalPosition.ClearChanged();
-        transformComponent.GlobalRotation.ClearChanged();
-        transformComponent.GlobalRotation.ClearChanged();
+        transformComponent.m_GlobalPosition.ClearChanged();
+        transformComponent.m_GlobalRotation.ClearChanged();
+        transformComponent.m_GlobalRotation.ClearChanged();
         transformComponent.Rotation.ClearChanged();
         transformComponent.Position.ClearChanged();
         transformComponent.Scale.ClearChanged();

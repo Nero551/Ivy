@@ -32,8 +32,8 @@ struct Window
         OpenGLProfile Profile = OpenGLProfile::Core;
         bool Debug = true;
         bool ForwardCompatibility = true;
-        std::string X11ClassName = "ivy_engine";
-        std::string WaylandAppId = "ivy_engine";
+        std::string X11ClassName = "X11";
+        std::string WaylandAppId = "Wayland";
         bool DoubleBuffer = true;
         int DepthBits = 24;
         int StencilBits = 8;
