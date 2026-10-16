@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Ivy::G
+namespace Ivy::R
 {
 enum class LightType
 {
@@ -8,4 +8,4 @@ enum class LightType
     Point = 1,
     Spot = 2
 };
-} // namespace Ivy::G
+} // namespace Ivy::R

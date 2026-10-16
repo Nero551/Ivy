@@ -7,3 +7,4 @@
 #include "RenderBatch.hpp"
 #include "Renderer.hpp"
 #include "Systems/LightingSystem.hpp"
+#include "Systems/Renderer3DSystem.hpp"

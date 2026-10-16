@@ -9,6 +9,7 @@
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "RenderBatch.hpp"
+#include "Systems/Renderer3DSystem.hpp"
 #include "Utilities/DataStructures/Indirect2DVector.hpp"
 
 namespace Ivy::R
@@ -28,8 +29,6 @@ struct Renderer : C::Module
     U::CheckedPtr<C::Resource<G::Uniformbuffer>> GUniformbuffer{
         "Graphics module has no Uniform buffer to use"};
 
-    U::Indirect2DVector<RenderBatch> Batches;
-
   protected:
     void SetupFramebuffer();
     void SetupMSAAFrameBuffer();
@@ -37,11 +36,6 @@ struct Renderer : C::Module
 
     void Start() override;
     void BeginFrame(double dt) override;
-
-    void RenderWorld();
-    void FillBatches(unsigned int entityId, C::Transform3DComponent& transformComponent,
-        MaterialComponent& materialComponent, MeshComponent& meshComponent);
-    void OnEntityDestroyed(const C::EntityDestroyed& event);
 
     void Render() override;
     void Update(double dt) override;

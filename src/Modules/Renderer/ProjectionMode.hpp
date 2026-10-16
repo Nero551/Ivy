@@ -1,10 +1,10 @@
 #pragma once
 
-namespace Ivy::G
+namespace Ivy::R
 {
 enum class ProjectionMode
 {
     Perspective,
     Orthographic
 };
-} // namespace Ivy::G
+} // namespace Ivy::R

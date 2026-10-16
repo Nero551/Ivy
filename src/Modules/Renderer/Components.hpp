@@ -19,7 +19,7 @@ struct CameraComponent : C::Component
     float Near = 0.1f;
     float Far = 100.0f;
     float AspectRatio = 1.0f;
-    G::ProjectionMode ProjectionMode = G::ProjectionMode::Perspective;
+    ProjectionMode ProjectionMode = ProjectionMode::Perspective;
 
     float Sensitivity = 0.05f;
     float Yaw = 0;
@@ -28,7 +28,7 @@ struct CameraComponent : C::Component
     M::Matrix<4, 4> GetProjectionMatrix() const
     {
         //TODO: currently , orthographic doesn't fucking work
-        if (ProjectionMode == G::ProjectionMode::Orthographic)
+        if (ProjectionMode == ProjectionMode::Orthographic)
         {
             return M::Matrix<4, 4>::Orthographic(
                 -AspectRatio, AspectRatio, -AspectRatio, AspectRatio, Near, Far);
@@ -39,7 +39,7 @@ struct CameraComponent : C::Component
 
 struct LightComponent : C::Component
 {
-    G::LightType Type = G::LightType::Directional;
+    LightType Type = LightType::Directional;
     M::Vector<3> Color = M::Vector<3>{1};
     M::Vector<3> Ambient = M::Vector<3>{0.8};
     M::Vector<3> Diffuse = M::Vector<3>{1};

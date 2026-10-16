@@ -31,6 +31,7 @@
 #include "Graphics/Window.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "Math/Vector/Vector3.hpp"
+#include "Modules/Renderer/Systems/Renderer3DSystem.hpp"
 #include "RenderBatch.hpp"
 #include "Systems/LightingSystem.hpp"
 #include "Utilities/Image.hpp"
@@ -144,10 +145,8 @@ void Renderer::PresentFramebuffer()
 
 void Renderer::Start()
 {
-    m_Engine.GetService<C::EventBus>().Sub<C::EntityDestroyed>(
-        [this](const C::EntityDestroyed& event) { OnEntityDestroyed(event); });
-
     AddSystem<LightingSystem>();
+    AddSystem<Renderer3DSystem>();
 
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);
@@ -160,6 +159,7 @@ void Renderer::Start()
     SetupFramebuffer();
 
     GetSystem<LightingSystem>().Start();
+    GetSystem<Renderer3DSystem>().Start();
 }
 
 void Renderer::BeginFrame(double dt)
@@ -170,85 +170,7 @@ void Renderer::BeginFrame(double dt)
     G::Context::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
 }
 
-//TODO: after i learn compute shaders, i could move this entire rendering pipeline on a
-// compute shader.
-void Renderer::RenderWorld()
-{
-    const auto& camera = m_Engine.World.GetCamera();
-    auto& query = m_Engine.ECS.Query;
-
-    const M::Matrix<4, 4> projection =
-        query.Pool<CameraComponent>().GetComponentById(camera.GetId()).GetProjectionMatrix();
-
-    //View Matrix
-    auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId());
-    const M::Vector<3> pos = transform.Position;
-    const M::Vector<3> forward = transform.GetForward();
-    const M::Vector<3> up = transform.GetUp();
-    M::Matrix<4, 4> view = M::Matrix<4, 4>::LookAt(pos, pos + forward, up);
-
-    GUniformbuffer->Get().Set(view, 0);
-    GUniformbuffer->Get().Set(projection, 64);
-    GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
-    GUniformbuffer->Get().Set(
-        query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId()).m_GlobalPosition, 144);
-    GUniformbuffer->Get().Bind();
-
-    query.ForEach<MaterialComponent, C::Transform3DComponent, MeshComponent>(
-        [&](unsigned int entityId, MaterialComponent& materialComponent, C::Transform3DComponent& transform,
-            MeshComponent& meshComponent)
-        {
-            if (materialComponent.Material->Get().Shader->HotReload == true)
-            {
-                materialComponent.Material->Get().Shader->Reload();
-            }
-
-            FillBatches(entityId, transform, materialComponent, meshComponent);
-        });
-    for (auto& batch : Batches)
-    {
-        batch.Render();
-    }
-}
-
-void Renderer::FillBatches(unsigned int entityId, C::Transform3DComponent& transformComponent,
-    MaterialComponent& materialComponent, MeshComponent& meshComponent)
-{
-    unsigned int materialId = materialComponent.Material->GetHandle().Index;
-    unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
-
-    auto batch = Batches.Find(materialId, meshId);
-
-    if (batch == Batches.end())
-    {
-        batch = Batches.Emplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
-    }
-
-    if (!batch->Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
-        transformComponent.m_GlobalRotation.IsChanged() || transformComponent.m_GlobalScale.IsChanged())
-    {
-        batch->Instances.EmplaceOrReplace(
-            entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
-        transformComponent.m_GlobalPosition.ClearChanged();
-        transformComponent.m_GlobalRotation.ClearChanged();
-        transformComponent.m_GlobalRotation.ClearChanged();
-        transformComponent.Rotation.ClearChanged();
-        transformComponent.Position.ClearChanged();
-        transformComponent.Scale.ClearChanged();
-    }
-}
-
-void Renderer::OnEntityDestroyed(const C::EntityDestroyed& event)
-{
-    for (auto& batch : Batches)
-    {
-        if (batch.Instances.Contains(event.EntityId))
-        {
-            batch.Instances.Erase(event.EntityId);
-        }
-    }
-}
-
+//TODO: after i learn compute shaders, i could move this entire rendering pipeline on a compute shader.
 //TODO: if there is multiple semi-transparent objects behind each other , depth testing
 // breaks blending.
 //  fix this by classifying render passes by transparency, pairs well with future render
@@ -257,7 +179,7 @@ void Renderer::OnEntityDestroyed(const C::EntityDestroyed& event)
 void Renderer::Render()
 {
     GetSystem<LightingSystem>().Render();
-    RenderWorld();
+    GetSystem<Renderer3DSystem>().Render();
     PresentFramebuffer();
 }
 

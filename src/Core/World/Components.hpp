@@ -2,14 +2,16 @@
 
 #include "Core/ECS/Component.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
+#include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Utilities/Track.hpp"
+#include <cmath>
 
 namespace Ivy::R
 {
 struct CameraSystem;
-struct Renderer;
+struct Renderer3DSystem;
 } // namespace Ivy::R
 
 namespace Ivy::C
@@ -29,6 +31,21 @@ struct Transform2DComponent : Component
         modelMatrix = modelMatrix.RotateZ(m_GlobalRotation);
         modelMatrix = modelMatrix.Scale({m_GlobalScale().x, m_GlobalScale().y, 1});
         return modelMatrix;
+    }
+
+    M::Matrix<3, 3> GetNormalMatrix() const
+    {
+        return GetModelMatrix().ToMatrix3().Inverse().Transpose();
+    }
+
+    M::Vector<2> GetRight() const
+    {
+        return {std::cos(m_GlobalRotation), std::sin(m_GlobalRotation)};
+    }
+
+    M::Vector<2> GetUp() const
+    {
+        return {-std::sin(m_GlobalRotation), std::cos(m_GlobalRotation)};
     }
 
   private:
@@ -82,7 +99,7 @@ struct Transform3DComponent : C::Component
     U::Track<M::Quaternion<>> m_GlobalRotation = M::Quaternion<>::Identity();
     U::Track<M::Vector<3>> m_GlobalScale = M::Vector<3>::One();
     friend struct Transform3DSystem;
-    friend struct R::Renderer;
+    friend struct R::Renderer3DSystem;
     friend struct R::CameraSystem;
 };
 } // namespace Ivy::C
