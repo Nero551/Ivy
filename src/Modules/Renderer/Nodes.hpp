@@ -4,7 +4,7 @@
 #include "Modules/Renderer/Components.hpp"
 namespace Ivy::R
 {
-struct Camera2D : Node2D
+struct Camera2D : C::Node2D
 {
     using Node2D::Node2D;
     void Initialize() override
@@ -14,7 +14,7 @@ struct Camera2D : Node2D
     }
 };
 
-struct Camera3D : Node3D
+struct Camera3D : C::Node3D
 {
     using Node3D::Node3D;
     void Initialize() override
@@ -24,7 +24,7 @@ struct Camera3D : Node3D
     }
 };
 
-struct Light3D : Node3D
+struct Light3D : C::Node3D
 {
     using Node3D::Node3D;
     void Initialize() override
@@ -34,7 +34,7 @@ struct Light3D : Node3D
     }
 };
 
-struct MeshInstance2D : Node2D
+struct MeshInstance2D : C::Node2D
 {
     using Node2D::Node2D;
     void Initialize() override
@@ -45,7 +45,7 @@ struct MeshInstance2D : Node2D
     }
 };
 
-struct MeshInstance3D : Node3D
+struct MeshInstance3D : C::Node3D
 {
     using Node3D::Node3D;
     void Initialize() override

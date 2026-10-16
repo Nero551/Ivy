@@ -24,7 +24,7 @@ struct Grid : C::Scene
     using C::Scene::Scene;
     void Initialize() override
     {
-        SetRoot(m_Engine.ECS.CreateEntity<Node>());
+        SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
 
         CreateXY();
         // CreateXZ();
@@ -59,7 +59,7 @@ struct Grid : C::Scene
         auto& materialComponent = m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponentById(l.GetId());
         auto& meshComponent = m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponentById(l.GetId());
         auto& transformComponent =
-            m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(l.GetId());
+            m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(l.GetId());
         meshComponent.Mesh = &line;
         materialComponent.Material = &resourceManager.Load<G::Material>("GridLine Material");
         materialComponent.Material->Get().Shader = &shader();

@@ -6,5 +6,4 @@
 #include "ProjectionMode.hpp"
 #include "RenderBatch.hpp"
 #include "Renderer.hpp"
-#include "Systems/CameraSystem.hpp"
 #include "Systems/LightingSystem.hpp"

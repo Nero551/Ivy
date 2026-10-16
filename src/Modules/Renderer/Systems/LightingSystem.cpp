@@ -34,8 +34,8 @@ void LightingSystem::Render()
     int i = 0;
 
     constexpr unsigned int LightStride = 144;
-    m_Engine.ECS.Query.ForEach<LightComponent, Transform3DComponent>(
-        [&](unsigned int entityId, LightComponent& lightComponent, Transform3DComponent& transform)
+    m_Engine.ECS.Query.ForEach<LightComponent, C::Transform3DComponent>(
+        [&](unsigned int entityId, LightComponent& lightComponent, C::Transform3DComponent& transform)
         {
             const unsigned int LightOffset = 16 + i * LightStride;
 

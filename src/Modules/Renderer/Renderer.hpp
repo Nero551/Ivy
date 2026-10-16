@@ -39,7 +39,7 @@ struct Renderer : C::Module
     void BeginFrame(double dt) override;
 
     void RenderWorld();
-    void FillBatches(unsigned int entityId, Transform3DComponent& transformComponent,
+    void FillBatches(unsigned int entityId, C::Transform3DComponent& transformComponent,
         MaterialComponent& materialComponent, MeshComponent& meshComponent);
     void OnEntityDestroyed(const C::EntityDestroyed& event);
 

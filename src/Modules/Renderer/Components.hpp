@@ -22,7 +22,6 @@ struct CameraComponent : C::Component
     G::ProjectionMode ProjectionMode = G::ProjectionMode::Perspective;
 
     float Sensitivity = 0.05f;
-    float Speed = 5.0f;
     float Yaw = 0;
     float Pitch = 0;
 

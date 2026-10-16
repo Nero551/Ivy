@@ -82,6 +82,61 @@ void World::Update(const double dt)
         U::Log::Info(m_Engine.ECS.EntityAmount());
     }
 
+    auto& query = m_Engine.ECS.Query;
+    auto& input = m_Engine.GetModule<I::Input>();
+    auto& camera = GetCamera();
+
+    auto& transform = query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId());
+    auto& cameraComponent = query.Pool<R::CameraComponent>().GetComponentById(camera.GetId());
+
+    cameraComponent.AspectRatio = m_Engine.Window.GetAspectRatio();
+
+    if (input.GetMouseMode() == G::CursorMode::Disabled)
+    {
+        const float xOffset = M::Rad(-input.GetMouseDelta().x * cameraComponent.Sensitivity);
+        const float yOffset = M::Rad(-input.GetMouseDelta().y * cameraComponent.Sensitivity);
+
+        constexpr float maxPitch = M::Rad(89.9);
+
+        cameraComponent.Yaw += xOffset;
+        cameraComponent.Pitch += yOffset;
+        cameraComponent.Pitch = std::clamp(cameraComponent.Pitch, -maxPitch, maxPitch);
+
+        transform.Rotation = M::Quaternion<>::FromEulerXYZ({cameraComponent.Pitch, cameraComponent.Yaw, 0});
+    }
+
+    const float speed = 5 * static_cast<float>(dt);
+
+    if (input.IsKeyHeld(G::Key::W))
+    {
+        transform.Position += speed * transform.GetForward();
+    }
+
+    if (input.IsKeyHeld(G::Key::S))
+    {
+        transform.Position -= speed * transform.GetForward();
+    }
+
+    if (input.IsKeyHeld(G::Key::A))
+    {
+        transform.Position -= speed * transform.GetRight();
+    }
+
+    if (input.IsKeyHeld(G::Key::D))
+    {
+        transform.Position += speed * transform.GetRight();
+    }
+
+    if (input.IsKeyHeld(G::Key::Space))
+    {
+        transform.Position += speed * M::Vector<3>(0, 1, 0);
+    }
+
+    if (input.IsKeyHeld(G::Key::LeftShift))
+    {
+        transform.Position -= speed * M::Vector<3>(0, 1, 0);
+    }
+
     for (auto& system : m_Systems)
     {
         system->Update(dt);

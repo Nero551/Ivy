@@ -32,7 +32,6 @@
 #include "Math/Matrix/Matrix4.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "RenderBatch.hpp"
-#include "Systems/CameraSystem.hpp"
 #include "Systems/LightingSystem.hpp"
 #include "Utilities/Image.hpp"
 #include <ranges>
@@ -148,7 +147,6 @@ void Renderer::Start()
     m_Engine.GetService<C::EventBus>().Sub<C::EntityDestroyed>(
         [this](const C::EntityDestroyed& event) { OnEntityDestroyed(event); });
 
-    AddSystem<CameraSystem>();
     AddSystem<LightingSystem>();
 
     G::Context::Enable(G::Capability::ProgramPointSize);
@@ -183,7 +181,7 @@ void Renderer::RenderWorld()
         query.Pool<CameraComponent>().GetComponentById(camera.GetId()).GetProjectionMatrix();
 
     //View Matrix
-    auto& transform = m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId());
+    auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId());
     const M::Vector<3> pos = transform.Position;
     const M::Vector<3> forward = transform.GetForward();
     const M::Vector<3> up = transform.GetUp();
@@ -193,11 +191,11 @@ void Renderer::RenderWorld()
     GUniformbuffer->Get().Set(projection, 64);
     GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
     GUniformbuffer->Get().Set(
-        query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).m_GlobalPosition, 144);
+        query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId()).m_GlobalPosition, 144);
     GUniformbuffer->Get().Bind();
 
-    query.ForEach<MaterialComponent, Transform3DComponent, MeshComponent>(
-        [&](unsigned int entityId, MaterialComponent& materialComponent, Transform3DComponent& transform,
+    query.ForEach<MaterialComponent, C::Transform3DComponent, MeshComponent>(
+        [&](unsigned int entityId, MaterialComponent& materialComponent, C::Transform3DComponent& transform,
             MeshComponent& meshComponent)
         {
             if (materialComponent.Material->Get().Shader->HotReload == true)
@@ -213,7 +211,7 @@ void Renderer::RenderWorld()
     }
 }
 
-void Renderer::FillBatches(unsigned int entityId, Transform3DComponent& transformComponent,
+void Renderer::FillBatches(unsigned int entityId, C::Transform3DComponent& transformComponent,
     MaterialComponent& materialComponent, MeshComponent& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
@@ -263,10 +261,7 @@ void Renderer::Render()
     PresentFramebuffer();
 }
 
-void Renderer::Update(const double dt)
-{
-    GetSystem<CameraSystem>().Update(dt);
-}
+void Renderer::Update(const double dt) {}
 
 void Renderer::FixedUpdate(double fdt) {}
 

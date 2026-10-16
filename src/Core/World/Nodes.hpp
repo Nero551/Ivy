@@ -3,11 +3,11 @@
 #include "Components.hpp"
 #include "Core/ECS/ECS.hpp"
 #include "Core/ECS/Entity.hpp"
-namespace Ivy
+namespace Ivy::C
 {
-struct Node : C::Entity
+struct Node : Entity
 {
-    using C::Entity::Entity;
+    using Entity::Entity;
     void Initialize() override
     {
         Entity::Initialize();
@@ -33,4 +33,4 @@ struct Node3D : Node
         m_ECS.Query.Pool<Transform3DComponent>().Add(GetId());
     }
 };
-} // namespace Ivy
+} // namespace Ivy::C

@@ -3,7 +3,7 @@
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
 
-namespace Ivy
+namespace Ivy::C
 {
 void Transform3DSystem::Update(double fdt)
 {
@@ -44,4 +44,4 @@ void Transform3DSystem::Update(double fdt)
             transform.m_GlobalScale = transform.Scale;
         });
 }
-} // namespace Ivy
+} // namespace Ivy::C

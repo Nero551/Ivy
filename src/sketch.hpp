@@ -47,13 +47,9 @@ namespace Sketch
 //TODO: i need genuine move and copy semantics/constructors for everything in Graphics section.
 //
 // TODO: split renderer into Renderer2DSystem & Renderer3DSystem and group common methods.
-// TODO: add Transform2D and Transform2DSystem
 //
 // TODO: put all components under namespace CMP and drop the Component suffix
 // TODO: do same for systems, maybe even entities.
-//
-// TODO: As for camera, remove the controls fromm CameraSystem and put them in world
-// TODO: Make a Camera2D and Camera3D Entities that both use the same camera component but different transform components
 //
 
 using namespace Ivy;

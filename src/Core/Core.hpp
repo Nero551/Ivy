@@ -28,4 +28,5 @@
 #include "World/Scenes/Grid.hpp"
 #include "World/Systems/StressTester.hpp"
 #include "World/Systems/Transform3DSystem.hpp"
+#include "World/Systems/Trarnsform2DSystem.hpp"
 #include "World/World.hpp"

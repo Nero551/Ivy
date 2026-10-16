@@ -12,20 +12,30 @@ struct CameraSystem;
 struct Renderer;
 } // namespace Ivy::R
 
-namespace Ivy
+namespace Ivy::C
 {
 
-struct Transform2DComponent : C::Component
+struct Transform2DComponent : Component
 {
     U::Track<M::Vector<2>> Position;
     U::Track<M::Vector<2>> Scale;
     U::Track<float> Rotation;
     bool InheritTransform = true;
 
+    M::Matrix<4, 4> GetModelMatrix() const
+    {
+        M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
+        modelMatrix = modelMatrix.Translate({m_GlobalPosition().x, m_GlobalPosition().y, 0});
+        modelMatrix = modelMatrix.RotateZ(m_GlobalRotation);
+        modelMatrix = modelMatrix.Scale({m_GlobalScale().x, m_GlobalScale().y, 1});
+        return modelMatrix;
+    }
+
   private:
     U::Track<M::Vector<2>> m_GlobalPosition = M::Vector<2>::Zero();
     U::Track<float> m_GlobalRotation = 0;
     U::Track<M::Vector<2>> m_GlobalScale = M::Vector<2>::One();
+    friend struct Transform2DSystem;
 };
 
 struct Transform3DComponent : C::Component
@@ -36,7 +46,7 @@ struct Transform3DComponent : C::Component
 
     bool InheritTransform = true;
 
-    M::Matrix<4, 4> GetModelMatrix()
+    M::Matrix<4, 4> GetModelMatrix() const
     {
         M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
         modelMatrix = modelMatrix.Translate({m_GlobalPosition});
@@ -45,7 +55,7 @@ struct Transform3DComponent : C::Component
         return modelMatrix;
     }
 
-    M::Matrix<3, 3> GetNormalMatrix()
+    M::Matrix<3, 3> GetNormalMatrix() const
     {
 
         return GetModelMatrix().ToMatrix3().Inverse().Transpose();
@@ -75,4 +85,4 @@ struct Transform3DComponent : C::Component
     friend struct R::Renderer;
     friend struct R::CameraSystem;
 };
-} // namespace Ivy
+} // namespace Ivy::C
