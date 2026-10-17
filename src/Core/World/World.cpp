@@ -51,7 +51,7 @@ Entity& World::GetCamera()
 
 void World::Start()
 {
-    SetRoot(m_Engine.ECS.CreateEntity<C::Node>().GetId());
+    SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
     AddSystem<Transform3DSystem>();
 
     for (auto& system : m_Systems)

@@ -33,8 +33,8 @@ struct Controller : C::System
         auto& input = m_Engine.GetModule<I::Input>();
         auto& camera = m_Engine.World.GetCamera();
 
-        auto& transform = query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId());
-        auto& cameraComponent = query.Pool<R::CameraComponent>().GetComponentById(camera.GetId());
+        auto& transform = query.Pool<C::Transform3DComponent>().GetComponent(camera.GetId());
+        auto& cameraComponent = query.Pool<R::CameraComponent>().GetComponent(camera.GetId());
 
         cameraComponent.AspectRatio = m_Engine.Window.GetAspectRatio();
 

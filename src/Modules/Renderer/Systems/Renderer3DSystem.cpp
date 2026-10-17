@@ -27,10 +27,10 @@ void Renderer3DSystem::Render()
     auto& rendererModule = m_Engine.GetModule<Renderer>();
 
     const M::Matrix<4, 4> projection =
-        query.Pool<CameraComponent>().GetComponentById(camera.GetId()).GetProjectionMatrix();
+        query.Pool<CameraComponent>().GetComponent(camera.GetId()).GetProjectionMatrix();
 
     //View Matrix
-    auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId());
+    auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(camera.GetId());
     const M::Vector<3> pos = transform.Position;
     const M::Vector<3> forward = transform.GetForward();
     const M::Vector<3> up = transform.GetUp();
@@ -40,7 +40,7 @@ void Renderer3DSystem::Render()
     rendererModule.GUniformbuffer->Get().Set(projection, 64);
     rendererModule.GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
     rendererModule.GUniformbuffer->Get().Set(
-        query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId()).m_GlobalPosition, 144);
+        query.Pool<C::Transform3DComponent>().GetComponent(camera.GetId()).m_GlobalPosition, 144);
     rendererModule.GUniformbuffer->Get().Bind();
 
     query.ForEach<MaterialComponent, C::Transform3DComponent, MeshComponent>(

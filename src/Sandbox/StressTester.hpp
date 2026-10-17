@@ -52,7 +52,7 @@ struct StressTester : C::System
         {
             for (auto& point : points)
             {
-                auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(point);
+                auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(point);
                 transform.Position *= multiplier;
             }
         }
@@ -120,15 +120,14 @@ struct StressTester : C::System
         auto& mesh = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
 
         auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-        m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponentById(point.GetId()).Mesh = &mesh;
-        m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(point.GetId()).Scale =
+        m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponent(point.GetId()).Mesh = &mesh;
+        m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(point.GetId()).Scale =
             M::Vector<3>{0.2};
 
         if (resourceManager.Exists<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y)))
         {
             auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
-            m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material =
-                &material;
+            m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponent(point.GetId()).Material = &material;
         }
         else
         {
@@ -141,8 +140,7 @@ struct StressTester : C::System
             shader().AssignSource(resourceManager.Load<G::ShaderSource>(
                 "pointFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
             material().Shader = &shader();
-            m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponentById(point.GetId()).Material =
-                &material;
+            m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponent(point.GetId()).Material = &material;
         }
 
         m_Engine.World.GetRoot().AttachChild(point);
@@ -152,7 +150,7 @@ struct StressTester : C::System
     C::Entity& Plot(const M::Vector<3> vec3, const M::Vector<4> col = {1, 1, 1, 1})
     {
         auto& point = CreatePoint(col);
-        auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(point.GetId());
+        auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(point.GetId());
         transform.Position().x = vec3.x;
         transform.Position().y = vec3.y;
         transform.Position().z = vec3.z;

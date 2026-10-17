@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.hpp"
+#include "Core/ECS/Entity.hpp"
 #include "Events/ComponentAdded.hpp"
 #include "Events/ComponentRemoved.hpp"
 #include "Events/EntityDestroyed.hpp"
@@ -85,11 +86,11 @@ template <IsComponent T> struct ComponentPool : IComponentPool
     }
 
     /**
-         * @brief Constructs and adds a component for an entity.
-         *
-         * @param entityId ID of the entity receiving the component.
-         * @return Reference to the stored component.
-         */
+    * @brief Constructs and adds a component for an entity.
+    *
+    * @param entityId ID of the entity receiving the component.
+    * @return Reference to the stored component.
+    */
     T& Add(const unsigned int entityId)
     {
         auto component = m_Components.Emplace(entityId);
@@ -112,9 +113,14 @@ template <IsComponent T> struct ComponentPool : IComponentPool
          * @param entityId ID of the entity.
          * @return Reference to the stored component.
          */
-    T& GetComponentById(const unsigned int entityId)
+    T& GetComponent(const unsigned int entityId)
     {
         return m_Components.At(entityId);
+    }
+
+    T& GetComponent(const Entity& entity)
+    {
+        return m_Components.At(entity.GetId());
     }
 
     /** @brief Returns the component belonging to an entity. */
@@ -123,32 +129,15 @@ template <IsComponent T> struct ComponentPool : IComponentPool
         return m_Components[entityId];
     }
 
+    T& operator[](const Entity& entity)
+    {
+        return m_Components[entity.GetId()];
+    }
+
     /** @brief Reserves storage for the specified number of components. */
     void Reserve(const size_t count)
     {
         m_Components.Reserve(count);
-    }
-
-    /**
-         * @brief Returns the entity ID at a dense storage index.
-         *
-         * @param index Dense index of the component.
-         * @return Entity ID associated with the component.
-         */
-    unsigned int GetIdByIndex(const size_t index) const
-    {
-        return m_Components.GetSparseIndex(index);
-    }
-
-    /**
-         * @brief Returns the component at a dense storage index.
-         *
-         * @param index Dense index of the component.
-         * @return Reference to the stored component.
-         */
-    T& GetComponentByIndex(const unsigned int index)
-    {
-        return m_Components.GetByIndex(index);
     }
 
     /**
@@ -162,12 +151,6 @@ template <IsComponent T> struct ComponentPool : IComponentPool
 
         ComponentRemoved.EntityId = entityId;
         ComponentRemoved.Fire();
-    }
-
-    /** @brief Returns the dense storage index of an entity. */
-    unsigned int GetIndexById(const unsigned int entityId)
-    {
-        return m_Components.GetDenseIndex(entityId);
     }
 
     /** @brief Returns the number of stored components. */

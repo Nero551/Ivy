@@ -56,10 +56,9 @@ struct Grid : C::Scene
             m.GetName(), std::move(m.Vertices), std::move(m.Indices), G::Topology::Lines);
 
         auto& l = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-        auto& materialComponent = m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponentById(l.GetId());
-        auto& meshComponent = m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponentById(l.GetId());
-        auto& transformComponent =
-            m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(l.GetId());
+        auto& materialComponent = m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponent(l.GetId());
+        auto& meshComponent = m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponent(l.GetId());
+        auto& transformComponent = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(l.GetId());
         meshComponent.Mesh = &line;
         materialComponent.Material = &resourceManager.Load<G::Material>("GridLine Material");
         materialComponent.Material->Get().Shader = &shader();

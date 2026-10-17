@@ -16,9 +16,9 @@ void Sandbox::Start()
     m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
 
     auto& camera = m_Engine.ECS.CreateEntity<R::Camera3D>();
-    m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
+    m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(camera).Position = {0, 0, 10};
     m_Engine.World.GetRoot().AttachChild(camera);
-    m_Engine.World.SetCamera(camera.GetId());
+    m_Engine.World.SetCamera(camera);
 
     CoordinateAxesScene coordinateAxes = m_Engine.World.CreateScene<CoordinateAxesScene>();
     m_Engine.World.GetRoot().AttachChild(coordinateAxes.GetRoot());

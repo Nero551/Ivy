@@ -73,9 +73,9 @@ struct ComponentPoolQuery
      *
      * @param callback Function invoked with the entity ID and component references.
      */
-    template <IsComponent First, IsComponent... Rest, typename Function>
-    requires std::invocable<Function, unsigned int, First&, Rest&...>
-    void ForEach(Function&& callback)
+    template <IsComponent First, IsComponent... Rest, typename F>
+    requires std::invocable<F, unsigned int, First&, Rest&...>
+    void ForEach(F&& callback)
     {
         auto pools = GetPools<First, Rest...>();
 
