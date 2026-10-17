@@ -20,18 +20,11 @@ struct World : SystemOwner
     using SystemOwner::SystemOwner;
 
     int MaxLights = 24;
-    void SetRoot(const unsigned int id)
-    {
-        m_Root = id;
-    }
-
+    void SetRoot(const unsigned int id);
+    void SetRoot(const Entity& entity);
     Entity& GetRoot();
-
-    void SetCamera(const unsigned int id)
-    {
-        m_ActiveCamera = id;
-    }
-
+    void SetCamera(const Entity& entity);
+    void SetCamera(const unsigned int id);
     Entity& GetCamera();
 
     template <typename T, typename... Args> T CreateScene(Args&&... args)
@@ -43,18 +36,12 @@ struct World : SystemOwner
 
   protected:
     void Start();
-
-    void Update(double dt);
-
-    void FixedUpdate(double fdt);
-
-    void Stop();
-
     void BeginFrame(double dt);
-
-    void EndFrame(double dt);
-
+    void FixedUpdate(double fdt);
+    void Update(double dt);
     void Render();
+    void EndFrame(double dt);
+    void Stop();
 
     friend struct Engine;
 

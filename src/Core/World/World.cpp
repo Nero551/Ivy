@@ -3,15 +3,32 @@
 #include "Core/Engine.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Systems/Transform3DSystem.hpp"
-#include "Graphics/InputEnums/CursorMode.hpp"
-#include "Graphics/InputEnums/Key.hpp"
-#include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Nodes.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::C
 {
+
+void World::SetRoot(const unsigned int id)
+{
+    m_Root = id;
+}
+
+void World::SetRoot(const Entity& entity)
+{
+    m_Root = entity.GetId();
+}
+
+void World::SetCamera(const unsigned int id)
+{
+    m_ActiveCamera = id;
+}
+
+void World::SetCamera(const Entity& entity)
+{
+    m_ActiveCamera = entity.GetId();
+}
+
 Entity& World::GetRoot()
 {
     auto root = m_Engine.ECS.TryFindEntity(m_Root);
@@ -32,7 +49,6 @@ Entity& World::GetCamera()
     return *camera;
 }
 
-//TODO: quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
 void World::Start()
 {
     SetRoot(m_Engine.ECS.CreateEntity<C::Node>().GetId());
@@ -46,11 +62,6 @@ void World::Start()
 
 void World::Update(const double dt)
 {
-    if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::Escape))
-    {
-        m_Engine.Shutdown();
-    }
-
     for (auto& system : m_Systems)
     {
         system->Update(dt);
