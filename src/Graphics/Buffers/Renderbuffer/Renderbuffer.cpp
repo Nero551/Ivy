@@ -3,10 +3,6 @@
 
 namespace Ivy::G
 {
-Renderbuffer::~Renderbuffer()
-{
-    glDeleteRenderbuffers(1, &m_Id);
-}
 
 bool Renderbuffer::IsGenerated() const
 {
@@ -32,10 +28,13 @@ void Renderbuffer::Generate()
     }
 }
 
-void Renderbuffer::Regenerate()
+void Renderbuffer::Delete()
 {
-    glDeleteRenderbuffers(1, &m_Id);
-    m_Id = 0;
+    if (IsGenerated())
+    {
+        glDeleteRenderbuffers(1, &m_Id);
+        m_Id = 0;
+    }
 }
 
 void Renderbuffer::Bind()

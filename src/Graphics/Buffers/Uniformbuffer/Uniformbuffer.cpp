@@ -3,10 +3,6 @@
 
 namespace Ivy::G
 {
-Uniformbuffer::~Uniformbuffer()
-{
-    glDeleteBuffers(1, &m_Id);
-}
 void Uniformbuffer::Generate()
 {
     if (IsGenerated())
@@ -23,10 +19,13 @@ bool Uniformbuffer::IsGenerated() const
     return m_Id != 0;
 }
 
-void Uniformbuffer::Regenerate()
+void Uniformbuffer::Delete()
 {
-    glDeleteBuffers(1, &m_Id);
-    m_Id = 0;
+    if (IsGenerated())
+    {
+        glDeleteBuffers(1, &m_Id);
+        m_Id = 0;
+    }
 }
 
 void Uniformbuffer::Bind()

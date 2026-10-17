@@ -46,8 +46,6 @@ namespace Sketch
 // also need a way to even show 2D? will the camera be ortho?
 // or just a perspective but flat (no x or y just z (front and back) ) ?
 //
-//TODO: i need genuine move and copy semantics/constructors for everything in Graphics section.
-//
 // TODO: split renderer into Renderer2DSystem & Renderer3DSystem and group common methods.
 //
 // TODO: put all components under namespace CMP and drop the Component suffix
@@ -56,6 +54,8 @@ namespace Sketch
 // TODO: use a GetSmallestPool in ComponentPoolQuery instead of using the first pool as the driver.
 // TODO: make orthographic camera work.
 // TODO: figure out if 2D needs normal matrix
+
+//TODO: (HIGH PRIORITY) i need genuine move and copy semantics/constructors for everything in Graphics section.
 
 using namespace Ivy;
 

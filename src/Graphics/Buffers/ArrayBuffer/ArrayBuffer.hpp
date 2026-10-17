@@ -1,6 +1,7 @@
 #pragma once
 #include "../../OpenGL.hpp"
 #include "../BufferUsage.hpp"
+#include <utility>
 
 namespace Ivy::G
 {
@@ -10,13 +11,29 @@ struct ArrayBuffer
     /** @brief Controls the OpenGL usage hint applied when data is uploaded. */
     BufferUsage Usage = BufferUsage::StaticDraw;
 
-    /** @brief Constructs an ungenerated array buffer. */
-    ArrayBuffer() {}
+    ArrayBuffer() = default;
+    ~ArrayBuffer()
+    {
+        Delete();
+    }
 
     ArrayBuffer(const ArrayBuffer&) = delete;
     ArrayBuffer& operator=(const ArrayBuffer&) = delete;
-    ArrayBuffer(ArrayBuffer&& Other) noexcept : m_Id(std::exchange(Other.m_Id, 0)) {}
-    ArrayBuffer& operator=(ArrayBuffer&& Other) noexcept;
+    ArrayBuffer(ArrayBuffer&& other) noexcept
+        : m_Id(std::exchange(other.m_Id, 0)), Usage(std::exchange(other.Usage, BufferUsage::StaticDraw))
+    {
+    }
+    ArrayBuffer& operator=(ArrayBuffer&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+            m_Id = std::exchange(other.m_Id, 0);
+            Usage = std::exchange(other.Usage, BufferUsage::StaticDraw);
+        }
+
+        return *this;
+    }
     /** @brief Generates the buffer once; subsequent calls have no effect. */
     void Generate();
 
@@ -35,10 +52,7 @@ struct ArrayBuffer
     bool IsGenerated() const;
 
     /** @brief Releases the buffer and resets its ID to zero. */
-    void Regenerate();
-
-    /** @brief Releases the buffer when this object is destroyed. */
-    ~ArrayBuffer();
+    void Delete();
 
     /** @brief Binds this buffer to GL_ARRAY_BUFFER. */
     void Bind();

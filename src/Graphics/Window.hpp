@@ -10,6 +10,7 @@
 #include <concepts>
 #include <functional>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -44,7 +45,54 @@ struct Window
     Configuration Config;
 
     Window() = default;
-    ~Window();
+    ~Window()
+    {
+        Terminate();
+    }
+    Window(const Window&) = delete;
+    Window& operator=(const Window&) = delete;
+
+    Window(Window&& other) noexcept
+        : Config(std::move(other.Config)), m_GlfwWindow(std::exchange(other.m_GlfwWindow, nullptr)),
+          m_Platform(std::exchange(other.m_Platform, GLFWPlatform::Null)),
+          m_ScrollCallback(std::move(other.m_ScrollCallback)),
+          m_CursorPosCallback(std::move(other.m_CursorPosCallback)),
+          m_FramebufferSizeCallback(std::move(other.m_FramebufferSizeCallback)),
+          m_KeyCallback(std::move(other.m_KeyCallback)),
+          m_MouseButtonCallback(std::move(other.m_MouseButtonCallback)),
+          m_CursorEnteredCallback(std::move(other.m_CursorEnteredCallback))
+    {
+        if (m_GlfwWindow != nullptr)
+        {
+            glfwSetWindowUserPointer(m_GlfwWindow, this);
+        }
+    }
+    Window& operator=(Window&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Terminate();
+
+            Config = std::move(other.Config);
+
+            m_GlfwWindow = std::exchange(other.m_GlfwWindow, nullptr);
+            m_Platform = std::exchange(other.m_Platform, GLFWPlatform::Null);
+
+            m_KeyCallback = std::move(other.m_KeyCallback);
+            m_ScrollCallback = std::move(other.m_ScrollCallback);
+            m_CursorPosCallback = std::move(other.m_CursorPosCallback);
+            m_MouseButtonCallback = std::move(other.m_MouseButtonCallback);
+            m_CursorEnteredCallback = std::move(other.m_CursorEnteredCallback);
+            m_FramebufferSizeCallback = std::move(other.m_FramebufferSizeCallback);
+
+            if (m_GlfwWindow != nullptr)
+            {
+                glfwSetWindowUserPointer(m_GlfwWindow, this);
+            }
+        }
+
+        return *this;
+    }
 
     /**
     * @brief Generates a window.
@@ -52,7 +100,7 @@ struct Window
     * @param height Window height in pixels.
     * @param title Window title.
     */
-    void Generate(int width, int height, const std::string& title);
+    void Generate(int width, int height, std::string_view title);
     void Terminate();
 
     bool IsTerminated() const;

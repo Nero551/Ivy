@@ -7,6 +7,8 @@
 #include "FramebufferAttachment.hpp"
 #include "FramebufferTarget.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include <unordered_map>
+#include <utility>
 
 namespace Ivy::G
 {
@@ -23,38 +25,41 @@ namespace Ivy::G
  */
 struct Framebuffer
 {
-    /**
-     * @brief Specifies which framebuffer target is affected by operations.
-     *
-     * Defaults to the read/draw framebuffer target, which is suitable for
-     * normal rendering.
-     */
     FrameBufferTarget Target = FrameBufferTarget::ReadDraw;
-
-    /**
-     * @brief Textures currently attached to this framebuffer.
-     *
-     * The key identifies the framebuffer attachment point and the value
-     * references the texture attached to it.
-     */
     std::unordered_map<FramebufferAttachment, U::CheckedPtr<Texture>> TextureAttachments;
-
-    /**
-     * @brief Renderbuffers currently attached to this framebuffer.
-     *
-     * The key identifies the framebuffer attachment point and the value
-     * references the renderbuffer attached to it.
-     */
     std::unordered_map<FramebufferAttachment, U::CheckedPtr<Renderbuffer>> RenderBuffers;
 
-    /**
-     * @brief Creates a framebuffer resource.
-     * @param name Resource name.
-     */
     Framebuffer(const std::string& name) : m_Name(name) {}
+    ~Framebuffer()
+    {
+        Delete();
+    }
+    Framebuffer(const Framebuffer&) = delete;
+    Framebuffer& operator=(const Framebuffer&) = delete;
+    Framebuffer(Framebuffer&& other) noexcept
+        : Target(std::exchange(other.Target, FrameBufferTarget::ReadDraw)),
+          TextureAttachments(std::move(other.TextureAttachments)),
+          RenderBuffers(std::move(other.RenderBuffers)), m_Id(std::exchange(other.m_Id, 0)),
+          m_Name(std::move(other.m_Name))
+    {
+    }
 
-    /// Releases the underlying OpenGL framebuffer object.
-    ~Framebuffer();
+    Framebuffer& operator=(Framebuffer&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+
+            m_Id = std::exchange(other.m_Id, 0);
+            Target = std::exchange(other.Target, FrameBufferTarget::ReadDraw);
+
+            TextureAttachments = std::move(other.TextureAttachments);
+            RenderBuffers = std::move(other.RenderBuffers);
+            m_Name = std::move(other.m_Name);
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Generates the OpenGL framebuffer object.
@@ -66,7 +71,7 @@ struct Framebuffer
      * @brief Deletes the current OpenGL framebuffer object.
      * The framebuffer can be generated again afterward with Generate().
      */
-    void Regenerate();
+    void Delete();
 
     /**
      * @brief Binds this framebuffer to its configured target.

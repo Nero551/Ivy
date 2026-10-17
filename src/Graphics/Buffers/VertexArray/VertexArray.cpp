@@ -11,16 +11,6 @@
 
 namespace Ivy::G
 {
-VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
-{
-    if (this != &other)
-    {
-        Regenerate();
-        m_Id = std::exchange(other.m_Id, 0);
-    }
-
-    return *this;
-}
 void VertexArray::Generate()
 {
     if (IsGenerated())
@@ -35,15 +25,13 @@ bool VertexArray::IsGenerated() const
     return m_Id != 0;
 }
 
-void VertexArray::Regenerate()
+void VertexArray::Delete()
 {
-    glDeleteVertexArrays(1, &m_Id);
-    m_Id = 0;
-}
-
-VertexArray::~VertexArray()
-{
-    glDeleteVertexArrays(1, &m_Id);
+    if (IsGenerated())
+    {
+        glDeleteVertexArrays(1, &m_Id);
+        m_Id = 0;
+    }
 }
 
 void VertexArray::Bind()

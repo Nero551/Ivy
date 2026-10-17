@@ -11,13 +11,26 @@ struct VertexArray
 {
 
     /** @brief Constructs an ungenerated vertex array object. */
-    VertexArray() {}
+    VertexArray() = default;
+    ~VertexArray()
+    {
+        Delete();
+    }
 
     VertexArray(const VertexArray&) = delete;
     VertexArray& operator=(const VertexArray&) = delete;
 
     VertexArray(VertexArray&& other) noexcept : m_Id(std::exchange(other.m_Id, 0)) {}
-    VertexArray& operator=(VertexArray&& other) noexcept;
+    VertexArray& operator=(VertexArray&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+            m_Id = std::exchange(other.m_Id, 0);
+        }
+
+        return *this;
+    }
     /** @brief Generates the VAO if it has not already been generated. */
     void Generate();
 
@@ -25,10 +38,7 @@ struct VertexArray
     bool IsGenerated() const;
 
     /** @brief Deletes the VAO and resets its ID to zero. */
-    void Regenerate();
-
-    /** @brief Deletes the VAO when destroyed. */
-    ~VertexArray();
+    void Delete();
 
     /** @brief Binds the VAO as the current vertex array. */
     void Bind();

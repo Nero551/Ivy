@@ -4,9 +4,9 @@
 #include "Graphics/InputEnums/Key.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Nodes.hpp"
-#include "Sandbox/Controller.hpp"
 #include "Sandbox/Scenes/CoordinateAxesScene.hpp"
-#include "Sandbox/StressTester.hpp"
+#include "Sandbox/Systems/Controller.hpp"
+#include "Sandbox/Systems/StressTester.hpp"
 namespace Ivy::Sandbox
 {
 

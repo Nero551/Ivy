@@ -6,19 +6,16 @@
 #include "OpenGL.hpp"
 #include "Utilities/Image.hpp"
 #include <string>
+#include <string_view>
 
 namespace Ivy::G
 {
-Window::~Window()
-{
-    Terminate();
-}
-void Window::Generate(const int width, const int height, const std::string& title)
+void Window::Generate(const int width, const int height, std::string_view title)
 {
     SetConfiguration();
     m_Platform = static_cast<GLFWPlatform>(glfwGetPlatform());
 
-    GLFWwindow* glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    GLFWwindow* glfwWindow = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
     m_GlfwWindow = glfwWindow;
     if (!glfwWindow)
     {

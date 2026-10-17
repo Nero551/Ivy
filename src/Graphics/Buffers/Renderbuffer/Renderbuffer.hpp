@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../../Texture/TextureInternalFormat.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
+#include <string>
+#include <utility>
 
 namespace Ivy::G
 {
@@ -34,18 +35,40 @@ struct Renderbuffer
      *
      * @param name Resource name.
      */
-    explicit Renderbuffer(const std::string& name) : m_Name(name) {}
+    Renderbuffer(const std::string& name) : m_Name(name) {}
+    ~Renderbuffer()
+    {
+        Delete();
+    }
+    Renderbuffer(const Renderbuffer&) = delete;
+    Renderbuffer& operator=(const Renderbuffer&) = delete;
+    Renderbuffer(Renderbuffer&& other) noexcept
+        : m_Id(std::exchange(other.m_Id, 0)), Width(std::exchange(other.Width, 0)),
+          Height(std::exchange(other.Height, 0)), Samples(std::exchange(other.Samples, 0)),
+          InternalFormat(std::exchange(other.InternalFormat, TextureInternalFormat::Depth24Stencil8)),
+          m_Name(std::move(other.m_Name))
+    {
+    }
+    Renderbuffer& operator=(Renderbuffer&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+            m_Id = std::exchange(other.m_Id, 0);
+            Width = std::exchange(other.Width, 0);
+            Height = std::exchange(other.Height, 0);
+            Samples = std::exchange(other.Samples, 0);
+            InternalFormat = std::exchange(other.InternalFormat, TextureInternalFormat::Depth24Stencil8);
+            m_Name = std::move(other.m_Name);
+        }
+        return *this;
+    }
 
     /** @brief Gets the resource name. */
     const std::string& GetName() const
     {
         return m_Name;
     }
-
-    /**
-     * @brief Releases the underlying OpenGL renderbuffer object.
-     */
-    ~Renderbuffer();
 
     /**
      * @brief Checks whether the renderbuffer has been generated.
@@ -64,7 +87,7 @@ struct Renderbuffer
      * @brief Deletes the current OpenGL renderbuffer object.
      * The renderbuffer can be generated again afterward with Generate().
      */
-    void Regenerate();
+    void Delete();
 
     /**
      * @brief Binds the renderbuffer to GL_RENDERBUFFER.

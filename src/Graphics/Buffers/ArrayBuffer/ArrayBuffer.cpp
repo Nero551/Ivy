@@ -4,17 +4,6 @@
 
 namespace Ivy::G
 {
-
-ArrayBuffer& ArrayBuffer::operator=(ArrayBuffer&& Other) noexcept
-{
-    if (this != &Other)
-    {
-        Regenerate();
-        m_Id = std::exchange(Other.m_Id, 0);
-    }
-
-    return *this;
-}
 void ArrayBuffer::Generate()
 {
     if (IsGenerated())
@@ -29,15 +18,13 @@ bool ArrayBuffer::IsGenerated() const
     return m_Id != 0;
 }
 
-void ArrayBuffer::Regenerate()
+void ArrayBuffer::Delete()
 {
-    glDeleteBuffers(1, &m_Id);
-    m_Id = 0;
-}
-
-ArrayBuffer::~ArrayBuffer()
-{
-    glDeleteBuffers(1, &m_Id);
+    if (IsGenerated())
+    {
+        glDeleteBuffers(1, &m_Id);
+        m_Id = 0;
+    }
 }
 
 void ArrayBuffer::Bind()

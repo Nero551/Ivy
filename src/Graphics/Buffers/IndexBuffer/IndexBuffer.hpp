@@ -1,5 +1,7 @@
 #pragma once
 #include "../ArrayBuffer/ArrayBuffer.hpp"
+#include "Graphics/Buffers/BufferUsage.hpp"
+#include <utility>
 
 namespace Ivy::G
 {
@@ -10,8 +12,30 @@ struct IndexBuffer
     /** @brief Controls the OpenGL usage hint applied when index data is uploaded. */
     BufferUsage Usage = BufferUsage::StaticDraw;
 
-    /** @brief Constructs an ungenerated index buffer. */
-    IndexBuffer();
+    IndexBuffer() = default;
+    ~IndexBuffer()
+    {
+        Delete();
+    }
+    IndexBuffer(const IndexBuffer&) = delete;
+    IndexBuffer& operator=(const IndexBuffer&) = delete;
+
+    IndexBuffer(IndexBuffer&& other) noexcept
+        : m_Id(std::exchange(other.m_Id, 0)), Usage(std::exchange(other.Usage, BufferUsage::StaticDraw))
+    {
+    }
+
+    IndexBuffer& operator=(IndexBuffer&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+            m_Id = std::exchange(other.m_Id, 0);
+            Usage = std::exchange(other.Usage, BufferUsage::StaticDraw);
+        }
+
+        return *this;
+    }
 
     /** @brief Generates the buffer once; subsequent calls have no effect. */
     void Generate();
@@ -27,10 +51,7 @@ struct IndexBuffer
     bool IsGenerated() const;
 
     /** @brief Releases the buffer and resets its ID to zero. */
-    void Regenerate();
-
-    /** @brief Releases the buffer when this object is destroyed. */
-    ~IndexBuffer();
+    void Delete();
 
     /** @brief Binds this buffer to GL_ELEMENT_ARRAY_BUFFER for indexed drawing. */
     void Bind();

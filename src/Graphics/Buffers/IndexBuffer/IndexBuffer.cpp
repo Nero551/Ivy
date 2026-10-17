@@ -4,8 +4,6 @@
 
 namespace Ivy::G
 {
-IndexBuffer::IndexBuffer() = default;
-
 void IndexBuffer::Generate()
 {
     if (IsGenerated())
@@ -27,15 +25,13 @@ bool IndexBuffer::IsGenerated() const
     return m_Id != 0;
 }
 
-void IndexBuffer::Regenerate()
+void IndexBuffer::Delete()
 {
-    glDeleteBuffers(1, &m_Id);
-    m_Id = 0;
-}
-
-IndexBuffer::~IndexBuffer()
-{
-    glDeleteBuffers(1, &m_Id);
+    if (IsGenerated())
+    {
+        glDeleteBuffers(1, &m_Id);
+        m_Id = 0;
+    }
 }
 
 void IndexBuffer::Bind()

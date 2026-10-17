@@ -1,6 +1,8 @@
 #pragma once
 #include "../../OpenGL.hpp"
 #include "Graphics/Buffers/BufferUsage.hpp"
+#include <string>
+#include <utility>
 
 namespace Ivy::G
 {
@@ -20,7 +22,34 @@ struct Uniformbuffer
     unsigned int Binding = 0;
 
     Uniformbuffer(const std::string& name) : m_Name(name) {}
-    ~Uniformbuffer();
+    ~Uniformbuffer()
+    {
+        Delete();
+    }
+    Uniformbuffer(const Uniformbuffer&) = delete;
+    Uniformbuffer& operator=(const Uniformbuffer&) = delete;
+    Uniformbuffer(Uniformbuffer&& other) noexcept
+        : Usage(std::exchange(other.Usage, BufferUsage::StaticDraw)), Size(std::exchange(other.Size, 0)),
+          Binding(std::exchange(other.Binding, 0)), m_Name(std::move(other.m_Name)),
+          m_Id(std::exchange(other.m_Id, 0))
+    {
+    }
+
+    Uniformbuffer& operator=(Uniformbuffer&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+
+            m_Id = std::exchange(other.m_Id, 0);
+            Usage = std::exchange(other.Usage, BufferUsage::StaticDraw);
+            Size = std::exchange(other.Size, 0);
+            Binding = std::exchange(other.Binding, 0);
+            m_Name = std::move(other.m_Name);
+        }
+
+        return *this;
+    }
 
     /** @brief Gets the resource name. */
     const std::string& GetName() const
@@ -48,7 +77,7 @@ struct Uniformbuffer
     bool IsGenerated() const;
 
     /** @brief Deletes the OpenGL uniform buffer. */
-    void Regenerate();
+    void Delete();
 
     /** @brief Binds the buffer to its uniform buffer binding point. */
     void Bind();

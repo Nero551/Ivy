@@ -97,9 +97,9 @@ void Mesh::DrawInstanced(const int instanceCount)
 
 void Mesh::Regenerate()
 {
-    VBO.Regenerate();
-    EBO.Regenerate();
-    VAO.Regenerate();
+    VBO.Delete();
+    EBO.Delete();
+    VAO.Delete();
 }
 
 void Mesh::DrawElements() const

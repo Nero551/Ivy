@@ -11,11 +11,6 @@
 
 namespace Ivy::G
 {
-Framebuffer::~Framebuffer()
-{
-    glDeleteFramebuffers(1, &m_Id);
-}
-
 void Framebuffer::Generate()
 {
     if (IsGenerated())
@@ -25,10 +20,13 @@ void Framebuffer::Generate()
     glCreateFramebuffers(1, &m_Id);
 }
 
-void Framebuffer::Regenerate()
+void Framebuffer::Delete()
 {
-    glDeleteFramebuffers(1, &m_Id);
-    m_Id = 0;
+    if (IsGenerated())
+    {
+        glDeleteFramebuffers(1, &m_Id);
+        m_Id = 0;
+    }
 }
 
 void Framebuffer::Bind()
@@ -112,7 +110,7 @@ void Framebuffer::Resize(const int width, const int height)
 
     for (auto& [attachment, buffer] : RenderBuffers)
     {
-        buffer->Regenerate();
+        buffer->Delete();
         buffer->Width = width;
         buffer->Height = height;
         buffer->Generate();
