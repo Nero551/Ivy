@@ -392,24 +392,24 @@ TEST_CASE("Function numerical differentiation")
 
     SECTION("Derivative method")
     {
-        REQUIRE(f.Derivative(2.0f, dx) == Approx(4.0f).margin(0.01f));
-        REQUIRE(f.Derivative(2.0f, dx, DifferentiationMethod::Forward) == Approx(4.0f).margin(0.01f));
-        REQUIRE(f.Derivative(2.0f, dx, DifferentiationMethod::Backward) == Approx(4.0f).margin(0.01f));
+        REQUIRE(Derivative(f, 2.0f, dx) == Approx(4.0f).margin(0.01f));
+        REQUIRE(Derivative(f, 2.0f, dx, DifferentiationMethod::Forward) == Approx(4.0f).margin(0.01f));
+        REQUIRE(Derivative(f, 2.0f, dx, DifferentiationMethod::Backward) == Approx(4.0f).margin(0.01f));
     }
 
     SECTION("Differentiate returns a function")
     {
-        auto df = f.Differentiate(dx);
+        auto df = Differentiate(f, dx);
         REQUIRE(df(2.0f) == Approx(4.0f).margin(0.01f));
         // relative step
-        auto dfRel = f.Differentiate(dx, DifferentiationMethod::Central);
+        auto dfRel = Differentiate(f, dx, DifferentiationMethod::Central);
         REQUIRE(dfRel(2.0f) == Approx(4.0f).margin(0.01f));
     }
 
     SECTION("Derivative of constant is zero")
     {
         auto c = Function<float, float>([](float) { return 5.0f; });
-        REQUIRE(c.Derivative(1.0f, dx) == Approx(0.0f).margin(1e-6f));
+        REQUIRE(Derivative(c, 1.0f, dx) == Approx(0.0f).margin(1e-6f));
     }
 }
 
@@ -420,16 +420,16 @@ TEST_CASE("Function numerical integration")
 
     SECTION("Integral method")
     {
-        REQUIRE(f.Integral(0.0f, 2.0f, dx) == Approx(8.0f / 3.0f).margin(0.01f));
-        REQUIRE(f.Integral(0.0f, 2.0f, dx, IntegrationMethod::Left) == Approx(8.0f / 3.0f).margin(0.02f));
-        REQUIRE(f.Integral(0.0f, 2.0f, dx, IntegrationMethod::Right) == Approx(8.0f / 3.0f).margin(0.02f));
+        REQUIRE(Integral(f, 0.0f, 2.0f, dx) == Approx(8.0f / 3.0f).margin(0.01f));
+        REQUIRE(Integral(f, 0.0f, 2.0f, dx, IntegrationMethod::Left) == Approx(8.0f / 3.0f).margin(0.02f));
+        REQUIRE(Integral(f, 0.0f, 2.0f, dx, IntegrationMethod::Right) == Approx(8.0f / 3.0f).margin(0.02f));
         REQUIRE(
-            f.Integral(0.0f, 2.0f, dx, IntegrationMethod::Trapezoid) == Approx(8.0f / 3.0f).margin(0.01f));
+            Integral(f, 0.0f, 2.0f, dx, IntegrationMethod::Trapezoid) == Approx(8.0f / 3.0f).margin(0.01f));
     }
 
     SECTION("Integrate returns cumulative function")
     {
-        auto F = f.Integrate(0.0f, dx);
+        auto F = Integrate(f, 0.0f, dx);
         REQUIRE(F(2.0f) == Approx(8.0f / 3.0f).margin(0.01f));
         REQUIRE(F(1.0f) == Approx(1.0f / 3.0f).margin(0.01f));
     }
@@ -437,7 +437,7 @@ TEST_CASE("Function numerical integration")
     SECTION("Integral of constant")
     {
         auto c = Function<float, float>([](float) { return 5.0f; });
-        REQUIRE(c.Integral(0.0f, 2.0f, dx) == Approx(10.0f).margin(0.01f));
+        REQUIRE(Integral(c, 0.0f, 2.0f, dx) == Approx(10.0f).margin(0.01f));
     }
 }
 
@@ -447,26 +447,26 @@ TEST_CASE("Function Taylor and Maclaurin")
 
     SECTION("Taylor")
     {
-        auto taylor = f.Taylor(3, 0.3f);
+        auto taylor = Taylor(f, 3, 0.3f);
         // exp(0.7) ≈ 2.01375, Taylor at a=0.3 with 3 terms should be reasonable
         REQUIRE(taylor(0.7f) == Approx(std::exp(0.7f)).margin(0.1f));
         // More terms should improve accuracy
-        auto taylor5 = f.Taylor(3, 0.5f);
+        auto taylor5 = Taylor(f, 3, 0.5f);
         REQUIRE(taylor5(0.7f) == Approx(std::exp(0.7f)).margin(0.01f));
     }
 
     SECTION("Maclaurin")
     {
-        auto mac = f.Maclaurin(3);
+        auto mac = Maclaurin(f, 3);
         REQUIRE(mac(0.7f) == Approx(std::exp(0.7f)).margin(0.1f));
-        auto mac5 = f.Maclaurin(3);
+        auto mac5 = Maclaurin(f, 3);
         REQUIRE(mac5(0.3f) == Approx(std::exp(0.3f)).margin(0.01f));
     }
 
     SECTION("Taylor of polynomial")
     {
         auto p = Function<float, float>([](const float x) { return 2.0f * x * x + 3.0f * x + 1.0f; });
-        auto taylor = p.Taylor(4, 1.0f);
+        auto taylor = Taylor(p, 4, 1.0f);
         // Should match exactly
         REQUIRE(taylor(1.0f) == Approx(p(1.0f)));
     }

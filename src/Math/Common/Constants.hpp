@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utilities/FixedString.hpp"
+#include <numbers>
 namespace Ivy::M
 {
 inline constexpr float EPSILON = 1e-5f;

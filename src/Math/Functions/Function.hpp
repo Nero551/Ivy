@@ -1,9 +1,5 @@
 #pragma once
-#include "../../Utilities/Debug/Log.hpp"
-#include "DifferentiationMethod.hpp"
-#include "IntegrationMethod.hpp"
 #include "Math/Common/Comparison.hpp"
-#include "Math/Common/Exponentials.hpp"
 #include "Math/Concepts.hpp"
 
 namespace Ivy::M
@@ -54,154 +50,10 @@ template <typename Input, typename Output> struct Function
         return [f = *this, g](const Middle& input) { return f(g(input)); };
     }
 
-    /**
-     * @brief Calculates the numerical derivative of the function.
-     * @param dx Step size used for numerical differentiation.
-     * @param method Numerical differentiation method to use.
-     * @return A function representing the numerical derivative.
-     * @note Only available for functions with a scalar Input type.
-     */
-    Function Differentiate(
-        Input dx = 0.001f, DifferentiationMethod method = DifferentiationMethod::Central) const
-        requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
-    {
-        return [f = *this, dx, method](const Input x)
-        {
-            const Input h = dx * std::max(1.0f, std::abs(x));
-            switch (method)
-            {
-            case DifferentiationMethod::Central:
-                return (f(x + h) - f(x - h)) / (2.0f * h);
-            case DifferentiationMethod::Forward:
-                return (f(x + h) - f(x)) / h;
-            case DifferentiationMethod::Backward:
-                return (f(x) - f(x - h)) / h;
-            default:
-                U::Log::Fatal("Invalid Differentiation Method");
-                return Output{};
-            }
-        };
-    }
-
-    /**
-     * @brief Evaluates the numerical derivative at x.
-     * @param x Input value at which to evaluate the derivative.
-     * @param dx Step size used for numerical differentiation.
-     * @param method Numerical differentiation method to use.
-     * @return The numerical derivative at x.
-     */
-    Output Derivative(Input x, const Input dx = 0.001f,
-        const DifferentiationMethod method = DifferentiationMethod::Central) const
-        requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
-    {
-        return Differentiate(dx, method)(x);
-    }
-
     Output AverageRateOfChange(const Input start, const Input end) const
         requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
     {
         return (Evaluate(end) - Evaluate(start)) / (end - start);
-    }
-
-    Output Average(const Input start, const Input end) const
-        requires(Scalar<Input> && Additive<Output, Output> && Divisible<Output, Input>)
-    {
-        return Integrate(start, end) / (end - start);
-    }
-
-    /**
-     * @brief Evaluates the definite integral from lowerBound to upperBound.
-     * @param lowerBound Lower bound of the integration interval.
-     * @param upperBound Upper bound of the integration interval.
-     * @param dx Step size used for numerical integration.
-     * @param method Numerical integration method to use.
-     * @return The approximate value of the integral.
-     */
-    Output Integral(const Input lowerBound, Input upperBound, const Input dx = 0.001f,
-        const IntegrationMethod method = IntegrationMethod::Midpoint) const requires(Scalar<Input> &&
-        Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
-    {
-        return Integrate(lowerBound, dx, method)(upperBound);
-    }
-
-    /**
-     * @brief Creates a numerical integral function with respect to its upper bound.
-     * @param lowerBound Lower bound of the integration interval.
-     * @param dx Step size used for numerical integration.
-     * @param method Numerical integration method to use.
-     * @return A function whose value is the integral from lowerBound to its input.
-     */
-    Function Integrate(Input lowerBound, Input dx = 0.001f,
-        IntegrationMethod method = IntegrationMethod::Midpoint) const requires(Scalar<Input> &&
-        Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
-    {
-        return [f = *this, lowerBound, dx, method](const Input upperBound)
-        {
-            Output result{};
-            for (Input x = lowerBound; x < upperBound; x += dx)
-            {
-                const Input width = std::min(dx, upperBound - x);
-
-                switch (method)
-                {
-                case IntegrationMethod::Midpoint:
-                    result += f(x + width / 2.0f) * width;
-                    break;
-
-                case IntegrationMethod::Right:
-                    result += f(x + width) * width;
-                    break;
-
-                case IntegrationMethod::Left:
-                    result += f(x) * width;
-                    break;
-
-                case IntegrationMethod::Trapezoid:
-                    result += (f(x) + f(x + width)) / 2.0f * width;
-                    break;
-
-                default:
-                    U::Log::Fatal("Invalid Integration Method");
-                }
-            }
-
-            return result;
-        };
-    }
-
-    /**
-     * @brief Creates a Taylor polynomial approximation about the point a.
-     * @param terms Number of terms in the Taylor polynomial.
-     * @param a Point about which the polynomial is expanded.
-     * @return A function representing the Taylor polynomial approximation.
-     */
-    Function<float, Output> Taylor(unsigned int terms, Input a) const
-        requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
-    {
-        return [terms, a, f = *this](const Input x)
-        {
-            Output result{};
-            Function currentFunc = f;
-
-            for (unsigned int n = 0; n < terms; ++n)
-            {
-                result += currentFunc(a) * Pow(x - a, n) / Factorial(n);
-                currentFunc = currentFunc.Differentiate();
-            }
-
-            return result;
-        };
-    }
-
-    /**
-     * @brief Creates a Taylor polynomial approximation centered at zero.
-     * @param terms Number of terms in the Taylor polynomial.
-     * @return A function representing the Maclaurin polynomial approximation.
-     */
-    Function<float, Output> Maclaurin(const unsigned int terms) const
-        requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
-    {
-        return Taylor(terms, 0.0f);
     }
 
     /**

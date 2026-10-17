@@ -237,6 +237,13 @@ template <M::Scalar T> struct Dual
     }
 };
 
+template <typename In, typename Out> struct Field
+{
+    M::Function<In, Out> Function;
+
+    Field(M::Function<In, Out>& f) : Function(f) {}
+};
+
 inline void Test()
 {
     P::Dimension<float, P::Acceleration> g = 9.8;
