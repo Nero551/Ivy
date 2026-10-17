@@ -3,11 +3,9 @@
 #include "Core/ECS/ComponentPool.hpp"
 #include "Core/ECS/Scene.hpp"
 #include "Core/Engine.hpp"
-#include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Core/World/Nodes.hpp"
-#include "Core/World/Scenes/Grid.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Topology.hpp"
@@ -15,6 +13,7 @@
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
+#include "Grid.hpp"
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
@@ -24,7 +23,7 @@
 #include <assimp/postprocess.h>
 #include <utility>
 
-namespace Ivy
+namespace Ivy::Sandbox
 {
 struct CoordinateAxesScene : C::Scene
 {
@@ -106,4 +105,4 @@ struct CoordinateAxesScene : C::Scene
         m_Engine.ECS.FindEntity(GetRoot()).AttachChild(grid.GetRoot());
     }
 };
-} // namespace Ivy
+} // namespace Ivy::Sandbox

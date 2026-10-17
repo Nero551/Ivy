@@ -20,6 +20,8 @@
 #include <dlfcn.h>
 #include <ostream>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace Sketch
 {
@@ -235,13 +237,6 @@ template <M::Scalar T> struct Dual
         U::Log::Assert(Real == 0, "[Dual] An Inverse Exists Only If Real Part a != 0");
         return Conjugate() / MagnitudeSquared();
     }
-};
-
-template <typename In, typename Out> struct Field
-{
-    M::Function<In, Out> Function;
-
-    Field(M::Function<In, Out>& f) : Function(f) {}
 };
 
 inline void Test()

@@ -2,8 +2,6 @@
 #include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Nodes.hpp"
-#include "Core/World/Scenes/CoordinateAxesScene.hpp"
-#include "Core/World/Systems/StressTester.hpp"
 #include "Core/World/Systems/Transform3DSystem.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "Graphics/InputEnums/Key.hpp"
@@ -37,20 +35,8 @@ Entity& World::GetCamera()
 //TODO: quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
 void World::Start()
 {
+    SetRoot(m_Engine.ECS.CreateEntity<C::Node>().GetId());
     AddSystem<Transform3DSystem>();
-    // AddSystem<StressTester>();
-
-    m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
-
-    SetRoot(m_Engine.ECS.CreateEntity<Node>().GetId());
-
-    auto& camera = m_Engine.ECS.CreateEntity<R::Camera3D>();
-    m_Engine.ECS.Query.Pool<Transform3DComponent>().GetComponentById(camera.GetId()).Position = {0, 0, 10};
-    GetRoot().AttachChild(camera);
-    SetCamera(camera.GetId());
-
-    CoordinateAxesScene coordinateAxes = CreateScene<CoordinateAxesScene>();
-    GetRoot().AttachChild(coordinateAxes.GetRoot());
 
     for (auto& system : m_Systems)
     {
@@ -63,78 +49,6 @@ void World::Update(const double dt)
     if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::Escape))
     {
         m_Engine.Shutdown();
-    }
-
-    if (m_Engine.GetModule<I::Input>().IsKeyReleased(G::Key::Q))
-    {
-        if (m_Engine.GetModule<I::Input>().GetMouseMode() == G::CursorMode::Disabled)
-        {
-            m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Normal);
-        }
-        else
-        {
-            m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
-        }
-    }
-
-    if (m_Engine.GetModule<I::Input>().IsKeyPressed(G::Key::T))
-    {
-        U::Log::Info(m_Engine.ECS.EntityAmount());
-    }
-
-    auto& query = m_Engine.ECS.Query;
-    auto& input = m_Engine.GetModule<I::Input>();
-    auto& camera = GetCamera();
-
-    auto& transform = query.Pool<C::Transform3DComponent>().GetComponentById(camera.GetId());
-    auto& cameraComponent = query.Pool<R::CameraComponent>().GetComponentById(camera.GetId());
-
-    cameraComponent.AspectRatio = m_Engine.Window.GetAspectRatio();
-
-    if (input.GetMouseMode() == G::CursorMode::Disabled)
-    {
-        const float xOffset = M::Rad(-input.GetMouseDelta().x * cameraComponent.Sensitivity);
-        const float yOffset = M::Rad(-input.GetMouseDelta().y * cameraComponent.Sensitivity);
-
-        constexpr float maxPitch = M::Rad(89.9);
-
-        cameraComponent.Yaw += xOffset;
-        cameraComponent.Pitch += yOffset;
-        cameraComponent.Pitch = std::clamp(cameraComponent.Pitch, -maxPitch, maxPitch);
-
-        transform.Rotation = M::Quaternion<>::FromEulerXYZ({cameraComponent.Pitch, cameraComponent.Yaw, 0});
-    }
-
-    const float speed = 5 * static_cast<float>(dt);
-
-    if (input.IsKeyHeld(G::Key::W))
-    {
-        transform.Position += speed * transform.GetForward();
-    }
-
-    if (input.IsKeyHeld(G::Key::S))
-    {
-        transform.Position -= speed * transform.GetForward();
-    }
-
-    if (input.IsKeyHeld(G::Key::A))
-    {
-        transform.Position -= speed * transform.GetRight();
-    }
-
-    if (input.IsKeyHeld(G::Key::D))
-    {
-        transform.Position += speed * transform.GetRight();
-    }
-
-    if (input.IsKeyHeld(G::Key::Space))
-    {
-        transform.Position += speed * M::Vector<3>(0, 1, 0);
-    }
-
-    if (input.IsKeyHeld(G::Key::LeftShift))
-    {
-        transform.Position -= speed * M::Vector<3>(0, 1, 0);
     }
 
     for (auto& system : m_Systems)

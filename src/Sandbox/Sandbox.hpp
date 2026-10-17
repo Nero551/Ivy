@@ -1,0 +1,12 @@
+#pragma once
+#include "Core/Module.hpp"
+namespace Ivy::Sandbox
+{
+struct Sandbox : C::Module
+{
+    using C::Module::Module;
+    void Start() override;
+    void Update(double dt) override;
+};
+
+} // namespace Ivy::Sandbox

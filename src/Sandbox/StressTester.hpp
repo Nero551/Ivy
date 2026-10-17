@@ -13,15 +13,26 @@
 #include "Modules/Renderer/Nodes.hpp"
 #include <utility>
 
-namespace Ivy
+namespace Ivy::Sandbox
 {
 struct StressTester : C::System
 {
     using C::System::System;
 
-    void Start() override
+    void Spawn(int dimension, int craziness)
     {
-        FourDimensionalProjection(3);
+        if (dimension == 2)
+        {
+            TwoDimensionalProjection(craziness);
+        }
+        else if (dimension == 3)
+        {
+            ThreeDimensionalProjection(craziness);
+        }
+        else if (dimension == 4)
+        {
+            FourDimensionalProjection(craziness);
+        }
     }
 
     void Update(double dt) override
@@ -149,4 +160,4 @@ struct StressTester : C::System
         return point;
     }
 };
-} // namespace Ivy
+} // namespace Ivy::Sandbox
