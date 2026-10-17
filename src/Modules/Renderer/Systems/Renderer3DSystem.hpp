@@ -12,8 +12,8 @@ struct Renderer3DSystem : C::System
     void Start() override;
     void Render() override;
 
-    void FillBatches(unsigned int entityId, C::Transform3DComponent& transformComponent,
-        MaterialComponent& materialComponent, MeshComponent& meshComponent);
+    void FillBatches(unsigned int entityId, CMP::Transform3D& transformComponent,
+        CMP::Material& materialComponent, CMP::Mesh& meshComponent);
     U::Indirect2DVector<RenderBatch> Batches;
 };
 } // namespace Ivy::R

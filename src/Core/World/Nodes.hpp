@@ -20,7 +20,7 @@ struct Node2D : Node
     void Initialize() override
     {
         Node::Initialize();
-        m_ECS.Query.Pool<Transform2DComponent>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Transform2D>().Add(GetId());
     }
 };
 
@@ -30,7 +30,7 @@ struct Node3D : Node
     void Initialize() override
     {
         Node::Initialize();
-        m_ECS.Query.Pool<Transform3DComponent>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Transform3D>().Add(GetId());
     }
 };
 } // namespace Ivy::C

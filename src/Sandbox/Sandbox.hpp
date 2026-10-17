@@ -4,7 +4,7 @@ namespace Ivy::Sandbox
 {
 struct Sandbox : C::Module
 {
-    using C::Module::Module;
+    using Module::Module;
     void Start() override;
     void Update(double dt) override;
 };

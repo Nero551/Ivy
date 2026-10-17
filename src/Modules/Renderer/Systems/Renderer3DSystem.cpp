@@ -27,10 +27,10 @@ void Renderer3DSystem::Render()
     auto& rendererModule = m_Engine.GetModule<Renderer>();
 
     const M::Matrix<4, 4> projection =
-        query.Pool<CameraComponent>().GetComponent(camera.GetId()).GetProjectionMatrix();
+        query.Pool<CMP::Camera>().GetComponent(camera.GetId()).GetProjectionMatrix();
 
     //View Matrix
-    auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(camera.GetId());
+    auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(camera.GetId());
     const M::Vector<3> pos = transform.Position;
     const M::Vector<3> forward = transform.GetForward();
     const M::Vector<3> up = transform.GetUp();
@@ -40,12 +40,12 @@ void Renderer3DSystem::Render()
     rendererModule.GUniformbuffer->Get().Set(projection, 64);
     rendererModule.GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
     rendererModule.GUniformbuffer->Get().Set(
-        query.Pool<C::Transform3DComponent>().GetComponent(camera.GetId()).m_GlobalPosition, 144);
+        query.Pool<CMP::Transform3D>().GetComponent(camera.GetId()).m_GlobalPosition, 144);
     rendererModule.GUniformbuffer->Get().Bind();
 
-    query.ForEach<MaterialComponent, C::Transform3DComponent, MeshComponent>(
-        [&](unsigned int entityId, MaterialComponent& materialComponent, C::Transform3DComponent& transform,
-            MeshComponent& meshComponent)
+    query.ForEach<CMP::Material, CMP::Transform3D, CMP::Mesh>(
+        [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform3D& transform,
+            CMP::Mesh& meshComponent)
         {
             if (materialComponent.Material->Get().Shader->HotReload == true)
             {
@@ -60,8 +60,8 @@ void Renderer3DSystem::Render()
     }
 }
 
-void Renderer3DSystem::FillBatches(unsigned int entityId, C::Transform3DComponent& transformComponent,
-    MaterialComponent& materialComponent, MeshComponent& meshComponent)
+void Renderer3DSystem::FillBatches(unsigned int entityId, CMP::Transform3D& transformComponent,
+    CMP::Material& materialComponent, CMP::Mesh& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;

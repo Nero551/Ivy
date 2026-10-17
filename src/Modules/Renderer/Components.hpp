@@ -11,15 +11,15 @@
 #include "Modules/Renderer/ProjectionMode.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
-namespace Ivy::R
+namespace Ivy::CMP
 {
-struct CameraComponent : C::Component
+struct Camera : C::Component
 {
     float FOV = 45.0f;
     float Near = 0.1f;
     float Far = 100.0f;
     float AspectRatio = 1.0f;
-    ProjectionMode ProjectionMode = ProjectionMode::Perspective;
+    R::ProjectionMode ProjectionMode = R::ProjectionMode::Perspective;
 
     float Sensitivity = 0.05f;
     float Yaw = 0;
@@ -28,7 +28,7 @@ struct CameraComponent : C::Component
     M::Matrix<4, 4> GetProjectionMatrix() const
     {
         //TODO: currently , orthographic doesn't fucking work
-        if (ProjectionMode == ProjectionMode::Orthographic)
+        if (ProjectionMode == R::ProjectionMode::Orthographic)
         {
             return M::Matrix<4, 4>::Orthographic(
                 -AspectRatio, AspectRatio, -AspectRatio, AspectRatio, Near, Far);
@@ -37,9 +37,9 @@ struct CameraComponent : C::Component
     }
 };
 
-struct LightComponent : C::Component
+struct Light : C::Component
 {
-    LightType Type = LightType::Directional;
+    R::LightType Type = R::LightType::Directional;
     M::Vector<3> Color = M::Vector<3>{1};
     M::Vector<3> Ambient = M::Vector<3>{0.8};
     M::Vector<3> Diffuse = M::Vector<3>{1};
@@ -53,13 +53,13 @@ struct LightComponent : C::Component
     float OuterCutOff = M::Rad(17.5);
 };
 
-struct MaterialComponent : C::Component
+struct Material : C::Component
 {
     U::CheckedPtr<C::Resource<G::Material>> Material{"Material Component Has No Material Assigned"};
 };
 
-struct MeshComponent : C::Component
+struct Mesh : C::Component
 {
     U::CheckedPtr<C::Resource<G::Mesh>> Mesh{"Mesh Component Has No Mesh Assigned"};
 };
-} // namespace Ivy::R
+} // namespace Ivy::CMP

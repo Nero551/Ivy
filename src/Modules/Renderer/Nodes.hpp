@@ -10,7 +10,7 @@ struct Camera2D : C::Node2D
     void Initialize() override
     {
         Node2D::Initialize();
-        m_ECS.Query.Pool<CameraComponent>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Camera>().Add(GetId());
     }
 };
 
@@ -20,7 +20,7 @@ struct Camera3D : C::Node3D
     void Initialize() override
     {
         Node3D::Initialize();
-        m_ECS.Query.Pool<CameraComponent>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Camera>().Add(GetId());
     }
 };
 
@@ -30,7 +30,7 @@ struct Light3D : C::Node3D
     void Initialize() override
     {
         Node3D::Initialize();
-        m_ECS.Query.Pool<LightComponent>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Light>().Add(GetId());
     }
 };
 
@@ -40,8 +40,8 @@ struct MeshInstance2D : C::Node2D
     void Initialize() override
     {
         Node2D::Initialize();
-        m_ECS.Query.Pool<MaterialComponent>().Add(GetId());
-        m_ECS.Query.Pool<MeshComponent>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Material>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Mesh>().Add(GetId());
     }
 };
 
@@ -51,8 +51,8 @@ struct MeshInstance3D : C::Node3D
     void Initialize() override
     {
         Node3D::Initialize();
-        m_ECS.Query.Pool<MaterialComponent>().Add(GetId());
-        m_ECS.Query.Pool<MeshComponent>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Material>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Mesh>().Add(GetId());
     }
 };
 } // namespace Ivy::R

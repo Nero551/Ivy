@@ -10,7 +10,7 @@ void Transform3DSystem::Update(double fdt)
     auto& world = m_Engine.World;
     auto& ecs = m_Engine.ECS;
     auto& query = m_Engine.ECS.Query;
-    auto& transformPool = query.Pool<Transform3DComponent>();
+    auto& transformPool = query.Pool<CMP::Transform3D>();
 
     world.GetRoot().ForEachDescendant(
         [&](const unsigned int entityId)

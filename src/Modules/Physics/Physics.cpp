@@ -39,9 +39,9 @@ C::Entity& Physics::CreatePoint(M::Vector<4> col)
     material().Shader = &shader();
 
     auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-    m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponent(point.GetId()).Mesh = &mesh;
-    m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponent(point.GetId()).Material = &material;
-    m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(point.GetId()).Scale = M::Vector<3>{0.2};
+    m_Engine.ECS.Query.Pool<CMP::Mesh>().GetComponent(point.GetId()).Mesh = &mesh;
+    m_Engine.ECS.Query.Pool<CMP::Material>().GetComponent(point.GetId()).Material = &material;
+    m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(point.GetId()).Scale = M::Vector<3>{0.2};
     m_Engine.World.GetRoot().AttachChild(point);
 
     return point;
@@ -53,7 +53,7 @@ void Physics::Plot(const M::Vector<3> vec3, const M::Vector<4> col)
     if (vec3.x < max && vec3.y < max && vec3.z < max)
     {
         auto& point = CreatePoint(col);
-        auto& transform = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(point.GetId());
+        auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(point.GetId());
         transform.Position().x = vec3.x;
         transform.Position().y = vec3.y;
         transform.Position().z = vec3.z;
@@ -79,8 +79,8 @@ void Physics::Start()
     objectMaterial().Shader = &objectShader();
 
     auto& cube = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-    query.Pool<R::MeshComponent>().GetComponent(cube.GetId()).Mesh = &mesh;
-    query.Pool<R::MaterialComponent>().GetComponent(cube.GetId()).Material = &objectMaterial;
+    query.Pool<CMP::Mesh>().GetComponent(cube.GetId()).Mesh = &mesh;
+    query.Pool<CMP::Material>().GetComponent(cube.GetId()).Material = &objectMaterial;
     query.Pool<BodyComponent>().Add(cube.GetId());
     cubeId = cube.GetId();
     m_Engine.World.GetRoot().AttachChild(cube);
@@ -98,7 +98,7 @@ void Physics::FixedUpdate(const double fdt)
     auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
     auto& input = m_Engine.GetModule<I::Input>();
     auto& query = m_Engine.ECS.Query;
-    auto& transform = query.Pool<C::Transform3DComponent>().GetComponent(cubeId);
+    auto& transform = query.Pool<CMP::Transform3D>().GetComponent(cubeId);
     auto& body = query.Pool<BodyComponent>().GetComponent(cubeId);
 
     // ExternalForces = M::Vector3{0};

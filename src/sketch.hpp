@@ -55,9 +55,6 @@ namespace Sketch
 // TODO: make orthographic camera work.
 // TODO: figure out if 2D needs normal matrix
 
-//TODO: (HIGH PRIORITY) i need genuine move and copy semantics/constructors for everything in Graphics section.
-// TODO: Material is all that remains
-
 using namespace Ivy;
 
 using Index = unsigned int;

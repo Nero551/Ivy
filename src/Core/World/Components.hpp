@@ -13,11 +13,16 @@ namespace Ivy::R
 struct CameraSystem;
 struct Renderer3DSystem;
 } // namespace Ivy::R
-
 namespace Ivy::C
 {
+struct Transform3DSystem;
+struct Transform2DSystem;
+} // namespace Ivy::C
 
-struct Transform2DComponent : Component
+namespace Ivy::CMP
+{
+
+struct Transform2D : C::Component
 {
     U::Track<M::Vector<2>> Position;
     U::Track<M::Vector<2>> Scale;
@@ -52,10 +57,10 @@ struct Transform2DComponent : Component
     U::Track<M::Vector<2>> m_GlobalPosition = M::Vector<2>::Zero();
     U::Track<float> m_GlobalRotation = 0;
     U::Track<M::Vector<2>> m_GlobalScale = M::Vector<2>::One();
-    friend struct Transform2DSystem;
+    friend struct C::Transform2DSystem;
 };
 
-struct Transform3DComponent : C::Component
+struct Transform3D : C::Component
 {
     U::Track<M::Vector<3>> Position = M::Vector<3>::Zero();
     U::Track<M::Quaternion<>> Rotation = M::Quaternion<>::Identity();
@@ -98,8 +103,7 @@ struct Transform3DComponent : C::Component
     U::Track<M::Vector<3>> m_GlobalPosition = M::Vector<3>::Zero();
     U::Track<M::Quaternion<>> m_GlobalRotation = M::Quaternion<>::Identity();
     U::Track<M::Vector<3>> m_GlobalScale = M::Vector<3>::One();
-    friend struct Transform3DSystem;
+    friend struct C::Transform3DSystem;
     friend struct R::Renderer3DSystem;
-    friend struct R::CameraSystem;
 };
-} // namespace Ivy::C
+} // namespace Ivy::CMP

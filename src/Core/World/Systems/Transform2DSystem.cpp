@@ -10,7 +10,7 @@ void Transform2DSystem::Update(double dt)
     auto& world = m_Engine.World;
     auto& ecs = m_Engine.ECS;
     auto& query = m_Engine.ECS.Query;
-    auto& transformPool = query.Pool<Transform2DComponent>();
+    auto& transformPool = query.Pool<CMP::Transform2D>();
 
     world.GetRoot().ForEachDescendant(
         [&](const unsigned int entityId)

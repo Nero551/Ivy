@@ -55,9 +55,9 @@ struct Grid : C::Scene
         auto& line = resourceManager.Load<G::Mesh>(m);
 
         auto& l = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-        auto& materialComponent = m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponent(l.GetId());
-        auto& meshComponent = m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponent(l.GetId());
-        auto& transformComponent = m_Engine.ECS.Query.Pool<C::Transform3DComponent>().GetComponent(l.GetId());
+        auto& materialComponent = m_Engine.ECS.Query.Pool<CMP::Material>().GetComponent(l.GetId());
+        auto& meshComponent = m_Engine.ECS.Query.Pool<CMP::Mesh>().GetComponent(l.GetId());
+        auto& transformComponent = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(l.GetId());
         meshComponent.Mesh = &line;
         materialComponent.Material = &resourceManager.Load<G::Material>("GridLine Material");
         materialComponent.Material->Get().Shader = &shader();
