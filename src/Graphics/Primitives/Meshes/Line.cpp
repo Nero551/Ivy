@@ -1,5 +1,6 @@
 #include "../Primitives.hpp"
 
+#include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Topology.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
@@ -23,6 +24,7 @@ G::Mesh CreateLine(const std::string& name)
     mesh.Vertices = std::move(vertices);
     mesh.Indices = std::move(indices);
     mesh.Topology = Topology::Lines;
+    mesh.CullMode = CullMode::None;
 
     return mesh;
 }

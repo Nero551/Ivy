@@ -26,11 +26,10 @@ void Renderer3DSystem::Render()
     auto& query = m_Engine.ECS.Query;
     auto& rendererModule = m_Engine.GetModule<Renderer>();
 
-    const M::Matrix<4, 4> projection =
-        query.Pool<CMP::Camera>().GetComponent(camera.GetId()).GetProjectionMatrix();
+    const M::Matrix<4, 4> projection = query.Pool<CMP::Camera>().GetComponent(camera).GetProjectionMatrix();
 
     //View Matrix
-    auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(camera.GetId());
+    auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(camera);
     const M::Vector<3> pos = transform.Position;
     const M::Vector<3> forward = transform.GetForward();
     const M::Vector<3> up = transform.GetUp();

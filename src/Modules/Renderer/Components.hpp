@@ -16,24 +16,22 @@ namespace Ivy::CMP
 struct Camera : C::Component
 {
     float FOV = 45.0f;
-    float Near = 0.1f;
-    float Far = 100.0f;
-    float AspectRatio = 1.0f;
+    float Near = 0.1;
+    float Far = 100;
+    float Left = -50;
+    float Right = 50;
+    float Top = 50;
+    float Bottom = -50;
     R::ProjectionMode ProjectionMode = R::ProjectionMode::Perspective;
-
     float Sensitivity = 0.05f;
-    float Yaw = 0;
-    float Pitch = 0;
 
     M::Matrix<4, 4> GetProjectionMatrix() const
     {
-        //TODO: currently , orthographic doesn't fucking work
         if (ProjectionMode == R::ProjectionMode::Orthographic)
         {
-            return M::Matrix<4, 4>::Orthographic(
-                -AspectRatio, AspectRatio, -AspectRatio, AspectRatio, Near, Far);
+            return M::Matrix<4, 4>::Orthographic(Left, Right, Bottom, Top, Near, Far);
         }
-        return M::Matrix<4, 4>::Perspective(M::Rad(FOV), AspectRatio, Near, Far);
+        return M::Matrix<4, 4>::Perspective(M::Rad(FOV), (Right - Left) / (Top - Bottom), Near, Far);
     }
 };
 

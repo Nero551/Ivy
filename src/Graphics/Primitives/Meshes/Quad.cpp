@@ -1,5 +1,6 @@
 #include "../Primitives.hpp"
 
+#include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
 #include <string>
@@ -22,6 +23,7 @@ G::Mesh CreateQuad(const std::string& name)
     G::Mesh mesh{name};
     mesh.Vertices = std::move(vertices);
     mesh.Indices = std::move(indices);
+    mesh.CullMode = CullMode::None;
 
     return mesh;
 }

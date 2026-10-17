@@ -48,11 +48,8 @@ namespace Sketch
 //
 // TODO: split renderer into Renderer2DSystem & Renderer3DSystem and group common methods.
 //
-// TODO: put all components under namespace CMP and drop the Component suffix
-// TODO: do same for systems, maybe even entities.
-//
 // TODO: use a GetSmallestPool in ComponentPoolQuery instead of using the first pool as the driver.
-// TODO: make orthographic camera work.
+//
 // TODO: figure out if 2D needs normal matrix
 
 using namespace Ivy;

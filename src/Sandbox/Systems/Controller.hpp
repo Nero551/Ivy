@@ -36,7 +36,10 @@ struct Controller : C::System
         auto& transform = query.Pool<CMP::Transform3D>().GetComponent(camera.GetId());
         auto& cameraComponent = query.Pool<CMP::Camera>().GetComponent(camera.GetId());
 
-        cameraComponent.AspectRatio = m_Engine.Window.GetAspectRatio();
+        cameraComponent.Left = 0;
+        cameraComponent.Bottom = 0;
+        cameraComponent.Right = m_Engine.Window.GetWidth();
+        cameraComponent.Top = m_Engine.Window.GetHeight();
 
         if (input.GetMouseMode() == G::CursorMode::Disabled)
         {
@@ -45,12 +48,11 @@ struct Controller : C::System
 
             constexpr float maxPitch = M::Rad(89.9);
 
-            cameraComponent.Yaw += xOffset;
-            cameraComponent.Pitch += yOffset;
-            cameraComponent.Pitch = std::clamp(cameraComponent.Pitch, -maxPitch, maxPitch);
+            m_Yaw += xOffset;
+            m_Pitch += yOffset;
+            m_Pitch = std::clamp(m_Pitch, -maxPitch, maxPitch);
 
-            transform.Rotation =
-                M::Quaternion<>::FromEulerXYZ({cameraComponent.Pitch, cameraComponent.Yaw, 0});
+            transform.Rotation = M::Quaternion<>::FromEulerXYZ({m_Pitch, m_Yaw, 0});
         }
 
         const float speed = 5 * static_cast<float>(dt);
@@ -85,5 +87,9 @@ struct Controller : C::System
             transform.Position -= speed * M::Vector<3>(0, 1, 0);
         }
     }
+
+  private:
+    float m_Yaw;
+    float m_Pitch;
 };
 } // namespace Ivy::Sandbox
