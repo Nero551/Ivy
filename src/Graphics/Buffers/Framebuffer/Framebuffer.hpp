@@ -7,6 +7,7 @@
 #include "FramebufferAttachment.hpp"
 #include "FramebufferTarget.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include <string>
 #include <unordered_map>
 #include <utility>
 
@@ -29,7 +30,7 @@ struct Framebuffer
     std::unordered_map<FramebufferAttachment, U::CheckedPtr<Texture>> TextureAttachments;
     std::unordered_map<FramebufferAttachment, U::CheckedPtr<Renderbuffer>> RenderBuffers;
 
-    Framebuffer(const std::string& name) : m_Name(name) {}
+    Framebuffer(std::string name) : m_Name(std::move(name)) {}
     ~Framebuffer()
     {
         Delete();
@@ -37,8 +38,7 @@ struct Framebuffer
     Framebuffer(const Framebuffer&) = delete;
     Framebuffer& operator=(const Framebuffer&) = delete;
     Framebuffer(Framebuffer&& other) noexcept
-        : Target(std::exchange(other.Target, FrameBufferTarget::ReadDraw)),
-          TextureAttachments(std::move(other.TextureAttachments)),
+        : Target(other.Target), TextureAttachments(std::move(other.TextureAttachments)),
           RenderBuffers(std::move(other.RenderBuffers)), m_Id(std::exchange(other.m_Id, 0)),
           m_Name(std::move(other.m_Name))
     {
@@ -51,7 +51,7 @@ struct Framebuffer
             Delete();
 
             m_Id = std::exchange(other.m_Id, 0);
-            Target = std::exchange(other.Target, FrameBufferTarget::ReadDraw);
+            Target = other.Target;
 
             TextureAttachments = std::move(other.TextureAttachments);
             RenderBuffers = std::move(other.RenderBuffers);

@@ -21,7 +21,7 @@ struct Uniformbuffer
     /** @brief Uniform buffer binding point. */
     unsigned int Binding = 0;
 
-    Uniformbuffer(const std::string& name) : m_Name(name) {}
+    Uniformbuffer(std::string name) : m_Name(std::move(name)) {}
     ~Uniformbuffer()
     {
         Delete();
@@ -29,8 +29,7 @@ struct Uniformbuffer
     Uniformbuffer(const Uniformbuffer&) = delete;
     Uniformbuffer& operator=(const Uniformbuffer&) = delete;
     Uniformbuffer(Uniformbuffer&& other) noexcept
-        : Usage(std::exchange(other.Usage, BufferUsage::StaticDraw)), Size(std::exchange(other.Size, 0)),
-          Binding(std::exchange(other.Binding, 0)), m_Name(std::move(other.m_Name)),
+        : Usage(other.Usage), Size(other.Size), Binding(other.Binding), m_Name(std::move(other.m_Name)),
           m_Id(std::exchange(other.m_Id, 0))
     {
     }
@@ -42,9 +41,9 @@ struct Uniformbuffer
             Delete();
 
             m_Id = std::exchange(other.m_Id, 0);
-            Usage = std::exchange(other.Usage, BufferUsage::StaticDraw);
-            Size = std::exchange(other.Size, 0);
-            Binding = std::exchange(other.Binding, 0);
+            Usage = other.Usage;
+            Size = other.Size;
+            Binding = other.Binding;
             m_Name = std::move(other.m_Name);
         }
 

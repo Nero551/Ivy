@@ -9,7 +9,6 @@
 
 namespace Ivy::G
 {
-Material::Material(std::string name) : m_Name(std::move(name)) {}
 
 const std::string& Material::GetName() const
 {

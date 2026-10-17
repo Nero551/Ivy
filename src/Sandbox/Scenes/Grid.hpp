@@ -52,8 +52,7 @@ struct Grid : C::Scene
             "axisVert", "Assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
         G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = resourceManager.Load<G::Mesh>(
-            m.GetName(), std::move(m.Vertices), std::move(m.Indices), G::Topology::Lines);
+        auto& line = resourceManager.Load<G::Mesh>(m);
 
         auto& l = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
         auto& materialComponent = m_Engine.ECS.Query.Pool<R::MaterialComponent>().GetComponent(l.GetId());

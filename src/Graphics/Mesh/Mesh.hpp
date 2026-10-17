@@ -3,13 +3,14 @@
 #include "../Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "../Buffers/IndexBuffer/IndexBuffer.hpp"
 #include "../Buffers/VertexArray/VertexArray.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
 #include "CullMode.hpp"
 #include "FrontFace.hpp"
 #include "RenderMode.hpp"
 #include "Topology.hpp"
 #include "Vertex.hpp"
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace Ivy::G
 {
@@ -25,44 +26,21 @@ struct Mesh
     VertexArray VAO;
     ArrayBuffer VBO;
     IndexBuffer EBO;
-    /** Rendering mode used when drawing the mesh. */
+
     RenderMode RenderMode = RenderMode::Solid;
-
-    /** Primitive topology used to interpret the mesh indices. */
     Topology Topology = Topology::Triangles;
-
-    /**
-     * @brief Face culling mode used when drawing the mesh.
-     * Determines which faces are discarded during rasterization.
-     */
     CullMode CullMode = CullMode::Back;
-
-    /**
-     * @brief Winding order considered front-facing.
-     * Determines how OpenGL identifies front-facing and back-facing faces.
-     */
     FrontFace FrontFace = FrontFace::CounterClockwise;
 
-    /** CPU-side vertex data used to generate the GPU resources. */
     std::vector<Vertex> Vertices;
-
-    /** CPU-side index data used to generate the GPU resources. */
     std::vector<unsigned int> Indices;
 
-    /**
-     * @brief Creates a mesh resource.
-     * @param name Resource name.
-     */
-    Mesh(const std::string& name) : m_Name(name) {}
-
-    Mesh(const std::string& name, std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-        G::Topology topology = G::Topology::Triangles)
-        : Topology(topology), Vertices(std::move(vertices)), Indices(std::move(indices)), m_Name(name)
-    {
-    }
-
-    /** Releases the OpenGL resources owned by the mesh. */
-    ~Mesh();
+    Mesh(std::string name) : m_Name(std::move(name)) {}
+    ~Mesh() = default;
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+    Mesh(Mesh&&) noexcept = default;
+    Mesh& operator=(Mesh&&) noexcept = default;
 
     /**
      * @brief Gets the OpenGL vertex array object ID.
@@ -107,7 +85,7 @@ struct Mesh
      * Deletes the existing GPU resources and marks the mesh as not
      * generated so they can be recreated by Generate().
      */
-    void Regenerate();
+    void Delete();
 
   private:
     std::string m_Name;

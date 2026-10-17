@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Core/Services/ResourceManager/Resource.hpp"
 #include "ShaderStage.hpp"
+#include "Utilities/FileSystem.hpp"
+#include <string>
+#include <unordered_set>
+#include <utility>
 
 namespace Ivy::G
 {
@@ -29,23 +32,54 @@ struct ShaderSource
     //  by line and storing which line has which code.
 
     ShaderSource(std::string name, const std::string& path, ShaderStage stage,
-        std::string version = "version 460 core");
+        std::string version = "version 460 core")
+        : Path(path), Version(std::move(version)), m_Name(std::move(name)), m_Stage(stage)
+    {
+        SourceCode = U::FileSystem::ReadFile(path);
+    }
 
-    ~ShaderSource();
+    ~ShaderSource()
+    {
+        Delete();
+    }
+    ShaderSource(const ShaderSource&) = delete;
+    ShaderSource& operator=(const ShaderSource&) = delete;
+    ShaderSource(ShaderSource&& other) noexcept
+        : Path(std::move(other.Path)), SourceCode(std::move(other.SourceCode)),
+          GeneratedCode(std::move(other.GeneratedCode)), Version(std::move(other.Version)),
+          m_Name(std::move(other.m_Name)), m_Id(std::exchange(other.m_Id, 0)), m_Stage(other.m_Stage),
+          m_Includes(std::move(other.m_Includes))
+    {
+    }
+
+    ShaderSource& operator=(ShaderSource&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+
+            Path = std::move(other.Path);
+            SourceCode = std::move(other.SourceCode);
+            GeneratedCode = std::move(other.GeneratedCode);
+            Version = std::move(other.Version);
+            m_Name = std::move(other.m_Name);
+            m_Id = std::exchange(other.m_Id, 0);
+            m_Stage = other.m_Stage;
+            m_Includes = std::move(other.m_Includes);
+        }
+
+        return *this;
+    }
+
     unsigned int GetId() const;
     const std::string& GetName() const;
     ShaderStage GetStage() const;
 
     /** @brief Preprocesses the source, generates an OpenGL Id & compiles the source */
     void Compile();
-
-    /** @brief checks if the source was compiled.
-     * @return true if compiled , false if not.
-     */
     bool IsCompiled() const;
 
-    /** @brief Reloads and preprocesses the shader source. */
-    void Reload();
+    void Delete();
 
   private:
     std::string m_Name;

@@ -100,7 +100,7 @@ void Framebuffer::Resize(const int width, const int height)
 {
     for (auto& [attachment, texture] : TextureAttachments)
     {
-        texture->Regenerate();
+        texture->Delete();
         texture->Width = width;
         texture->Height = height;
         texture->Generate();

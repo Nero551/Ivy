@@ -49,7 +49,7 @@ void Renderer3DSystem::Render()
         {
             if (materialComponent.Material->Get().Shader->HotReload == true)
             {
-                materialComponent.Material->Get().Shader->Reload();
+                materialComponent.Material->Get().Shader->Delete();
             }
 
             FillBatches(entityId, transform, materialComponent, meshComponent);

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Core/Services/ResourceManager/Resource.hpp"
 #include "TextureInternalFormat.hpp"
 #include "TextureTarget.hpp"
+#include <string>
+#include <utility>
 
 namespace Ivy::G
 {
@@ -22,6 +23,9 @@ struct Texture
     /** Internal format used to store the texture data on the GPU. */
     TextureInternalFormat InternalFormat = TextureInternalFormat::RGBA8;
 
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+
     /** Width of the texture in pixels. */
     int Width = 0;
 
@@ -37,10 +41,6 @@ struct Texture
      * @param name Resource name.
      * @param target OpenGL texture target represented by this texture.
      */
-    Texture(std::string name, TextureTarget target);
-
-    /** @brief Releases the underlying OpenGL texture object. */
-    ~Texture();
 
     /**
      * @brief Gets the texture's OpenGL target.
@@ -64,7 +64,7 @@ struct Texture
      *
      * The texture can be generated again afterward by calling Generate().
      */
-    void Regenerate();
+    void Delete();
 
     /**
      * @brief Checks whether the texture has been generated on the GPU.
@@ -80,7 +80,7 @@ struct Texture
      * Specialized texture types override this function to create and upload
      * their specific texture data.
      */
-    virtual void Generate();
+    virtual void Generate() {}
 
     /**
      * @brief Binds the texture to a texture unit.
@@ -96,6 +96,31 @@ struct Texture
   protected:
     /** OpenGL texture object ID. Zero indicates that no object is generated. */
     unsigned int m_Id = 0;
+
+    Texture(std::string name, const TextureTarget target) : m_Name(std::move(name)), m_Target(target) {}
+    ~Texture()
+    {
+        Delete();
+    }
+    Texture(Texture&& other) noexcept
+        : m_Name(std::move(other.m_Name)), m_Target(std::exchange(other.m_Target, TextureTarget::Texture2D)),
+          m_Id(std::exchange(other.m_Id, 0))
+    {
+    }
+
+    Texture& operator=(Texture&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
+
+            m_Name = std::move(other.m_Name);
+            m_Target = std::exchange(other.m_Target, TextureTarget::Texture2D);
+            m_Id = std::exchange(other.m_Id, 0);
+        }
+
+        return *this;
+    }
 
   private:
     std::string m_Name;

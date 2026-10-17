@@ -3,6 +3,9 @@
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include <concepts>
+#include <string>
+#include <utility>
 
 namespace Ivy::C
 {
@@ -33,6 +36,36 @@ struct ResourceManager : Service
         }
 
         auto resource = std::make_unique<Resource<T>>(name, std::forward<Args>(args)...);
+        typename Resource<T>::Handle handle = m_Handles.Acquire();
+        resource->m_Handle = handle;
+
+        m_ResourceLookup.emplace(std::move(key), handle);
+
+        return static_cast<Resource<T>&>(**m_Resources.Emplace(handle.Index, std::move(resource)));
+    }
+
+    /**
+     * @brief Loads an existing object as a resource or returns an already loaded resource with the same type and name.
+     * **Warning:** If a new resource is created, the supplied object is moved into the resource. If an
+     * lvalue is passed, it becomes a valid but moved-from object and must not be used as though it still
+     * contains its original state.
+     *
+     * @tparam T Type of the resource to load.
+     * @param object Object to load as a resource.
+     * @return Reference to the loaded resource.
+     */
+    template <typename T>
+    Resource<T>& Load(T& object)
+        requires(std::move_constructible<T> && requires(T& value) { value.GetName(); })
+    {
+        std::string key = typeid(T).name() + object.GetName();
+
+        if (const auto it = m_ResourceLookup.find(key); it != m_ResourceLookup.end())
+        {
+            return static_cast<Resource<T>&>(*m_Resources[it->second.Index]);
+        }
+
+        auto resource = std::make_unique<Resource<T>>(std::move(object));
         typename Resource<T>::Handle handle = m_Handles.Acquire();
         resource->m_Handle = handle;
 

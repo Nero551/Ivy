@@ -20,10 +20,7 @@ struct IndexBuffer
     IndexBuffer(const IndexBuffer&) = delete;
     IndexBuffer& operator=(const IndexBuffer&) = delete;
 
-    IndexBuffer(IndexBuffer&& other) noexcept
-        : m_Id(std::exchange(other.m_Id, 0)), Usage(std::exchange(other.Usage, BufferUsage::StaticDraw))
-    {
-    }
+    IndexBuffer(IndexBuffer&& other) noexcept : m_Id(std::exchange(other.m_Id, 0)), Usage(other.Usage) {}
 
     IndexBuffer& operator=(IndexBuffer&& other) noexcept
     {
@@ -31,7 +28,7 @@ struct IndexBuffer
         {
             Delete();
             m_Id = std::exchange(other.m_Id, 0);
-            Usage = std::exchange(other.Usage, BufferUsage::StaticDraw);
+            Usage = other.Usage;
         }
 
         return *this;

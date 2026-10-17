@@ -35,7 +35,7 @@ struct Renderbuffer
      *
      * @param name Resource name.
      */
-    Renderbuffer(const std::string& name) : m_Name(name) {}
+    Renderbuffer(std::string name) : m_Name(std::move(name)) {}
     ~Renderbuffer()
     {
         Delete();
@@ -43,10 +43,8 @@ struct Renderbuffer
     Renderbuffer(const Renderbuffer&) = delete;
     Renderbuffer& operator=(const Renderbuffer&) = delete;
     Renderbuffer(Renderbuffer&& other) noexcept
-        : m_Id(std::exchange(other.m_Id, 0)), Width(std::exchange(other.Width, 0)),
-          Height(std::exchange(other.Height, 0)), Samples(std::exchange(other.Samples, 0)),
-          InternalFormat(std::exchange(other.InternalFormat, TextureInternalFormat::Depth24Stencil8)),
-          m_Name(std::move(other.m_Name))
+        : m_Id(std::exchange(other.m_Id, 0)), Width(other.Width), Height(other.Height),
+          Samples(other.Samples), InternalFormat(other.InternalFormat), m_Name(std::move(other.m_Name))
     {
     }
     Renderbuffer& operator=(Renderbuffer&& other) noexcept
@@ -55,10 +53,10 @@ struct Renderbuffer
         {
             Delete();
             m_Id = std::exchange(other.m_Id, 0);
-            Width = std::exchange(other.Width, 0);
-            Height = std::exchange(other.Height, 0);
-            Samples = std::exchange(other.Samples, 0);
-            InternalFormat = std::exchange(other.InternalFormat, TextureInternalFormat::Depth24Stencil8);
+            Width = other.Width;
+            Height = other.Height;
+            Samples = other.Samples;
+            InternalFormat = other.InternalFormat;
             m_Name = std::move(other.m_Name);
         }
         return *this;

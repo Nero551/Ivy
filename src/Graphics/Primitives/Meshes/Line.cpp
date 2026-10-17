@@ -19,6 +19,11 @@ G::Mesh CreateLine(const std::string& name)
 
     std::vector<unsigned int> indices = {0, 1};
 
-    return G::Mesh{name, std::move(vertices), std::move(indices), G::Topology::Lines};
+    G::Mesh mesh{name};
+    mesh.Vertices = std::move(vertices);
+    mesh.Indices = std::move(indices);
+    mesh.Topology = Topology::Lines;
+
+    return mesh;
 }
 } // namespace Ivy::G::Primitives

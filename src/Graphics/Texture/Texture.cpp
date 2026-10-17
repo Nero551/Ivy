@@ -3,17 +3,9 @@
 #include "../OpenGL.hpp"
 #include "Graphics/Texture/TextureTarget.hpp"
 #include <string>
-#include <utility>
 
 namespace Ivy::G
 {
-Texture::Texture(std::string name, const TextureTarget target) : m_Name(std::move(name)), m_Target(target) {}
-
-Texture::~Texture()
-{
-    glDeleteTextures(1, &m_Id);
-}
-
 TextureTarget Texture::GetTarget() const
 {
     return m_Target;
@@ -29,18 +21,19 @@ unsigned int Texture::GetId() const
     return m_Id;
 }
 
-void Texture::Regenerate()
+void Texture::Delete()
 {
-    glDeleteTextures(1, &m_Id);
-    m_Id = 0;
+    if (IsGenerated())
+    {
+        glDeleteTextures(1, &m_Id);
+        m_Id = 0;
+    }
 }
 
 bool Texture::IsGenerated() const
 {
     return m_Id != 0;
 }
-
-void Texture::Generate() {}
 
 void Texture::Bind(const unsigned int unit)
 {

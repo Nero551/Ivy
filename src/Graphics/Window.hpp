@@ -54,8 +54,7 @@ struct Window
 
     Window(Window&& other) noexcept
         : Config(std::move(other.Config)), m_GlfwWindow(std::exchange(other.m_GlfwWindow, nullptr)),
-          m_Platform(std::exchange(other.m_Platform, GLFWPlatform::Null)),
-          m_ScrollCallback(std::move(other.m_ScrollCallback)),
+          m_Platform(other.m_Platform), m_ScrollCallback(std::move(other.m_ScrollCallback)),
           m_CursorPosCallback(std::move(other.m_CursorPosCallback)),
           m_FramebufferSizeCallback(std::move(other.m_FramebufferSizeCallback)),
           m_KeyCallback(std::move(other.m_KeyCallback)),
@@ -76,7 +75,7 @@ struct Window
             Config = std::move(other.Config);
 
             m_GlfwWindow = std::exchange(other.m_GlfwWindow, nullptr);
-            m_Platform = std::exchange(other.m_Platform, GLFWPlatform::Null);
+            m_Platform = other.m_Platform;
 
             m_KeyCallback = std::move(other.m_KeyCallback);
             m_ScrollCallback = std::move(other.m_ScrollCallback);

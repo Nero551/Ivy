@@ -27,7 +27,7 @@ C::Entity& Physics::CreatePoint(M::Vector<4> col)
 {
     auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
     G::Mesh m = G::Primitives::CreateCube("point");
-    auto& mesh = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
+    auto& mesh = resourceManager.Load<G::Mesh>(m);
     auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
     material().Color = col;
     auto& shader = resourceManager.Load<G::Shader>("pointShader");
@@ -67,7 +67,7 @@ void Physics::Start()
     auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
     auto& query = m_Engine.ECS.Query;
     G::Mesh m = G::Primitives::CreateCube("mesh");
-    auto& mesh = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
+    auto& mesh = resourceManager.Load<G::Mesh>(m);
     auto& objectShader = resourceManager.Load<G::Shader>("objectShader");
 
     objectShader().AssignSource(resourceManager.Load<G::ShaderSource>(

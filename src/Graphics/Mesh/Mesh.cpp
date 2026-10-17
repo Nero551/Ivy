@@ -12,9 +12,6 @@
 
 namespace Ivy::G
 {
-
-Mesh::~Mesh() = default;
-
 const std::string& Mesh::GetName() const
 {
     return m_Name;
@@ -95,7 +92,7 @@ void Mesh::DrawInstanced(const int instanceCount)
     VAO.Unbind();
 }
 
-void Mesh::Regenerate()
+void Mesh::Delete()
 {
     VBO.Delete();
     EBO.Delete();

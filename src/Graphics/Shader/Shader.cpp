@@ -19,12 +19,6 @@
 
 namespace Ivy::G
 {
-
-Shader::~Shader()
-{
-    glDeleteProgram(m_Id);
-}
-
 unsigned int Shader::GetId() const
 {
     return m_Id;
@@ -61,20 +55,23 @@ void Shader::AssignSource(ShaderSource& source)
     m_Sources.emplace_back(&source);
 }
 
-void Shader::Reload()
+void Shader::Delete()
 {
-    for (auto& source : m_Sources)
+    if (IsProgramCreated())
     {
-        source->Reload();
-    }
+        for (auto& source : m_Sources)
+        {
+            source->Delete();
+        }
 
-    for (UniformPair& uniPair : m_PendingUniforms)
-    {
-        uniPair.Location = -1;
-    }
+        for (UniformPair& uniPair : m_PendingUniforms)
+        {
+            uniPair.Location = -1;
+        }
 
-    glDeleteProgram(m_Id);
-    m_Id = 0;
+        glDeleteProgram(m_Id);
+        m_Id = 0;
+    }
 }
 
 std::vector<U::CheckedPtr<ShaderSource>>& Shader::GetSources()

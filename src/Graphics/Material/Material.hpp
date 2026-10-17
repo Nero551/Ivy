@@ -65,7 +65,12 @@ struct Material
      *
      * @param name Resource name.
      */
-    explicit Material(std::string name);
+    Material(std::string name) : m_Name(std::move(name)) {}
+    ~Material() = default;
+    Material(const Material&) = delete;
+    Material& operator=(const Material&) = delete;
+    Material(Material&&) noexcept = default;
+    Material& operator=(Material&&) noexcept = default;
 
     /** @brief Gets the resource name. */
     const std::string& GetName() const;
@@ -78,6 +83,8 @@ struct Material
      *       An out-of-bounds slot is rejected and logged as an error.
      */
     void AssignTexture(Texture& texture, unsigned int slot);
+
+    void Delete();
 
     /**
      * @brief Activates the material and uploads its properties.

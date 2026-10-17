@@ -117,7 +117,7 @@ struct StressTester : C::System
     {
         auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
         G::Mesh m = G::Primitives::CreateQuad("point");
-        auto& mesh = resourceManager.Load<G::Mesh>(m.GetName(), std::move(m.Vertices), std::move(m.Indices));
+        auto& mesh = resourceManager.Load<G::Mesh>(m);
 
         auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
         m_Engine.ECS.Query.Pool<R::MeshComponent>().GetComponent(point.GetId()).Mesh = &mesh;

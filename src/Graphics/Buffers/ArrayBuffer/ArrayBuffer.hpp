@@ -19,17 +19,14 @@ struct ArrayBuffer
 
     ArrayBuffer(const ArrayBuffer&) = delete;
     ArrayBuffer& operator=(const ArrayBuffer&) = delete;
-    ArrayBuffer(ArrayBuffer&& other) noexcept
-        : m_Id(std::exchange(other.m_Id, 0)), Usage(std::exchange(other.Usage, BufferUsage::StaticDraw))
-    {
-    }
+    ArrayBuffer(ArrayBuffer&& other) noexcept : m_Id(std::exchange(other.m_Id, 0)), Usage(other.Usage) {}
     ArrayBuffer& operator=(ArrayBuffer&& other) noexcept
     {
         if (this != &other)
         {
             Delete();
             m_Id = std::exchange(other.m_Id, 0);
-            Usage = std::exchange(other.Usage, BufferUsage::StaticDraw);
+            Usage = other.Usage;
         }
 
         return *this;

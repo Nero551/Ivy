@@ -1,5 +1,6 @@
 #pragma once
 #include "Utilities/DataStructures/GIndexPool.hpp"
+#include <concepts>
 
 namespace Ivy::C
 {
@@ -24,6 +25,10 @@ template <typename T> struct Resource : IResource
   public:
     template <typename... Args> requires NamedResource<T, Args...>
     Resource(const std::string& name, Args&&... args) : m_Resource(name, std::forward<Args>(args)...)
+    {
+    }
+    Resource(T&& object) requires(std::move_constructible<T>)
+        : m_Resource(std::move(object))
     {
     }
 

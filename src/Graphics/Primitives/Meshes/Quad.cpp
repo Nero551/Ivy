@@ -19,6 +19,10 @@ G::Mesh CreateQuad(const std::string& name)
 
     std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
 
-    return G::Mesh{name, std::move(vertices), std::move(indices)};
+    G::Mesh mesh{name};
+    mesh.Vertices = std::move(vertices);
+    mesh.Indices = std::move(indices);
+
+    return mesh;
 }
 } // namespace Ivy::G::Primitives

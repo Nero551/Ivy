@@ -1,10 +1,7 @@
 #pragma once
 
-#include "Core/Services/ResourceManager/Resource.hpp"
-#include "Math/Matrix/Matrix.hpp"
 #include "Math/Matrix/Matrix3.hpp"
 #include "Math/Matrix/Matrix4.hpp"
-#include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Math/Vector/Vector4.hpp"
@@ -13,7 +10,9 @@
 #include "Utilities/DataStructures/StringMap.hpp"
 #include <string>
 #include <string_view>
+#include <utility>
 #include <variant>
+#include <vector>
 
 namespace Ivy::G
 {
@@ -36,10 +35,26 @@ struct Shader
      * @brief Creates a shader resource.
      * @param name Name used to identify the shader resource.
      */
-    explicit Shader(const std::string& name) : m_Name(name) {}
+    Shader(std::string name) : m_Name(std::move(name)) {}
+    ~Shader()
+    {
+        Delete();
+    }
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
+    Shader(Shader&& other) noexcept : m_Name(std::move(other.m_Name)), m_Id(std::exchange(other.m_Id, 0)) {}
+    Shader& operator=(Shader&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Delete();
 
-    /** @brief Deletes the OpenGL program when the resource is destroyed. */
-    ~Shader();
+            m_Name = std::move(other.m_Name);
+            m_Id = std::exchange(other.m_Id, 0);
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Gets the OpenGL program handle.
@@ -119,7 +134,7 @@ struct Shader
      * Deletes the linked program and invalidates cached uniform locations.
      * The program is recreated on the next call to Use().
      */
-    void Reload();
+    void Delete();
 
     /**
      * @brief Gets the shader sources associated with this program.

@@ -49,6 +49,10 @@ G::Mesh CreateCube(const std::string& name)
     std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 11, 8, 12, 13, 14,
         14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20};
 
-    return G::Mesh{name, std::move(vertices), std::move(indices)};
+    G::Mesh mesh{name};
+    mesh.Vertices = std::move(vertices);
+    mesh.Indices = std::move(indices);
+
+    return mesh;
 }
 } // namespace Ivy::G::Primitives

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../DataType.hpp"
+#include "Graphics/Texture/TextureTarget.hpp"
 #include "Texture.hpp"
 #include "TextureFilter.hpp"
 #include "TextureFormat.hpp"
@@ -49,7 +50,12 @@ struct Texture2D : Texture
      *
      * @param name Resource name.
      */
-    explicit Texture2D(const std::string& name) : Texture(name, TextureTarget::Texture2D) {}
+    Texture2D(const std::string& name) : Texture(name, TextureTarget::Texture2D) {}
+    Texture2D(const Texture2D&) = delete;
+    Texture2D& operator=(const Texture2D&) = delete;
+
+    Texture2D(Texture2D&&) noexcept = default;
+    Texture2D& operator=(Texture2D&&) noexcept = default;
 
     /**
      * @brief Generates the OpenGL 2D texture object.

@@ -68,6 +68,10 @@ G::Mesh CreateUVSphere(const std::string& name, const float radius, const int se
         }
     }
 
-    return G::Mesh{name, std::move(vertices), std::move(indices)};
+    G::Mesh mesh{name};
+    mesh.Vertices = std::move(vertices);
+    mesh.Indices = std::move(indices);
+
+    return mesh;
 }
 } // namespace Ivy::R

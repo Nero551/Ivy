@@ -11,17 +11,6 @@
 
 namespace Ivy::G
 {
-ShaderSource::ShaderSource(
-    std::string name, const std::string& path, const ShaderStage stage, std::string version)
-    : Path(path), Version(std::move(version)), m_Name(std::move(name)), m_Stage(stage)
-{
-    SourceCode = U::FileSystem::ReadFile(path);
-}
-
-ShaderSource::~ShaderSource()
-{
-    glDeleteShader(m_Id);
-}
 
 unsigned int ShaderSource::GetId() const
 {
@@ -45,6 +34,7 @@ void ShaderSource::Compile()
         return;
     }
 
+    GeneratedCode = SourceCode;
     Preprocess();
 
     // auto result = ShaderSourceValidator::Validate(*this);
@@ -97,17 +87,19 @@ bool ShaderSource::IsCompiled() const
     return m_Id != 0;
 }
 
-void ShaderSource::Reload()
+void ShaderSource::Delete()
 {
-    SourceCode = U::FileSystem::ReadFile(Path);
-    glDeleteShader(m_Id);
-    m_Id = 0;
+    if (IsCompiled())
+    {
+        GeneratedCode = SourceCode;
+        m_Includes.clear();
+        glDeleteShader(m_Id);
+        m_Id = 0;
+    }
 }
 
 void ShaderSource::Preprocess()
 {
-    GeneratedCode = SourceCode;
-    m_Includes.clear();
     GeneratedCode.insert(0, "#" + Version + "\n");
 
     std::unordered_set<std::string> includesProcessing;
