@@ -8,7 +8,8 @@
 #include "Modules/Physics/Physics.hpp"
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
-#include "Sandbox/Sandbox.hpp"
+#include "Sandbox/Sandbox2D.hpp"
+#include "Sandbox/Sandbox3D.hpp"
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
 
@@ -63,7 +64,7 @@ void Engine::Configure()
     AddModule<R::Renderer>();
     AddModule<Profiling>();
     AddModule<Physics>();
-    AddModule<Sandbox::Sandbox>();
+    AddModule<Sandbox::Sandbox2D>();
 }
 
 void Engine::Start()

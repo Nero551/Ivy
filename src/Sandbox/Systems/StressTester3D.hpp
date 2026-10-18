@@ -1,0 +1,160 @@
+#pragma once
+
+#include "Core/ECS/Entity.hpp"
+#include "Core/ECS/System.hpp"
+#include "Core/Engine.hpp"
+#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Graphics/InputEnums/Key.hpp"
+#include "Graphics/Mesh/CullMode.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Primitives/Primitives.hpp"
+#include "Math/Vector/Vector.hpp"
+#include "Modules/Input/Input.hpp"
+#include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/Nodes.hpp"
+
+namespace Ivy::Sandbox
+{
+struct StressTester3D : C::System
+{
+    using C::System::System;
+
+    void Spawn(int dimension, int craziness)
+    {
+        if (dimension == 2)
+        {
+            TwoDimensionalProjection(craziness);
+        }
+        else if (dimension == 3)
+        {
+            ThreeDimensionalProjection(craziness);
+        }
+        else if (dimension == 4)
+        {
+            FourDimensionalProjection(craziness);
+        }
+    }
+
+    void Update(double dt) override
+    {
+        auto& input = m_Engine.GetModule<I::Input>();
+
+        if (input.IsKeyHeld(G::Key::Left))
+        {
+            multiplier -= 5 * dt;
+        }
+        if (input.IsKeyHeld(G::Key::Right))
+        {
+            multiplier += 5 * dt;
+        }
+
+        if (multiplier != 1)
+        {
+            for (auto& point : points)
+            {
+                auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(point);
+                transform.Position *= multiplier;
+            }
+        }
+
+        multiplier = 1;
+    };
+
+  private:
+    float multiplier = 1;
+    std::vector<unsigned int> points;
+
+    void TwoDimensionalProjection(int increase)
+    {
+        points.reserve(M::Pow(360.0f / increase, 1));
+        U::Log::Info(M::Pow(360.0f / increase, 1));
+        for (int theta = -180; theta < 180; theta += increase)
+        {
+            M::Vector<2> v2 = M::Vector<2>::FromPolar(M::Polar(M::Rad(theta)));
+            float proj = v2.StereoProject();
+            auto& point = Plot({proj, 0, 0});
+            points.emplace_back(point.GetId());
+        }
+    }
+    void ThreeDimensionalProjection(int increase)
+    {
+        U::Log::Info(M::Pow(360.0f / increase, 2));
+        points.reserve(M::Pow(360.0f / increase, 2));
+
+        for (int theta = -180; theta < 180; theta += increase)
+        {
+            for (int phi = -180; phi < 180; phi += increase)
+            {
+                M::Vector<3> v3 = M::Vector<3>::FromSpherical(M::Spherical(M::Rad(theta), M::Rad(phi)));
+                M::Vector<2> proj = v3.StereoProject();
+                auto& point = Plot({proj.x, proj.y, 0});
+                points.emplace_back(point.GetId());
+            }
+        }
+    }
+    void FourDimensionalProjection(int increase)
+    {
+        points.reserve(M::Pow(360.0f / increase, 3));
+        U::Log::Info(M::Pow(360.0f / increase, 3));
+        m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3));
+        for (int theta = -180; theta < 180; theta += increase)
+        {
+            for (int phi = -180; phi < 180; phi += increase)
+            {
+                for (int h = -180; h < 180; h += increase)
+                {
+                    M::Vector<4> v4 = M::Vector<4>::FromHyperSpherical(
+                        M::HyperSpherical(M::Rad(theta), M::Rad(phi), M::Rad(h)));
+                    M::Vector<3> proj = v4.StereoProject();
+                    auto& point = Plot(proj);
+                    points.emplace_back(point.GetId());
+                }
+            }
+        }
+    }
+
+    C::Entity& CreatePoint(M::Vector<4> col)
+    {
+        auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+        G::Mesh m = G::Primitives::CreateQuad("point");
+        auto& mesh = resourceManager.Load<G::Mesh>(m);
+
+        auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        m_Engine.ECS.Query.Pool<CMP::Mesh>().GetComponent(point.GetId()).Mesh = &mesh;
+        m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(point.GetId()).Scale = M::Vector<3>{0.2};
+
+        if (resourceManager.Exists<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y)))
+        {
+            auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
+            m_Engine.ECS.Query.Pool<CMP::Material>().GetComponent(point.GetId()).Material = &material;
+        }
+        else
+        {
+            auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
+            material().Color = col;
+            auto& shader = resourceManager.Load<G::Shader>("pointShader");
+
+            shader().AssignSource(resourceManager.Load<G::ShaderSource>(
+                "pointVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex));
+            shader().AssignSource(resourceManager.Load<G::ShaderSource>(
+                "pointFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
+            material().Shader = &shader();
+            m_Engine.ECS.Query.Pool<CMP::Material>().GetComponent(point.GetId()).Material = &material;
+        }
+
+        m_Engine.World.GetRoot().AttachChild(point);
+        return point;
+    }
+
+    C::Entity& Plot(const M::Vector<3> vec3, const M::Vector<4> col = {1, 1, 1, 1})
+    {
+        auto& point = CreatePoint(col);
+        auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(point.GetId());
+        transform.Position().x = vec3.x;
+        transform.Position().y = vec3.y;
+        transform.Position().z = vec3.z;
+
+        return point;
+    }
+};
+} // namespace Ivy::Sandbox

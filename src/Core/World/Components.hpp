@@ -32,9 +32,6 @@ struct Transform2D : C::Component
 
     M::Matrix<4, 4> GetModelMatrix() const
     {
-        U::Log::Info(m_GlobalPosition);
-        U::Log::Info(m_GlobalRotation);
-        U::Log::Info(m_GlobalScale);
         M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
         modelMatrix = modelMatrix.Translate({m_GlobalPosition().x, m_GlobalPosition().y, 0});
         modelMatrix = modelMatrix.RotateZ(m_GlobalRotation);

@@ -2,6 +2,7 @@
 #include "Core/ECS/ECS.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/ProjectionMode.hpp"
 namespace Ivy::R
 {
 struct Camera2D : C::Node2D
@@ -11,6 +12,7 @@ struct Camera2D : C::Node2D
     {
         Node2D::Initialize();
         m_ECS.Query.Pool<CMP::Camera>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Camera>().GetComponent(GetId()).ProjectionMode = ProjectionMode::Orthographic;
     }
 };
 
@@ -21,6 +23,7 @@ struct Camera3D : C::Node3D
     {
         Node3D::Initialize();
         m_ECS.Query.Pool<CMP::Camera>().Add(GetId());
+        m_ECS.Query.Pool<CMP::Camera>().GetComponent(GetId()).ProjectionMode = ProjectionMode::Perspective;
     }
 };
 

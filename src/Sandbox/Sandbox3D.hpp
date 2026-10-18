@@ -2,7 +2,7 @@
 #include "Core/Module.hpp"
 namespace Ivy::Sandbox
 {
-struct Sandbox : C::Module
+struct Sandbox3D : C::Module
 {
     using Module::Module;
     void Start() override;

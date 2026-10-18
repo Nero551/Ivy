@@ -29,11 +29,8 @@
 #include "Graphics/Texture/TextureFormat.hpp"
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 #include "Graphics/Window.hpp"
-#include "Math/Matrix/Matrix4.hpp"
-#include "Math/Vector/Vector3.hpp"
 #include "Modules/Renderer/Systems/Renderer2DSystem.hpp"
 #include "Modules/Renderer/Systems/Renderer3DSystem.hpp"
-#include "RenderBatch.hpp"
 #include "Systems/LightingSystem.hpp"
 #include "Utilities/Image.hpp"
 #include <ranges>

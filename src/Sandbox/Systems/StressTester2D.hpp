@@ -15,23 +15,15 @@
 
 namespace Ivy::Sandbox
 {
-struct StressTester : C::System
+struct StressTester2D : C::System
 {
     using C::System::System;
 
     void Spawn(int dimension, int craziness)
     {
-        if (dimension == 2)
-        {
-            // TwoDimensionalProjection(craziness);
-        }
-        else if (dimension == 3)
+        if (dimension == 3)
         {
             ThreeDimensionalProjection(craziness);
-        }
-        else if (dimension == 4)
-        {
-            // FourDimensionalProjection(craziness);
         }
     }
 

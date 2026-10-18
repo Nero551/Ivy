@@ -51,7 +51,6 @@ void Renderer2DSystem::Render()
         [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform2D& transform,
             CMP::Mesh& meshComponent)
         {
-            U::Log::Info(entityId);
             if (materialComponent.Material->Get().Shader->HotReload == true)
             {
                 materialComponent.Material->Get().Shader->Delete();
