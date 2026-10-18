@@ -31,6 +31,7 @@
 #include "Graphics/Window.hpp"
 #include "Math/Matrix/Matrix4.hpp"
 #include "Math/Vector/Vector3.hpp"
+#include "Modules/Renderer/Systems/Renderer2DSystem.hpp"
 #include "Modules/Renderer/Systems/Renderer3DSystem.hpp"
 #include "RenderBatch.hpp"
 #include "Systems/LightingSystem.hpp"
@@ -147,6 +148,7 @@ void Renderer::Start()
 {
     AddSystem<LightingSystem>();
     AddSystem<Renderer3DSystem>();
+    AddSystem<Renderer2DSystem>();
 
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);
@@ -160,6 +162,7 @@ void Renderer::Start()
 
     GetSystem<LightingSystem>().Start();
     GetSystem<Renderer3DSystem>().Start();
+    GetSystem<Renderer2DSystem>().Start();
 }
 
 void Renderer::BeginFrame(double dt)
@@ -180,6 +183,7 @@ void Renderer::Render()
 {
     GetSystem<LightingSystem>().Render();
     GetSystem<Renderer3DSystem>().Render();
+    GetSystem<Renderer2DSystem>().Render();
     PresentFramebuffer();
 }
 

@@ -5,13 +5,14 @@
 #include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"
 #include "Math/Vector/Vector3.hpp"
+#include "Utilities/Debug/Log.hpp"
 #include "Utilities/Track.hpp"
 #include <cmath>
 
 namespace Ivy::R
 {
-struct CameraSystem;
 struct Renderer3DSystem;
+struct Renderer2DSystem;
 } // namespace Ivy::R
 namespace Ivy::C
 {
@@ -24,13 +25,16 @@ namespace Ivy::CMP
 
 struct Transform2D : C::Component
 {
-    U::Track<M::Vector<2>> Position;
-    U::Track<M::Vector<2>> Scale;
-    U::Track<float> Rotation;
-    bool InheritTransform = true;
+    U::Track<M::Vector<2>> Position = M::Vector<2>::Zero();
+    U::Track<M::Vector<2>> Scale = M::Vector<2>::One();
+    U::Track<float> Rotation = 0;
+    bool InheritTransform = false;
 
     M::Matrix<4, 4> GetModelMatrix() const
     {
+        U::Log::Info(m_GlobalPosition);
+        U::Log::Info(m_GlobalRotation);
+        U::Log::Info(m_GlobalScale);
         M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
         modelMatrix = modelMatrix.Translate({m_GlobalPosition().x, m_GlobalPosition().y, 0});
         modelMatrix = modelMatrix.RotateZ(m_GlobalRotation);
@@ -58,6 +62,7 @@ struct Transform2D : C::Component
     U::Track<float> m_GlobalRotation = 0;
     U::Track<M::Vector<2>> m_GlobalScale = M::Vector<2>::One();
     friend struct C::Transform2DSystem;
+    friend struct R::Renderer2DSystem;
 };
 
 struct Transform3D : C::Component

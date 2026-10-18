@@ -16,13 +16,13 @@ namespace Ivy::CMP
 struct Camera : C::Component
 {
     float FOV = 45.0f;
-    float Near = 0.1;
-    float Far = 100;
+    float Near = -1;
+    float Far = 1;
     float Left = -50;
     float Right = 50;
     float Top = 50;
     float Bottom = -50;
-    R::ProjectionMode ProjectionMode = R::ProjectionMode::Perspective;
+    R::ProjectionMode ProjectionMode = R::ProjectionMode::Orthographic;
     float Sensitivity = 0.05f;
 
     M::Matrix<4, 4> GetProjectionMatrix() const

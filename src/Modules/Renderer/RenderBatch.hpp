@@ -1,8 +1,8 @@
 #pragma once
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Math/Matrix/Matrix4.hpp"
-#include "Utilities/DataStructures/SparseSetAoS.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 
 namespace Ivy::R

@@ -78,10 +78,10 @@ void Physics::Start()
     auto& objectMaterial = resourceManager.Load<G::Material>("cubeMaterial");
     objectMaterial().Shader = &objectShader();
 
-    auto& cube = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+    auto& cube = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
     query.Pool<CMP::Mesh>().GetComponent(cube.GetId()).Mesh = &mesh;
     query.Pool<CMP::Material>().GetComponent(cube.GetId()).Material = &objectMaterial;
-    query.Pool<BodyComponent>().Add(cube.GetId());
+    // query.Pool<BodyComponent>().Add(cube.GetId());
     cubeId = cube.GetId();
     m_Engine.World.GetRoot().AttachChild(cube);
 }
@@ -95,11 +95,11 @@ void Physics::FixedUpdate(const double fdt)
 
     float g = -9.8;
 
-    auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
-    auto& input = m_Engine.GetModule<I::Input>();
-    auto& query = m_Engine.ECS.Query;
-    auto& transform = query.Pool<CMP::Transform3D>().GetComponent(cubeId);
-    auto& body = query.Pool<BodyComponent>().GetComponent(cubeId);
+    // auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+    // auto& input = m_Engine.GetModule<I::Input>();
+    // auto& query = m_Engine.ECS.Query;
+    // auto& transform = query.Pool<CMP::Transform3D>().GetComponent(cubeId);
+    // auto& body = query.Pool<BodyComponent>().GetComponent(cubeId);
 
     // ExternalForces = M::Vector3{0};
     // M::Vector3 friction = {-body.Velocity.x * M::PHI, 0, -body.Velocity.z * M::PHI};

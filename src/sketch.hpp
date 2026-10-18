@@ -49,8 +49,8 @@ namespace Sketch
 // TODO: split renderer into Renderer2DSystem & Renderer3DSystem and group common methods.
 //
 // TODO: use a GetSmallestPool in ComponentPoolQuery instead of using the first pool as the driver.
-//
-// TODO: figure out if 2D needs normal matrix
+
+//TODO: make renderer2D & 3D return early if active camera is 3D/2D
 
 using namespace Ivy;
 

@@ -26,6 +26,11 @@ void Renderer3DSystem::Render()
     auto& query = m_Engine.ECS.Query;
     auto& rendererModule = m_Engine.GetModule<Renderer>();
 
+    if (!query.Pool<CMP::Transform3D>().HasId(camera.GetId()))
+    {
+        return;
+    }
+
     const M::Matrix<4, 4> projection = query.Pool<CMP::Camera>().GetComponent(camera).GetProjectionMatrix();
 
     //View Matrix
@@ -79,7 +84,7 @@ void Renderer3DSystem::FillBatches(unsigned int entityId, CMP::Transform3D& tran
             entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
         transformComponent.m_GlobalPosition.ClearChanged();
         transformComponent.m_GlobalRotation.ClearChanged();
-        transformComponent.m_GlobalRotation.ClearChanged();
+        transformComponent.m_GlobalScale.ClearChanged();
         transformComponent.Rotation.ClearChanged();
         transformComponent.Position.ClearChanged();
         transformComponent.Scale.ClearChanged();
