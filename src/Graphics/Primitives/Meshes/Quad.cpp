@@ -12,10 +12,10 @@ namespace Ivy::G::Primitives
 G::Mesh CreateQuad(const std::string& name)
 {
     std::vector<G::Vertex> vertices = {
-        {{-0.5f, -0.5f, 0.0f, 1.0f}, {1, 1, 1, 1}, {0, 0}, {0, 0, 1}},
-        {{0.5f, -0.5f, 0.0f, 1.0f},  {1, 1, 1, 1}, {1, 0}, {0, 0, 1}},
-        {{0.5f, 0.5f, 0.0f, 1.0f},   {1, 1, 1, 1}, {1, 1}, {0, 0, 1}},
-        {{-0.5f, 0.5f, 0.0f, 1.0f},  {1, 1, 1, 1}, {0, 1}, {0, 0, 1}}
+        {.Position = {-0.5f, -0.5f, 0.0f, 1.0f}, .Color = {1, 1, 1, 1}, .UV = {0, 0}, .Normal = {0, 0, 1}},
+        {.Position = {0.5f, -0.5f, 0.0f, 1.0f},  .Color = {1, 1, 1, 1}, .UV = {1, 0}, .Normal = {0, 0, 1}},
+        {.Position = {0.5f, 0.5f, 0.0f, 1.0f},   .Color = {1, 1, 1, 1}, .UV = {1, 1}, .Normal = {0, 0, 1}},
+        {.Position = {-0.5f, 0.5f, 0.0f, 1.0f},  .Color = {1, 1, 1, 1}, .UV = {0, 1}, .Normal = {0, 0, 1}}
     };
 
     std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};

@@ -7,14 +7,9 @@ namespace Ivy::G
 {
 struct Vertex
 {
-    M::Vector<4> Position;
-    M::Vector<4> Color;
-    M::Vector<2> UV;
-    M::Vector<3> Normal;
-
-    Vertex(const M::Vector<4> pos, const M::Vector<4> col, const M::Vector<2> uv, const M::Vector<3> normal)
-        : Position(pos), Color(col), UV(uv), Normal(normal)
-    {
-    }
+    M::Vector<4> Position{0, 0, 0, 1};
+    M::Vector<4> Color{1, 1, 1, 1};
+    M::Vector<2> UV{0, 0};
+    M::Vector<3> Normal{0, 0, 0};
 };
 } // namespace Ivy::G

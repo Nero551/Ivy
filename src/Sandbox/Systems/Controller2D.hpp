@@ -2,6 +2,7 @@
 #include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
+#include "Math/Common/Constants.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
@@ -11,7 +12,7 @@ namespace Ivy::Sandbox
 struct Controller2D : C::System
 {
     using C::System::System;
-    void Update(double dt)
+    void Update(double dt) override
     {
         if (m_Engine.GetModule<I::Input>().IsKeyPressed(G::Key::T))
         {
@@ -22,14 +23,16 @@ struct Controller2D : C::System
         auto& input = m_Engine.GetModule<I::Input>();
         auto& camera = m_Engine.World.GetCamera();
 
+        m_Zoom += input.GetScrollDelta().y * M::PI * M::PHI;
+
         auto& transform = query.Pool<CMP::Transform2D>().GetComponent(camera);
         auto& cameraComponent = query.Pool<CMP::Camera>().GetComponent(camera);
 
         cameraComponent.ProjectionMode = R::ProjectionMode::Orthographic;
-        cameraComponent.Left = -m_Engine.Window.GetWidth() / 65.0f;
-        cameraComponent.Bottom = -m_Engine.Window.GetHeight() / 65.0f;
-        cameraComponent.Right = m_Engine.Window.GetWidth() / 65.0f;
-        cameraComponent.Top = m_Engine.Window.GetHeight() / 65.0f;
+        cameraComponent.Left = -m_Engine.Window.GetWidth() / m_Zoom;
+        cameraComponent.Bottom = -m_Engine.Window.GetHeight() / m_Zoom;
+        cameraComponent.Right = m_Engine.Window.GetWidth() / m_Zoom;
+        cameraComponent.Top = m_Engine.Window.GetHeight() / m_Zoom;
 
         const float speed = 5 * static_cast<float>(dt);
 
@@ -57,5 +60,6 @@ struct Controller2D : C::System
   private:
     float m_Yaw;
     float m_Pitch;
+    float m_Zoom = 65;
 };
 } // namespace Ivy::Sandbox

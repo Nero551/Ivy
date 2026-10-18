@@ -74,6 +74,26 @@ struct ResourceManager : Service
         return static_cast<Resource<T>&>(**m_Resources.Emplace(handle.Index, std::move(resource)));
     }
 
+    template <typename T>
+    Resource<T>& Load(T&& object)
+        requires(std::move_constructible<T> && requires(T& value) { value.GetName(); })
+    {
+        std::string key = typeid(T).name() + object.GetName();
+
+        if (const auto it = m_ResourceLookup.find(key); it != m_ResourceLookup.end())
+        {
+            return static_cast<Resource<T>&>(*m_Resources[it->second.Index]);
+        }
+
+        auto resource = std::make_unique<Resource<T>>(std::forward<T>(object));
+        typename Resource<T>::Handle handle = m_Handles.Acquire();
+        resource->m_Handle = handle;
+
+        m_ResourceLookup.emplace(std::move(key), handle);
+
+        return static_cast<Resource<T>&>(**m_Resources.Emplace(handle.Index, std::move(resource)));
+    }
+
     /**
     * @brief Unloads a resource using its name & type. Does nothing if the name or type is invalid.
     * @param name name of the resource to unload.

@@ -11,6 +11,8 @@
 
 namespace Ivy::R
 {
+using G::Vertex;
+
 G::Mesh CreateUVSphere(const std::string& name, const float radius, const int sectors, const int stacks)
 {
 
@@ -34,11 +36,11 @@ G::Mesh CreateUVSphere(const std::string& name, const float radius, const int se
             const float x = r * std::cos(theta);
             const float z = r * std::sin(theta);
 
-            vertices.emplace_back(G::Vertex{
-                {radius * x, radius * y, radius * z, 1.0f},
-                M::Color::White,
-                {sector / static_cast<float>(sectors), stack / static_cast<float>(stacks)},
-                {x, y, z}
+            vertices.emplace_back(Vertex{
+                .Position = {radius * x, radius * y, radius * z, 1.0f},
+                .Color = M::Color::White,
+                .UV = {sector / static_cast<float>(sectors), stack / static_cast<float>(stacks)},
+                .Normal = {x, y, z}
             });
         }
     }
