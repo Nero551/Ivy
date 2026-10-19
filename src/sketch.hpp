@@ -51,6 +51,9 @@ namespace Sketch
 // TODO: use a GetSmallestPool in ComponentPoolQuery instead of using the first pool as the driver.
 
 //TODO: make renderer2D & 3D return early if active camera is 3D/2D
+//
+// TODO: need particle system (cpu particle & gpu particle(compute shaders))
+// TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
 
 using namespace Ivy;
 

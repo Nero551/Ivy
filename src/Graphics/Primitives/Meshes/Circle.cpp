@@ -4,7 +4,7 @@
 #include "Math/Common/Constants.hpp"
 #include <cmath>
 
-namespace Ivy::G::Primitives
+namespace Ivy::G
 {
 Mesh Primitives::CreateCircle(const std::string& name, float radius, int sectors)
 {
@@ -52,4 +52,4 @@ Mesh Primitives::CreateCircle(const std::string& name, float radius, int sectors
 
     return mesh;
 }
-} // namespace Ivy::G::Primitives
+} // namespace Ivy::G

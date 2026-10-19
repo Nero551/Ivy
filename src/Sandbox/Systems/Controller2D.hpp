@@ -3,9 +3,12 @@
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
 #include "Math/Common/Constants.hpp"
+#include "Math/Common/Constraints.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <algorithm>
 namespace Ivy::Sandbox
 {
 
@@ -24,6 +27,7 @@ struct Controller2D : C::System
         auto& camera = m_Engine.World.GetCamera();
 
         m_Zoom += input.GetScrollDelta().y * M::PI * M::PHI;
+        m_Zoom = std::max(m_Zoom, 5.0f);
 
         auto& transform = query.Pool<CMP::Transform2D>().GetComponent(camera);
         auto& cameraComponent = query.Pool<CMP::Camera>().GetComponent(camera);
@@ -34,7 +38,7 @@ struct Controller2D : C::System
         cameraComponent.Right = m_Engine.Window.GetWidth() / m_Zoom;
         cameraComponent.Top = m_Engine.Window.GetHeight() / m_Zoom;
 
-        const float speed = 5 * static_cast<float>(dt);
+        const float speed = 20 * static_cast<float>(dt);
 
         if (input.IsKeyHeld(G::Key::A))
         {
@@ -46,12 +50,12 @@ struct Controller2D : C::System
             transform.Position += speed * M::Vector<2>(1, 0);
         }
 
-        if (input.IsKeyHeld(G::Key::Space))
+        if (input.IsKeyHeld(G::Key::W))
         {
             transform.Position += speed * M::Vector<2>(0, 1);
         }
 
-        if (input.IsKeyHeld(G::Key::LeftShift))
+        if (input.IsKeyHeld(G::Key::S))
         {
             transform.Position -= speed * M::Vector<2>(0, 1);
         }
