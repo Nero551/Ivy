@@ -5,6 +5,7 @@
 #include "Math/Concepts.hpp"
 #include "Math/Equations/LinearEquation.hpp"
 #include "Math/Equations/LinearSystem.hpp"
+#include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
@@ -236,6 +237,9 @@ template <M::Scalar T> struct Dual
         return Conjugate() / MagnitudeSquared();
     }
 };
+
+//TODO: add NumberOfDimensions method to all math types
+//TODO: make Function take multiple inputs(ex: two quaternions) via vardiac templates(...Args)
 
 inline void Test()
 {

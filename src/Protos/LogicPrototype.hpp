@@ -148,17 +148,4 @@ struct ALU
         return result;
     }
 };
-
-struct uInt8 : Bits<8>
-{
-    using Bits::Bits;
-    constexpr uInt8(uint8_t value)
-    {
-        for (int i = 0; i < 8; ++i)
-        {
-            (*this)(i) = value % 2;
-            value /= 2;
-        }
-    }
-};
 } // namespace Ivy::DigitalLogic

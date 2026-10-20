@@ -19,13 +19,13 @@ template <typename T> struct CheckedPtr
     }
 
     /** @brief Constructs a null CheckedPtr with a custom error message. */
-    CheckedPtr(const std::string_view nullMessage) noexcept
+    CheckedPtr(std::string_view nullMessage) noexcept
     {
         this->m_NullMessage = nullMessage;
     }
 
     /** @brief Constructs a CheckedPtr from a pointer with a custom error message. */
-    CheckedPtr(T* objectPtr, const std::string_view nullMessage) noexcept
+    CheckedPtr(T* objectPtr, std::string_view nullMessage) noexcept
     {
         m_Ptr = objectPtr;
         this->m_NullMessage = nullMessage;

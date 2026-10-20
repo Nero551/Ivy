@@ -11,11 +11,6 @@ namespace Ivy::U
  */
 template <std::unsigned_integral IndexType = unsigned int> struct IndexPool
 {
-    //TODO: wut if i own an index somewhere else but then it gets released and acquired.
-    // now that index that i owned somewhere else points to a different object.
-    // to fix this, make GIndexPool that will use a generation system.
-    // GenerationalIndexPool
-
     /** @brief Returns whether the index is currently being used. */
     bool IsAcquired(IndexType index) const
     {

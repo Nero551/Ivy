@@ -17,7 +17,6 @@
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields.hpp"
-#include <cmath>
 namespace Ivy::Sandbox
 {
 
@@ -38,7 +37,7 @@ void Sandbox2D::Start()
     AddSystem<VectorFields>();
     GetSystem<VectorFields>().Start();
 
-    GetSystem<VectorFields>().MotionUnderLinearResistiveForce();
+    GetSystem<VectorFields>().Pendulum();
 }
 
 void Sandbox2D::Update(double dt)

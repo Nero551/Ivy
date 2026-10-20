@@ -18,9 +18,7 @@ namespace Ivy::U
  */
 struct Image
 {
-    /**
-     * @brief Specifies the number of color channels in each pixel.
-     */
+    /** @brief Specifies the number of color channels in each pixel. */
     enum class ColorChannels
     {
         /** Single red channel. */
@@ -36,7 +34,7 @@ struct Image
         RGBA = 4
     };
 
-    Image() {}
+    Image() = default;
 
     /**
      * @brief Loads an image from disk.

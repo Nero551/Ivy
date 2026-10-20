@@ -29,7 +29,6 @@ template <typename T> struct Track
     {
         if (m_Value == value)
         {
-            ClearChanged();
             return;
         }
 
