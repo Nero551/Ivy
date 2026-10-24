@@ -37,7 +37,7 @@ void Sandbox2D::Start()
     AddSystem<VectorFields>();
     GetSystem<VectorFields>().Start();
 
-    GetSystem<VectorFields>().Pendulum();
+    GetSystem<VectorFields>().MotionUnderQuadraticResistiveForce();
 }
 
 void Sandbox2D::Update(double dt)

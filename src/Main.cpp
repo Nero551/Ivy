@@ -8,12 +8,11 @@ int main(const int argc, char* argv[])
     {
         std::string_view argument = argv[i];
 
-        if (argument == "--debug")
+        if (argument == "--vulkan")
         {
-            // Enable debug mode
+            //? This is where u can add custom features for command line args
+            //? ex: "Ivy --renderer vulkan"
         }
-        //? This is where u can add custom features for command line args
-        //? ex: "Ivy --renderer vulkan"
     }
 
     Sketch::Test();

@@ -65,49 +65,51 @@ template <typename T> struct Track
         return *this;
     }
 
-    template <typename V> decltype(auto) operator+(const V& value) const requires(M::Additive<T, V>)
+    template <typename V> M::AdditionResult<V, T> operator+(const V& value) const requires(M::Additive<T, V>)
     {
         return m_Value + value;
     }
 
-    template <typename V> decltype(auto) operator-(const V& value) const requires(M::Subtractive<T, V>)
+    template <typename V>
+    M::SubtractionResult<V, T> operator-(const V& value) const requires(M::Subtractive<T, V>)
     {
         return m_Value - value;
     }
 
-    template <typename V> decltype(auto) operator*(const V& value) const requires(M::Multiplicative<T, V>)
+    template <typename V>
+    M::MultiplicationResult<V, T> operator*(const V& value) const requires(M::Multiplicative<T, V>)
     {
         return m_Value * value;
     }
 
-    template <typename V> decltype(auto) operator/(const V& value) const requires(M::Divisible<T, V>)
+    template <typename V> M::DivisionResult<V, T> operator/(const V& value) const requires(M::Divisible<T, V>)
     {
         return m_Value / value;
     }
 
     template <typename V>
-    friend decltype(auto) operator+(const V& other, const Track& value)
+    friend M::AdditionResult<V, T> operator+(const V& other, const Track& value)
         requires(!std::same_as<V, Track> && M::Additive<V, T>)
     {
         return other + value.m_Value;
     }
 
     template <typename V>
-    friend decltype(auto) operator-(const V& other, const Track& value)
+    friend M::SubtractionResult<V, T> operator-(const V& other, const Track& value)
         requires(!std::same_as<V, Track> && M::Subtractive<V, T>)
     {
         return other - value.m_Value;
     }
 
     template <typename V>
-    friend decltype(auto) operator*(const V& other, const Track& value)
+    friend M::MultiplicationResult<V, T> operator*(const V& other, const Track& value)
         requires(!std::same_as<V, Track> && M::Multiplicative<V, T>)
     {
         return other * value.m_Value;
     }
 
     template <typename V>
-    friend decltype(auto) operator/(const V& other, const Track& value)
+    friend M::DivisionResult<V, T> operator/(const V& other, const Track& value)
         requires(!std::same_as<V, Track> && M::Divisible<V, T>)
     {
         return other / value.m_Value;

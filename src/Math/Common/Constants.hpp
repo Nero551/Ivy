@@ -5,9 +5,13 @@
 namespace Ivy::M
 {
 inline constexpr float EPSILON = 1e-5f;
+/** euler's number (the base of the natural logarithm) */
 inline constexpr float E = std::numbers::e_v<float>;
+/** @brief half circle (180 degrees) */
 inline constexpr float PI = std::numbers::pi_v<float>;
+/** @brief full circle (360 degrees or 2 * PI) */
 inline constexpr float TAU = PI * 2.0f;
+/** @brief Golden ratio. */
 inline constexpr float PHI = std::numbers::phi_v<float>;
 
 namespace Greek

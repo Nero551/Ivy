@@ -150,3 +150,7 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 ### Week 16 · October 11–18
 
 - Core framework redesign & cleanup
+- Learned move/copy semantics & constructors.
+- made separate 2D and 3D systems
+
+### Week 16 · October 19–26

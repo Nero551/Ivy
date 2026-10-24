@@ -39,6 +39,3 @@ command -v xmake
 command -v doxygen
 
 echo "🥳 Dependencies Installed!"
-
-ROOT="$(git rev-parse --show-toplevel)"
-"$ROOT/scripts/init-submodules.sh"

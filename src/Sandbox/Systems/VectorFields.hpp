@@ -97,6 +97,33 @@ struct VectorFields : C::System
         }
     }
 
+    void LimitedExponentialGrowthDecay()
+    {
+        const float dt = 0.15;
+        const float duration = 50;
+        const float k = 0.05;
+        float a = 15;
+        for (float p0 = 0; p0 <= 20; p0 += 1)
+        {
+            float p = p0;
+            for (float t = 0; t < duration; t += dt)
+            {
+                float dp = k * p * (a - p);
+                const M::Vector<2> pos = {t, p};
+                const M::Vector<2> target = {1, dp};
+                p += dp * dt;
+
+                auto& arrow = Arrow();
+
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.5};
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                m_Engine.World.GetRoot().AttachChild(arrow);
+            }
+        }
+    }
+
     void MotionUnderLinearResistiveForce()
     {
         const float dt = 0.1;
@@ -111,6 +138,37 @@ struct VectorFields : C::System
             for (float t = 0; t < duration; t += dt)
             {
                 float dv = g - (b / m) * v;
+                const M::Vector<2> pos = {t, v};
+                const M::Vector<2> target = {1, dv};
+                v += dv * dt;
+
+                auto& arrow = Arrow();
+
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.2, 0.2};
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                m_Engine.World.GetRoot().AttachChild(arrow);
+            }
+        }
+    }
+
+    void MotionUnderQuadraticResistiveForce()
+    {
+        const float dt = 0.1;
+        const float duration = 20;
+        const float g = 9.8;
+        const float m = 0.046;
+        const float D = 1;
+        const float p = 1;
+        const float A = 10e-3f * 1.4f;
+
+        for (float v0 = -40; v0 <= 40; v0 += 1)
+        {
+            float v = v0;
+            for (float t = 0; t < duration; t += dt)
+            {
+                float dv = g - (D * p * A / (2 * m)) * v * std::abs(v);
                 const M::Vector<2> pos = {t, v};
                 const M::Vector<2> target = {1, dv};
                 v += dv * dt;

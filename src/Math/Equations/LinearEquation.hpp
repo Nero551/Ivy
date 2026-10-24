@@ -6,7 +6,7 @@
 namespace Ivy::M
 {
 
-/** @brief Represents a linear equation with a fixed number of variables. */
+/** @brief Represents a linear equation in the form ax + by + ... = c. */
 template <int Variables, Scalar T = float> struct LinearEquation
 {
     T Result;

@@ -1,17 +1,22 @@
 #pragma once
 
 #include "Core/ECS/Component.hpp"
+#include "Math/Common/Exponentials.hpp"
+#include "Math/Common/Logarithms.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
 #include "Math/Equations/LinearEquation.hpp"
 #include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Math.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
 #include "Physics/DimensionalAnalysis/Dimension.hpp"
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Physics/DimensionalAnalysis/Dimensionals.hpp"
+#include "Physics/Units.hpp"
 #include "Utilities/Debug/Inspector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/Track.hpp"
@@ -40,18 +45,7 @@ namespace Sketch
 //TODO: not running renderer + transform system sends fps from 34 to 6500 (on 1.7m entities).
 //TODO: its the ForEachDescendant thing.
 //
-//TODO: make a 2D system for the engine (support for 2D).
-// transforms will be vector2 for pos & scale and complex number or a float for rotation.
-// u will probably discover alot of issues with the current framework. fix those.
-// support for 2D will open up alot of paths for simulations and such.
-// also need a way to even show 2D? will the camera be ortho?
-// or just a perspective but flat (no x or y just z (front and back) ) ?
-//
-// TODO: split renderer into Renderer2DSystem & Renderer3DSystem and group common methods.
-//
 // TODO: use a GetSmallestPool in ComponentPoolQuery instead of using the first pool as the driver.
-
-//TODO: make renderer2D & 3D return early if active camera is 3D/2D
 //
 // TODO: need particle system (cpu particle & gpu particle(compute shaders))
 // TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
@@ -86,7 +80,7 @@ template <typename T, Index Size> struct Array
 
 template <typename Input, typename Output>
 Output Summation(const int start, const int end, const M::Function<Input, Output>& f)
-    requires(std::convertible_to<int, Input> && M::Additive<Output, Output>)
+    requires(std::convertible_to<Input, int> && M::Additive<Output, Output>)
 {
     Output result{};
 
@@ -240,9 +234,17 @@ template <M::Scalar T> struct Dual
 
 //TODO: add NumberOfDimensions method to all math types
 //TODO: make Function take multiple inputs(ex: two quaternions) via vardiac templates(...Args)
+// TODO: make compose able to take multiple function inputs.
 
 inline void Test()
 {
     P::Dimension<float, P::Acceleration> g = 9.8;
+
+    P::Dimension<M::Vector<2>, P::Length<1>> deltaR = {2, 3};
+    P::Dimension<M::Vector<2>, P::Force> F = {5, 2};
+
+    P::Dimension<float, P::Joule> work = F().Dot(deltaR());
+
+    U::Log::Info(work);
 }
 } // namespace Sketch

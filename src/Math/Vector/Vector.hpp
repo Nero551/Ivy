@@ -117,7 +117,7 @@ template <unsigned int Components, Scalar T = float> struct Vector
         return (*this - vector).Length();
     }
 
-    /** @brief Projects the vector stereographically onto a line. */
+    /** @brief Projects the vector stereographically onto a lower dimensional vector(N - 1). */
     constexpr Vector<Components - 1> StereoProject() const
     {
         const T r = Length();
