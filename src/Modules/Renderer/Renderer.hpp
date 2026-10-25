@@ -4,6 +4,7 @@
 #include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Module.hpp"
 #include "Core/World/Components.hpp"
+#include "Graphics/AntiAliasing/MSAA.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -14,24 +15,19 @@
 
 namespace Ivy::R
 {
+
 struct Renderer : C::Module
 {
     using C::Module::Module;
 
-    U::CheckedPtr<C::Resource<G::Framebuffer>> Framebuffer{"Graphics module has no Framebuffer to use"};
-    U::CheckedPtr<C::Resource<G::Framebuffer>> MSAAFramebuffer{
-        "Graphics module has no MSAA Framebuffer to use"};
-    const int MSAASamples = 8;
-
-    U::CheckedPtr<C::Resource<G::Material>> ScreenMaterial{
-        "Graphics module has no Screen Material to render on"};
-    U::CheckedPtr<C::Resource<G::Mesh>> ScreenMesh{"Graphics module has no Screen Mesh to render on"};
-    U::CheckedPtr<C::Resource<G::Uniformbuffer>> GUniformbuffer{
-        "Graphics module has no Uniform buffer to use"};
+    G::Framebuffer Framebuffer{"Graphics module has no Framebuffer to use"};
+    G::Material ScreenMaterial{"Graphics module has no Screen Material to render on"};
+    G::Mesh ScreenMesh{"Graphics module has no Screen Mesh to render on"};
+    G::Uniformbuffer GUniformbuffer{"Graphics module has no Uniform buffer to use"};
+    G::MSAA MSAntiAliasing{8};
 
   protected:
     void SetupFramebuffer();
-    void SetupMSAAFrameBuffer();
     void PresentFramebuffer();
 
     void Start() override;

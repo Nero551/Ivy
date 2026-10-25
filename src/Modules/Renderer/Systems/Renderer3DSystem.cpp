@@ -40,12 +40,12 @@ void Renderer3DSystem::Render()
     const M::Vector<3> up = transform.GetUp();
     M::Matrix<4, 4> view = M::Matrix<4, 4>::LookAt(pos, pos + forward, up);
 
-    rendererModule.GUniformbuffer->Get().Set(view, 0);
-    rendererModule.GUniformbuffer->Get().Set(projection, 64);
-    rendererModule.GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
-    rendererModule.GUniformbuffer->Get().Set(
+    rendererModule.GUniformbuffer.Set(view, 0);
+    rendererModule.GUniformbuffer.Set(projection, 64);
+    rendererModule.GUniformbuffer.Set(m_Engine.GetTime(), 128);
+    rendererModule.GUniformbuffer.Set(
         query.Pool<CMP::Transform3D>().GetComponent(camera.GetId()).m_GlobalPosition, 144);
-    rendererModule.GUniformbuffer->Get().Bind();
+    rendererModule.GUniformbuffer.Bind();
 
     query.ForEach<CMP::Material, CMP::Transform3D, CMP::Mesh>(
         [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform3D& transform,

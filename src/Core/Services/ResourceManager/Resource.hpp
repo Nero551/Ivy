@@ -1,6 +1,7 @@
 #pragma once
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include <concepts>
+#include <string>
 
 namespace Ivy::C
 {

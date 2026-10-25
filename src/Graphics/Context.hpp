@@ -9,6 +9,13 @@
 /** @brief Handles initialization, modification and termination of the graphics state */
 namespace Ivy::G::Context
 {
+
+enum class GPUBackend
+{
+    OpenGL,
+    Vulkan
+};
+
 inline double GetTime()
 {
     return glfwGetTime();

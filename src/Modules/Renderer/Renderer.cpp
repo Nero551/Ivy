@@ -49,10 +49,6 @@ void Renderer::SetupFramebuffer()
     auto& resources = m_Engine.GetService<C::ResourceManager>();
     auto& window = m_Engine.Window;
 
-    Framebuffer = &resources.Load<struct G::Framebuffer>("[Graphics] Framebuffer");
-
-    ScreenMesh = &resources.Load<G::Mesh>("[Graphics] Screen Mesh");
-    ScreenMaterial = &resources.Load<G::Material>("[Graphics] Screen Material");
     auto& screenShader = resources.Load<G::Shader>("[Graphics] Screen Shader");
     auto& screenVert = resources.Load<G::ShaderSource>(
         "[Graphics] Screen Vertex", "Assets/Shaders/screen.vert", G::ShaderStage::Vertex);
@@ -62,14 +58,14 @@ void Renderer::SetupFramebuffer()
     screenShader().AssignSource(screenVert);
     screenShader().AssignSource(screenFrag);
 
-    ScreenMaterial->Get().Shader = &screenShader();
-    ScreenMaterial->Get().Depth.Enabled = false;
-    ScreenMaterial->Get().Stencil.Enabled = false;
-    ScreenMaterial->Get().Blend.Enabled = false;
+    ScreenMaterial.Shader = &screenShader();
+    ScreenMaterial.Depth.Enabled = false;
+    ScreenMaterial.Stencil.Enabled = false;
+    ScreenMaterial.Blend.Enabled = false;
 
-    ScreenMesh->Get().Vertices = vertices;
-    ScreenMesh->Get().Indices = indices;
-    ScreenMesh->Get().CullMode = G::CullMode::None;
+    ScreenMesh.Vertices = vertices;
+    ScreenMesh.Indices = indices;
+    ScreenMesh.CullMode = G::CullMode::None;
 
     auto& screenTexture = resources.Load<G::Texture2D>("COLOR_BUFFER");
     screenTexture.Get().Width = window.GetWidth();
@@ -81,40 +77,16 @@ void Renderer::SetupFramebuffer()
     screenTexture.Get().MagFilter = G::TextureFilter::Linear;
     screenTexture.Get().MinFilter = G::TextureFilter::Linear;
 
-    Framebuffer->Get().AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
+    Framebuffer.AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
 
     m_Engine.Window.SetFramebufferSizeCallback(
         [&](G::Window& win, const int w, const int h)
         {
             G::Context::SetViewport(0, 0, w, h);
             auto& graphics = m_Engine.GetModule<Renderer>();
-            graphics.MSAAFramebuffer->Get().Resize(w, h);
-            graphics.Framebuffer->Get().Resize(w, h);
+            graphics.MSAntiAliasing.OutputBuffer.Resize(w, h);
+            graphics.Framebuffer.Resize(w, h);
         });
-}
-
-void Renderer::SetupMSAAFrameBuffer()
-{
-    auto& resources = m_Engine.GetService<C::ResourceManager>();
-    auto& window = m_Engine.Window;
-
-    MSAAFramebuffer = &resources.Load<struct G::Framebuffer>("[Graphics] MSAA Framebuffer");
-    MSAAFramebuffer->Get().Target = G::FrameBufferTarget::ReadDraw;
-
-    auto& colorBuffer = resources.Load<G::Renderbuffer>("[Graphics] MSAA Color Render Buffer");
-    colorBuffer().Width = window.GetWidth();
-    colorBuffer().Height = window.GetHeight();
-    colorBuffer().Samples = MSAASamples;
-    colorBuffer().InternalFormat = G::TextureInternalFormat::RGB8;
-
-    auto& depthstencilBuffer = resources.Load<G::Renderbuffer>("[Graphics] MSAA DepthStencil Render Buffer");
-    depthstencilBuffer().Height = window.GetHeight();
-    depthstencilBuffer().Width = window.GetWidth();
-    depthstencilBuffer().Samples = MSAASamples;
-    depthstencilBuffer().InternalFormat = G::TextureInternalFormat::Depth24Stencil8;
-
-    MSAAFramebuffer->Get().AttachRenderBuffer(G::FramebufferAttachment::Color0, colorBuffer);
-    MSAAFramebuffer->Get().AttachRenderBuffer(G::FramebufferAttachment::DepthStencil, depthstencilBuffer);
 }
 
 void Renderer::PresentFramebuffer()
@@ -123,22 +95,22 @@ void Renderer::PresentFramebuffer()
     int width = window.GetWidth();
     int height = window.GetHeight();
 
-    MSAAFramebuffer->Get().Blit(Framebuffer->Get(), width, height, width, height, G::BufferBit::Color);
+    MSAntiAliasing.OutputBuffer.Blit(Framebuffer, width, height, width, height, G::BufferBit::Color);
 
-    MSAAFramebuffer->Get().Unbind();
+    MSAntiAliasing.OutputBuffer.Unbind();
 
     G::Context::ClearColor(0.08, 0.05, 0.1, 1);
     G::Context::Clear(G::BufferBit::Color);
 
     int i = 0;
-    for (auto& texture : Framebuffer->Get().TextureAttachments | std::views::values)
+    for (auto& texture : Framebuffer.TextureAttachments | std::views::values)
     {
-        ScreenMaterial->Get().AssignTexture(*texture, i);
+        ScreenMaterial.AssignTexture(*texture, i);
         ++i;
     }
 
-    ScreenMaterial->Get().Use();
-    ScreenMesh->Get().Draw();
+    ScreenMaterial.Use();
+    ScreenMesh.Draw();
 }
 
 void Renderer::Start()
@@ -150,11 +122,9 @@ void Renderer::Start()
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);
 
-    auto& resources = m_Engine.GetService<C::ResourceManager>();
-    GUniformbuffer = &resources.Load<G::Uniformbuffer>("[Graphics] Global Uniform buffer");
-    GUniformbuffer->Get().Size = 160;
+    GUniformbuffer.Size = 160;
 
-    SetupMSAAFrameBuffer();
+    MSAntiAliasing.Generate(m_Engine.Window.GetWidth(), m_Engine.Window.GetHeight());
     SetupFramebuffer();
 
     GetSystem<LightingSystem>().Start();
@@ -164,7 +134,7 @@ void Renderer::Start()
 
 void Renderer::BeginFrame(double dt)
 {
-    MSAAFramebuffer->Get().Bind();
+    MSAntiAliasing.OutputBuffer.Bind();
 
     G::Context::ClearColor(0.08, 0.05, 0.1, 1);
     G::Context::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
@@ -191,7 +161,7 @@ void Renderer::FixedUpdate(double fdt) {}
 void Renderer::Stop()
 {
     const G::Texture2D& texture =
-        static_cast<G::Texture2D&>(Framebuffer->Get().GetTexture(G::FramebufferAttachment::Color0));
+        static_cast<G::Texture2D&>(Framebuffer.GetTexture(G::FramebufferAttachment::Color0));
 
     U::Image image = {texture.Width, texture.Height, U::Image::ColorChannels::RGB, texture.ReadPixels()};
     image.SaveToDiskPNG("Assets/LastFrame.png", true);

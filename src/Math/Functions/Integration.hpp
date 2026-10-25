@@ -59,16 +59,16 @@ Function<Input, Output> Integrate(const Function<Input, Output>& f, Input lowerB
 
             switch (method)
             {
-            case IntegrationMethod::Midpoint:
-                result += f(x + width / 2.0f) * width;
+            case IntegrationMethod::Left:
+                result += f(x) * width;
                 break;
 
             case IntegrationMethod::Right:
                 result += f(x + width) * width;
                 break;
 
-            case IntegrationMethod::Left:
-                result += f(x) * width;
+            case IntegrationMethod::Midpoint:
+                result += f(x + width / 2.0f) * width;
                 break;
 
             case IntegrationMethod::Trapezoid:

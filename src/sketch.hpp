@@ -9,6 +9,7 @@
 #include "Math/Equations/LinearSystem.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Functions/Integration.hpp"
 #include "Math/Math.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Set.hpp"

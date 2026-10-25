@@ -41,11 +41,11 @@ void Renderer2DSystem::Render()
     M::Matrix<4, 4> view = transform.GetModelMatrix().Inverse();
     auto& camPos = transform.m_GlobalPosition;
 
-    rendererModule.GUniformbuffer->Get().Set(view, 0);
-    rendererModule.GUniformbuffer->Get().Set(projection, 64);
-    rendererModule.GUniformbuffer->Get().Set(m_Engine.GetTime(), 128);
-    rendererModule.GUniformbuffer->Get().Set(M::Vector<3>{camPos().x, camPos().y, 0}, 144);
-    rendererModule.GUniformbuffer->Get().Bind();
+    rendererModule.GUniformbuffer.Set(view, 0);
+    rendererModule.GUniformbuffer.Set(projection, 64);
+    rendererModule.GUniformbuffer.Set(m_Engine.GetTime(), 128);
+    rendererModule.GUniformbuffer.Set(M::Vector<3>{camPos().x, camPos().y, 0}, 144);
+    rendererModule.GUniformbuffer.Bind();
 
     query.ForEach<CMP::Material, CMP::Transform2D, CMP::Mesh>(
         [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform2D& transform,

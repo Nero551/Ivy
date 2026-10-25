@@ -69,7 +69,6 @@ void Engine::Configure()
 
 void Engine::Start()
 {
-    G::Context::Initialize();
     Window.Generate(800, 600, "Ivy");
     Configure();
 
@@ -205,8 +204,6 @@ void Engine::Stop()
     {
         Instance.Reset();
     }
-
     Window.Terminate();
-    G::Context::Terminate();
 }
 } // namespace Ivy::C

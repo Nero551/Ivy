@@ -1,4 +1,5 @@
 #include "Core/Engine.hpp"
+#include "Graphics/Context.hpp"
 #include "sketch.hpp"
 #include <string_view>
 
@@ -16,9 +17,11 @@ int main(const int argc, char* argv[])
     }
 
     Sketch::Test();
-    return 0;
+    // return 0;
 
+    Ivy::G::Context::Initialize();
     Ivy::C::Engine engine;
     engine.Run();
+    Ivy::G::Context::Terminate();
     return 0;
 }

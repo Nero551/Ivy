@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AntiAliasing/MSAA.hpp"
 #include "Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Buffers/BufferBit.hpp"
 #include "Buffers/BufferTarget.hpp"
