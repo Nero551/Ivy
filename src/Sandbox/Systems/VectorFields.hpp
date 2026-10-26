@@ -33,6 +33,7 @@ struct VectorFields : C::System
 
         m_Material = &resources.Load<G::Material>("arrowMat");
         m_Material->Get().Shader = &shader();
+        m_Material->Get().Color = {1, 1, 1, 1};
     }
 
     void Pendulum()

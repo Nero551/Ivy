@@ -3,30 +3,50 @@
 #include "Core/World/Components.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/Material/Material.hpp"
-#include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
-#include "Math/Common/Constants.hpp"
-#include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Random.hpp"
-#include "Math/Common/Trigonometry.hpp"
 #include "Math/Vector/Vector.hpp"
+#include "Math/Vector/Vector2.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 #include "Sandbox/Scenes/CoordinateAxes2D.hpp"
 #include "Sandbox/Systems/Controller2D.hpp"
-#include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstdlib>
 namespace Ivy::Sandbox
 {
 
-static int ballId;
+unsigned int Sandbox2D::CreateCircle()
+{
+    auto& query = m_Engine.ECS.Query;
+    auto& resources = m_Engine.GetService<C::ResourceManager>();
+    auto& circle = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+    query.Pool<CMP::Mesh>().GetComponent(circle).Mesh = &resources.Load(G::Primitives::CreateCircle("ball"));
 
+    auto& vertSource = resources.Load<G::ShaderSource>(
+        "circleShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+    auto& fragSource = resources.Load<G::ShaderSource>(
+        "circleShaderFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+
+    auto& shader = resources.Load<G::Shader>("circleShader", vertSource, fragSource);
+    auto& mat = resources.Load<G::Material>("circleMat");
+    mat().Shader = &shader();
+    mat().Color = {1, 1, 1, 1};
+
+    query.Pool<CMP::Material>().GetComponent(circle).Material = &mat;
+    m_Engine.World.GetRoot().AttachChild(circle);
+    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(circle);
+    transform.Position = {0, 1};
+
+    return circle.GetId();
+}
+
+static int ballId;
 void Sandbox2D::Start()
 {
 
@@ -41,44 +61,27 @@ void Sandbox2D::Start()
     // AddSystem<StressTester2D>();
     // GetSystem<StressTester2D>().Spawn(3, 5);
 
-    AddSystem<VectorFields>();
-    GetSystem<VectorFields>().Start();
+    // AddSystem<VectorFields>();
+    // GetSystem<VectorFields>().Start();
 
     // GetSystem<VectorFields>().MotionUnderQuadraticResistiveForce();
-
-    auto& query = m_Engine.ECS.Query;
-    auto& resources = m_Engine.GetService<C::ResourceManager>();
-    auto& circle = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
-    query.Pool<CMP::Mesh>().GetComponent(circle).Mesh = &resources.Load(G::Primitives::CreateCircle("ball"));
-
-    auto& vertSource = resources.Load<G::ShaderSource>(
-        "circleShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = resources.Load<G::ShaderSource>(
-        "circleShaderFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-
-    auto& shader = resources.Load<G::Shader>("circleShader", vertSource, fragSource);
-    auto& mat = resources.Load<G::Material>("arrowMat");
-    mat().Shader = &shader();
-    mat().Color = {1, 1, 1, 1};
-
-    query.Pool<CMP::Material>().GetComponent(circle).Material = &mat;
-    m_Engine.World.GetRoot().AttachChild(circle);
-    ballId = circle.GetId();
-
-    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(circle);
-    transform.Position = {0, 1};
+    ballId = CreateCircle();
 }
 
-static M::Vector<2> v = {0, 0};
-static M::Vector<2> a{0, 0};
-static M::Vector<2> p = {0, 0};
-static M::Vector<2> R = {0, 0};
-static M::Vector<2> wind = {0, 0};
+struct Particle
+{
+    M::Vector<2> Position;
+    M::Vector<2> Velocity;
+    M::Vector<2> Acceleration;
+    M::Vector<2> Force;
+    float Mass = 1;
+};
 
-static M::Vector<2> g = {0, -9.8};
+static Particle p;
+static M::Vector<2> g{0, -9.8};
 static float b = 0.5;
 static float restitution = 0.8;
-static float s = 20;
+static float speed = 20;
 
 void Sandbox2D::FixedUpdate(double fdt)
 {
@@ -86,62 +89,66 @@ void Sandbox2D::FixedUpdate(double fdt)
     {
         m_Engine.Shutdown();
     }
-
     GetSystem<Controller2D>().Update(fdt);
     // GetSystem<StressTester2D>().Update(dt);
-
     auto& query = m_Engine.ECS.Query;
-    auto& circle = m_Engine.ECS.GetEntity(ballId);
     auto& input = m_Engine.GetModule<I::Input>();
-    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(circle);
+    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(ballId));
 
     M::Vector<2> f{0, 0};
 
     if (input.IsKeyHeld(G::Key::Up))
     {
-        f.y += s;
+        f.y += speed;
     }
     if (input.IsKeyHeld(G::Key::Down))
     {
-        f.y -= s;
+        f.y -= speed;
     }
     if (input.IsKeyHeld(G::Key::Left))
     {
-        f.x -= s;
+        f.x -= speed;
     }
     if (input.IsKeyHeld(G::Key::Right))
     {
-        f.x += s;
+        f.x += speed;
     }
 
-    wind += M::Vector<2>{M::Random(-1.0f, 1.0f), M::Random(-1.0f, 1.0f)} * fdt;
+    M::Vector<2> wind = M::Vector<2>{M::RandomGaussian(M::Random(-1.0f, 1.0f), M::Random()),
+        M::RandomGaussian(M::Random(-1.0f, 1.0f), M::Random())};
+    M::Vector<2> R = (-0.5 * p.Velocity) + wind;
 
-    R = (-b * v) + wind;
-    a = f + R + g;
-    v += a * fdt;
+    p.Force = f * p.Mass + R + p.Mass * g;
+    p.Acceleration = p.Force / p.Mass;
 
-    if (p.y < 0.1)
+    p.Velocity += p.Acceleration * fdt;
+
+    if (p.Position.y < 0.5)
     {
-        if (std::abs(v.y) < 0.4)
+        if (std::abs(p.Velocity.y) <= 1.5)
         {
-            v.y = 0;
+            p.Velocity.y = 0;
+        }
+        else
+        {
+            p.Velocity.y = (restitution / p.Mass) * -p.Velocity.y;
         }
 
-        v.y = restitution * -v.y;
-        p.y = 0.1;
+        p.Position.y = 0.5;
     }
 
-    p += v * fdt;
+    p.Position += p.Velocity * fdt;
 
-    transform.Position = p;
+    transform.Position = p.Position;
 
     U::Log::Info("[[[");
     U::Log::Info("Applied Force: ", f);
     U::Log::Info("Wind: ", wind);
     U::Log::Info("Resistive Force: ", R);
-    U::Log::Info("Acceleration: ", a);
-    U::Log::Info("Velocity: ", v);
-    U::Log::Info("Position: ", p);
+    U::Log::Info("Total Force: ", p.Force);
+    U::Log::Info("Acceleration: ", p.Acceleration);
+    U::Log::Info("Velocity: ", p.Velocity);
+    U::Log::Info("Position: ", p.Position);
     U::Log::Info("]]]");
 }
 } // namespace Ivy::Sandbox

@@ -22,6 +22,7 @@
 #include "Functions/Differentiation.hpp"
 #include "Functions/Function.hpp"
 #include "Functions/Integration.hpp"
+#include "Functions/Inverse.hpp"
 #include "Functions/Series.hpp"
 #include "Geometry/Basis.hpp"
 #include "Matrix/BasicMatrix.hpp"

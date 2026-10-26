@@ -7,6 +7,9 @@ struct Sandbox2D : C::Module
     using Module::Module;
     void Start() override;
     void FixedUpdate(double fdt) override;
+
+  private:
+    unsigned int CreateCircle();
 };
 
 } // namespace Ivy::Sandbox

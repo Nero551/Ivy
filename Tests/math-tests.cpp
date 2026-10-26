@@ -364,12 +364,12 @@ TEST_CASE("Function inverse (scalar‑to‑scalar)")
     auto f = Function<float, float>([](const float x) { return 2.0f * x + 3.0f; });
     SECTION("InverseEvaluate")
     {
-        REQUIRE(f.InverseEvaluate(7.0f, -10.0f, 10.0f) == Approx(2.0f));
+        REQUIRE(InverseEvaluate(f, 7.0f, -10.0f, 10.0f) == Approx(2.0f));
     }
 
     SECTION("Inverse function")
     {
-        auto inv = f.Inverse(-10.0f, 10.0f);
+        auto inv = Inverse(f, -10.0f, 10.0f);
         REQUIRE(inv(7.0f) == Approx(2.0f));
         // Check f(inv(y)) ≈ y
         REQUIRE(f(inv(7.0f)) == Approx(7.0f));
@@ -380,7 +380,7 @@ TEST_CASE("Function inverse (scalar‑to‑scalar)")
         auto g = Function<float, float>([](const float x) { return x * x; });
         // This is not monotonic over [-10,10], but binary search will still find something.
         // We just check it runs.
-        auto invG = g.Inverse(0.0f, 10.0f); // restrict to positive domain
+        auto invG = Inverse(g, 0.0f, 10.0f); // restrict to positive domain
         REQUIRE(invG(4.0f) == Approx(2.0f));
     }
 }

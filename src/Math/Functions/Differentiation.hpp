@@ -12,6 +12,13 @@ enum class DifferentiationMethod
     Central
 };
 
+template <typename Input, Scalar Output>
+Output AverageRateOfChange(const Function<Input, Output>& f, const Input start, const Input end)
+    requires(Subtractive<Output, Output> && Divisible<Output, Input>)
+{
+    return (f(end) - f(start)) / (end - start);
+}
+
 /**
  * @brief Calculates the numerical derivative of the function.
  * @param dx Step size used for numerical differentiation.
