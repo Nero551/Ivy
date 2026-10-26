@@ -9,7 +9,7 @@ namespace Ivy
 {
 void Profiling::Start() {}
 
-void Profiling::Update(const double dt)
+void Profiling::FixedUpdate(const double dt)
 {
     m_Elapsed += dt;
 

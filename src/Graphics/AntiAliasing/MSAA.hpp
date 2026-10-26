@@ -10,8 +10,6 @@ namespace Ivy::G
 struct MSAA
 {
     G::Framebuffer OutputBuffer{"MSAA Output"};
-    G::Renderbuffer ColorBuffer{"MSAA Color"};
-    G::Renderbuffer DepthStencilBuffer{"MSAA DepthStencil"};
     unsigned Samples = 8;
 
     MSAA() = default;
@@ -30,18 +28,18 @@ struct MSAA
 
         OutputBuffer.Target = G::FrameBufferTarget::ReadDraw;
 
-        ColorBuffer.Width = width;
-        ColorBuffer.Height = height;
-        ColorBuffer.Samples = Samples;
-        ColorBuffer.InternalFormat = G::TextureInternalFormat::RGB8;
+        m_ColorBuffer.Width = width;
+        m_ColorBuffer.Height = height;
+        m_ColorBuffer.Samples = Samples;
+        m_ColorBuffer.InternalFormat = G::TextureInternalFormat::RGB8;
 
-        DepthStencilBuffer.Width = width;
-        DepthStencilBuffer.Height = height;
-        DepthStencilBuffer.Samples = Samples;
-        DepthStencilBuffer.InternalFormat = G::TextureInternalFormat::Depth24Stencil8;
+        m_DepthStencilBuffer.Width = width;
+        m_DepthStencilBuffer.Height = height;
+        m_DepthStencilBuffer.Samples = Samples;
+        m_DepthStencilBuffer.InternalFormat = G::TextureInternalFormat::Depth24Stencil8;
 
-        OutputBuffer.AttachRenderBuffer(G::FramebufferAttachment::Color0, ColorBuffer);
-        OutputBuffer.AttachRenderBuffer(G::FramebufferAttachment::DepthStencil, DepthStencilBuffer);
+        OutputBuffer.AttachRenderBuffer(G::FramebufferAttachment::Color0, m_ColorBuffer);
+        OutputBuffer.AttachRenderBuffer(G::FramebufferAttachment::DepthStencil, m_DepthStencilBuffer);
     };
 
     void Delete()
@@ -49,15 +47,19 @@ struct MSAA
         if (IsGenerated())
         {
             OutputBuffer.Delete();
-            ColorBuffer.Delete();
-            DepthStencilBuffer.Delete();
+            m_ColorBuffer.Delete();
+            m_DepthStencilBuffer.Delete();
         }
     }
 
     bool IsGenerated()
     {
-        return OutputBuffer.IsGenerated() && ColorBuffer.IsGenerated() && DepthStencilBuffer.IsGenerated();
+        return OutputBuffer.IsGenerated() && m_ColorBuffer.IsGenerated() &&
+            m_DepthStencilBuffer.IsGenerated();
     }
-};
 
+  private:
+    G::Renderbuffer m_ColorBuffer{"MSAA Color"};
+    G::Renderbuffer m_DepthStencilBuffer{"MSAA DepthStencil"};
+};
 } // namespace Ivy::G

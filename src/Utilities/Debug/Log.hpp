@@ -66,7 +66,7 @@ struct Log
         std::cout << m_Red << "💀 [FATAL] " << m_Reset;
         (..., (std::cout << args));
         std::cout << '\n';
-        throw std::exception();
+        throw std::runtime_error("");
     }
 
     /** @brief Validates a raw pointer and returns the dereferenced object. */

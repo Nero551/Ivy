@@ -34,8 +34,6 @@ struct Renderer : C::Module
     void BeginFrame(double dt) override;
 
     void Render() override;
-    void Update(double dt) override;
-    void FixedUpdate(double fdt) override;
 
     void Stop() override;
 };

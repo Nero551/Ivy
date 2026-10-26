@@ -135,14 +135,12 @@ void Renderer::Start()
 void Renderer::BeginFrame(double dt)
 {
     MSAntiAliasing.OutputBuffer.Bind();
-
     G::Context::ClearColor(0.08, 0.05, 0.1, 1);
     G::Context::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
 }
 
 //TODO: after i learn compute shaders, i could move this entire rendering pipeline on a compute shader.
-//TODO: if there is multiple semi-transparent objects behind each other , depth testing
-// breaks blending.
+//TODO: if there is multiple semi-transparent objects behind each other , depth testing breaks blending.
 //  fix this by classifying render passes by transparency, pairs well with future render
 //  batches / instancing. for ordering semi-transparent object by distance , use a map ,
 //  it auto sorts.
@@ -153,10 +151,6 @@ void Renderer::Render()
     GetSystem<Renderer2DSystem>().Render();
     PresentFramebuffer();
 }
-
-void Renderer::Update(const double dt) {}
-
-void Renderer::FixedUpdate(double fdt) {}
 
 void Renderer::Stop()
 {

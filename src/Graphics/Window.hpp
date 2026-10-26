@@ -47,7 +47,7 @@ struct Window
     Window() = default;
     ~Window()
     {
-        Terminate();
+        Delete();
     }
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
@@ -70,7 +70,7 @@ struct Window
     {
         if (this != &other)
         {
-            Terminate();
+            Delete();
 
             Config = std::move(other.Config);
 
@@ -100,9 +100,9 @@ struct Window
     * @param title Window title.
     */
     void Generate(int width, int height, std::string_view title);
-    void Terminate();
+    void Delete();
 
-    bool IsTerminated() const;
+    bool IsGenerated() const;
 
     /** @brief Returns the window's width-to-height ratio. */
     float GetAspectRatio() const;

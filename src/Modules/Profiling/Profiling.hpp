@@ -15,7 +15,7 @@ struct Profiling : C::Module
   protected:
     void Start() override;
 
-    void Update(double dt) override;
+    void FixedUpdate(double dt) override;
 
   private:
     std::deque<double> FrameTimes;

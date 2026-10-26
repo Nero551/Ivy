@@ -34,17 +34,17 @@ void Window::Generate(const int width, const int height, std::string_view title)
     glViewport(0, 0, width, height);
     glfwSetWindowUserPointer(m_GlfwWindow, this);
 }
-void Window::Terminate()
+void Window::Delete()
 {
-    if (!IsTerminated())
+    if (IsGenerated())
     {
         glfwDestroyWindow(m_GlfwWindow);
         m_GlfwWindow = nullptr;
     }
 }
-bool Window::IsTerminated() const
+bool Window::IsGenerated() const
 {
-    return m_GlfwWindow == nullptr;
+    return m_GlfwWindow != nullptr;
 }
 
 float Window::GetAspectRatio() const

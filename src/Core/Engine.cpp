@@ -135,7 +135,7 @@ void Engine::Update()
 
     for (auto& module : m_Modules)
     {
-        module->Update(m_TimeHandler.GetDelta());
+        module->FixedUpdate(m_TimeHandler.GetDelta());
     }
 
     for (auto& service : m_Services)
@@ -204,6 +204,6 @@ void Engine::Stop()
     {
         Instance.Reset();
     }
-    Window.Terminate();
+    Window.Delete();
 }
 } // namespace Ivy::C

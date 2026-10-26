@@ -32,7 +32,7 @@ void Sandbox3D::Start()
     GetSystem<StressTester3D>().Spawn(3, 5);
 }
 
-void Sandbox3D::Update(double dt)
+void Sandbox3D::FixedUpdate(double dt)
 {
     if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::Escape))
     {

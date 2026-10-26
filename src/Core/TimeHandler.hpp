@@ -5,15 +5,6 @@ namespace Ivy::C
 {
 struct TimeHandler
 {
-  private:
-    double m_Time = 0.0;
-    double m_DeltaTime = 0.0;
-    double m_FixedDeltaTime = 1.0 / 60.0;
-
-    double m_LastFrame = 0.0;
-    double m_Accumulator = 0.0;
-
-  public:
     double GetTime() const
     {
         return m_Time;
@@ -55,5 +46,13 @@ struct TimeHandler
     {
         m_Accumulator -= m_FixedDeltaTime;
     }
+
+  private:
+    double m_Time = 0.0;
+    double m_DeltaTime = 0.0;
+    double m_FixedDeltaTime = 1.0 / 60.0;
+
+    double m_LastFrame = 0.0;
+    double m_Accumulator = 0.0;
 };
 } // namespace Ivy::C

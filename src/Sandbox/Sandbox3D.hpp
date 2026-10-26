@@ -6,7 +6,7 @@ struct Sandbox3D : C::Module
 {
     using Module::Module;
     void Start() override;
-    void Update(double dt) override;
+    void FixedUpdate(double dt) override;
 };
 
 } // namespace Ivy::Sandbox

@@ -29,10 +29,7 @@ struct VectorFields : C::System
         auto& fragSource = resources.Load<G::ShaderSource>(
             "arrowShaderFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment);
 
-        auto& shader = resources.Load<G::Shader>("arrowShader");
-
-        shader().AssignSource(vertSource);
-        shader().AssignSource(fragSource);
+        auto& shader = resources.Load<G::Shader>("arrowShader", vertSource, fragSource);
 
         m_Material = &resources.Load<G::Material>("arrowMat");
         m_Material->Get().Shader = &shader();

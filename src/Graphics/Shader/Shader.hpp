@@ -36,6 +36,11 @@ struct Shader
      * @param name Name used to identify the shader resource.
      */
     Shader(std::string name) : m_Name(std::move(name)) {}
+    Shader(std::string name, ShaderSource& vert, ShaderSource& frag) : m_Name(std::move(name))
+    {
+        AssignSource(vert);
+        AssignSource(frag);
+    }
     ~Shader()
     {
         Delete();
