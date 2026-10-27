@@ -2,6 +2,7 @@
 #include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include <ostream>
 namespace Ivy::M
 {
 
@@ -12,21 +13,26 @@ enum class ODEMethod
     ImplicitEuler,
 };
 
-template <Scalar Independent, typename Dependent> struct ODE
+template <Scalar Independent, typename Conditions> struct ODE
 {
     struct State
     {
-        Dependent y;
+        Conditions y;
         Independent x;
 
-        State(Independent X, const Dependent& Y) : x(X), y(Y) {}
+        State(Independent X, const Conditions& Y) : x(X), y(Y) {}
+
+        friend std::ostream& operator<<(std::ostream& os, const State& state)
+        {
+            return os << state.x << " " << state.y;
+        }
     };
 
-    using DerivativeFunction = Function<Dependent, State>;
+    using DerivativeFunction = Function<Conditions, State>;
 
     ODE(const DerivativeFunction& f) : m_Derivative(f) {}
 
-    Dependent Derivative(const State& current) const
+    Conditions Derivative(const State& current) const
     {
         return m_Derivative(current);
     }
@@ -44,7 +50,8 @@ template <Scalar Independent, typename Dependent> struct ODE
 
         while (result.x < target)
         {
-            result = Step(result, dx);
+            const Independent step = std::min(dx, target - result.x);
+            result = Step(result, step);
         }
 
         return result;

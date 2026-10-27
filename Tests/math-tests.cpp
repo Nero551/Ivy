@@ -1866,3 +1866,383 @@ TEST_CASE("Overdetermined linear system has unique solution")
     REQUIRE(solution.IsUnique());
     REQUIRE(solution.GetSolution() == Vector<2>{2.0, 3.0});
 }
+
+TEST_CASE("ODE evaluates its derivative")
+{
+    // dy/dx = 2x + y
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State& state) -> double { return 2.0 * state.x + state.y; }};
+
+    const Equation::State state{3.0, 4.0};
+
+    REQUIRE(equation.Derivative(state) == 10.0);
+}
+
+TEST_CASE("ODE evaluates a constant derivative")
+{
+    // dy/dx = 5
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State&) -> double { return 5.0; }};
+
+    REQUIRE(equation.Derivative({0.0, 0.0}) == 5.0);
+    REQUIRE(equation.Derivative({2.0, -10.0}) == 5.0);
+}
+
+TEST_CASE("ODE performs a single explicit Euler step")
+{
+    // dy/dx = 2y
+    // y(0) = 3, dx = 0.1
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State& state) -> double { return 2.0 * state.y; }};
+
+    const Equation::State initial{0.0, 3.0};
+    const auto result = equation.Step(initial, 0.1);
+
+    REQUIRE(result.x == Catch::Approx(0.1));
+    REQUIRE(result.y == Catch::Approx(3.6));
+}
+
+TEST_CASE("ODE step preserves the state when the derivative is zero")
+{
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State&) -> double { return 0.0; }};
+
+    const Equation::State initial{2.0, 7.0};
+    const auto result = equation.Step(initial, 0.5);
+
+    REQUIRE(result.x == Catch::Approx(2.5));
+    REQUIRE(result.y == Catch::Approx(7.0));
+}
+
+TEST_CASE("ODE solves a constant derivative exactly")
+{
+    // dy/dx = 4
+    // y(0) = 2
+    // Exact: y(x) = 2 + 4x
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State&) -> double { return 4.0; }};
+
+    const Equation::State initial{0.0, 2.0};
+    const auto result = equation.Solve(initial, 3.0, 0.1);
+
+    REQUIRE(result.x == Catch::Approx(3.0));
+    REQUIRE(result.y == Catch::Approx(14.0));
+}
+
+TEST_CASE("ODE solves a constant solution")
+{
+    // dy/dx = 0
+    // y(0) = 42
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State&) -> double { return 0.0; }};
+
+    const Equation::State initial{0.0, 42.0};
+    const auto result = equation.Solve(initial, 10.0, 0.25);
+
+    REQUIRE(result.x == Catch::Approx(10.0));
+    REQUIRE(result.y == Catch::Approx(42.0));
+}
+
+TEST_CASE("ODE solves exponential growth approximately")
+{
+    // dy/dx = y
+    // y(0) = 1
+    // Exact: y(x) = exp(x)
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State& state) -> double { return state.y; }};
+
+    const Equation::State initial{0.0, 1.0};
+    const auto result = equation.Solve(initial, 1.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(1.0));
+    REQUIRE(result.y == Catch::Approx(2.719).epsilon(0.001));
+}
+
+TEST_CASE("ODE solves exponential decay approximately")
+{
+    // dy/dx = -y
+    // y(0) = 1
+    // Exact: y(x) = exp(-x)
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State& state) -> double { return -state.y; }};
+
+    const Equation::State initial{0.0, 1.0};
+    const auto result = equation.Solve(initial, 1.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(1.0));
+    REQUIRE(result.y == Catch::Approx(0.367879).epsilon(0.001));
+}
+
+TEST_CASE("ODE handles a target that is not divisible by the step size")
+{
+    // dy/dx = 1
+    // y(0) = 0
+    const ODE<double, double> equation{[](const ODE<double, double>::State&) -> double { return 1.0; }};
+
+    const ODE<double, double>::State initial{0.0, 0.0};
+    const auto result = equation.Solve(initial, 1.0, 0.3);
+
+    // Steps: 0.3, 0.3, 0.3, 0.1
+    REQUIRE(result.x == Catch::Approx(1.0));
+    REQUIRE(result.y == Catch::Approx(1.0));
+}
+
+TEST_CASE("ODE returns the initial state when the target equals the initial position")
+{
+    const ODE<double, double> equation{
+        [](const ODE<double, double>::State& state) -> double { return state.y; }};
+
+    const ODE<double, double>::State initial{2.0, 5.0};
+    const auto result = equation.Solve(initial, 2.0, 0.1);
+
+    REQUIRE(result.x == Catch::Approx(2.0));
+    REQUIRE(result.y == Catch::Approx(5.0));
+}
+
+TEST_CASE("ODE supports vector-valued conditions")
+{
+    // dx/dt = y
+    // dy/dt = -x
+    //
+    // State vector: (x, y)
+    // Initial state: (1, 0)
+    // Exact solution: (cos(t), -sin(t))
+    using StateVector = Vector<2>;
+    using Equation = ODE<double, StateVector>;
+
+    const Equation equation{
+        [](const Equation::State& state) -> StateVector { return {-state.y.y, state.y.x}; }};
+
+    const Equation::State initial{
+        0.0, StateVector{1.0, 0.0}
+    };
+    const auto result = equation.Solve(initial, 1.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(1.0));
+    REQUIRE(result.y.x == Catch::Approx(0.540302).epsilon(0.002));
+    REQUIRE(result.y.y == Catch::Approx(0.841471).epsilon(0.002));
+}
+
+TEST_CASE("ODE evaluates a non-autonomous equation")
+{
+    // dy/dx = x
+    // y(0) = 0
+    // Exact: y(x) = x^2 / 2
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State& state) -> double { return state.x; }};
+
+    const Equation::State initial{0.0, 0.0};
+    const auto result = equation.Solve(initial, 2.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(2.0));
+    REQUIRE(result.y == Catch::Approx(2.0).epsilon(0.002));
+}
+
+TEST_CASE("ODE explicit Euler error decreases with smaller step sizes")
+{
+    // dy/dx = y
+    // y(0) = 1
+    // Exact at x = 1: e
+    using Equation = ODE<double, double>;
+
+    const Equation equation{[](const Equation::State& state) -> double { return state.y; }};
+
+    const Equation::State initial{0.0, 1.0};
+
+    const auto coarse = equation.Solve(initial, 1.0, 0.1);
+    const auto fine = equation.Solve(initial, 1.0, 0.01);
+
+    const double exact = 2.718281828459045;
+    const double coarseError = std::abs(coarse.y - exact);
+    const double fineError = std::abs(fine.y - exact);
+
+    REQUIRE(fineError < coarseError);
+    REQUIRE(fineError < 0.02);
+}
+
+TEST_CASE("ODE solves a second-order harmonic oscillator")
+{
+    // y'' = -y
+    // y(0) = 1
+    // y'(0) = 0
+    //
+    // Convert to:
+    // u1' = u2
+    // u2' = -u1
+    //
+    // Exact solution:
+    // y(t)  = cos(t)
+    // y'(t) = -sin(t)
+
+    using StateVector = Vector<2, double>;
+    using Equation = ODE<double, StateVector>;
+
+    const Equation equation{[](const Equation::State& state) -> StateVector
+        {
+            const double position = state.y.x;
+            const double velocity = state.y.y;
+
+            return {velocity, -position};
+        }};
+
+    const Equation::State initial{
+        0.0, StateVector{1.0, 0.0}
+    };
+    const auto result = equation.Solve(initial, 1.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(1.0));
+    REQUIRE(result.y.x == Catch::Approx(std::cos(1.0)).epsilon(0.002));
+    REQUIRE(result.y.y == Catch::Approx(-std::sin(1.0)).epsilon(0.002));
+}
+
+TEST_CASE("ODE solves a second-order vector-valued equation")
+{
+    // r''(t) = -r(t)
+    //
+    // r(0)  = (1, 2)
+    // r'(0) = (0, 0)
+    //
+    // State = (position.x, position.y, velocity.x, velocity.y)
+    //
+    // Exact solution:
+    // r(t)  = (cos(t), 2*cos(t))
+    // r'(t) = (-sin(t), -2*sin(t))
+
+    using StateVector = Vector<4, double>;
+    using Equation = ODE<double, StateVector>;
+
+    const Equation equation{[](const Equation::State& state) -> StateVector
+        {
+            const double positionX = state.y.x;
+            const double positionY = state.y.y;
+            const double velocityX = state.y.z;
+            const double velocityY = state.y.w;
+
+            return {velocityX, velocityY, -positionX, -positionY};
+        }};
+
+    const Equation::State initial{
+        0.0, StateVector{1.0, 2.0, 0.0, 0.0}
+    };
+
+    const auto result = equation.Solve(initial, 1.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(1.0));
+
+    REQUIRE(result.y.x == Catch::Approx(std::cos(1.0)).epsilon(0.002));
+    REQUIRE(result.y.y == Catch::Approx(2.0 * std::cos(1.0)).epsilon(0.002));
+
+    REQUIRE(result.y.z == Catch::Approx(-std::sin(1.0)).epsilon(0.002));
+    REQUIRE(result.y.w == Catch::Approx(-2.0 * std::sin(1.0)).epsilon(0.002));
+}
+
+TEST_CASE("ODE solves a damped pendulum")
+{
+    // theta'' = -(b / (m * L^2)) * theta' - (g / L) * sin(theta)
+    //
+    // Initial conditions:
+    // theta(0) = 1.0 rad
+    // theta'(0) = 0.0 rad/s
+    //
+    // Constants:
+    // g = 9.81 m/s^2
+    // L = 2.0 m
+    // m = 1.0 kg
+    // b = 0.2 kg*m^2/s
+
+    constexpr double gravity = 9.81;
+    constexpr double length = 2.0;
+    constexpr double mass = 1.0;
+    constexpr double damping = 0.2;
+
+    using StateVector = Vector<2, double>;
+    using Equation = ODE<double, StateVector>;
+
+    const Equation equation{[gravity, length, mass, damping](const Equation::State& state) -> StateVector
+        {
+            const double theta = state.y.x;
+            const double angularVelocity = state.y.y;
+
+            const double angularAcceleration = -(damping / (mass * length * length)) * angularVelocity -
+                (gravity / length) * std::sin(theta);
+
+            return {angularVelocity, angularAcceleration};
+        }};
+
+    const Equation::State initial{
+        0.0, StateVector{1.0, 0.0}
+    };
+
+    const auto result = equation.Solve(initial, 2.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(2.0));
+    REQUIRE(std::isfinite(result.y.x));
+    REQUIRE(std::isfinite(result.y.y));
+
+    // The pendulum should have moved away from its initial angle.
+    REQUIRE(result.y.x != Catch::Approx(1.0));
+
+    // Damping should have reduced the energy compared with the initial state.
+    const double initialEnergy = mass * gravity * length * (1.0 - std::cos(initial.y.x));
+
+    const double finalEnergy = 0.5 * mass * length * length * result.y.y * result.y.y +
+        mass * gravity * length * (1.0 - std::cos(result.y.x));
+
+    REQUIRE(finalEnergy < initialEnergy);
+}
+
+TEST_CASE("ODE solves a coupled second-order system")
+{
+    // x''  = -k1*x - c1*x' + coupling*(x2 - x)
+    // x2'' = -k2*x2 - c2*x2' + coupling*(x - x2)
+    //
+    // State = (x, x2, v1, v2)
+
+    constexpr double k1 = 2.0;
+    constexpr double k2 = 3.0;
+    constexpr double c1 = 0.2;
+    constexpr double c2 = 0.3;
+    constexpr double coupling = 0.5;
+
+    using StateVector = Vector<4, double>;
+    using Equation = ODE<double, StateVector>;
+
+    const Equation equation{[k1, k2, c1, c2, coupling](const Equation::State& state) -> StateVector
+        {
+            const double x1 = state.y.x;
+            const double x2 = state.y.y;
+            const double v1 = state.y.z;
+            const double v2 = state.y.w;
+
+            const double a1 = -k1 * x1 - c1 * v1 + coupling * (x2 - x1);
+            const double a2 = -k2 * x2 - c2 * v2 + coupling * (x1 - x2);
+
+            return {v1, v2, a1, a2};
+        }};
+
+    const Equation::State initial{
+        0.0, StateVector{1.0, 0.0, 0.0, 0.0}
+    };
+
+    const auto result = equation.Solve(initial, 2.0, 0.001);
+
+    REQUIRE(result.x == Catch::Approx(2.0));
+
+    REQUIRE(std::isfinite(result.y.x));
+    REQUIRE(std::isfinite(result.y.y));
+    REQUIRE(std::isfinite(result.y.z));
+    REQUIRE(std::isfinite(result.y.w));
+
+    // The system should evolve from its initial state.
+    REQUIRE(result.y.x != Catch::Approx(1.0));
+    REQUIRE(result.y.y != Catch::Approx(0.0));
+}

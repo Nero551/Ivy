@@ -7,6 +7,7 @@
 #include "Math/Concepts.hpp"
 #include "Math/Equations/LinearEquation.hpp"
 #include "Math/Equations/LinearSystem.hpp"
+#include "Math/Equations/ODE.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Functions/Integration.hpp"
@@ -22,6 +23,7 @@
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/Track.hpp"
 #include <array>
+#include <cmath>
 #include <concepts>
 #include <cstdlib>
 #include <dlfcn.h>
@@ -240,5 +242,26 @@ inline void Test()
     P::Dimension<float, P::Joule> work = F().Dot(deltaR());
 
     U::Log::Info(work);
+
+    using StateVector = M::Vector<3, double>;
+    using Equation = M::ODE<double, StateVector>;
+
+    const Equation equation{[](const Equation::State& state) -> StateVector
+        {
+            const double t = state.x;
+            const double x = state.y.x;
+            const double y = state.y.y;
+            const double z = state.y.z;
+
+            return {y + 0.3 * std::sin(3.0 * t) - 0.1 * x * z,
+                -x + 0.2 * y * (1.0 - z * z) + 0.15 * std::cos(5.0 * t),
+                0.5 * (x * y - z) + 0.1 * std::sin(x * y)};
+        }};
+
+    const Equation::State initial{
+        0.0, {1.0, 0.0, 0.5}
+    };
+
+    U::Log::Info(equation.Solve(initial, 10, 0.0000005));
 }
 } // namespace Sketch
