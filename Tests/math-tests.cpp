@@ -2,7 +2,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include "Math/Functions/Function.hpp"
 #include "Math/Math.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
+#include "Math/Vector/Vector.hpp"
 
 using Catch::Approx;
 using Catch::Matchers::WithinAbs;
@@ -664,7 +667,7 @@ TEST_CASE("Function with Complex type")
     }
 }
 
-TEST_CASE("Function friend operators (if implemented)")
+TEST_CASE("Function friend operators")
 {
     auto f = Function<float, float>([](const float x) { return x + 1.0f; });
     SECTION("With Output (float) – left-hand side")
@@ -690,6 +693,92 @@ TEST_CASE("Function friend operators (if implemented)")
     Function<Vector<2>, float> fv = ([](const float t) { return Vector<2>(t, t); });
     auto hv = Vector<2>(1.0f, 2.0f) + fv;
     REQUIRE(hv(3.0f) == Vector<2>(4.0f, 5.0f));
+}
+
+TEST_CASE("Function with multi inputs")
+{
+    auto f = Function<Vector<2>, float, float, Quaternion<>>{
+        [](const float x, const float y, const Quaternion<>& q) { return Vector<2>{x * y, q.Angle()}; }};
+
+    const Quaternion<> q = Quaternion<>::Identity();
+
+    SECTION("evaluation")
+    {
+        const Vector<2> result = f(2.0f, 3.0f, q);
+
+        REQUIRE(result.x == 6.0f);
+        REQUIRE(result.y == q.Angle());
+    }
+
+    SECTION("scalar operations")
+    {
+        const auto h = 2 * f;
+        const auto g = 2 / f;
+        const auto j = 2 - f;
+        const auto k = 2 + f;
+
+        const Vector<2> hResult = h(2.0f, 3.0f, q);
+        const Vector<2> gResult = g(2.0f, 3.0f, q);
+        const Vector<2> jResult = j(2.0f, 3.0f, q);
+        const Vector<2> kResult = k(2.0f, 3.0f, q);
+
+        REQUIRE(hResult.x == 12.0f);
+        REQUIRE(hResult.y == 2 * q.Angle());
+
+        REQUIRE(gResult.x == Catch::Approx(2.0f / 6.0f));
+        REQUIRE(gResult.y == Catch::Approx(2.0f / q.Angle()));
+
+        REQUIRE(jResult.x == -4.0f);
+        REQUIRE(jResult.y == 2.0f - q.Angle());
+
+        REQUIRE(kResult.x == 8.0f);
+        REQUIRE(kResult.y == 2.0f + q.Angle());
+    }
+
+    SECTION("scalar compound assignments")
+    {
+        auto h = f;
+        h += 2;
+        h -= 1;
+        h *= 3;
+        h /= 2;
+
+        const Vector<2> result = h(2.0f, 3.0f, q);
+
+        REQUIRE(result.x == 10.5f);
+        REQUIRE(result.y == Catch::Approx(((q.Angle() + 2.0f - 1.0f) * 3.0f) / 2.0f));
+    }
+
+    SECTION("negation")
+    {
+        const auto h = -f;
+        const Vector<2> result = h(2.0f, 3.0f, q);
+
+        REQUIRE(result.x == -6.0f);
+        REQUIRE(result.y == -q.Angle());
+    }
+}
+
+TEST_CASE("Function composition with multi inputs")
+{
+    const auto f = Function<float, float>{[](const float x) { return x * 2.0f; }};
+
+    const auto g = Function<float, float, float, float>{
+        [](const float x, const float y, const float z) { return x + y + z; }};
+
+    SECTION("Compose")
+    {
+        const auto h = f.Compose(g);
+
+        REQUIRE(h(1.0f, 2.0f, 3.0f) == 12.0f);
+    }
+
+    SECTION("Call operator composition")
+    {
+        const auto h = f(g);
+
+        REQUIRE(h(1.0f, 2.0f, 3.0f) == 12.0f);
+    }
 }
 
 //==============================================================================
