@@ -29,11 +29,10 @@ Output Average(const Function<Input, Output>& f, const Input start, const Input 
  * @param method Numerical integration method to use.
  * @return The approximate value of the integral.
  */
-template <typename Input, typename Output>
-Output Integral(const Function<Input, Output>& f, const Input lowerBound, Input upperBound,
+template <typename Output, Scalar Input>
+Output Integral(const Function<Output, Input>& f, const Input lowerBound, Input upperBound,
     const Input dx = 0.001f, const IntegrationMethod method = IntegrationMethod::Midpoint)
-    requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input> &&
-        Divisible<Output, Input>)
+    requires(Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
 {
     return Integrate(f, lowerBound, dx, method)(upperBound);
 }
@@ -45,10 +44,10 @@ Output Integral(const Function<Input, Output>& f, const Input lowerBound, Input 
  * @param method Numerical integration method to use.
  * @return A function whose value is the integral from lowerBound to its input.
  */
-template <typename Input, typename Output>
-Function<Input, Output> Integrate(const Function<Input, Output>& f, Input lowerBound, Input dx = 0.001f,
-    IntegrationMethod method = IntegrationMethod::Midpoint) requires(Scalar<Input> &&
-    Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
+template <typename Output, Scalar Input>
+Function<Output, Input> Integrate(const Function<Output, Input>& f, Input lowerBound, Input dx = 0.001f,
+    IntegrationMethod method = IntegrationMethod::Midpoint)
+    requires(Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
 {
     return [f, lowerBound, dx, method](const Input upperBound)
     {

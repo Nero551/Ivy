@@ -51,6 +51,9 @@ namespace Sketch
 // TODO: need particle system (cpu particle & gpu particle(compute shaders))
 // TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
 
+//TODO: all this time i been thinking how to make cpu side easier to use and more optimized & automatic, even for graphics.
+//TODO: i should be thinking about how to make cpu -> gpu pipeline easier to MODIFY and use. not make gpu/shaders as automatic as possible.
+
 using namespace Ivy;
 
 using Index = unsigned int;
@@ -79,20 +82,6 @@ template <typename T, Index Size> struct Array
     T m_Data[Size];
 };
 
-template <typename Input, typename Output>
-Output Summation(const int start, const int end, const M::Function<Input, Output>& f)
-    requires(std::convertible_to<Input, int> && M::Additive<Output, Output>)
-{
-    Output result{};
-
-    for (int i = start; i <= end; ++i)
-    {
-        result += f(static_cast<Input>(i));
-    }
-
-    return result;
-}
-
 template <unsigned int... Dimensions> struct Tensor
 {
     static constexpr unsigned int Order = sizeof...(Dimensions);
@@ -115,8 +104,11 @@ template <unsigned int... Dimensions> struct Tensor
         requires(sizeof...(Indices) == Order && (std::integral<Indices> && ...))
     {
         std::array<unsigned int, Order> indexArray{static_cast<unsigned int>(indices)...};
-        unsigned int flatIndex = Summation(0, Order - 1,
-            Ivy::M::Function<int, unsigned int>{[&](const int i) { return indexArray[i] * Strides[i]; }});
+        unsigned int flatIndex = 0;
+        for (unsigned int i = 0; i < Order; ++i)
+        {
+            flatIndex += indexArray[i] * Strides[i];
+        }
 
         return m_Data[flatIndex];
     }
@@ -236,6 +228,13 @@ template <M::Scalar T> struct Dual
 //TODO: add NumberOfDimensions method to all math types
 //TODO: make Function take multiple inputs(ex: two quaternions) via vardiac templates(...Args)
 // TODO: make compose able to take multiple function inputs.
+//
+//TODO: shaders only have a finite amount of sources(vertex, fragment, geometry, tessellation)
+//TODO: drop the sources map in shader and just use members(Vertex, Fragment, Geometry, etc).
+
+template <typename Output, typename... Inputs> struct DifferentialEquation
+{
+};
 
 inline void Test()
 {

@@ -10,9 +10,9 @@ namespace Ivy::M
 * @param a Point about which the polynomial is expanded.
 * @return A function representing the Taylor polynomial approximation.
 */
-template <typename Input, typename Output>
-Function<float, Output> Taylor(const Function<Input, Output>& f, unsigned int terms, Input a)
-    requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
+template <typename Output, Scalar Input>
+Function<Output, Input> Taylor(const Function<Output, Input>& f, unsigned int terms, Input a)
+    requires(Additive<Output, Output> && Multiplicative<Output, Input>)
 {
     return [terms, a, f](const Input x)
     {
@@ -34,9 +34,9 @@ Function<float, Output> Taylor(const Function<Input, Output>& f, unsigned int te
 * @param terms Number of terms in the Taylor polynomial.
 * @return A function representing the Maclaurin polynomial approximation.
 */
-template <typename Input, typename Output>
-Function<float, Output> Maclaurin(const Function<Input, Output>& f, const unsigned int terms)
-    requires(Scalar<Input> && Additive<Output, Output> && Multiplicative<Output, Input>)
+template <typename Output, Scalar Input>
+Function<Output, Input> Maclaurin(const Function<Output, Input>& f, const unsigned int terms)
+    requires(Additive<Output, Output> && Multiplicative<Output, Input>)
 {
     return Taylor(f, terms, 0.0f);
 }

@@ -8,13 +8,14 @@
 namespace Ivy::M
 {
 
-template <typename Input, typename Output> struct Function;
+template <typename Output, typename... Inputs> struct Function;
 
 template <typename T> struct IsFunctionType : std::false_type
 {
 };
 
-template <typename Input, typename Output> struct IsFunctionType<Function<Input, Output>> : std::true_type
+template <typename Output, typename... Inputs>
+struct IsFunctionType<Function<Output, Inputs...>> : std::true_type
 {
 };
 
@@ -22,13 +23,13 @@ template <typename F>
 concept IsFunction = IsFunctionType<std::remove_cvref_t<F>>::value;
 
 /** @brief Represents a mathematical function mapping an Input type to an Output type. */
-template <typename Input, typename Output> struct Function
+template <typename Output, typename... Inputs> struct Function
 {
     /**
      * @brief Constructs a function from a callable returning Output when given Input.
      * @param f Callable used to evaluate the function.
      */
-    template <typename F> requires(std::same_as<std::invoke_result_t<F, Input>, Output> && !IsFunction<F>)
+    template <typename F> requires(std::same_as<std::invoke_result_t<F, Inputs...>, Output> && !IsFunction<F>)
     Function(F&& f) : m_Func(std::forward<F>(f))
     {
     }
@@ -38,9 +39,9 @@ template <typename Input, typename Output> struct Function
      * @param input Input value at which to evaluate the function.
      * @return The function value at input.
      */
-    Output Evaluate(const Input& input) const
+    Output Evaluate(const Inputs&... inputs) const
     {
-        return m_Func(input);
+        return m_Func(inputs...);
     }
 
     /**
@@ -48,59 +49,63 @@ template <typename Input, typename Output> struct Function
      * @param g Function applied before this function.
      * @return The composed function.
      */
-    template <typename Middle> Function<Middle, Output> Compose(const Function<Middle, Input>& g) const
+    template <typename PrimaryInput, typename... Middles>
+    Function<Output, Middles...> Compose(const Function<PrimaryInput, Middles...>& g) const
+        requires(sizeof...(Inputs) == 1 && std::invocable<Function<Output, Inputs...>, PrimaryInput>)
     {
-        return [f = *this, g](const Middle& input) { return f(g(input)); };
+        return [f = *this, g](const Middles&... inputs) { return f(g(inputs...)); };
     }
 
     /** @brief Composes this function with another function, producing f(g(x)). */
-    template <typename Middle> Function<Middle, Output> operator()(const Function<Middle, Input>& g) const
+    template <typename PrimaryInput, typename... Middles>
+    Function<Output, Middles...> operator()(const Function<PrimaryInput, Middles...>& g) const
+        requires(sizeof...(Inputs) == 1 && std::invocable<Function, PrimaryInput>)
     {
         return Compose(g);
     }
 
     /** @brief Evaluates the function at the given input. */
-    Output operator()(const Input& input) const
+    Output operator()(const Inputs&... inputs) const
     {
-        return Evaluate(input);
+        return Evaluate(inputs...);
     }
 
     /** @brief Negates the function, producing -f(x). */
     Function operator-() const requires(Negatable<Output>)
     {
-        return [f = *this](const Input& x) { return -f(x); };
+        return [f = *this](const Inputs&... inputs) { return -f(inputs...); };
     }
 
     /** @brief Adds two functions pointwise, producing f(x) + g(x). */
     template <typename O>
-    Function<Input, AdditionResult<Output, O>> operator+(const Function<Input, O>& g) const
+    Function<AdditionResult<Output, O>, Inputs...> operator+(const Function<O, Inputs...>& g) const
         requires(Additive<Output, O>)
     {
-        return [f = *this, g](const Input& x) { return f(x) + g(x); };
+        return [f = *this, g](const Inputs&... inputs) { return f(inputs...) + g(inputs...); };
     }
 
     /** @brief Subtracts two functions pointwise, producing f(x) - g(x). */
     template <typename O>
-    Function<Input, SubtractionResult<Output, O>> operator-(const Function<Input, O>& g) const
+    Function<SubtractionResult<Output, O>, Inputs...> operator-(const Function<O, Inputs...>& g) const
         requires(Subtractive<Output, O>)
     {
-        return [f = *this, g](const Input& x) { return f(x) - g(x); };
+        return [f = *this, g](const Inputs&... inputs) { return f(inputs...) - g(inputs...); };
     }
 
     /** @brief Multiplies two functions pointwise, producing f(x) * g(x). */
     template <typename O>
-    Function<Input, MultiplicationResult<Output, O>> operator*(const Function<Input, O>& g) const
+    Function<MultiplicationResult<Output, O>, Inputs...> operator*(const Function<O, Inputs...>& g) const
         requires(Multiplicative<Output, O>)
     {
-        return [f = *this, g](const Input& x) { return f(x) * g(x); };
+        return [f = *this, g](const Inputs&... inputs) { return f(inputs...) * g(inputs...); };
     }
 
     /** @brief Divides two functions pointwise, producing f(x) / g(x). */
     template <typename O>
-    Function<Input, DivisionResult<Output, O>> operator/(const Function<Input, O>& g) const
+    Function<DivisionResult<Output, O>, Inputs...> operator/(const Function<O, Inputs...>& g) const
         requires(Divisible<Output, O>)
     {
-        return [f = *this, g](const Input& x) { return f(x) / g(x); };
+        return [f = *this, g](const Inputs&... inputs) { return f(inputs...) / g(inputs...); };
     }
 
     /** @brief Adds another function pointwise to this function. */
@@ -128,31 +133,31 @@ template <typename Input, typename Output> struct Function
     }
 
     template <typename T>
-    Function<Input, AdditionResult<Output, T>> operator+(const T& value) const
+    Function<AdditionResult<Output, T>, Inputs...> operator+(const T& value) const
         requires(!IsFunction<T> && Additive<Output, T>)
     {
-        return [f = *this, value](const Input& x) { return f(x) + value; };
+        return [f = *this, value](const Inputs&... inputs) { return f(inputs...) + value; };
     }
 
     template <typename T>
-    Function<Input, SubtractionResult<Output, T>> operator-(const T& value) const
+    Function<SubtractionResult<Output, T>, Inputs...> operator-(const T& value) const
         requires(!IsFunction<T> && Subtractive<Output, T>)
     {
-        return [f = *this, value](const Input& x) { return f(x) - value; };
+        return [f = *this, value](const Inputs&... inputs) { return f(inputs...) - value; };
     }
 
     template <typename T>
-    Function<Input, MultiplicationResult<Output, T>> operator*(const T& value) const
+    Function<MultiplicationResult<Output, T>, Inputs...> operator*(const T& value) const
         requires(!IsFunction<T> && Multiplicative<Output, T>)
     {
-        return [f = *this, value](const Input& x) { return f(x) * value; };
+        return [f = *this, value](const Inputs&... inputs) { return f(inputs...) * value; };
     }
 
     template <typename T>
-    Function<Input, DivisionResult<Output, T>> operator/(const T& value) const
+    Function<DivisionResult<Output, T>, Inputs...> operator/(const T& value) const
         requires(!IsFunction<T> && Divisible<Output, T>)
     {
-        return [f = *this, value](const Input& x) { return f(x) / value; };
+        return [f = *this, value](const Inputs&... inputs) { return f(inputs...) / value; };
     }
 
     template <typename T>
@@ -184,35 +189,35 @@ template <typename Input, typename Output> struct Function
     }
 
     template <typename T>
-    friend Function<Input, AdditionResult<T, Output>> operator+(const T& value, const Function& f)
+    friend Function<AdditionResult<T, Output>, Inputs...> operator+(const T& value, const Function& f)
         requires(!IsFunction<T> && Additive<T, Output>)
     {
-        return f + value;
+        return [f, value](const Inputs&... inputs) { return value + f(inputs...); };
     }
 
     template <typename T>
-    friend Function<Input, SubtractionResult<T, Output>> operator-(const T& value, const Function& f)
+    friend Function<SubtractionResult<T, Output>, Inputs...> operator-(const T& value, const Function& f)
         requires(!IsFunction<T> && Subtractive<T, Output>)
     {
-        return [f, value](const Input& x) { return value - f(x); };
+        return [f, value](const Inputs&... inputs) { return value - f(inputs...); };
     }
 
     template <typename T>
-    friend Function<Input, MultiplicationResult<T, Output>> operator*(const T& value, const Function& f)
+    friend Function<MultiplicationResult<T, Output>, Inputs...> operator*(const T& value, const Function& f)
         requires(!IsFunction<T> && Multiplicative<T, Output>)
     {
-        return f * value;
+        return [f, value](const Inputs&... inputs) { return value * f(inputs...); };
     }
 
     template <typename T>
-    friend Function<Input, DivisionResult<T, Output>> operator/(const T& value, const Function& f)
+    friend Function<DivisionResult<T, Output>, Inputs...> operator/(const T& value, const Function& f)
         requires(!IsFunction<T> && Divisible<T, Output>)
     {
-        return [f, value](const Input& x) { return value / f(x); };
+        return [f, value](const Inputs&... inputs) { return value / f(inputs...); };
     }
 
   private:
-    std::function<Output(Input)> m_Func;
+    std::function<Output(Inputs...)> m_Func;
 };
 
 } // namespace Ivy::M

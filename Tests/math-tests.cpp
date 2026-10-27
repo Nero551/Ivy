@@ -353,8 +353,8 @@ TEST_CASE("Function composition")
 
     SECTION("Composition with non‑float type")
     {
-        Function<int, float> intToFloat = [](const int x) { return static_cast<float>(x) + 0.5f; };
-        Function<float, int> floatToInt = [](const float x) { return static_cast<int>(x); };
+        Function<float, int> intToFloat = [](const int x) { return static_cast<float>(x) + 0.5f; };
+        Function<int, float> floatToInt = [](const float x) { return static_cast<int>(x); };
         auto composed = intToFloat.Compose(floatToInt); // intToFloat(floatToInt(x))
     }
 }
@@ -579,7 +579,7 @@ TEST_CASE("Function compound assignment operators")
 TEST_CASE("Function with non‑scalar types (Vector2)")
 {
     // Define a function that takes float and returns Vector2
-    auto f = Function<float, Vector<2>>([](const float t) { return Vector<2>(t, t * t); });
+    auto f = Function<Vector<2>, float>([](const float t) { return Vector<2>(t, t * t); });
     SECTION("Evaluate")
     {
         auto res = f(2.0f);
@@ -588,7 +588,7 @@ TEST_CASE("Function with non‑scalar types (Vector2)")
 
     SECTION("Arithmetic with Output type (Vector2)")
     {
-        auto g = Function<float, Vector<2>>([](float t) { return Vector<2>(1.0f, 2.0f); });
+        auto g = Function<Vector<2>, float>([](float t) { return Vector<2>(1.0f, 2.0f); });
         auto h = f + g;
         auto res = h(2.0f);
         REQUIRE(res == Vector<2>(3.0f, 6.0f));
@@ -629,7 +629,7 @@ TEST_CASE("Function with non‑scalar types (Vector2)")
 
     SECTION("Compound assignment with Vector2")
     {
-        Function<float, Vector<2>> h = f;
+        Function<Vector<2>, float> h = f;
         h += Vector<2>(1.0f, 1.0f);
         REQUIRE(h(2.0f) == Vector<2>(3.0f, 5.0f));
         h = f;
@@ -643,7 +643,7 @@ TEST_CASE("Function with non‑scalar types (Vector2)")
 
 TEST_CASE("Function with Complex type")
 {
-    auto f = Function<float, Complex<>>([](const float t) { return Complex<>(t, t * t); });
+    auto f = Function<Complex<>, float>([](const float t) { return Complex<>(t, t * t); });
     SECTION("Evaluate")
     {
         auto res = f(2.0f);
@@ -652,7 +652,7 @@ TEST_CASE("Function with Complex type")
 
     SECTION("Arithmetic")
     {
-        auto g = Function<float, Complex<>>([](float t) { return Complex<>(1.0f, 2.0f); });
+        auto g = Function<Complex<>, float>([](float t) { return Complex<>(1.0f, 2.0f); });
         auto h = f + g;
         REQUIRE(h(2.0f) == Complex<>(3.0f, 6.0f));
         h = f * g;
@@ -687,7 +687,7 @@ TEST_CASE("Function friend operators (if implemented)")
     }
 
     // For Vector2 left‑hand side (tested earlier)
-    Function<float, Vector<2>> fv = ([](const float t) { return Vector<2>(t, t); });
+    Function<Vector<2>, float> fv = ([](const float t) { return Vector<2>(t, t); });
     auto hv = Vector<2>(1.0f, 2.0f) + fv;
     REQUIRE(hv(3.0f) == Vector<2>(4.0f, 5.0f));
 }

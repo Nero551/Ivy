@@ -12,8 +12,8 @@ enum class DifferentiationMethod
     Central
 };
 
-template <typename Input, Scalar Output>
-Output AverageRateOfChange(const Function<Input, Output>& f, const Input start, const Input end)
+template <typename Output, Scalar Input>
+Output AverageRateOfChange(const Function<Output, Input>& f, const Input start, const Input end)
     requires(Subtractive<Output, Output> && Divisible<Output, Input>)
 {
     return (f(end) - f(start)) / (end - start);
@@ -26,10 +26,10 @@ Output AverageRateOfChange(const Function<Input, Output>& f, const Input start, 
  * @return A function representing the numerical derivative.
  * @note Only available for functions with a scalar Input type.
  */
-template <typename Input, typename Output>
-Function<Input, Output> Differentiate(const Function<Input, Output>& f, Input dx = 0.001f,
+template <typename Output, Scalar Input>
+Function<Output, Input> Differentiate(const Function<Output, Input>& f, Input dx = 0.001f,
     DifferentiationMethod method = DifferentiationMethod::Central)
-    requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
+    requires(Subtractive<Output, Output> && Divisible<Output, Input>)
 {
     return [f, dx, method](const Input x)
     {
@@ -56,10 +56,10 @@ Function<Input, Output> Differentiate(const Function<Input, Output>& f, Input dx
  * @param method Numerical differentiation method to use.
  * @return The numerical derivative at x.
  */
-template <typename Input, typename Output>
-Output Derivative(const Function<Input, Output>& f, Input x, const Input dx = 0.001f,
+template <typename Output, Scalar Input>
+Output Derivative(const Function<Output, Input>& f, Input x, const Input dx = 0.001f,
     const DifferentiationMethod method = DifferentiationMethod::Central)
-    requires(Scalar<Input> && Subtractive<Output, Output> && Divisible<Output, Input>)
+    requires(Subtractive<Output, Output> && Divisible<Output, Input>)
 {
     return Differentiate(f, dx, method)(x);
 }

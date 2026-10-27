@@ -14,7 +14,7 @@ namespace Ivy::M
  * @note Requires a scalar-to-scalar function that is monotonic over the given domain.
  */
 template <Scalar Input, Scalar Output>
-Input InverseEvaluate(const Function<Input, Output>& f, Input y, Input domainMin, Input domainMax)
+Input InverseEvaluate(const Function<Output, Input>& f, Input y, Input domainMin, Input domainMax)
     requires(Additive<Input, Input>)
 {
     Input x = 0.0f;
@@ -46,7 +46,7 @@ Input InverseEvaluate(const Function<Input, Output>& f, Input y, Input domainMin
  * @note The function must be monotonic over the given domain.
  */
 template <Scalar Input, Scalar Output>
-Function<Output, Input> Inverse(const Function<Input, Output>& f, Input domainMin, Input domainMax)
+Function<Input, Output> Inverse(const Function<Output, Input>& f, Input domainMin, Input domainMax)
     requires(Additive<Input, Input>)
 {
     return [f, domainMin, domainMax](const Output y) -> Input
