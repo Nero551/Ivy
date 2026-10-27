@@ -1,5 +1,5 @@
 BasedOnStyle: LLVM
-AlignAfterOpenBracket: false
+AlignAfterOpenBracket: DontAlign
 AlignArrayOfStructures: Left
 AllowShortCaseExpressionOnASingleLine: false
 AllowShortEnumsOnASingleLine: false

@@ -8,10 +8,13 @@
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Trigonometry.hpp"
+#include "Math/Equations/ODE.hpp"
+#include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include <cmath>
 
 namespace Ivy::Sandbox
 {
@@ -40,6 +43,10 @@ struct VectorFields : C::System
     {
         const float dt = 0.025;
         const float duration = 20;
+
+        M::ODE<float, M::Vector<2>> eq{[](const M::ODE<float, M::Vector<2>>::State& state)
+            { return M::Vector<2>{state.y.y, -0.2f * state.y.y - 9.8f / 2.0f * std::sin(state.y.x)}; }};
+
         for (float theta0 = -2 * M::TAU; theta0 <= 2 * M::TAU; theta0 += M::Rad(60))
         {
             for (float theta_dot0 = -10; theta_dot0 <= 10; theta_dot0 += 2)
@@ -49,13 +56,17 @@ struct VectorFields : C::System
 
                 for (float t = 0; t < duration; t += dt)
                 {
-                    const float theta_double_dot = -0.2 * theta_dot - (9.8 / 2) * std::sin(theta);
+                    const M::ODE<float, M::Vector<2>>::State state{
+                        t, {theta, theta_dot}
+                    };
 
+                    const float theta_double_dot = eq.Derivative(state).y;
+
+                    const auto next_state = eq.Step(state, dt);
+                    theta = next_state.y.x;
+                    theta_dot = next_state.y.y;
                     const M::Vector<2> pos = {theta, theta_dot};
                     const M::Vector<2> target = {theta_dot, theta_double_dot};
-
-                    theta += theta_dot * dt;
-                    theta_dot += theta_double_dot * dt;
 
                     auto& arrow = Arrow();
 
@@ -74,15 +85,17 @@ struct VectorFields : C::System
         const float dt = 0.15;
         const float duration = 50;
         const float k = -0.2f;
+        M::ODE<float, float> eq{[k](const auto& state) { return k * state.y; }};
         for (float p0 = -20; p0 <= 20; p0 += 1)
         {
             float p = p0;
+
             for (float t = 0; t < duration; t += dt)
             {
-                float dp = k * p;
+                float dp = eq.Derivative({t, p});
+                p = eq.Step({t, p}, dt).y;
                 const M::Vector<2> pos = {t, p};
                 const M::Vector<2> target = {1, dp};
-                p += dp * dt;
 
                 auto& arrow = Arrow();
 
@@ -101,15 +114,17 @@ struct VectorFields : C::System
         const float duration = 50;
         const float k = 0.05;
         float a = 15;
+        M::ODE<float, float> eq{[k, a](const auto& state) { return k * state.y * (a - state.y); }};
         for (float p0 = 0; p0 <= 20; p0 += 1)
         {
             float p = p0;
+
             for (float t = 0; t < duration; t += dt)
             {
-                float dp = k * p * (a - p);
+                float dp = eq.Derivative({t, p});
+                p = eq.Step({t, p}, dt).y;
                 const M::Vector<2> pos = {t, p};
                 const M::Vector<2> target = {1, dp};
-                p += dp * dt;
 
                 auto& arrow = Arrow();
 
@@ -130,15 +145,17 @@ struct VectorFields : C::System
         const float m = 1;
         const float g = 9.8;
 
+        M::ODE<float, float> eq{[b, m, g](const auto& state) { return g - (b / m) * state.y; }};
+
         for (float v0 = -40; v0 <= 40; v0 += 1)
         {
             float v = v0;
             for (float t = 0; t < duration; t += dt)
             {
-                float dv = g - (b / m) * v;
+                float dv = eq.Derivative({t, v});
+                v = eq.Step({t, v}, dt).y;
                 const M::Vector<2> pos = {t, v};
                 const M::Vector<2> target = {1, dv};
-                v += dv * dt;
 
                 auto& arrow = Arrow();
 
@@ -161,15 +178,18 @@ struct VectorFields : C::System
         const float p = 1;
         const float A = 10e-3f * 1.4f;
 
+        M::ODE<float, float> eq{[g, D, p, A, m](const auto& state)
+            { return g - (D * p * A / (2 * m)) * state.y * std::abs(state.y); }};
+
         for (float v0 = -40; v0 <= 40; v0 += 1)
         {
             float v = v0;
             for (float t = 0; t < duration; t += dt)
             {
-                float dv = g - (D * p * A / (2 * m)) * v * std::abs(v);
+                float dv = eq.Derivative({t, v});
                 const M::Vector<2> pos = {t, v};
                 const M::Vector<2> target = {1, dv};
-                v += dv * dt;
+                v = eq.Step({t, v}, dt).y;
 
                 auto& arrow = Arrow();
 

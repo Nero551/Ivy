@@ -226,15 +226,9 @@ template <M::Scalar T> struct Dual
 };
 
 //TODO: add NumberOfDimensions method to all math types
-//TODO: make Function take multiple inputs(ex: two quaternions) via vardiac templates(...Args)
-// TODO: make compose able to take multiple function inputs.
 //
 //TODO: shaders only have a finite amount of sources(vertex, fragment, geometry, tessellation)
 //TODO: drop the sources map in shader and just use members(Vertex, Fragment, Geometry, etc).
-
-template <typename Output, typename... Inputs> struct DifferentialEquation
-{
-};
 
 inline void Test()
 {

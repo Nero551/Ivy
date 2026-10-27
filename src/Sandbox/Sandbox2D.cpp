@@ -61,10 +61,10 @@ void Sandbox2D::Start()
     // AddSystem<StressTester2D>();
     // GetSystem<StressTester2D>().Spawn(3, 5);
 
-    // AddSystem<VectorFields>();
-    // GetSystem<VectorFields>().Start();
+    AddSystem<VectorFields>();
+    GetSystem<VectorFields>().Start();
 
-    // GetSystem<VectorFields>().MotionUnderQuadraticResistiveForce();
+    GetSystem<VectorFields>().Pendulum();
     ballId = CreateCircle();
 }
 
