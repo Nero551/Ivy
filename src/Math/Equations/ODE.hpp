@@ -2,6 +2,7 @@
 #include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include <functional>
 #include <ostream>
 namespace Ivy::M
 {
@@ -42,16 +43,20 @@ template <Scalar Independent, typename StateValue> struct ODE
         return {current.x + dx, current.y + Derivative(current) * dx};
     }
 
-    State Solve(const State& initial, const Independent& target, const Independent& dx) const
+    State Solve(
+        const State& initial, const Independent& target, const Independent& dx,
+        std::function_ref<void(const State&)> action = [](const State&) {}) const
     {
         U::Log::Assert(dx > 0, "dx must be positive");
-        // explicit euler.
+
         State result = initial;
 
+        action(result);
         while (result.x < target)
         {
             const Independent step = std::min(dx, target - result.x);
             result = Step(result, step);
+            action(result);
         }
 
         return result;

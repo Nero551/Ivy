@@ -65,7 +65,7 @@ void Sandbox2D::Start()
     GetSystem<VectorFields>().Start();
 
     GetSystem<VectorFields>().Pendulum();
-    // ballId = CreateCircle();
+    ballId = CreateCircle();
 }
 
 struct Particle
@@ -78,10 +78,10 @@ struct Particle
 };
 
 static Particle p;
-static M::Vector<2> g{0, -9.8};
+constexpr static M::Vector<2> g{0, -9.8};
 static float b = 0.5;
 static float restitution = 0.8;
-static float speed = 20;
+static float speed = 15;
 
 void Sandbox2D::FixedUpdate(double fdt)
 {
@@ -91,64 +91,65 @@ void Sandbox2D::FixedUpdate(double fdt)
     }
     GetSystem<Controller2D>().Update(fdt);
     // GetSystem<StressTester2D>().Update(dt);
-    // auto& query = m_Engine.ECS.Query;
-    // auto& input = m_Engine.GetModule<I::Input>();
-    // auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(ballId));
 
-    // M::Vector<2> f{0, 0};
+    auto& query = m_Engine.ECS.Query;
+    auto& input = m_Engine.GetModule<I::Input>();
+    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(ballId));
 
-    // if (input.IsKeyHeld(G::Key::Up))
-    // {
-    //     f.y += speed;
-    // }
-    // if (input.IsKeyHeld(G::Key::Down))
-    // {
-    //     f.y -= speed;
-    // }
-    // if (input.IsKeyHeld(G::Key::Left))
-    // {
-    //     f.x -= speed;
-    // }
-    // if (input.IsKeyHeld(G::Key::Right))
-    // {
-    //     f.x += speed;
-    // }
+    M::Vector<2> f{0, 0};
 
-    // M::Vector<2> wind = M::Vector<2>{M::RandomGaussian(M::Random(-1.0f, 1.0f), M::Random()),
-    //     M::RandomGaussian(M::Random(-1.0f, 1.0f), M::Random())};
-    // M::Vector<2> R = (-0.5 * p.Velocity) + wind;
+    if (input.IsKeyHeld(G::Key::Up))
+    {
+        f.y += speed;
+    }
+    if (input.IsKeyHeld(G::Key::Down))
+    {
+        f.y -= speed;
+    }
+    if (input.IsKeyHeld(G::Key::Left))
+    {
+        f.x -= speed;
+    }
+    if (input.IsKeyHeld(G::Key::Right))
+    {
+        f.x += speed;
+    }
 
-    // p.Force = f * p.Mass + R + p.Mass * g;
-    // p.Acceleration = p.Force / p.Mass;
+    M::Vector<2> wind = M::Vector<2>{M::RandomGaussian(M::Random(-1.0f, 1.0f), M::Random()),
+        M::RandomGaussian(M::Random(-1.0f, 1.0f), M::Random())};
+    M::Vector<2> R = (-0.5 * p.Velocity) + wind;
 
-    // p.Velocity += p.Acceleration * fdt;
+    p.Force = f * p.Mass + R + p.Mass * g;
+    p.Acceleration = p.Force / p.Mass;
 
-    // if (p.Position.y < 0.5)
-    // {
-    //     if (std::abs(p.Velocity.y) <= 1.5)
-    //     {
-    //         p.Velocity.y = 0;
-    //     }
-    //     else
-    //     {
-    //         p.Velocity.y = (restitution / p.Mass) * -p.Velocity.y;
-    //     }
+    p.Velocity += p.Acceleration * fdt;
 
-    //     p.Position.y = 0.5;
-    // }
+    if (p.Position.y < 0.5)
+    {
+        if (std::abs(p.Velocity.y) <= 1.5)
+        {
+            p.Velocity.y = 0;
+        }
+        else
+        {
+            p.Velocity.y = (restitution / p.Mass) * -p.Velocity.y;
+        }
 
-    // p.Position += p.Velocity * fdt;
+        p.Position.y = 0.5;
+    }
 
-    // transform.Position = p.Position;
+    p.Position += p.Velocity * fdt;
 
-    // U::Log::Info("[[[");
-    // U::Log::Info("Applied Force: ", f);
-    // U::Log::Info("Wind: ", wind);
-    // U::Log::Info("Resistive Force: ", R);
-    // U::Log::Info("Total Force: ", p.Force);
-    // U::Log::Info("Acceleration: ", p.Acceleration);
-    // U::Log::Info("Velocity: ", p.Velocity);
-    // U::Log::Info("Position: ", p.Position);
-    // U::Log::Info("]]]");
+    transform.Position = p.Position;
+
+    U::Log::Info("[[[");
+    U::Log::Info("Applied Force: ", f);
+    U::Log::Info("Wind: ", wind);
+    U::Log::Info("Resistive Force: ", R);
+    U::Log::Info("Total Force: ", p.Force);
+    U::Log::Info("Acceleration: ", p.Acceleration);
+    U::Log::Info("Velocity: ", p.Velocity);
+    U::Log::Info("Position: ", p.Position);
+    U::Log::Info("]]]");
 }
 } // namespace Ivy::Sandbox

@@ -39,6 +39,7 @@ namespace Sketch
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
 //TODO: redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
+// TODO: make ECS entity storage use GIndexPool instead of IndexPool.
 
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
 
@@ -55,6 +56,8 @@ namespace Sketch
 
 //TODO: all this time i been thinking how to make cpu side easier to use and more optimized & automatic, even for graphics.
 //TODO: i should be thinking about how to make cpu -> gpu pipeline easier to MODIFY and use. not make gpu/shaders as automatic as possible.
+
+//TODO: add NumberOfDimensions method to all math types
 
 using namespace Ivy;
 
@@ -226,10 +229,6 @@ template <M::Scalar T> struct Dual
         return Conjugate() / MagnitudeSquared();
     }
 };
-
-//TODO: add NumberOfDimensions method to all math types
-//TODO: shaders only have a finite amount of sources(vertex, fragment, geometry, tessellation)
-//TODO: drop the sources map in shader and just use members(Vertex, Fragment, Geometry, etc).
 
 inline void Test()
 {

@@ -117,6 +117,7 @@ void Shader::CreateProgram()
     {
         glGetProgramInfoLog(m_Id, 512, nullptr, infoLog);
         U::Log::Error(std::string("Shader Program: " + GetName() + " Linking Failed: " + infoLog));
+        Delete();
     }
 }
 

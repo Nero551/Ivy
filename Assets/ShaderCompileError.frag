@@ -151,16 +151,13 @@ float rand(vec2 co) {
 
 in float vectorMag;
 // Efficient HSV to RGB conversion function
-vec3 hsv2rgb(vec3 c) {
+vec3 HSVToRGB(vec3 c) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-void main()
-{
-    float mag = vectorMag;
-    float maxMagnitude = 10.0;
+vec3 MagnitudeToColor(float mag, float maxMagnitude) {
     float normalizedMag = clamp(mag / maxMagnitude, 0.0, 1.0);
 
     // Map magnitude to Hue (inverted so 0.66 is Blue and 0.0 is Red)
@@ -168,6 +165,11 @@ void main()
     float saturation = 1.0;
     float value = 1.0;
 
-    vec3 finalColor = hsv2rgb(vec3(hue, saturation, value));
-    fragColor = vec4(finalColor, 1.0);
+    vec3 finalColor = HSVToRGB(vec3(hue, saturation, value));
+    return finalColor;
+}
+
+void main()
+{
+    FragColor = vec4(MagnitudeToColor(vectorMag * , 10), 1.0f);
 }

@@ -1,5 +1,6 @@
 #include "ShaderSource.hpp"
 
+#include <filesystem>
 #include <string>
 #include <unordered_set>
 #include <utility>
@@ -67,7 +68,7 @@ void ShaderSource::Compile()
     if (!success)
     {
         glGetShaderInfoLog(m_Id, 512, nullptr, infoLog);
-        U::Log::Error(std::string("Shader:" + GetName() + infoLog + " | " + Path));
+        U::Log::Error(std::string("Shader Source:" + GetName() + infoLog + " | " + Path));
 
         if (m_Stage == ShaderStage::Fragment)
         {
@@ -77,8 +78,7 @@ void ShaderSource::Compile()
         {
             U::FileSystem::WriteFile("Assets/ShaderCompileError.vert", GeneratedCode);
         }
-        glDeleteShader(m_Id);
-        m_Id = 0;
+        Delete();
     }
 }
 
@@ -91,6 +91,7 @@ void ShaderSource::Delete()
 {
     if (IsCompiled())
     {
+        SourceCode = U::FileSystem::ReadFile(Path);
         GeneratedCode = SourceCode;
         m_Includes.clear();
         glDeleteShader(m_Id);

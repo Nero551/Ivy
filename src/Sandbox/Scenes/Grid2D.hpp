@@ -54,14 +54,14 @@ struct Grid2D : C::Scene
 
         transformComponent.Rotation = rotation;
         transformComponent.Position = position;
-        transformComponent.Scale = {40, 1};
+        transformComponent.Scale = {200, 1};
         materialComponent.Material->Get().Color = M::Color::Gray;
         l.SetParent(GetRoot());
     }
 
     void CreateXY()
     {
-        for (int x = -20; x < 20; ++x)
+        for (int x = -100; x < 100; ++x)
         {
             if (x != 0)
             {
@@ -69,7 +69,7 @@ struct Grid2D : C::Scene
             }
         }
 
-        for (int y = -20; y < 20; ++y)
+        for (int y = -100; y < 100; ++y)
         {
             if (y != 0)
             {
