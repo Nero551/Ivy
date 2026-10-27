@@ -46,14 +46,16 @@ void VertexArray::Unbind()
 }
 
 void VertexArray::SetVertexBuffer(
-    const ArrayBuffer& vbo, const int bindingIndex, const int stride, const int offset)
+    ArrayBuffer& vbo, const int bindingIndex, const int stride, const int offset)
 {
+    vbo.Generate();
     Generate();
     glVertexArrayVertexBuffer(m_Id, bindingIndex, vbo.GetId(), offset, stride);
 }
 
-void VertexArray::SetIndexBuffer(const IndexBuffer& ebo)
+void VertexArray::SetIndexBuffer(IndexBuffer& ebo)
 {
+    ebo.Generate();
     Generate();
     glVertexArrayElementBuffer(m_Id, ebo.GetId());
 }

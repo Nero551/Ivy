@@ -8,6 +8,7 @@ layout(location = 4) in mat4 MODEL_MATRIX;
 layout(location = 8) in mat3 NORMAL_MATRIX;
 
 out VS_OUT {
+    flat int InstanceID;
     vec4 Position;
     vec4 WorldPosition;
     vec4 Color;
@@ -18,6 +19,7 @@ out VS_OUT {
 
 void DefaultVertex()
 {
+    VSOut.InstanceID = gl_InstanceID;
     VSOut.Normal = normalize(NORMAL_MATRIX * aNormal);
     VSOut.Color = aColor;
     VSOut.WorldPosition = MODEL_MATRIX * aPosition;

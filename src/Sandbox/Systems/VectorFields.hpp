@@ -3,8 +3,11 @@
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
+#include "Graphics/DataType.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
+#include "Graphics/Texture/Texture.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Trigonometry.hpp"
@@ -14,7 +17,11 @@
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <array>
 #include <cmath>
+#include <string>
+#include <vector>
 
 namespace Ivy::Sandbox
 {
@@ -28,9 +35,9 @@ struct VectorFields : C::System
         m_Mesh = &resources.Load(G::Primitives::CreateArrow("vectorArrow"));
 
         auto& vertSource = resources.Load<G::ShaderSource>(
-            "arrowShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+            "arrowShaderVert", "Assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
         auto& fragSource = resources.Load<G::ShaderSource>(
-            "arrowShaderFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+            "arrowShaderFrag", "Assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
 
         auto& shader = resources.Load<G::Shader>("arrowShader", vertSource, fragSource);
 
@@ -41,43 +48,70 @@ struct VectorFields : C::System
 
     void Pendulum()
     {
-        const float dt = 0.025;
-        const float duration = 20;
+        constexpr float thetaMin = -10.0f;
+        constexpr float thetaMax = 10;
+        constexpr float omegaMin = -10.0f;
+        constexpr float omegaMax = 10.0f;
 
-        M::ODE<float, M::Vector<2>> eq{[](const M::ODE<float, M::Vector<2>>::State& state)
-            { return M::Vector<2>{state.y.y, -0.2f * state.y.y - 9.8f / 2.0f * std::sin(state.y.x)}; }};
+        // Spacing between arrows.
+        constexpr float thetaStep = 0.125;
+        constexpr float omegaStep = 0.125;
 
-        for (float theta0 = -2 * M::TAU; theta0 <= 2 * M::TAU; theta0 += M::Rad(60))
-        {
-            for (float theta_dot0 = -10; theta_dot0 <= 10; theta_dot0 += 2)
+        using StateVector = M::Vector<2>;
+        using Equation = M::ODE<float, StateVector>;
+
+        const Equation equation{[](const Equation::State& state) -> StateVector
             {
-                float theta = theta0;
-                float theta_dot = theta_dot0;
+                const float theta = state.y.x;
+                const float omega = state.y.y;
 
-                for (float t = 0; t < duration; t += dt)
+                const float thetaDot = omega;
+                const float omegaDot = -0.2f * omega - (9.8f / 2.0f) * std::sin(theta);
+
+                return {thetaDot, omegaDot};
+            }};
+
+        unsigned int index = 0;
+        std::vector<float> magnitudes{};
+
+        for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
+        {
+            for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
+            {
+                // Evaluate the derivative at this point in phase space.
+                const Equation::State state{
+                    0.0f, {theta, omega}
+                };
+                const StateVector derivative = equation.Derivative(state);
+
+                // Skip the arrow if the vector field is effectively zero.
+                if (derivative.Length() < 0.0001f)
                 {
-                    const M::ODE<float, M::Vector<2>>::State state{
-                        t, {theta, theta_dot}
-                    };
-
-                    const float theta_double_dot = eq.Derivative(state).y;
-
-                    const auto next_state = eq.Step(state, dt);
-                    theta = next_state.y.x;
-                    theta_dot = next_state.y.y;
-                    const M::Vector<2> pos = {theta, theta_dot};
-                    const M::Vector<2> target = {theta_dot, theta_double_dot};
-
-                    auto& arrow = Arrow();
-
-                    m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos * 3;
-                    m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.2, 0.2};
-                    m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
-
-                    m_Engine.World.GetRoot().AttachChild(arrow);
+                    continue;
                 }
+
+                // Create one arrow for this grid point.
+                const auto& arrow = Arrow();
+
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = StateVector{theta, omega} * 2;
+                transform.Scale = M::Vector<2>{0.2, 0.1};
+                transform.Rotation = derivative.Angle();
+
+                magnitudes.push_back(derivative.Length());
+                ++index;
+
+                m_Engine.World.GetRoot().AttachChild(arrow.GetId());
             }
         }
+
+        G::ArrayBuffer buffer{};
+
+        buffer.SetData(magnitudes);
+        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     void ExponentialGrowthDecay()

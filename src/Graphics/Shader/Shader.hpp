@@ -145,7 +145,7 @@ struct Shader
      * @brief Gets the shader sources associated with this program.
      * @return Mutable references to the checked source pointers.
      */
-    std::vector<U::CheckedPtr<ShaderSource>>& GetSources();
+    std::vector<U::CheckedPtr<ShaderSource>> GetSources();
 
   private:
     /** @brief Name used to identify this shader resource. */

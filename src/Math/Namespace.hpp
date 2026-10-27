@@ -10,6 +10,7 @@
  *  - Quaternions
  *  - Multi-variable/valued functions
  *  - Linear system of equations solver.
+ *  - ODE solver (explicit euler only).
  */
 namespace Ivy::M
 {

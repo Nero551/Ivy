@@ -228,40 +228,18 @@ template <M::Scalar T> struct Dual
 };
 
 //TODO: add NumberOfDimensions method to all math types
-//
 //TODO: shaders only have a finite amount of sources(vertex, fragment, geometry, tessellation)
 //TODO: drop the sources map in shader and just use members(Vertex, Fragment, Geometry, etc).
 
 inline void Test()
 {
-    P::Dimension<float, P::Acceleration> g = 9.8;
+    // P::Dimension<float, P::Acceleration> g = 9.8;
 
-    P::Dimension<M::Vector<2>, P::Length<1>> deltaR = {2, 3};
-    P::Dimension<M::Vector<2>, P::Force> F = {5, 2};
+    // P::Dimension<M::Vector<2>, P::Length<1>> deltaR = {2, 3};
+    // P::Dimension<M::Vector<2>, P::Force> F = {5, 2};
 
-    P::Dimension<float, P::Joule> work = F().Dot(deltaR());
+    // P::Dimension<float, P::Joule> work = F().Dot(deltaR());
 
-    U::Log::Info(work);
-
-    using StateVector = M::Vector<3, double>;
-    using Equation = M::ODE<double, StateVector>;
-
-    const Equation equation{[](const Equation::State& state) -> StateVector
-        {
-            const double t = state.x;
-            const double x = state.y.x;
-            const double y = state.y.y;
-            const double z = state.y.z;
-
-            return {y + 0.3 * std::sin(3.0 * t) - 0.1 * x * z,
-                -x + 0.2 * y * (1.0 - z * z) + 0.15 * std::cos(5.0 * t),
-                0.5 * (x * y - z) + 0.1 * std::sin(x * y)};
-        }};
-
-    const Equation::State initial{
-        0.0, {1.0, 0.0, 0.5}
-    };
-
-    U::Log::Info(equation.Solve(initial, 10, 0.0000005));
+    // U::Log::Info(work);
 }
 } // namespace Sketch

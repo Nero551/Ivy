@@ -1,6 +1,7 @@
 #include "../GlobalUniforms.glsl"
 
 in VS_OUT {
+    flat int InstanceID;
     vec4 Position;
     vec4 WorldPosition;
     vec4 Color;
@@ -10,6 +11,7 @@ in VS_OUT {
 } GSIn[];
 
 out VS_OUT {
+    flat int InstanceID;
     vec4 Position;
     vec4 WorldPosition;
     vec4 Color;

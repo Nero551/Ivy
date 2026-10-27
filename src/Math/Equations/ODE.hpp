@@ -9,18 +9,18 @@ namespace Ivy::M
 enum class ODEMethod
 {
     ExplicitEuler,
-    RK4,
     ImplicitEuler,
+    RK4,
 };
 
-template <Scalar Independent, typename Conditions> struct ODE
+template <Scalar Independent, typename StateValue> struct ODE
 {
     struct State
     {
-        Conditions y;
+        StateValue y;
         Independent x;
 
-        State(Independent X, const Conditions& Y) : x(X), y(Y) {}
+        State(Independent X, const StateValue& Y) : x(X), y(Y) {}
 
         friend std::ostream& operator<<(std::ostream& os, const State& state)
         {
@@ -28,11 +28,11 @@ template <Scalar Independent, typename Conditions> struct ODE
         }
     };
 
-    using DerivativeFunction = Function<Conditions, State>;
+    using DerivativeFunction = Function<StateValue, State>;
 
     ODE(const DerivativeFunction& f) : m_Derivative(f) {}
 
-    Conditions Derivative(const State& current) const
+    StateValue Derivative(const State& current) const
     {
         return m_Derivative(current);
     }

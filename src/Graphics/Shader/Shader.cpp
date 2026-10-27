@@ -74,7 +74,7 @@ void Shader::Delete()
     }
 }
 
-std::vector<U::CheckedPtr<ShaderSource>>& Shader::GetSources()
+std::vector<U::CheckedPtr<ShaderSource>> Shader::GetSources()
 {
     return m_Sources;
 }

@@ -3,6 +3,7 @@
 out vec4 FragColor;
 
 in VS_OUT {
+    flat int InstanceID;
     vec4 Position;
     vec4 WorldPosition;
     vec4 Color;

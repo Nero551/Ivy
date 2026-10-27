@@ -2,6 +2,7 @@
 #include "Math/Concepts.hpp"
 #include <concepts>
 #include <functional>
+#include <tuple>
 #include <type_traits>
 
 namespace Ivy::M
@@ -48,19 +49,25 @@ template <typename Output, typename... Inputs> struct Function
      * @param g Function applied before this function.
      * @return The composed function.
      */
-    template <typename PrimaryInput, typename... Middles>
-    Function<Output, Middles...> Compose(const Function<PrimaryInput, Middles...>& g) const
-        requires(sizeof...(Inputs) == 1 && std::invocable<Function<Output, Inputs...>, PrimaryInput>)
+    /**
+     * @brief Composes this function with one function per input.
+     * @param functions Functions applied before this function.
+     * @return The composed function.
+     */
+    template <typename... Middles>
+    Function<Output, Middles...> Compose(const Function<Inputs, Middles...>&... functions) const
+        requires(sizeof...(Inputs) > 0)
     {
-        return [f = *this, g](const Middles&... inputs) { return f(g(inputs...)); };
+        return [f = *this, ... functions = functions](const Middles&... inputs)
+        { return f(functions(inputs...)...); };
     }
 
     /** @brief Composes this function with another function, producing f(g(x)). */
-    template <typename PrimaryInput, typename... Middles>
-    Function<Output, Middles...> operator()(const Function<PrimaryInput, Middles...>& g) const
-        requires(sizeof...(Inputs) == 1 && std::invocable<Function, PrimaryInput>)
+    template <typename... Middles>
+    Function<Output, Middles...> operator()(const Function<Inputs, Middles...>&... functions) const
+        requires(sizeof...(Inputs) > 0)
     {
-        return Compose(g);
+        return Compose(functions...);
     }
 
     /** @brief Evaluates the function at the given input. */

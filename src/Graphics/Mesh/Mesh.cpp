@@ -24,7 +24,7 @@ unsigned int Mesh::GetId() const
 
 bool Mesh::IsGenerated() const
 {
-    return VAO.GetId() != 0;
+    return VAO.GetId() != 0 && VBO.GetId() != 0 && EBO.GetId() != 0;
 }
 
 void Mesh::Generate()
