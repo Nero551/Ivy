@@ -73,58 +73,58 @@ struct VectorFields : C::System
 
         std::vector<float> magnitudes{};
 
-        equation.Solve(
-            {
-                0, {M::Rad(0), 4}
-        },
-            100, 0.0005,
-            [&](const Equation::State& state)
-            {
-                // Create one arrow for this grid point.
-                const auto& arrow = Arrow();
-                StateVector derivative = equation.Derivative(state);
-
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
-
-                transform.Position = state.y;
-                transform.Scale = M::Vector<2>{0.03125, 0.015625};
-                transform.Rotation = derivative.Angle();
-
-                magnitudes.push_back(derivative.Length());
-
-                m_Engine.World.GetRoot().AttachChild(arrow.GetId());
-            });
-
-        // for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
-        // {
-        //     for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
+        // equation.Solve(
         //     {
-        //         // Evaluate the derivative at this point in phase space.
-        //         const Equation::State state{
-        //             0.0f, {theta, omega}
-        //         };
-        //         const StateVector derivative = equation.Derivative(state);
-
-        //         // Skip the arrow if the vector field is effectively zero.
-        //         if (derivative.Length() < 0.0001f)
-        //         {
-        //             continue;
-        //         }
-
+        //         0, {M::Rad(0), 4}
+        // },
+        //     100, 0.0005,
+        //     [&](const Equation::State& state)
+        //     {
         //         // Create one arrow for this grid point.
         //         const auto& arrow = Arrow();
+        //         StateVector derivative = equation.Derivative(state);
 
         //         CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
 
-        //         transform.Position = StateVector{theta, omega} * 2;
-        //         transform.Scale = M::Vector<2>{0.2, 0.1};
+        //         transform.Position = state.y;
+        //         transform.Scale = M::Vector<2>{0.03125, 0.015625};
         //         transform.Rotation = derivative.Angle();
 
         //         magnitudes.push_back(derivative.Length());
 
         //         m_Engine.World.GetRoot().AttachChild(arrow.GetId());
-        //     }
-        // }
+        //     });
+
+        for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
+        {
+            for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
+            {
+                // Evaluate the derivative at this point in phase space.
+                const Equation::State state{
+                    0.0f, {theta, omega}
+                };
+                const StateVector derivative = equation.Derivative(state);
+
+                // Skip the arrow if the vector field is effectively zero.
+                if (derivative.Length() < 0.0001f)
+                {
+                    continue;
+                }
+
+                // Create one arrow for this grid point.
+                const auto& arrow = Arrow();
+
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = StateVector{theta, omega} * 2;
+                transform.Scale = M::Vector<2>{0.2, 0.1};
+                transform.Rotation = derivative.Angle();
+
+                magnitudes.push_back(derivative.Length());
+
+                m_Engine.World.GetRoot().AttachChild(arrow.GetId());
+            }
+        }
 
         G::ArrayBuffer buffer{};
 

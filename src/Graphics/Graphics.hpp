@@ -41,7 +41,6 @@
 #include "Primitives/Primitives.hpp"
 #include "Shader/Shader.hpp"
 #include "Shader/ShaderSource.hpp"
-#include "Shader/ShaderSourceValidator.hpp"
 #include "Shader/ShaderStage.hpp"
 #include "Texture/Cubemap.hpp"
 #include "Texture/Texture2D.hpp"

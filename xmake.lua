@@ -8,7 +8,6 @@ add_requires("tracy v0.13.1")
 add_requires("catch2 v3.16.0")
 add_requires("glfw 3.4")
 add_requires("assimp v6.0.5")
-add_requires("glslang")
 add_requires("stb")
 add_requires("glad 0.1.36")
 
@@ -52,7 +51,7 @@ target("Ivy")
     end)
 
     add_links("glslang-default-resource-limits")
-    add_packages("tracy", "glfw", "assimp", "glslang", "stb", "glad")
+    add_packages("tracy", "glfw", "assimp", "stb", "glad")
 
 
 target("IvyTests")

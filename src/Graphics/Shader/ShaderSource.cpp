@@ -37,25 +37,6 @@ void ShaderSource::Compile()
 
     GeneratedCode = SourceCode;
     Preprocess();
-
-    // auto result = ShaderSourceValidator::Validate(*this);
-    // if (!result.Success)
-    // {
-    //     U::Logger::Error("[VALIDATOR] ", result.Log);
-    //     if (Stage == ShaderStage::Fragment)
-    //     {
-    //         U::FileSystem::WriteFile("Assets/ShaderCompileError.frag", GeneratedCode);
-    //     }
-    //     if (Stage == ShaderStage::Vertex)
-    //     {
-    //         U::FileSystem::WriteFile("Assets/ShaderCompileError.vert", GeneratedCode);
-    //     }
-    //     if (Stage == ShaderStage::Geometry)
-    //     {
-    //         U::FileSystem::WriteFile("Assets/ShaderCompileError.geom", GeneratedCode);
-    //     }
-    // }
-
     const char* string = GeneratedCode.c_str();
 
     m_Id = glCreateShader(static_cast<GLenum>(m_Stage));

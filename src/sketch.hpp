@@ -57,7 +57,8 @@ namespace Sketch
 //TODO: all this time i been thinking how to make cpu side easier to use and more optimized & automatic, even for graphics.
 //TODO: i should be thinking about how to make cpu -> gpu pipeline easier to MODIFY and use. not make gpu/shaders as automatic as possible.
 
-//TODO: add NumberOfDimensions method to all math types
+//TODO: add NumberOfDimensions method to all math types, actually sizeof() / sizeof(T) will give me the number of dimensions
+// ex: sizeof(Vector<4>) / sizeof(float) = 4
 
 using namespace Ivy;
 
@@ -238,7 +239,8 @@ inline void Test()
     // P::Dimension<M::Vector<2>, P::Force> F = {5, 2};
 
     // P::Dimension<float, P::Joule> work = F().Dot(deltaR());
-
-    // U::Log::Info(work);
+    //
+    //
+    //
 }
 } // namespace Sketch

@@ -4,7 +4,7 @@
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Capability.hpp"
 #include "OpenGL.hpp"
-#include <glslang/Public/ShaderLang.h>
+// #include <glslang/Public/ShaderLang.h>
 
 /** @brief Handles initialization, modification and termination of the graphics state */
 namespace Ivy::G::Context
@@ -64,16 +64,10 @@ inline void Initialize()
     {
         U::Log::Fatal("Failed to initialize GLFW");
     }
-
-    if (!glslang::InitializeProcess())
-    {
-        U::Log::Fatal("Failed to initialize glslang");
-    }
 }
 
 inline void Terminate()
 {
-    glslang::FinalizeProcess();
     glfwTerminate();
 }
 } // namespace Ivy::G::Context
