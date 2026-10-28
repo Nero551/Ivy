@@ -10,6 +10,8 @@ struct Sandbox2D : C::Module
 
   private:
     unsigned int CreateCircle();
+    unsigned int CreateSquare();
+    void PlayWithBall(double fdt);
 };
 
 } // namespace Ivy::Sandbox

@@ -8,13 +8,16 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Common/Random.hpp"
+#include "Math/Equations/ODE.hpp"
 #include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
+#include "Physics/DimensionalAnalysis/Dimensionals.hpp"
 #include "Sandbox/Scenes/CoordinateAxes2D.hpp"
 #include "Sandbox/Systems/Controller2D.hpp"
+#include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstdlib>
@@ -46,7 +49,32 @@ unsigned int Sandbox2D::CreateCircle()
     return circle.GetId();
 }
 
-static int ballId;
+unsigned int Sandbox2D::CreateSquare()
+{
+    auto& query = m_Engine.ECS.Query;
+    auto& resources = m_Engine.GetService<C::ResourceManager>();
+    auto& square = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+    query.Pool<CMP::Mesh>().GetComponent(square).Mesh = &resources.Load(G::Primitives::CreateQuad("cube"));
+
+    auto& vertSource = resources.Load<G::ShaderSource>(
+        "squareShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+    auto& fragSource = resources.Load<G::ShaderSource>(
+        "squareShaderFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+
+    auto& shader = resources.Load<G::Shader>("squareShader", vertSource, fragSource);
+    auto& mat = resources.Load<G::Material>("squareMat");
+    mat().Shader = &shader();
+    mat().Color = {1, 1, 1, 1};
+
+    query.Pool<CMP::Material>().GetComponent(square).Material = &mat;
+    m_Engine.World.GetRoot().AttachChild(square);
+    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(square);
+    transform.Position = {0, 1};
+
+    return square.GetId();
+}
+
+static int particleId;
 void Sandbox2D::Start()
 {
 
@@ -58,29 +86,27 @@ void Sandbox2D::Start()
     m_Engine.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
 
     AddSystem<Controller2D>();
-    // AddSystem<StressTester2D>();
-    // GetSystem<StressTester2D>().Spawn(3, 5);
+    AddSystem<StressTester2D>();
+    // GetSystem<StressTester2D>().ThreeDimensionalProjection(5);
 
     AddSystem<VectorFields>();
     GetSystem<VectorFields>().Start();
 
-    GetSystem<VectorFields>().Pendulum();
-    ballId = CreateCircle();
+    // GetSystem<VectorFields>().Pendulum();
+    particleId = CreateSquare();
 }
 
 struct Particle
 {
     M::Vector<2> Position;
-    M::Vector<2> Velocity;
+    M::Vector<2> Velocity{100, 0};
     M::Vector<2> Acceleration;
     M::Vector<2> Force;
-    float Mass = 1;
+    float Mass = 2;
 };
 
 static Particle p;
 constexpr static M::Vector<2> g{0, -9.8};
-static float b = 0.5;
-static float restitution = 0.8;
 static float speed = 15;
 
 void Sandbox2D::FixedUpdate(double fdt)
@@ -90,11 +116,68 @@ void Sandbox2D::FixedUpdate(double fdt)
         m_Engine.Shutdown();
     }
     GetSystem<Controller2D>().Update(fdt);
-    // GetSystem<StressTester2D>().Update(dt);
+
+    auto& plotter = GetSystem<StressTester2D>();
+    // plotter.Plot({p.Position.x, p.Force.x}, {0, 0, 1, 1});
+    // plotter.Plot({p.Force.x, p.Position.x}, {0, 1, 1, 1});
+
+    // plotter.Plot({p.Velocity.x, p.Force.x}, {1, 0.12, 0.2, 1});
+    // plotter.Plot({p.Force.x, p.Velocity.x}, {0.3, 0.7, 1, 1});
+
+    // plotter.Plot({p.Position.x, p.Acceleration.x}, {0, 1, 0, 1});
+    // plotter.Plot({p.Acceleration.x, p.Position.x}, {1, 1, 0, 1});
+
+    // plotter.Plot({p.Velocity.x, p.Acceleration.x}, {0, 0.3, 0.5, 1});
+    // plotter.Plot({p.Acceleration.x, p.Velocity.x}, {1, 0.2, 0, 1});
+
+    // plotter.Plot({p.Velocity.x, p.Position.x}, {1, 0, 0, 1});
+    // plotter.Plot({p.Position.x, p.Velocity.x}, {1, 0.6, 0.3, 1});
+    // plotter.Plot({static_cast<float>(m_Engine.GetTime()), p.Position.x}, {0, 1, 0, 1});
+    // plotter.Plot({static_cast<float>(m_Engine.GetTime()), p.Velocity.x}, {0, 1, 1, 1});
+    // plotter.Plot({static_cast<float>(m_Engine.GetTime()), p.Acceleration.x}, {1, 0, 0, 1});
 
     auto& query = m_Engine.ECS.Query;
     auto& input = m_Engine.GetModule<I::Input>();
-    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(ballId));
+    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(particleId));
+
+    p.Position.y = 0.5;
+    M::Vector<2> f{0, 0};
+
+    if (input.IsKeyHeld(G::Key::Left))
+    {
+        f.x -= speed;
+    }
+    if (input.IsKeyHeld(G::Key::Right))
+    {
+        f.x += speed;
+    }
+
+    M::Vector<2> dampening = -0.1 * p.Velocity;
+    p.Force = f * p.Mass + -0.5 * p.Position + dampening;
+    p.Acceleration = p.Force / p.Mass;
+    p.Velocity += p.Acceleration * fdt;
+    p.Position += p.Velocity * fdt;
+
+    transform.Position = p.Position;
+
+    // U::Log::Info("[[[");
+    // U::Log::Info("Applied Force: ", f);
+    // U::Log::Info("Total Force: ", p.Force);
+    // U::Log::Info("Acceleration: ", p.Acceleration);
+    // U::Log::Info("Velocity: ", p.Velocity);
+    // U::Log::Info("Position: ", p.Position);
+    // U::Log::Info("]]]");
+
+    // PlayWithBall(fdt);
+}
+
+void Sandbox2D::PlayWithBall(double fdt)
+{
+    constexpr float b = 0.5;
+    constexpr float restitution = 0.8;
+    auto& query = m_Engine.ECS.Query;
+    auto& input = m_Engine.GetModule<I::Input>();
+    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(particleId));
 
     M::Vector<2> f{0, 0};
 

@@ -19,14 +19,6 @@ struct StressTester2D : C::System
 {
     using C::System::System;
 
-    void Spawn(int dimension, int craziness)
-    {
-        if (dimension == 3)
-        {
-            ThreeDimensionalProjection(craziness);
-        }
-    }
-
     void Update(double dt) override
     {
         auto& input = m_Engine.GetModule<I::Input>();
@@ -51,11 +43,6 @@ struct StressTester2D : C::System
 
         multiplier = 1;
     };
-
-  private:
-    float multiplier = 1;
-    std::vector<unsigned int> points;
-
     // void TwoDimensionalProjection(int increase)
     // {
     //     points.reserve(M::Pow(360.0f / increase, 1));
@@ -147,5 +134,9 @@ struct StressTester2D : C::System
 
         return point;
     }
+
+  private:
+    float multiplier = 1;
+    std::vector<unsigned int> points;
 };
 } // namespace Ivy::Sandbox

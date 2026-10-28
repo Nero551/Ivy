@@ -135,7 +135,7 @@ void Engine::Update()
 
     for (auto& module : m_Modules)
     {
-        module->FixedUpdate(m_TimeHandler.GetDelta());
+        module->Update(m_TimeHandler.GetDelta());
     }
 
     for (auto& service : m_Services)

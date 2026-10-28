@@ -27,6 +27,7 @@
 #include <concepts>
 #include <cstdlib>
 #include <dlfcn.h>
+#include <ios>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -231,16 +232,27 @@ template <M::Scalar T> struct Dual
     }
 };
 
+template <M::Scalar In, typename Out> Out Summation(const M::Function<Out, In>& f, In start, In end)
+{
+    Out result{};
+    for (In i = start; i <= end; ++i)
+    {
+        result += f(i);
+    }
+    return result;
+};
+
 inline void Test()
 {
-    // P::Dimension<float, P::Acceleration> g = 9.8;
+    P::Dimension<float, P::Acceleration> g = -9.8;
 
-    // P::Dimension<M::Vector<2>, P::Length<1>> deltaR = {2, 3};
-    // P::Dimension<M::Vector<2>, P::Force> F = {5, 2};
+    P::Dimension<float, P::Mass<1>> m = 0.55;
+    P::Dimension<float, P::Length<1>> x = 2 * P::Units::Centimeter;
+    P::Dimension<float, P::OperationDimensional<P::Force, P::Length<-1>, "N/m">> k = (-m * g) / x;
 
-    // P::Dimension<float, P::Joule> work = F().Dot(deltaR());
-    //
-    //
-    //
+    P::Dimension<float, P::Joule> work = -1.0f / 2.0f * k * P::Pow<2>(x);
+
+    U::Log::Info(k);
+    U::Log::Info(work);
 }
 } // namespace Sketch

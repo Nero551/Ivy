@@ -26,8 +26,16 @@ struct Controller2D : C::System
         auto& input = m_Engine.GetModule<I::Input>();
         auto& camera = m_Engine.World.GetCamera();
 
-        m_Zoom += input.GetScrollDelta().y * M::PI * M::PHI;
-        m_Zoom = std::max(m_Zoom, 5.0f);
+        if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::LeftControl))
+        {
+            m_Zoom += input.GetScrollDelta().y * M::PI * M::PHI;
+        }
+        else
+        {
+            m_Zoom += input.GetScrollDelta().y;
+        }
+
+        m_Zoom = std::max(m_Zoom, 2.0f);
 
         auto& transform = query.Pool<CMP::Transform2D>().GetComponent(camera);
         auto& cameraComponent = query.Pool<CMP::Camera>().GetComponent(camera);

@@ -153,4 +153,11 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 - Learned move/copy semantics & constructors.
 - made separate 2D and 3D systems
 
-### Week 16 · October 19–26
+### Week 17 · October 19–26
+
+- made all project deps static libs
+
+### Week 18 · October 27 – November 3
+
+- ODEs solver via explicit euler
+- colored vector fields for ODEs
