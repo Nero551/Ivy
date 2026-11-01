@@ -99,7 +99,17 @@ struct Entity
     std::vector<U::CheckedPtr<Entity>> GetAncestors() const;
 
     /** @brief Calls a callback for every ancestor ID. */
-    void ForEachAncestor(const std::function<void(unsigned int)>& callback) const;
+    template <typename F> requires std::invocable<F&, unsigned int>
+    void ForEachAncestor(F&& callback) const
+    {
+        U::CheckedPtr<Entity> current = TryFindParent();
+
+        while (current)
+        {
+            callback(current->GetId());
+            current = current->TryFindParent();
+        }
+    }
 
     /** @brief Returns whether the specified entity is an ancestor. */
     bool IsAncestorOf(unsigned int entityId) const;

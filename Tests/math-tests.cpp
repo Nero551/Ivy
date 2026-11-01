@@ -322,9 +322,9 @@ TEST_CASE("Function construction and evaluation")
         REQUIRE(f.Evaluate(3.0f) == 9.0f);
     }
 
-    SECTION("Construct from std::function")
+    SECTION("Construct from")
     {
-        std::function<float(float)> func = [](const float x) { return 2.0f * x + 1.0f; };
+        std::copyable_function<float(float) const> func = [](const float x) { return 2.0f * x + 1.0f; };
         Function<float, float> f(func);
         REQUIRE(f(1.5f) == 4.0f);
     }

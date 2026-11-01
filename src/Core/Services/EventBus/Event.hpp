@@ -1,5 +1,8 @@
 #pragma once
-#include "../../../Utilities/Debug/Log.hpp"
+#include <concepts>
+#include <cstddef>
+#include <functional>
+#include <vector>
 
 namespace Ivy::C
 {
@@ -11,21 +14,21 @@ struct IEvent
 /** @brief Self-managing event that owns its listeners and dispatches them immediately after Fire(). */
 template <typename T> struct Event : IEvent
 {
-    Event() {}
+    Event() = default;
     ~Event() override = default;
 
     /** @brief Dispatches the event to all registered listeners. */
-    void Fire()
+    void Fire() const
     {
 
-        for (const auto& listener : m_Listeners)
+        for (auto& listener : m_Listeners)
         {
-            listener.Callback(static_cast<T&>(*this));
+            listener.Callback(static_cast<const T&>(*this));
         }
     }
 
     /** @brief Registers a listener and returns its unique subscription ID. */
-    template <typename F> requires std::invocable<F, T&>
+    template <typename F> requires std::invocable<F, const T&>
     std::size_t Sub(F&& callback)
     {
         const auto subscription = ++m_NextSubscription;
@@ -53,8 +56,8 @@ template <typename T> struct Event : IEvent
     /** @brief Stores a listener callback and its subscription ID. */
     struct Entry
     {
-        std::size_t Subscription;
-        std::function<void(T&)> Callback;
+        const std::size_t Subscription;
+        const std::copyable_function<void(const T&) const> Callback;
     };
 
     std::vector<Entry> m_Listeners;

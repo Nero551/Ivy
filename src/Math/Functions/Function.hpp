@@ -230,7 +230,7 @@ template <typename Output, typename... Inputs> struct Function
     }
 
   private:
-    std::function<Output(Inputs...)> m_Func;
+    std::copyable_function<Output(Inputs...) const> m_Func;
 };
 
 } // namespace Ivy::M

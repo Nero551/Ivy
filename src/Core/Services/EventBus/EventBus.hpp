@@ -81,7 +81,7 @@ struct EventBus : Service
     struct Entry
     {
         std::size_t Subscription;
-        std::function<void(IEvent&)> Callback;
+        std::copyable_function<void(IEvent&)> Callback;
     };
 
     /** @brief Global event listeners grouped by event type. */

@@ -12,6 +12,7 @@
 #include "Math/Functions/Function.hpp"
 #include "Math/Functions/Integration.hpp"
 #include "Math/Math.hpp"
+#include "Math/MathTuple.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
@@ -309,17 +310,11 @@ struct Shader
     }
 };
 
-//TODO: define NumberOfDimensions method to math objects (vector,quaternion,matrix,complex)
-//TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, etc
-//
-//? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//? !!!!!! UTMOST PRIORITY !!!!!!!
-//? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//TODO: make custom MathTuple. it will be a tuple that will allow for mathematical operations.
-//TODO: able to represent multi-variable output, storage & input effectively.
-//TODO: use std::tuples to make Function able to return multiple outputs.
-//TODO: use tuple on ODE.
-//
+//TODO: define VariableCount method to math objects (vector,quaternion,matrix,complex,math tuple,etc)
+// TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables.
+// this will be needed for partial derivatives specifically.
+//TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, IsMathTuple, etc
+// TODO: prevent math tuples from being input-able to Function.
 
 inline void Test()
 {
@@ -331,5 +326,8 @@ inline void Test()
 
     P::Dimension<float, P::Joule> work = -1.0f / 2.0f * k * P::Pow<2>(x);
     U::Log::Info(work);
+
+    M::ODE<float, float, float> eq = {
+        [](float t, float x, float y) { return M::ODE<float, float, float>::State{t, x * y, x / y}; }};
 }
 } // namespace Sketch

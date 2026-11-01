@@ -256,13 +256,13 @@ struct Window
     GLFWwindow* m_GlfwWindow = nullptr;
     GLFWPlatform m_Platform = GLFWPlatform::Null;
 
-    std::function<void(Window&, double, double)> m_ScrollCallback;
-    std::function<void(Window&, double, double)> m_CursorPosCallback;
-    std::function<void(Window&, int, int)> m_FramebufferSizeCallback;
-    std::function<void(Window&, Key, int, Action, int)> m_KeyCallback;
-    std::function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
+    std::copyable_function<void(Window&, double, double)> m_ScrollCallback;
+    std::copyable_function<void(Window&, double, double)> m_CursorPosCallback;
+    std::copyable_function<void(Window&, int, int)> m_FramebufferSizeCallback;
+    std::copyable_function<void(Window&, Key, int, Action, int)> m_KeyCallback;
+    std::copyable_function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
 
-    std::function<void(Window&, bool)> m_CursorEnteredCallback;
+    std::copyable_function<void(Window&, bool)> m_CursorEnteredCallback;
 
     void SetConfiguration();
 };

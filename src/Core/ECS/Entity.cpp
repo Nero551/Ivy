@@ -178,17 +178,6 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetAncestors() const
     return ancestors;
 }
 
-void Entity::ForEachAncestor(const std::function<void(unsigned int)>& callback) const
-{
-    unsigned int current = m_Parent;
-
-    while (current != 0)
-    {
-        callback(current);
-        const Entity& entity = m_ECS.GetEntity(current);
-        current = entity.m_Parent;
-    }
-}
 bool Entity::IsAncestorOf(const unsigned int entityId) const
 {
     for (auto id : m_Children)

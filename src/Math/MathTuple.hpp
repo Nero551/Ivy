@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Concepts.hpp"
+#include "Utilities/Concepts.hpp"
 #include <cstddef>
 #include <ostream>
 #include <tuple>
@@ -13,8 +14,9 @@ template <typename... Args> struct MathTuple
     std::tuple<Args...> m_Values;
 
   public:
+    //TODO: add comparison operators and assignment operators (==, !=, +=, *=, etc)
+
     static constexpr size_t Size = std::tuple_size_v<std::tuple<Args...>>;
-    template <unsigned int I> using Select = std::tuple_element<I, std::tuple<Args...>>;
 
     constexpr MathTuple(const Args&... args) : m_Values(args...) {}
 
@@ -95,6 +97,25 @@ template <typename... Args> struct MathTuple
     template <unsigned int I> constexpr decltype(auto) Get() const
     {
         return std::get<I>(m_Values);
+    }
+
+    constexpr operator std::tuple<Args...>()
+    {
+        return m_Values;
+    }
+    constexpr operator const std::tuple<Args...>() const
+    {
+        return m_Values;
+    }
+
+    constexpr operator U::Select<0, Args...>() requires(sizeof...(Args) == 1)
+    {
+        return Get<0>();
+    }
+
+    constexpr operator const U::Select<0, Args...>() const requires(sizeof...(Args) == 1)
+    {
+        return Get<0>();
     }
 
     friend std::ostream& operator<<(std::ostream& os, const MathTuple<Args...>& tuple)

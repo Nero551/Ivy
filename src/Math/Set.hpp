@@ -66,7 +66,7 @@ template <typename T> struct Set
     }
 
   private:
-    std::function<bool(const T&)> m_Predicate;
+    std::copyable_function<bool(const T&) const> m_Predicate;
 };
 
 } // namespace Ivy::M
