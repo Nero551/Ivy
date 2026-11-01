@@ -87,13 +87,13 @@ void Sandbox2D::Start()
     m_Engine.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
 
     AddSystem<Controller2D>();
-    AddSystem<StressTester2D>();
+    // AddSystem<StressTester2D>();
     // GetSystem<StressTester2D>().FourDimensionalProjection(3);
 
-    // AddSystem<VectorFields>();
-    // GetSystem<VectorFields>().Start();
+    AddSystem<VectorFields>();
+    GetSystem<VectorFields>().Start();
 
-    // GetSystem<VectorFields>().PendulumModel();
+    GetSystem<VectorFields>().DampenedSpringModel();
     particleId = CreateSquare();
 }
 

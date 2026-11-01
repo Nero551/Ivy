@@ -57,56 +57,27 @@ struct VectorFields : C::System
         constexpr float thetaStep = 0.125;
         constexpr float omegaStep = 0.125;
 
-        using StateVector = M::Vector<2>;
-        using Equation = M::ODE<float, StateVector>;
+        using Equation = M::ODE<float, float, float>;
 
-        const Equation equation{[](const Equation::State& state) -> StateVector
+        const Equation equation{[](float t, float theta, float omega)
             {
-                const float theta = state.y.x;
-                const float omega = state.y.y;
-
                 const float thetaDot = omega;
                 const float omegaDot = -0.2f * omega - (9.8f / 2.0f) * std::sin(theta);
 
-                return {thetaDot, omegaDot};
+                return Equation::State{t, thetaDot, omegaDot};
             }};
 
         std::vector<float> magnitudes{};
-
-        equation.Solve(
-            {
-                0, {M::Rad(-720), 10}
-        },
-            100, 0.0005,
-            [&](const Equation::State& state)
-            {
-                // Create one arrow for this grid point.
-                const auto& arrow = Arrow();
-                StateVector derivative = equation.Derivative(state);
-
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
-
-                transform.Position = state.y * 2;
-                transform.Scale = M::Vector<2>{0.03125, 0.015625};
-                transform.Rotation = derivative.Angle();
-
-                magnitudes.push_back(derivative.Length());
-
-                m_Engine.World.GetRoot().AttachChild(arrow.GetId());
-            });
 
         for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
         {
             for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
             {
                 // Evaluate the derivative at this point in phase space.
-                const Equation::State state{
-                    0.0f, {theta, omega}
-                };
-                const StateVector derivative = equation.Derivative(state);
+                auto [thetaDot, omegaDot] = equation.Derivative({0.0f, theta, omega}).Variables;
 
                 // Skip the arrow if the vector field is effectively zero.
-                if (derivative.Length() < 0.0001f)
+                if (M::Vector<2>{thetaDot, omegaDot}.Length() < 0.0001f)
                 {
                     continue;
                 }
@@ -116,11 +87,11 @@ struct VectorFields : C::System
 
                 CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
 
-                transform.Position = StateVector{theta, omega} * 2;
+                transform.Position = M::Vector<2>{theta, omega} * 2;
                 transform.Scale = M::Vector<2>{0.2, 0.1};
-                transform.Rotation = derivative.Angle();
+                transform.Rotation = M::Vector<2>{thetaDot, omegaDot}.Angle();
 
-                magnitudes.push_back(derivative.Length());
+                magnitudes.push_back(M::Vector<2>{thetaDot, omegaDot}.Length());
 
                 m_Engine.World.GetRoot().AttachChild(arrow.GetId());
             }
@@ -133,184 +104,210 @@ struct VectorFields : C::System
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
-
     void ExponentialModel()
     {
         const float k = 0.2f;
-        M::ODE<float, float> eq{[k](const auto& state) { return k * state.y; }};
+
+        using Equation = M::ODE<float, float>;
+
+        const Equation equation{[k](float t, float p) { return Equation::State{t, k * p}; }};
 
         std::vector<float> magnitudes{};
-        for (float p = 0; p <= 50; p += 0.5)
+
+        for (float p = 0; p <= 50; p += 0.5f)
         {
-            for (float t = 0; t < 50; t += 0.5)
+            for (float t = 0; t < 50; t += 0.5f)
             {
-                float dp = eq.Derivative({t, p});
+                const auto [dp] = equation.Derivative({t, p}).Variables;
+
                 const M::Vector<2> pos = {t, p};
                 const M::Vector<2> target = {1, dp};
 
                 auto& arrow = Arrow();
+
                 magnitudes.push_back(target.Length());
 
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = pos;
+                transform.Scale = {0.5f, 0.25f};
+                transform.Rotation = target.Angle();
 
                 m_Engine.World.GetRoot().AttachChild(arrow);
             }
         }
 
         G::ArrayBuffer buffer{};
-
         buffer.SetData(magnitudes);
+
         m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
-
     void LogisticModel()
     {
-        const float k = 0.05;
-        float a = 15;
-        M::ODE<float, float> eq{[k, a](const auto& state) { return k * state.y * (a - state.y); }};
+        const float k = 0.05f;
+        const float a = 15.0f;
+
+        using Equation = M::ODE<float, float>;
+
+        const Equation equation{[k, a](float t, float p) { return Equation::State{t, k * p * (a - p)}; }};
 
         std::vector<float> magnitudes{};
-        for (float p = 0; p <= 50; p += 0.5)
+
+        for (float p = 0; p <= 50; p += 0.5f)
         {
-            for (float t = 0; t < 50; t += 0.5)
+            for (float t = 0; t < 50; t += 0.5f)
             {
-                float dp = eq.Derivative({t, p});
+                const auto [dp] = equation.Derivative({t, p}).Variables;
+
                 const M::Vector<2> pos = {t, p};
                 const M::Vector<2> target = {1, dp};
 
                 auto& arrow = Arrow();
 
                 magnitudes.push_back(target.Length());
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = pos;
+                transform.Scale = {0.5f, 0.25f};
+                transform.Rotation = target.Angle();
 
                 m_Engine.World.GetRoot().AttachChild(arrow);
             }
         }
 
         G::ArrayBuffer buffer{};
-
         buffer.SetData(magnitudes);
+
         m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
-
     void SpringModel()
     {
-        const float k = 0.8;
-        const float m = 1;
+        const float k = 0.8f;
+        const float m = 1.0f;
 
-        M::ODE<float, M::Vector<2>> eq{
-            [m, k](const auto& state) { return M::Vector<2>{state.y.y, -k * state.y.x / m}; }};
+        using Equation = M::ODE<float, float, float>;
+
+        const Equation equation{
+            [k, m](float t, float x, float v) { return Equation::State{t, v, -k * x / m}; }};
 
         std::vector<float> magnitudes{};
-        for (float v = -25; v <= 25; v += 0.5)
+
+        for (float v = -25; v <= 25; v += 0.5f)
         {
-            for (float x = -25; x < 25; x += 0.5)
+            for (float x = -25; x < 25; x += 0.5f)
             {
-                float dv = eq.Derivative({
-                                             0, {x, v}
-                })
-                               .y;
+                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).Variables;
+
                 const M::Vector<2> pos = {x, v};
-                const M::Vector<2> target = {v, dv};
+                const M::Vector<2> target = {dx, dv};
 
                 auto& arrow = Arrow();
 
                 magnitudes.push_back(target.Length());
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = pos;
+                transform.Scale = {0.5f, 0.25f};
+                transform.Rotation = target.Angle();
 
                 m_Engine.World.GetRoot().AttachChild(arrow);
             }
         }
 
         G::ArrayBuffer buffer{};
-
         buffer.SetData(magnitudes);
+
         m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
-
     void DampenedSpringModel()
     {
-        const float k = 0.8;
-        const float m = 1;
-        const float b = 0.5;
+        const float k = 0.8f;
+        const float m = 1.0f;
+        const float b = 0.5f;
 
-        M::ODE<float, M::Vector<2>> eq{[m, k, b](const auto& state)
-            { return M::Vector<2>{state.y.y, -k * state.y.x / m + -b * state.y.y / m}; }};
+        using Equation = M::ODE<float, float, float>;
+
+        const Equation equation{
+            [k, m, b](float t, float x, float v) { return Equation::State{t, v, -k * x / m - b * v / m}; }};
 
         std::vector<float> magnitudes{};
-        for (float v = -25; v <= 25; v += 0.5)
+
+        for (float v = -25; v <= 25; v += 0.5f)
         {
-            for (float x = -25; x < 25; x += 0.5)
+            for (float x = -25; x < 25; x += 0.5f)
             {
-                float dv = eq.Derivative({
-                                             0, {x, v}
-                })
-                               .y;
+                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).Variables;
+
                 const M::Vector<2> pos = {x, v};
-                const M::Vector<2> target = {v, dv};
+                const M::Vector<2> target = {dx, dv};
 
                 auto& arrow = Arrow();
 
                 magnitudes.push_back(target.Length());
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = pos;
+                transform.Scale = {0.5f, 0.25f};
+                transform.Rotation = target.Angle();
 
                 m_Engine.World.GetRoot().AttachChild(arrow);
             }
         }
 
         G::ArrayBuffer buffer{};
-
         buffer.SetData(magnitudes);
+
         m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
-
     void LinearResistiveForceModel()
     {
-        const float b = 0.8;
-        const float m = 1;
-        const float g = 9.8;
+        const float b = 0.8f;
+        const float m = 1.0f;
+        const float g = 9.8f;
 
-        M::ODE<float, float> eq{[b, m, g](const auto& state) { return g - (b / m) * state.y; }};
+        using Equation = M::ODE<float, float>;
+
+        const Equation equation{[b, m, g](float t, float v) { return Equation::State{t, g - (b / m) * v}; }};
 
         std::vector<float> magnitudes{};
-        for (float v = -25; v <= 25; v += 0.5)
+
+        for (float v = -25; v <= 25; v += 0.5f)
         {
-            for (float t = 0; t < 50; t += 0.5)
+            for (float t = 0; t < 50; t += 0.5f)
             {
-                float dv = eq.Derivative({t, v});
+                const auto [dv] = equation.Derivative({t, v}).Variables;
+
                 const M::Vector<2> pos = {t, v};
                 const M::Vector<2> target = {1, dv};
 
                 auto& arrow = Arrow();
 
                 magnitudes.push_back(target.Length());
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = pos;
+                transform.Scale = {0.5f, 0.25f};
+                transform.Rotation = target.Angle();
 
                 m_Engine.World.GetRoot().AttachChild(arrow);
             }
         }
 
         G::ArrayBuffer buffer{};
-
         buffer.SetData(magnitudes);
+
         m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
@@ -318,38 +315,45 @@ struct VectorFields : C::System
 
     void QuadraticResistiveForceModel()
     {
-        const float g = 9.8;
-        const float m = 0.046;
-        const float D = 1;
-        const float p = 1;
+        const float g = 9.8f;
+        const float m = 0.046f;
+        const float D = 1.0f;
+        const float p = 1.0f;
         const float A = 10e-3f * 1.4f;
 
-        M::ODE<float, float> eq{[g, D, p, A, m](const auto& state)
-            { return g - (D * p * A / (2 * m)) * state.y * std::abs(state.y); }};
+        using Equation = M::ODE<float, float>;
+
+        const Equation equation{[g, D, p, A, m](float t, float v)
+            { return Equation::State{t, g - (D * p * A / (2.0f * m)) * v * std::abs(v)}; }};
 
         std::vector<float> magnitudes{};
-        for (float v = -25; v <= 25; v += 0.5)
+
+        for (float v = -25; v <= 25; v += 0.5f)
         {
-            for (float t = 0; t < 50; t += 0.5)
+            for (float t = 0; t < 50; t += 0.5f)
             {
-                float dv = eq.Derivative({t, v});
+                const auto [dv] = equation.Derivative({t, v}).Variables;
+
                 const M::Vector<2> pos = {t, v};
                 const M::Vector<2> target = {1, dv};
 
                 auto& arrow = Arrow();
 
                 magnitudes.push_back(target.Length());
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
-                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+
+                transform.Position = pos;
+                transform.Scale = {0.5f, 0.25f};
+                transform.Rotation = target.Angle();
 
                 m_Engine.World.GetRoot().AttachChild(arrow);
             }
         }
 
         G::ArrayBuffer buffer{};
-
         buffer.SetData(magnitudes);
+
         m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);

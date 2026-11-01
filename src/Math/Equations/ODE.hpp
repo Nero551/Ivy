@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/MathTuple.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <functional>
 #include <ostream>
@@ -19,7 +20,7 @@ enum class ODEMethod
  *
  * Solves initial value problems of the form:
  * \f[
- * \frac{dy}{dx} = f(x, y)
+ * \frac{dy}{dx} = f(x, y, z, ...)
  * \f]
  *
  * Currently uses Explicit Euler integration.
@@ -27,31 +28,23 @@ enum class ODEMethod
  * @tparam Independent Scalar type of the independent variable.
  * @tparam StateValue Type of the dependent state.
  */
-template <Scalar Independent, typename DependentState> struct ODE
+template <M::Scalar Independent, typename... States> struct ODE
 {
-    /**
-     * @brief Represents a point in the solution.
-     */
     struct State
     {
-        DependentState y;
+        MathTuple<States...> Variables;
         Independent x;
 
-        /**
-         * @brief Constructs a state.
-         */
-        State(Independent X, const DependentState& Y) : x(X), y(Y) {}
+        State(Independent X, const States&... vars) : x(X), Variables(vars...) {}
+        State(Independent X, const MathTuple<States...>& tuple) : x(X), Variables(tuple) {}
 
-        /**
-         * @brief Writes the state as "x y".
-         */
         friend std::ostream& operator<<(std::ostream& os, const State& state)
         {
-            return os << state.x << " " << state.y;
+            os << "( " << state.x << ", " << state.Variables << " )";
         }
     };
 
-    using DerivativeFunction = Function<DependentState, State>;
+    using DerivativeFunction = M::Function<State, Independent, States...>;
 
     /**
      * @brief Constructs an ODE solver.
@@ -64,9 +57,10 @@ template <Scalar Independent, typename DependentState> struct ODE
      * @param current Current state.
      * @return Derivative of the state.
      */
-    DependentState Derivative(const State& current) const
+    State Derivative(const State& current) const
     {
-        return m_Derivative(current);
+        return current.Variables.Apply(
+            [this, &current](const States&... values) { return m_Derivative(current.x, values...); });
     }
 
     /**
@@ -77,7 +71,7 @@ template <Scalar Independent, typename DependentState> struct ODE
      */
     State Step(const State& current, const Independent& dx) const
     {
-        return {current.x + dx, current.y + Derivative(current) * dx};
+        return {current.x + dx, current.Variables + Derivative(current).Variables * dx};
     }
 
     /**
