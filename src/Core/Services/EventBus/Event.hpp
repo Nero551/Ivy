@@ -1,4 +1,5 @@
 #pragma once
+#include "stl.hpp"
 #include <concepts>
 #include <cstddef>
 #include <functional>
@@ -57,7 +58,7 @@ template <typename T> struct Event : IEvent
     struct Entry
     {
         const std::size_t Subscription;
-        const std::copyable_function<void(const T&) const> Callback;
+        const stl::function<void(const T&) const> Callback;
     };
 
     std::vector<Entry> m_Listeners;

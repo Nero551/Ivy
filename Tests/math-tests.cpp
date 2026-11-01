@@ -324,7 +324,7 @@ TEST_CASE("Function construction and evaluation")
 
     SECTION("Construct from")
     {
-        std::copyable_function<float(float) const> func = [](const float x) { return 2.0f * x + 1.0f; };
+        stl::function<float(float) const> func = [](const float x) { return 2.0f * x + 1.0f; };
         Function<float, float> f(func);
         REQUIRE(f(1.5f) == 4.0f);
     }

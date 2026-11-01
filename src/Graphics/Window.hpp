@@ -7,8 +7,8 @@
 #include "InputEnums/Key.hpp"
 #include "InputEnums/MouseButton.hpp"
 #include "OpenGL.hpp"
+#include "stl.hpp"
 #include <concepts>
-#include <functional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -256,13 +256,13 @@ struct Window
     GLFWwindow* m_GlfwWindow = nullptr;
     GLFWPlatform m_Platform = GLFWPlatform::Null;
 
-    std::copyable_function<void(Window&, double, double)> m_ScrollCallback;
-    std::copyable_function<void(Window&, double, double)> m_CursorPosCallback;
-    std::copyable_function<void(Window&, int, int)> m_FramebufferSizeCallback;
-    std::copyable_function<void(Window&, Key, int, Action, int)> m_KeyCallback;
-    std::copyable_function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
+    stl::function<void(Window&, double, double)> m_ScrollCallback;
+    stl::function<void(Window&, double, double)> m_CursorPosCallback;
+    stl::function<void(Window&, int, int)> m_FramebufferSizeCallback;
+    stl::function<void(Window&, Key, int, Action, int)> m_KeyCallback;
+    stl::function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
 
-    std::copyable_function<void(Window&, bool)> m_CursorEnteredCallback;
+    stl::function<void(Window&, bool)> m_CursorEnteredCallback;
 
     void SetConfiguration();
 };

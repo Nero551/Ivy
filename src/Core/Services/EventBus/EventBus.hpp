@@ -2,6 +2,7 @@
 
 #include "Core/Service.hpp"
 #include "Core/Services/EventBus/Event.hpp"
+#include "stl.hpp"
 
 namespace Ivy::C
 {
@@ -81,7 +82,7 @@ struct EventBus : Service
     struct Entry
     {
         std::size_t Subscription;
-        std::copyable_function<void(IEvent&)> Callback;
+        stl::function<void(IEvent&)> Callback;
     };
 
     /** @brief Global event listeners grouped by event type. */

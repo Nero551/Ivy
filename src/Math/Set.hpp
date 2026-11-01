@@ -1,8 +1,10 @@
 #pragma once
 
+#include "stl.hpp"
 #include <concepts>
 #include <functional>
 #include <type_traits>
+
 namespace Ivy::M
 {
 
@@ -66,7 +68,7 @@ template <typename T> struct Set
     }
 
   private:
-    std::copyable_function<bool(const T&) const> m_Predicate;
+    stl::function<bool(const T&) const> m_Predicate;
 };
 
 } // namespace Ivy::M

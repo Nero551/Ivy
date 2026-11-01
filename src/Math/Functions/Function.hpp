@@ -1,9 +1,8 @@
 #pragma once
 #include "Math/Concepts.hpp"
 #include "Math/MathTuple.hpp"
+#include "stl.hpp"
 #include <concepts>
-#include <functional>
-#include <tuple>
 #include <type_traits>
 
 namespace Ivy::M
@@ -230,7 +229,7 @@ template <typename Output, typename... Inputs> struct Function
     }
 
   private:
-    std::copyable_function<Output(Inputs...) const> m_Func;
+    stl::function<Output(Inputs...) const> m_Func;
 };
 
 } // namespace Ivy::M
