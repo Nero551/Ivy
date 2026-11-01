@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Concepts.hpp"
+#include "Math/MathTuple.hpp"
 #include <concepts>
 #include <functional>
 #include <tuple>
@@ -44,16 +45,7 @@ template <typename Output, typename... Inputs> struct Function
         return m_Func(inputs...);
     }
 
-    /**
-     * @brief Composes this function with another function, producing f(g(x)).
-     * @param g Function applied before this function.
-     * @return The composed function.
-     */
-    /**
-     * @brief Composes this function with one function per input.
-     * @param functions Functions applied before this function.
-     * @return The composed function.
-     */
+    /** @brief Composes this function with another function, producing f(g(x)). */
     template <typename... Middles>
     Function<Output, Middles...> Compose(const Function<Inputs, Middles...>&... functions) const
         requires(sizeof...(Inputs) > 0)
@@ -62,12 +54,27 @@ template <typename Output, typename... Inputs> struct Function
         { return f(functions(inputs...)...); };
     }
 
+    template <typename... Middles>
+    Function<Output, Middles...> Compose(const Function<MathTuple<Inputs...>, Middles...>& g) const
+        requires(sizeof...(Inputs) > 0)
+    {
+        return [f = *this, g](const Middles&... middles)
+        { return g(middles...).Apply([f](const Inputs... inputs) { return f(inputs...); }); };
+    }
+
     /** @brief Composes this function with another function, producing f(g(x)). */
     template <typename... Middles>
     Function<Output, Middles...> operator()(const Function<Inputs, Middles...>&... functions) const
         requires(sizeof...(Inputs) > 0)
     {
         return Compose(functions...);
+    }
+
+    template <typename... Middles>
+    Function<Output, Middles...> operator()(const Function<MathTuple<Inputs...>, Middles...>& g) const
+        requires(sizeof...(Inputs) > 0)
+    {
+        return Compose(g);
     }
 
     /** @brief Evaluates the function at the given input. */
