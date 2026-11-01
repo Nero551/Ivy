@@ -14,6 +14,7 @@
 #include "Math/Functions/Integration.hpp"
 #include "Math/Math.hpp"
 #include "Math/MathTuple.hpp"
+#include "Math/Matrix/Matrix.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
@@ -23,6 +24,7 @@
 #include "Physics/Units.hpp"
 #include "Utilities/Debug/Inspector.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/IsSpecialization.hpp"
 #include "Utilities/Track.hpp"
 #include <array>
 #include <cmath>
@@ -314,7 +316,10 @@ struct Shader
 //TODO: define VariableCount method to math objects (vector,quaternion,matrix,complex,math tuple,etc)
 // TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables.
 // this will be needed for partial derivatives specifically.
-//TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, IsMathTuple, etc
+//
+//TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, IsMathTuple, IsLinearEq, IsLinearSys etc
+// define them using the IsSpec family in Utilities/IsSpecialization.hpp
+//
 // TODO: prevent math tuples from being `input-able to Function.
 inline void Test() {}
 } // namespace Sketch

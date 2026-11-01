@@ -154,4 +154,21 @@ struct IsTvType<Template<Args...>> : std::true_type
 template <typename T>
 concept IsTv = IsTvType<std::remove_cvref_t<T>>::value;
 
+template <typename T, template <auto, auto, typename...> typename Template>
+struct IsVVTSpecialization : std::false_type
+{
+};
+
+template <template <auto, auto, typename...> typename Template, auto A, auto B, typename... Args>
+struct IsVVTSpecialization<Template<A, B, Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a non-type-then-non-type-then-type template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <auto, auto, typename...> typename Template>
+concept IsVVTSpec = IsVVTSpecialization<std::remove_cvref_t<T>, Template>::value;
+
 } // namespace Ivy::U

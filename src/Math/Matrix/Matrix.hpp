@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BasicMatrix.hpp"
+#include "Utilities/IsSpecialization.hpp"
 
 namespace Ivy::M
 {
