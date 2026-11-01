@@ -1,54 +1,15 @@
 #pragma once
+#include "Include.hpp"
 
-#include "AntiAliasing/MSAA.hpp"
-#include "Buffers/ArrayBuffer/ArrayBuffer.hpp"
-#include "Buffers/BufferBit.hpp"
-#include "Buffers/BufferTarget.hpp"
-#include "Buffers/BufferUsage.hpp"
-#include "Buffers/Framebuffer/FramebufferAttachment.hpp"
-#include "Buffers/Framebuffer/Framebuffer.hpp"
-#include "Buffers/Framebuffer/FramebufferTarget.hpp"
-#include "Buffers/IndexBuffer/IndexBuffer.hpp"
-#include "Buffers/Renderbuffer/Renderbuffer.hpp"
-#include "Buffers/Uniformbuffer/Uniformbuffer.hpp"
-#include "Buffers/VertexArray/VertexArray.hpp"
-#include "Capability.hpp"
-#include "Context.hpp"
-#include "DataType.hpp"
-#include "GLFWPlatform.hpp"
-#include "InputEnums/Action.hpp"
-#include "InputEnums/CursorMode.hpp"
-#include "InputEnums/Key.hpp"
-#include "InputEnums/MouseButton.hpp"
-#include "Material/Blend/BlendEquation.hpp"
-#include "Material/Blend/BlendFactor.hpp"
-#include "Material/Blend/Blend.hpp"
-#include "Material/Depth/DepthFunction.hpp"
-#include "Material/Depth/Depth.hpp"
-#include "Material/Material.hpp"
-#include "Material/Stencil/StencilAction.hpp"
-#include "Material/Stencil/StencilFunction.hpp"
-#include "Material/Stencil/Stencil.hpp"
-#include "Mesh/CullMode.hpp"
-#include "Mesh/FrontFace.hpp"
-#include "Mesh/Mesh.hpp"
-#include "Mesh/RenderMode.hpp"
-#include "Mesh/Topology.hpp"
-#include "Mesh/Vertex.hpp"
-#include "Namespace.hpp"
-#include "OpenGL.hpp"
-#include "OpenGLProfile.hpp"
-#include "Primitives/Primitives.hpp"
-#include "Shader/Shader.hpp"
-#include "Shader/ShaderSource.hpp"
-#include "Shader/ShaderStage.hpp"
-#include "Texture/Cubemap.hpp"
-#include "Texture/Texture2D.hpp"
-#include "Texture/Texture2DMultisample.hpp"
-#include "Texture/TextureFilter.hpp"
-#include "Texture/TextureFormat.hpp"
-#include "Texture/Texture.hpp"
-#include "Texture/TextureInternalFormat.hpp"
-#include "Texture/TextureTarget.hpp"
-#include "Texture/TextureWrap.hpp"
-#include "Window.hpp"
+/**
+ * @namespace Ivy::G
+ * @brief Graphics API for GPU resources and rendering operations.
+ * Currently only supports OpenGL.
+ *
+ * Contains abstractions for graphics resources such as textures, shaders,
+ * buffers, materials, meshes, and framebuffers.
+ */
+namespace Ivy::G
+{
+
+}

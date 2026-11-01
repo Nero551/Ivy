@@ -1,7 +1,13 @@
 #pragma once
+#include "Include.hpp"
 
-#include "DimensionalAnalysis/Dimensional.hpp"
-#include "DimensionalAnalysis/Dimensionals.hpp"
-#include "DimensionalAnalysis/Dimension.hpp"
-#include "Namespace.hpp"
-#include "Units.hpp"
+/**
+ * @namespace Ivy::P
+ * @brief A physics library for the Ivy game engine.
+ * Mainly contains:
+ * - Compile-time Dimensional Analysis
+ */
+namespace Ivy::P
+{
+
+}

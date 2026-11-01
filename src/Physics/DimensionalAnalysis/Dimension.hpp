@@ -4,6 +4,7 @@
 #include "Math/Concepts.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
+#include "Utilities/IsSpecialization.hpp"
 #include <concepts>
 #include <ostream>
 #include <type_traits>
@@ -18,16 +19,9 @@ concept SameNormalized = std::same_as<typename T::Normalized, typename D::Normal
 template <typename T, typename D> requires(IsDimensional<D>)
 struct Dimension;
 
-template <typename T> struct IsDimensionType : std::false_type
-{
-};
-
-template <typename T, typename D> struct IsDimensionType<Dimension<T, D>> : std::true_type
-{
-};
-
-template <typename F>
-concept IsDimension = IsDimensionType<std::remove_cvref_t<F>>::value;
+template <typename D>
+concept IsDimension = U::IsTSpec<D, Dimension>;
+;
 
 /**
  * @brief Associates a runtime value with a compile-time dimensional type.

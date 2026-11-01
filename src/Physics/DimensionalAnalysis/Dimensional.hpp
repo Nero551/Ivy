@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utilities/FixedString.hpp"
+#include "Utilities/IsSpecialization.hpp"
 namespace Ivy::P
 {
 
@@ -83,44 +84,15 @@ template <template <int> typename Derived, int Exp, int Ord> struct Dimensional
     using Flattenend = List<Derived<Exp>>;
 };
 
-template <typename T> struct IsDimensionalType : std::false_type
-{
-};
-template <template <int> typename Derived, int Exp> struct IsDimensionalType<Derived<Exp>> : std::true_type
-{
-};
-
-template <template <int> typename Derived, int Exp, int Ord>
-struct IsDimensionalType<Dimensional<Derived, Exp, Ord>> : std::true_type
-{
-};
-
-template <> struct IsDimensionalType<Dimensionless> : std::true_type
-{
-};
-
-template <typename A, typename B, U::FixedString N>
-struct IsDimensionalType<OperationDimensional<A, B, N>> : std::true_type
-{
-};
-
 template <typename T>
-concept IsDimensional = IsDimensionalType<T>::value;
+concept IsDimensional = U::IsTvVSpec<T, Dimensional> || U::IsDerivedTvVSpec<T, Dimensional> ||
+    U::IsTTVSpec<T, OperationDimensional> || U::IsSpec<T, Dimensionless>;
 
 template <typename A, typename B>
 concept DimensionalPair = IsDimensional<A> && IsDimensional<B>;
 
-template <typename T> struct IsOperationType : std::false_type
-{
-};
-
-template <typename A, typename B, U::FixedString Name>
-struct IsOperationType<OperationDimensional<A, B, Name>> : std::true_type
-{
-};
-
 template <typename T>
-concept IsOperation = IsOperationType<T>::value;
+concept IsOperation = U::IsTTVSpec<T, OperationDimensional>;
 
 template <typename A, int E> using Exponentiate = typename A::template WithExponent<E>;
 

@@ -1,28 +1,14 @@
 #pragma once
+#include "Include.hpp"
 
-#include "ECS/Component.hpp"
-#include "ECS/ComponentPool.hpp"
-#include "ECS/ComponentPoolQuery.hpp"
-#include "ECS/ECS.hpp"
-#include "ECS/Entity.hpp"
-#include "ECS/Events/ComponentAdded.hpp"
-#include "ECS/Events/ComponentRemoved.hpp"
-#include "ECS/Events/EntityCreated.hpp"
-#include "ECS/Events/EntityDestroyed.hpp"
-#include "ECS/Scene.hpp"
-#include "ECS/System.hpp"
-#include "Engine.hpp"
-#include "Module.hpp"
-#include "Namespace.hpp"
-#include "Service.hpp"
-#include "Services/EventBus/EventBus.hpp"
-#include "Services/EventBus/Event.hpp"
-#include "Services/ResourceManager/Resource.hpp"
-#include "Services/ResourceManager/ResourceManager.hpp"
-#include "SystemOwner.hpp"
-#include "TimeHandler.hpp"
-#include "World/Components.hpp"
-#include "World/Nodes.hpp"
-#include "World/Systems/Transform3DSystem.hpp"
-#include "World/Systems/Trarnsform2DSystem.hpp"
-#include "World/World.hpp"
+/**
+ * @namespace Ivy::C
+ * @brief Core engine systems and runtime infrastructure.
+ *
+ * Provides the engine, world, ECS, services, and other foundational systems
+ * used to manage application state and engine execution.
+ */
+namespace Ivy::C
+{
+
+}

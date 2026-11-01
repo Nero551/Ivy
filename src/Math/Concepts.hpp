@@ -52,5 +52,4 @@ template <typename T, typename O>
 using MultiplicationResult = decltype(std::declval<T>() * std::declval<O>());
 
 template <typename T, typename O> using DivisionResult = decltype(std::declval<T>() / std::declval<O>());
-
 } // namespace Ivy::M

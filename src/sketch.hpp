@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/ECS/Component.hpp"
+#include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Logarithms.hpp"
 #include "Math/Common/Trigonometry.hpp"
@@ -314,20 +315,6 @@ struct Shader
 // TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables.
 // this will be needed for partial derivatives specifically.
 //TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, IsMathTuple, etc
-// TODO: prevent math tuples from being input-able to Function.
-
-inline void Test()
-{
-    P::Dimension<float, P::Acceleration> g = -9.8;
-
-    P::Dimension<float, P::Mass<1>> m = 0.55;
-    P::Dimension<float, P::Length<1>> x = 2 * P::Units::Centimeter;
-    P::Dimension<float, P::OperationDimensional<P::Force, P::Length<-1>, "N/m">> k = (-m * g) / x;
-
-    P::Dimension<float, P::Joule> work = -1.0f / 2.0f * k * P::Pow<2>(x);
-    U::Log::Info(work);
-
-    M::ODE<float, float, float> eq = {
-        [](float t, float x, float y) { return M::ODE<float, float, float>::State{t, x * y, x / y}; }};
-}
+// TODO: prevent math tuples from being `input-able to Function.
+inline void Test() {}
 } // namespace Sketch

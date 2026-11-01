@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Concepts.hpp"
 #include "Math/MathTuple.hpp"
+#include "Utilities/IsSpecialization.hpp"
 #include "stl.hpp"
 #include <concepts>
 #include <type_traits>
@@ -9,18 +10,8 @@ namespace Ivy::M
 {
 
 template <typename Output, typename... Inputs> struct Function;
-
-template <typename T> struct IsFunctionType : std::false_type
-{
-};
-
-template <typename Output, typename... Inputs>
-struct IsFunctionType<Function<Output, Inputs...>> : std::true_type
-{
-};
-
 template <typename F>
-concept IsFunction = IsFunctionType<std::remove_cvref_t<F>>::value;
+concept IsFunction = U::IsTSpec<F, Function>;
 
 /** @brief Represents a mathematical function mapping an Input type to an Output type. */
 template <typename Output, typename... Inputs> struct Function

@@ -39,14 +39,14 @@ target("Ivy")
 
         local umbrella = import("scripts/generate-umbrellas")
 
-        umbrella.GenerateUmbrellaHeader("Core", "Core")
-        umbrella.GenerateUmbrellaHeader("Modules/Renderer", "Header")
-        umbrella.GenerateUmbrellaHeader("Modules/Input", "Header")
+        umbrella.GenerateUmbrellaHeader("Modules/Renderer", "Include")
+        umbrella.GenerateUmbrellaHeader("Modules/Input", "Include")
 
-        umbrella.GenerateUmbrellaHeader("Graphics", "Graphics")
-        umbrella.GenerateUmbrellaHeader("Math", "Math")
-        umbrella.GenerateUmbrellaHeader("Physics", "Physics")
-        umbrella.GenerateUmbrellaHeader("Utilities", "Utilities")
+        umbrella.GenerateUmbrellaHeader("Core", "Include")
+        umbrella.GenerateUmbrellaHeader("Graphics", "Include")
+        umbrella.GenerateUmbrellaHeader("Math", "Include")
+        umbrella.GenerateUmbrellaHeader("Physics", "Include")
+        umbrella.GenerateUmbrellaHeader("Utilities", "Include")
         umbrella.GenerateEngineUmbrella("Ivy")
     end)
 

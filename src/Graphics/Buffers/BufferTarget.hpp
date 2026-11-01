@@ -1,5 +1,5 @@
 #pragma once
-#include "OpenGL.hpp"
+#include "Graphics/OpenGL.hpp"
 
 namespace Ivy::G
 {

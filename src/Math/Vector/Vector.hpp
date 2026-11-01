@@ -20,7 +20,7 @@ namespace Ivy::M
  */
 template <unsigned int Components, Scalar T = float> struct Vector
 {
-    constexpr Vector() {}
+    constexpr Vector() = default;
     constexpr explicit Vector(float all)
     {
         m_Data.fill(all);

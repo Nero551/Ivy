@@ -1,21 +1,12 @@
 #pragma once
+#include "Include.hpp"
 
-#include "CheckedPtr.hpp"
-#include "Concepts.hpp"
-#include "DataStructures/GIndexPool.hpp"
-#include "DataStructures/IndexPool.hpp"
-#include "DataStructures/Indirect2DVector.hpp"
-#include "DataStructures/SparseSetAoS.hpp"
-#include "DataStructures/SparseSetSoA.hpp"
-#include "DataStructures/StringMap.hpp"
-#include "DataStructures/TypedVector.hpp"
-#include "DataStructures/TypeTree.hpp"
-#include "Debug/Inspector.hpp"
-#include "Debug/Log.hpp"
-#include "FileSystem.hpp"
-#include "FixedString.hpp"
-#include "Image.hpp"
-#include "Namespace.hpp"
-#include "Sort.hpp"
-#include "StringUtils.hpp"
-#include "Track.hpp"
+/**
+ * @namespace Ivy::U
+ * @brief Contains utility functions, helpers, and data structures for
+ * Ivy game engine.
+ */
+namespace Ivy::U
+{
+
+}
