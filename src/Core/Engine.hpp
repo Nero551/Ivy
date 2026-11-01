@@ -21,7 +21,7 @@ template <typename T>
 concept ServiceType = std::derived_from<T, Service>;
 
 /**
- * @brief Main Ivy engine and game loop. Manages the window, world, modules, and frame lifecycle.
+ * @brief Main Ivy engine and game loop. Manages the window, world, modules, ECS, and frame lifecycle.
  */
 struct Engine
 {
@@ -29,7 +29,7 @@ struct Engine
     World World{*this};
     EntityComponentSystem ECS{};
 
-    Engine() {}
+    Engine() = default;
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
     Engine(Engine&&) = delete;

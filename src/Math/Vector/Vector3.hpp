@@ -11,7 +11,7 @@
 namespace Ivy::M
 {
 /**
- * @brief 3D Ting-point vector.
+ * @brief 3D vector.
  *
  * Coordinate convention:
  * +X: right
@@ -85,7 +85,7 @@ template <Scalar T> struct Vector<3, T>
     /** @brief Returns the unit vector pointing forward along the Z axis. */
     static constexpr Vector Forward()
     {
-        return {0, 0, 1};
+        return {0, 0, -1};
     }
 
     /** @brief Constructs a zero vector. */

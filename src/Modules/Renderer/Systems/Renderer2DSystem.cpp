@@ -51,10 +51,10 @@ void Renderer2DSystem::Render()
         [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform2D& transform,
             CMP::Mesh& meshComponent)
         {
-            if (materialComponent.Material->Get().Shader->HotReload == true)
-            {
-                materialComponent.Material->Get().Shader->Delete();
-            }
+            // if (materialComponent.Material->Get().Shader->HotReload == true)
+            // {
+            //     materialComponent.Material->Get().Shader->Delete();
+            // }
 
             FillBatches(entityId, transform, materialComponent, meshComponent);
         });

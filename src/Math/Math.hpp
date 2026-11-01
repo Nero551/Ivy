@@ -26,6 +26,7 @@
 #include "Functions/Inverse.hpp"
 #include "Functions/Series.hpp"
 #include "Geometry/Basis.hpp"
+#include "MathTuple.hpp"
 #include "Matrix/BasicMatrix.hpp"
 #include "Matrix/Matrix2.hpp"
 #include "Matrix/Matrix3.hpp"

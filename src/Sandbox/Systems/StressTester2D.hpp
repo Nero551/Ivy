@@ -71,26 +71,26 @@ struct StressTester2D : C::System
             }
         }
     }
-    // void FourDimensionalProjection(int increase)
-    // {
-    //     points.reserve(M::Pow(360.0f / increase, 3));
-    //     U::Log::Info(M::Pow(360.0f / increase, 3));
-    //     m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3));
-    //     for (int theta = -180; theta < 180; theta += increase)
-    //     {
-    //         for (int phi = -180; phi < 180; phi += increase)
-    //         {
-    //             for (int h = -180; h < 180; h += increase)
-    //             {
-    //                 M::Vector<4> v4 = M::Vector<4>::FromHyperSpherical(
-    //                     M::HyperSpherical(M::Rad(theta), M::Rad(phi), M::Rad(h)));
-    //                 M::Vector<3> proj = v4.StereoProject();
-    //                 auto& point = Plot(proj);
-    //                 points.emplace_back(point.GetId());
-    //             }
-    //         }
-    //     }
-    // }
+    void FourDimensionalProjection(int increase)
+    {
+        points.reserve(M::Pow(360.0f / increase, 3));
+        U::Log::Info(M::Pow(360.0f / increase, 3));
+        m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3));
+        for (int theta = -180; theta < 180; theta += increase)
+        {
+            for (int phi = -180; phi < 180; phi += increase)
+            {
+                for (int h = -180; h < 180; h += increase)
+                {
+                    M::Vector<4> v4 = M::Vector<4>::FromHyperSpherical(
+                        M::HyperSpherical(M::Rad(theta), M::Rad(phi), M::Rad(h)));
+                    M::Vector<3> proj = v4.StereoProject();
+                    auto& point = Plot({proj.x, proj.y});
+                    points.emplace_back(point.GetId());
+                }
+            }
+        }
+    }
 
     C::Entity& CreatePoint(M::Vector<4> col)
     {

@@ -2,6 +2,7 @@
 
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include <concepts>
 #include <utility>
 #include <vector>
 
@@ -80,12 +81,12 @@ struct Entity
     template <typename F> requires std::invocable<F&, unsigned int>
     void ForEachDescendant(F&& callback)
     {
-        ForEachChild(
-            [&](const unsigned int childId)
-            {
-                callback(childId);
-                GetChild(childId).ForEachDescendant(callback);
-            });
+
+        for (const unsigned int childId : m_Children)
+        {
+            callback(childId);
+            GetChild(childId).ForEachDescendant(callback);
+        }
     }
 
     /** @brief Returns whether the specified entity is a descendant. */

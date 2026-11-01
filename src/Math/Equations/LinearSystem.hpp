@@ -4,6 +4,7 @@
 #include "Math/Matrix/Matrix.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
+#include <optional>
 
 namespace Ivy::M
 {
@@ -16,23 +17,19 @@ enum class SolutionType
     None
 };
 
-/** @brief Represents the result of solving a linear system. */
 template <unsigned int Variables, Scalar T = float> requires(Variables != 0)
 struct LinearSolution
 {
-    /** @brief Creates a linear solution containing a unique solution vector. */
     constexpr LinearSolution(const SolutionType type, const Vector<Variables, T>& sol)
         : m_Solution(sol), m_Type(type)
     {
     }
 
-    /** @brief Creates a linear solution containing an infinite solution set. */
     constexpr LinearSolution(const SolutionType type, const Set<Vector<Variables, T>>& solSet)
         : m_SolutionSet(solSet), m_Type(type)
     {
     }
 
-    /** @brief Writes a description of the solution to a stream. */
     friend std::ostream& operator<<(std::ostream& os, const LinearSolution& solution)
     {
         switch (solution.m_Type)
@@ -50,46 +47,39 @@ struct LinearSolution
         return os;
     }
 
-    /** @brief Returns whether the system has a unique solution. */
     constexpr bool IsUnique() const
     {
         return m_Type == SolutionType::Unique;
     }
 
-    /** @brief Returns whether the system has infinitely many solutions. */
     constexpr bool IsInfinite() const
     {
         return m_Type == SolutionType::Infinite;
     }
 
-    /** @brief Returns whether the system has no solution. */
     constexpr bool IsNone() const
     {
         return m_Type == SolutionType::None;
     }
 
-    /** @brief Returns the unique solution vector. */
     constexpr Vector<Variables, T>& GetSolution()
     {
         U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
         return m_Solution.value();
     }
 
-    /** @brief Returns the unique solution vector. */
     constexpr const Vector<Variables, T>& GetSolution() const
     {
         U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
         return m_Solution.value();
     }
 
-    /** @brief Returns the set of all solutions. */
     constexpr Set<Vector<Variables, T>>& GetSolutionSet()
     {
         U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
         return m_SolutionSet.value();
     }
 
-    /** @brief Returns the set of all solutions. */
     constexpr const Set<Vector<Variables, T>>& GetSolutionSet() const
     {
         U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");

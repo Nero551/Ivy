@@ -10,16 +10,7 @@
 
 namespace Ivy::M
 {
-/**
- * @brief 4D Ting-point vector.
- *
- * Stores four Ting-point components: x, y, z, and w.
- *
- * Vector operations are component-wise unless otherwise specified.
- *
- * Vector4 can be used as a general 4D mathematical vector or as a
- * homogeneous coordinate when used with Matrix4 transformations.
- */
+/** @brief 4D vector. */
 template <Scalar T> struct Vector<4, T>
 {
     T x = 0;

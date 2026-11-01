@@ -6,7 +6,7 @@ namespace Ivy::G
 {
 
 /** @brief Specifies an OpenGL rendering capability. */
-enum class Capability : GLenum
+enum class Capability
 {
     DepthTest = GL_DEPTH_TEST,
     StencilTest = GL_STENCIL_TEST,

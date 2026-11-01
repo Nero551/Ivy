@@ -1,6 +1,10 @@
 #include "Core/Engine.hpp"
 #include "Graphics/Context.hpp"
+#include "Math/Matrix/Matrix.hpp"
+#include "Math/Vector/Vector.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "sketch.hpp"
+#include "tracy/Tracy.hpp"
 #include <string_view>
 
 int main(const int argc, char* argv[])
@@ -11,6 +15,7 @@ int main(const int argc, char* argv[])
 
         if (argument == "--vulkan")
         {
+
             //? This is where u can add custom features for command line args
             //? ex: "Ivy --renderer vulkan"
         }

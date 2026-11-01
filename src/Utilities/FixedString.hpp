@@ -7,7 +7,7 @@ namespace Ivy::U
 {
 
 /**
- * @brief A structural compile-time string usable as a non-type template parameter.
+ * @brief A compile-time string usable as a non-type template parameter.
  * @tparam N Number of characters including the null terminator.
  */
 template <std::size_t N> struct FixedString

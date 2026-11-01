@@ -46,7 +46,7 @@ struct VectorFields : C::System
         m_Material->Get().Color = {1, 1, 1, 1};
     }
 
-    void Pendulum()
+    void PendulumModel()
     {
         constexpr float thetaMin = -25.0f;
         constexpr float thetaMax = 25;
@@ -73,27 +73,27 @@ struct VectorFields : C::System
 
         std::vector<float> magnitudes{};
 
-        // equation.Solve(
-        //     {
-        //         0, {M::Rad(0), 4}
-        // },
-        //     100, 0.0005,
-        //     [&](const Equation::State& state)
-        //     {
-        //         // Create one arrow for this grid point.
-        //         const auto& arrow = Arrow();
-        //         StateVector derivative = equation.Derivative(state);
+        equation.Solve(
+            {
+                0, {M::Rad(-720), 10}
+        },
+            100, 0.0005,
+            [&](const Equation::State& state)
+            {
+                // Create one arrow for this grid point.
+                const auto& arrow = Arrow();
+                StateVector derivative = equation.Derivative(state);
 
-        //         CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
 
-        //         transform.Position = state.y;
-        //         transform.Scale = M::Vector<2>{0.03125, 0.015625};
-        //         transform.Rotation = derivative.Angle();
+                transform.Position = state.y * 2;
+                transform.Scale = M::Vector<2>{0.03125, 0.015625};
+                transform.Rotation = derivative.Angle();
 
-        //         magnitudes.push_back(derivative.Length());
+                magnitudes.push_back(derivative.Length());
 
-        //         m_Engine.World.GetRoot().AttachChild(arrow.GetId());
-        //     });
+                m_Engine.World.GetRoot().AttachChild(arrow.GetId());
+            });
 
         for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
         {
@@ -181,6 +181,85 @@ struct VectorFields : C::System
                 float dp = eq.Derivative({t, p});
                 const M::Vector<2> pos = {t, p};
                 const M::Vector<2> target = {1, dp};
+
+                auto& arrow = Arrow();
+
+                magnitudes.push_back(target.Length());
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                m_Engine.World.GetRoot().AttachChild(arrow);
+            }
+        }
+
+        G::ArrayBuffer buffer{};
+
+        buffer.SetData(magnitudes);
+        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+    }
+
+    void SpringModel()
+    {
+        const float k = 0.8;
+        const float m = 1;
+
+        M::ODE<float, M::Vector<2>> eq{
+            [m, k](const auto& state) { return M::Vector<2>{state.y.y, -k * state.y.x / m}; }};
+
+        std::vector<float> magnitudes{};
+        for (float v = -25; v <= 25; v += 0.5)
+        {
+            for (float x = -25; x < 25; x += 0.5)
+            {
+                float dv = eq.Derivative({
+                                             0, {x, v}
+                })
+                               .y;
+                const M::Vector<2> pos = {x, v};
+                const M::Vector<2> target = {v, dv};
+
+                auto& arrow = Arrow();
+
+                magnitudes.push_back(target.Length());
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Position = pos;
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Scale = {0.5, 0.25};
+                m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow).Rotation = target.Angle();
+
+                m_Engine.World.GetRoot().AttachChild(arrow);
+            }
+        }
+
+        G::ArrayBuffer buffer{};
+
+        buffer.SetData(magnitudes);
+        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+    }
+
+    void DampenedSpringModel()
+    {
+        const float k = 0.8;
+        const float m = 1;
+        const float b = 0.5;
+
+        M::ODE<float, M::Vector<2>> eq{[m, k, b](const auto& state)
+            { return M::Vector<2>{state.y.y, -k * state.y.x / m + -b * state.y.y / m}; }};
+
+        std::vector<float> magnitudes{};
+        for (float v = -25; v <= 25; v += 0.5)
+        {
+            for (float x = -25; x < 25; x += 0.5)
+            {
+                float dv = eq.Derivative({
+                                             0, {x, v}
+                })
+                               .y;
+                const M::Vector<2> pos = {x, v};
+                const M::Vector<2> target = {v, dv};
 
                 auto& arrow = Arrow();
 

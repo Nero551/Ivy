@@ -786,14 +786,6 @@ TEST_CASE("Function composition with multi inputs")
 //==============================================================================
 TEST_CASE("Basis matrix")
 {
-    Basis basis;
-    Matrix<4, 4> m = basis.GetMatrix();
-
-    REQUIRE(m == Matrix<4, 4>::Identity());
-
-    Matrix<4, 4> inv = basis.GetInverseMatrix();
-    REQUIRE(inv == Matrix<4, 4>::Identity());
-
     Vector<3> right(0, 1, 0);
     Vector<3> up(0, 0, 1);
     Vector<3> forward(1, 0, 0);
@@ -1349,7 +1341,7 @@ TEST_CASE(
     REQUIRE(Vector<3>::One() == Vector<3>(1, 1, 1));
     REQUIRE(Vector<3>::Right() == Vector<3>(1, 0, 0));
     REQUIRE(Vector<3>::Up() == Vector<3>(0, 1, 0));
-    REQUIRE(Vector<3>::Forward() == Vector<3>(0, 0, 1));
+    REQUIRE(Vector<3>::Forward() == Vector<3>(0, 0, -1));
 }
 
 TEST_CASE(

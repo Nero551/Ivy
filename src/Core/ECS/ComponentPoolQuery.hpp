@@ -92,6 +92,7 @@ struct ComponentPoolQuery
 
             for (unsigned int entityId : cache.Entities)
             {
+
                 callback(entityId, firstPool[entityId], (std::get<ComponentPool<Rest>&>(pools)[entityId])...);
             }
 

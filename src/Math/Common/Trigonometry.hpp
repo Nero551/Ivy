@@ -5,12 +5,12 @@ namespace Ivy::M
 {
 constexpr float Rad(const float deg)
 {
-    return deg * PI / 180;
+    return deg * PI / 180.0f;
 }
 
 constexpr float Deg(const float rad)
 {
-    return rad * 180 / PI;
+    return rad * 180.0f / PI;
 }
 
 constexpr float DSin(const float deg)

@@ -27,9 +27,12 @@
 #include <concepts>
 #include <cstdlib>
 #include <dlfcn.h>
+#include <functional>
 #include <ios>
 #include <ostream>
 #include <string>
+#include <tuple>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -57,9 +60,6 @@ namespace Sketch
 
 //TODO: all this time i been thinking how to make cpu side easier to use and more optimized & automatic, even for graphics.
 //TODO: i should be thinking about how to make cpu -> gpu pipeline easier to MODIFY and use. not make gpu/shaders as automatic as possible.
-
-//TODO: add NumberOfDimensions method to all math types, actually sizeof() / sizeof(T) will give me the number of dimensions
-// ex: sizeof(Vector<4>) / sizeof(float) = 4
 
 using namespace Ivy;
 
@@ -242,6 +242,85 @@ template <M::Scalar In, typename Out> Out Summation(const M::Function<Out, In>& 
     return result;
 };
 
+template <M::Scalar In, typename Out> Out Product(const M::Function<Out, In>& f, In start, In end)
+{
+    Out result{};
+    for (In i = start; i <= end; ++i)
+    {
+        result *= f(i);
+    }
+    return result;
+};
+
+enum class GPUBackend
+{
+    OpenGL,
+    Vulkan,
+    DX12,
+};
+
+struct OpenGLBuffer
+{
+    int GL;
+};
+struct VulkanBuffer
+{
+    int Vulk;
+};
+
+struct NoBEImpl
+{
+    int NO_BACKEND_FOR_THIS;
+};
+
+template <GPUBackend BE, typename GL = NoBEImpl, typename VK = NoBEImpl, typename DX12 = NoBEImpl>
+using SelectBE = std::conditional_t<BE == GPUBackend::OpenGL, GL,
+    std::conditional_t<BE == GPUBackend::Vulkan, VK,
+        std::conditional_t<BE == GPUBackend::DX12, DX12, NoBEImpl>>>;
+
+static constexpr GPUBackend Backend = GPUBackend::DX12;
+
+struct Buffer : SelectBE<Backend, OpenGLBuffer, VulkanBuffer>
+{
+};
+
+// TODO: another idea could be to have free functions for each of openGL and vulkan, etc. structs (buffer) just selects based on backend.
+// and have my own custom api layer than unifies openGL and vulkan under custom api interface, convert vulkan and openGL to this api.
+
+void DoVulkan(unsigned int id) {}
+void DoOpenGL(unsigned int id) {}
+
+struct Shader
+{
+    unsigned int id = 0;
+    Shader()
+    {
+        switch (Backend)
+        {
+        case GPUBackend::OpenGL:
+            DoOpenGL(id);
+            break;
+        case GPUBackend::Vulkan:
+            DoVulkan(id);
+            break;
+        case GPUBackend::DX12:
+            break;
+        }
+    }
+};
+
+//TODO: define NumberOfDimensions method to math objects (vector,quaternion,matrix,complex)
+//TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, etc
+//
+//? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//? !!!!!! UTMOST PRIORITY !!!!!!!
+//? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//TODO: make custom MathTuple. it will be a tuple that will allow for mathematical operations.
+//TODO: able to represent multi-variable output, storage & input effectively.
+//TODO: use std::tuples to make Function able to return multiple outputs.
+//TODO: use tuple on ODE.
+//
+
 inline void Test()
 {
     P::Dimension<float, P::Acceleration> g = -9.8;
@@ -251,8 +330,6 @@ inline void Test()
     P::Dimension<float, P::OperationDimensional<P::Force, P::Length<-1>, "N/m">> k = (-m * g) / x;
 
     P::Dimension<float, P::Joule> work = -1.0f / 2.0f * k * P::Pow<2>(x);
-
-    U::Log::Info(k);
     U::Log::Info(work);
 }
 } // namespace Sketch

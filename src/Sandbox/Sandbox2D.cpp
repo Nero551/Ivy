@@ -8,6 +8,7 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Common/Random.hpp"
+#include "Math/Common/Trigonometry.hpp"
 #include "Math/Equations/ODE.hpp"
 #include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"
@@ -87,22 +88,22 @@ void Sandbox2D::Start()
 
     AddSystem<Controller2D>();
     AddSystem<StressTester2D>();
-    // GetSystem<StressTester2D>().ThreeDimensionalProjection(5);
+    // GetSystem<StressTester2D>().FourDimensionalProjection(3);
 
-    AddSystem<VectorFields>();
-    GetSystem<VectorFields>().Start();
+    // AddSystem<VectorFields>();
+    // GetSystem<VectorFields>().Start();
 
-    // GetSystem<VectorFields>().Pendulum();
+    // GetSystem<VectorFields>().PendulumModel();
     particleId = CreateSquare();
 }
 
 struct Particle
 {
     M::Vector<2> Position;
-    M::Vector<2> Velocity{100, 0};
+    M::Vector<2> Velocity{5, 0};
     M::Vector<2> Acceleration;
     M::Vector<2> Force;
-    float Mass = 2;
+    float Mass = 1;
 };
 
 static Particle p;
@@ -117,7 +118,7 @@ void Sandbox2D::FixedUpdate(double fdt)
     }
     GetSystem<Controller2D>().Update(fdt);
 
-    auto& plotter = GetSystem<StressTester2D>();
+    // auto& plotter = GetSystem<StressTester2D>();
     // plotter.Plot({p.Position.x, p.Force.x}, {0, 0, 1, 1});
     // plotter.Plot({p.Force.x, p.Position.x}, {0, 1, 1, 1});
 
@@ -152,7 +153,7 @@ void Sandbox2D::FixedUpdate(double fdt)
         f.x += speed;
     }
 
-    M::Vector<2> dampening = -0.1 * p.Velocity;
+    M::Vector<2> dampening = -0.4 * p.Velocity;
     p.Force = f * p.Mass + -0.5 * p.Position + dampening;
     p.Acceleration = p.Force / p.Mass;
     p.Velocity += p.Acceleration * fdt;

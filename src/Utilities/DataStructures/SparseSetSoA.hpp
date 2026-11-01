@@ -230,7 +230,7 @@ struct SparseSetSoA
 
         m_Dense.pop_back();
         m_Indices.pop_back();
-        m_Sparse[index] = InvalidSparseIndex;
+        m_Sparse[index] = InvalidDenseIndex;
 
         return true;
     }

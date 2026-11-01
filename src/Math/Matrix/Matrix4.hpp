@@ -9,7 +9,7 @@ namespace Ivy::M
 {
 
 /**
- * @brief 4Mx4 matrix.
+ * @brief 4x4 matrix.
  *
  * Matrix convention:
  * - Storage: column-major.

@@ -4,17 +4,11 @@
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Capability.hpp"
 #include "OpenGL.hpp"
-// #include <glslang/Public/ShaderLang.h>
+#include <type_traits>
 
 /** @brief Handles initialization, modification and termination of the graphics state */
 namespace Ivy::G::Context
 {
-
-enum class GPUBackend
-{
-    OpenGL,
-    Vulkan
-};
 
 inline double GetTime()
 {

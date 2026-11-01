@@ -11,15 +11,7 @@
 
 namespace Ivy::M
 {
-/**
- * @brief 2D floating-point vector.
- *
- * Components:
- * - x: horizontal component.
- * - y: vertical component.
- *
- * Vectors are treated as column vectors when used with matrices.
- */
+/** @brief 2D vector. */
 template <Scalar T> struct Vector<2, T>
 {
     T x = 0;
