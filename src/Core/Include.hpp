@@ -6,6 +6,7 @@
 #include "ECS/ComponentPoolQuery.hpp"
 #include "ECS/ECS.hpp"
 #include "ECS/Entity.hpp"
+#include "ECS/EntityID.hpp"
 #include "ECS/Events/ComponentAdded.hpp"
 #include "ECS/Events/ComponentRemoved.hpp"
 #include "ECS/Events/EntityCreated.hpp"

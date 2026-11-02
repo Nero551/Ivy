@@ -1,9 +1,11 @@
 #pragma once
 #include "Core/ECS/ComponentPoolQuery.hpp"
 #include "Core/ECS/Entity.hpp"
+#include "Core/ECS/EntityID.hpp"
 #include "Core/ECS/Events/EntityCreated.hpp"
 #include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <concepts>
@@ -52,7 +54,7 @@ struct EntityComponentSystem
      *
      * @param id ID of the entity to remove.
      */
-    void RemoveEntity(unsigned int id)
+    void RemoveEntity(EntityID id)
     {
         auto entity = TryFindEntity(id);
         if (!entity)
@@ -68,13 +70,13 @@ struct EntityComponentSystem
 
         EntityDestroyed.EntityId = id;
         EntityDestroyed.Fire();
-        m_Entities.Erase(id);
+        m_Entities.Erase(id.Index);
 
         for (auto& descendant : descendants)
         {
             EntityDestroyed.EntityId = descendant->GetId();
             EntityDestroyed.Fire();
-            m_Entities.Erase(descendant->GetId());
+            m_Entities.Erase(descendant->GetId().Index);
         }
     }
 
@@ -102,7 +104,12 @@ struct EntityComponentSystem
      *
      * @note No explicit existence check is performed.
      */
-    Entity& GetEntity(unsigned int id)
+    Entity& GetEntity(EntityID id)
+    {
+        return m_Entities[id.Index];
+    }
+
+    Entity& GetActiveEntity(unsigned int id)
     {
         return m_Entities[id];
     }
@@ -119,12 +126,12 @@ struct EntityComponentSystem
      */
     template <typename T> Entity& CreateEntity() requires std::derived_from<T, Entity>
     {
-        const unsigned int id = ++m_nextId;
+        const EntityID id = m_Ids.Acquire();
         T entity{*this};
         entity.m_Id = id;
         entity.Initialize();
 
-        auto it = m_Entities.Emplace(id, std::move(entity));
+        auto it = m_Entities.Emplace(id.Index, std::move(entity));
         EntityCreated.EntityId = id;
         EntityCreated.Fire();
 
@@ -142,7 +149,16 @@ struct EntityComponentSystem
      *
      * @note This function does not return if the entity does not exist.
      */
-    Entity& FindEntity(unsigned int id)
+    Entity& FindEntity(EntityID id)
+    {
+        if (!m_Ids.IsAcquired(id))
+        {
+            U::Log::Fatal("Entity Not Found: ", id);
+        }
+        return m_Entities[id.Index];
+    }
+
+    Entity& FindActiveEntity(unsigned int id)
     {
         if (!m_Entities.Contains(id))
         {
@@ -157,13 +173,22 @@ struct EntityComponentSystem
      * @param id ID of the entity to find.
      * @return CheckedPtr to the entity, or nullptr if it does not exist.
      */
-    U::CheckedPtr<Entity> TryFindEntity(unsigned int id)
+    U::CheckedPtr<Entity> TryFindEntity(EntityID id)
+    {
+        if (!m_Ids.IsAcquired(id))
+        {
+            return nullptr;
+        }
+        return &m_Entities[id.Index];
+    }
+
+    U::CheckedPtr<Entity> TryFindActiveEntity(unsigned int id)
     {
         if (!m_Entities.Contains(id))
         {
             return nullptr;
         }
-        return &m_Entities.At(id);
+        return &m_Entities[id];
     }
 
     /**
@@ -178,8 +203,6 @@ struct EntityComponentSystem
   private:
     /** @brief Storage for entities, indexed by their unique IDs. */
     U::SparseSetSoA<Entity> m_Entities{};
-
-    /** @brief Counter used to generate unique entity IDs. */
-    unsigned int m_nextId = 0;
+    U::GIndexPool<> m_Ids{};
 };
 } // namespace Ivy::C

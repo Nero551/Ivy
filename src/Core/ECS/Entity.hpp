@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Core/ECS/EntityID.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <concepts>
 #include <utility>
@@ -28,10 +30,10 @@ struct Entity
     }
 
     /** @brief Returns the entity's unique ID. */
-    unsigned int GetId() const;
+    EntityID GetId() const;
 
     /** @brief Destroys a direct child by ID. */
-    void DestroyChild(unsigned int id);
+    void DestroyChild(EntityID id);
 
     /**
      * @brief Attaches an entity as a direct child.
@@ -39,21 +41,21 @@ struct Entity
      */
     void AttachChild(Entity& child);
 
-    void AttachChild(const unsigned int id);
+    void AttachChild(const EntityID id);
 
     /** @brief Detaches a direct child by ID. */
-    void DetachChild(unsigned int id);
+    void DetachChild(EntityID id);
 
-    Entity& GetChild(const unsigned int id);
+    Entity& GetChild(const EntityID id);
 
     /** @brief Returns a direct child by ID. */
-    Entity& FindChild(unsigned int id);
+    Entity& FindChild(EntityID id);
 
     /** @brief Returns a direct child by ID, or null if it does not exist. */
-    U::CheckedPtr<Entity> TryFindChild(unsigned int id);
+    U::CheckedPtr<Entity> TryFindChild(EntityID id);
 
     /** @brief Returns whether the entity has the specified direct child. */
-    bool HasChild(unsigned int id) const;
+    bool HasChild(EntityID id) const;
 
     /** @brief Returns the number of direct children. */
     size_t ChildCount() const;
@@ -62,10 +64,10 @@ struct Entity
     std::vector<U::CheckedPtr<Entity>> GetChildren();
 
     /** @brief Calls a callback for every direct child ID. */
-    template <typename F> requires std::invocable<F&, unsigned int>
+    template <typename F> requires std::invocable<F&, EntityID>
     void ForEachChild(F&& callback)
     {
-        for (const unsigned int id : m_Children)
+        for (const EntityID id : m_Children)
         {
             callback(id);
         }
@@ -78,11 +80,11 @@ struct Entity
     std::vector<U::CheckedPtr<Entity>> GetDescendants();
 
     /** @brief Calls a callback for every descendant ID. */
-    template <typename F> requires std::invocable<F&, unsigned int>
+    template <typename F> requires std::invocable<F&, EntityID>
     void ForEachDescendant(F&& callback)
     {
 
-        for (const unsigned int childId : m_Children)
+        for (const EntityID childId : m_Children)
         {
             callback(childId);
             GetChild(childId).ForEachDescendant(callback);
@@ -90,10 +92,10 @@ struct Entity
     }
 
     /** @brief Returns whether the specified entity is a descendant. */
-    bool HasDescendant(unsigned int id) const;
+    bool HasDescendant(EntityID id) const;
 
     /** @brief Returns whether this entity is a descendant of the specified entity. */
-    bool IsDescendantOf(unsigned int id) const;
+    bool IsDescendantOf(EntityID id) const;
 
     /** @brief Returns all ancestors from the parent to the root. */
     std::vector<U::CheckedPtr<Entity>> GetAncestors() const;
@@ -112,10 +114,10 @@ struct Entity
     }
 
     /** @brief Returns whether the specified entity is an ancestor. */
-    bool IsAncestorOf(unsigned int entityId) const;
+    bool IsAncestorOf(EntityID entityId) const;
 
     /** @brief Returns whether the entity has the specified ancestor. */
-    bool HasAncestor(unsigned int id) const;
+    bool HasAncestor(EntityID id) const;
 
     /** @brief Returns the entity's parent, or null if it has none. */
     U::CheckedPtr<Entity> TryFindParent() const;
@@ -126,7 +128,7 @@ struct Entity
     /** @brief Sets the entity's parent. */
     void SetParent(Entity& parent);
 
-    void SetParent(unsigned int parent);
+    void SetParent(EntityID parent);
 
     /** @brief Removes the entity from its current parent. */
     void ClearParent();
@@ -149,9 +151,9 @@ struct Entity
   private:
     void RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity);
 
-    U::SparseSetSoA<unsigned int> m_Children{};
-    unsigned int m_Id = 0;
-    unsigned int m_Parent = 0;
+    U::SparseSetSoA<EntityID> m_Children{};
+    EntityID m_Id{0, 0};
+    EntityID m_Parent{0, 0};
 
     friend struct EntityComponentSystem;
 };

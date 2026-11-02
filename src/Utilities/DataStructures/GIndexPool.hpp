@@ -25,7 +25,6 @@ struct GIndexPool
         GenType Generation = 0;
 
         Handle() = default;
-
         Handle(IndexType index, GenType gen) : Index(index), Generation(gen) {}
 
         bool operator==(const Handle& other) const

@@ -93,7 +93,8 @@ struct ComponentPoolQuery
             for (unsigned int entityId : cache.Entities)
             {
 
-                callback(entityId, firstPool[entityId], (std::get<ComponentPool<Rest>&>(pools)[entityId])...);
+                callback(entityId, firstPool.m_Components[entityId],
+                    (std::get<ComponentPool<Rest>&>(pools).m_Components[entityId])...);
             }
 
             return;
@@ -105,14 +106,15 @@ struct ComponentPoolQuery
 
         for (auto [entityId, firstComponent] : firstPool)
         {
-            if (!((std::get<ComponentPool<Rest>&>(pools).HasId(entityId)) && ...))
+            if (!((std::get<ComponentPool<Rest>&>(pools).m_Components.Contains(entityId)) && ...))
             {
                 continue;
             }
 
             cache.Entities.push_back(entityId);
 
-            callback(entityId, firstComponent, std::get<ComponentPool<Rest>&>(pools)[entityId]...);
+            callback(
+                entityId, firstComponent, std::get<ComponentPool<Rest>&>(pools).m_Components[entityId]...);
         }
 
         cache.Version = m_QueryVersion;

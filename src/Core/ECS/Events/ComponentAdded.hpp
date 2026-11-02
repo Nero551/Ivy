@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/ECS/EntityID.hpp"
 #include "Core/Services/EventBus/Event.hpp"
 
 namespace Ivy::C
@@ -6,8 +7,8 @@ namespace Ivy::C
 struct ComponentAdded : Event<ComponentAdded>
 {
     using Event::Event;
-    unsigned int EntityId;
+    EntityID EntityId;
 
-    ComponentAdded(const unsigned int entityId) : EntityId(entityId) {}
+    ComponentAdded(const EntityID entityId) : EntityId(entityId) {}
 };
 } // namespace Ivy::C

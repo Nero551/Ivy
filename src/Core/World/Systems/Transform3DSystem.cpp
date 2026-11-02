@@ -13,7 +13,7 @@ void Transform3DSystem::Update(double fdt)
     auto& transformPool = query.Pool<CMP::Transform3D>();
 
     world.GetRoot().ForEachDescendant(
-        [&](const unsigned int entityId)
+        [&](const EntityID entityId)
         {
             auto& entity = ecs.GetEntity(entityId);
 

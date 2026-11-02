@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/ECS/Entity.hpp"
+#include "Core/ECS/EntityID.hpp"
 #include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
@@ -137,6 +138,6 @@ struct StressTester2D : C::System
 
   private:
     float multiplier = 1;
-    std::vector<unsigned int> points;
+    std::vector<C::EntityID> points;
 };
 } // namespace Ivy::Sandbox

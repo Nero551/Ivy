@@ -25,7 +25,7 @@
 namespace Ivy::Sandbox
 {
 
-unsigned int Sandbox2D::CreateCircle()
+C::EntityID Sandbox2D::CreateCircle()
 {
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
@@ -50,7 +50,7 @@ unsigned int Sandbox2D::CreateCircle()
     return circle.GetId();
 }
 
-unsigned int Sandbox2D::CreateSquare()
+C::EntityID Sandbox2D::CreateSquare()
 {
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
@@ -75,7 +75,7 @@ unsigned int Sandbox2D::CreateSquare()
     return square.GetId();
 }
 
-static int particleId;
+static C::EntityID particleId;
 void Sandbox2D::Start()
 {
 

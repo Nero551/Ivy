@@ -2,6 +2,7 @@
 
 #include "Components/BodyComponent.hpp"
 #include "Core/ECS/Entity.hpp"
+#include "Core/ECS/EntityID.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
@@ -60,7 +61,7 @@ void Physics::Plot(const M::Vector<3> vec3, const M::Vector<4> col)
     }
 }
 
-static unsigned int cubeId = 0;
+static C::EntityID cubeId{};
 
 void Physics::Start()
 {

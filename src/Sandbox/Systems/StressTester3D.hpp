@@ -62,7 +62,7 @@ struct StressTester3D : C::System
 
   private:
     float multiplier = 1;
-    std::vector<unsigned int> points;
+    std::vector<C::EntityID> points;
 
     void TwoDimensionalProjection(int increase)
     {

@@ -13,7 +13,7 @@ void Transform2DSystem::Update(double dt)
     auto& transformPool = query.Pool<CMP::Transform2D>();
 
     world.GetRoot().ForEachDescendant(
-        [&](const unsigned int entityId)
+        [&](const EntityID entityId)
         {
             auto& entity = ecs.GetEntity(entityId);
 

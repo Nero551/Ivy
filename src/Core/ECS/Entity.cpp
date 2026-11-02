@@ -1,5 +1,6 @@
 #include "Entity.hpp"
 #include "Core/ECS/ECS.hpp"
+#include "Core/ECS/EntityID.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstddef>
@@ -12,11 +13,11 @@
 
 namespace Ivy::C
 {
-unsigned int Entity::GetId() const
+EntityID Entity::GetId() const
 {
     return m_Id;
 }
-void Entity::DestroyChild(const unsigned int id)
+void Entity::DestroyChild(const EntityID id)
 {
     if (!HasChild(id))
     {
@@ -31,7 +32,7 @@ void Entity::AttachChild(Entity& child)
 {
     if (HasChild(child.m_Id))
     {
-        U::Log::Error("Child Entity already exists: " + std::to_string(child.m_Id));
+        U::Log::Error("Child Entity already exists: " + std::to_string(child.m_Id.Index));
         return;
     }
 
@@ -58,51 +59,52 @@ void Entity::AttachChild(Entity& child)
         child.ClearParent();
     }
 
-    m_Children.Emplace(child.m_Id, child.m_Id);
+    m_Children.Emplace(child.m_Id.Index, child.m_Id);
     child.m_Parent = m_Id;
 }
 
-void Entity::AttachChild(const unsigned int id)
+void Entity::AttachChild(const EntityID id)
 {
     AttachChild(m_ECS.FindEntity(id));
 }
 
-void Entity::DetachChild(const unsigned int id)
+void Entity::DetachChild(const EntityID id)
 {
-    if (m_Children.Erase(id))
+    if (m_Children.Contains(id.Index) && m_Children[id.Index] == id)
     {
-        m_ECS.GetEntity(id).m_Parent = 0;
+        m_Children.Erase(id.Index);
+        m_ECS.GetEntity(id).m_Parent = {0, 0};
     }
 }
 
-Entity& Entity::GetChild(const unsigned int id)
+Entity& Entity::GetChild(const EntityID id)
 {
     return m_ECS.GetEntity(id);
 }
 
-Entity& Entity::FindChild(const unsigned int id)
+Entity& Entity::FindChild(const EntityID id)
 {
     if (HasChild(id))
     {
         return m_ECS.FindEntity(id);
     }
 
-    U::Log::Fatal(std::format("Entity {} has no child {}", m_Id, id));
+    U::Log::Fatal(std::format("Entity {} has no child {}", m_Id.Index, id.Index));
 }
 
-U::CheckedPtr<Entity> Entity::TryFindChild(const unsigned int id)
+U::CheckedPtr<Entity> Entity::TryFindChild(const EntityID id)
 {
     if (HasChild(id))
     {
         return &m_ECS.FindEntity(id);
     }
 
-    return {std::format("Entity {} has no child {}", m_Id, id)};
+    return {std::format("Entity {} has no child {}", m_Id.Index, id.Index)};
 }
 
-bool Entity::HasChild(const unsigned int id) const
+bool Entity::HasChild(const EntityID id) const
 {
-    return m_Children.Contains(id);
+    return m_Children.Contains(id.Index) && m_Children[id.Index] == id;
 }
 
 size_t Entity::ChildCount() const
@@ -140,16 +142,16 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetDescendants()
     return descendants;
 }
 
-bool Entity::HasDescendant(const unsigned int id) const
+bool Entity::HasDescendant(const EntityID id) const
 {
     return IsAncestorOf(id);
 }
 
-bool Entity::IsDescendantOf(const unsigned int id) const
+bool Entity::IsDescendantOf(const EntityID id) const
 {
-    unsigned int current = m_Parent;
+    EntityID current = m_Parent;
 
-    while (current != 0)
+    while (current != EntityID{0, 0})
     {
         if (current == id)
         {
@@ -166,9 +168,9 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetAncestors() const
 {
     std::vector<U::CheckedPtr<Entity>> ancestors;
 
-    unsigned int current = m_Parent;
+    EntityID current = m_Parent;
 
-    while (current != 0)
+    while (current != EntityID{0, 0})
     {
         Entity& entity = m_ECS.GetEntity(current);
         ancestors.emplace_back(&entity);
@@ -178,7 +180,7 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetAncestors() const
     return ancestors;
 }
 
-bool Entity::IsAncestorOf(const unsigned int entityId) const
+bool Entity::IsAncestorOf(const EntityID entityId) const
 {
     for (auto id : m_Children)
     {
@@ -198,14 +200,14 @@ bool Entity::IsAncestorOf(const unsigned int entityId) const
     return false;
 }
 
-bool Entity::HasAncestor(const unsigned int id) const
+bool Entity::HasAncestor(const EntityID id) const
 {
     return IsDescendantOf(id);
 }
 
 U::CheckedPtr<Entity> Entity::TryFindParent() const
 {
-    if (m_Parent == 0)
+    if (m_Parent == EntityID{0, 0})
     {
         return nullptr;
     }
@@ -222,7 +224,7 @@ void Entity::SetParent(Entity& parent)
     parent.AttachChild(*this);
 }
 
-void Entity::SetParent(unsigned int parent)
+void Entity::SetParent(EntityID parent)
 {
     m_ECS.FindEntity(parent).AttachChild(*this);
 }
@@ -237,7 +239,7 @@ void Entity::ClearParent()
 
 bool Entity::HasParent() const
 {
-    return m_Parent != 0;
+    return m_Parent != EntityID{0, 0};
 }
 
 void Entity::Destroy()

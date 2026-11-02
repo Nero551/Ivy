@@ -46,9 +46,6 @@ namespace Sketch
 // expensive in a hot path, introduce a specialized RotQuaternion (RQuaternion)
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
-//TODO: redo Entity completely, make it use handles, add ability to search by entity object not just id/handle.
-// TODO: make ECS entity storage use GIndexPool instead of IndexPool.
-
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
 
 //TODO: make transform system cache its own vector of the root's children that's updated on events

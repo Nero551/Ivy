@@ -2,6 +2,7 @@
 
 #include "Component.hpp"
 #include "Core/ECS/Entity.hpp"
+#include "Core/ECS/EntityID.hpp"
 #include "Events/ComponentAdded.hpp"
 #include "Events/ComponentRemoved.hpp"
 #include "Events/EntityDestroyed.hpp"
@@ -13,6 +14,8 @@
 
 namespace Ivy::C
 {
+struct ComponentPoolQuery;
+
 struct IComponentPool
 {
     virtual ~IComponentPool() = default;
@@ -91,9 +94,9 @@ template <IsComponent T> struct ComponentPool : IComponentPool
     * @param entityId ID of the entity receiving the component.
     * @return Reference to the stored component.
     */
-    T& Add(const unsigned int entityId)
+    T& Add(const EntityID entityId)
     {
-        auto component = m_Components.Emplace(entityId);
+        auto component = m_Components.Emplace(entityId.Index);
 
         ComponentAdded.EntityId = entityId;
         ComponentAdded.Fire();
@@ -102,9 +105,9 @@ template <IsComponent T> struct ComponentPool : IComponentPool
     }
 
     /** @brief Returns whether the specified entity has this component. */
-    bool HasId(const unsigned int entityId) const
+    bool HasId(const EntityID entityId) const
     {
-        return m_Components.Contains(entityId);
+        return m_Components.Contains(entityId.Index);
     }
 
     /**
@@ -113,25 +116,25 @@ template <IsComponent T> struct ComponentPool : IComponentPool
          * @param entityId ID of the entity.
          * @return Reference to the stored component.
          */
-    T& GetComponent(const unsigned int entityId)
+    T& GetComponent(const EntityID entityId)
     {
-        return m_Components.At(entityId);
+        return m_Components.At(entityId.Index);
     }
 
     T& GetComponent(const Entity& entity)
     {
-        return m_Components.At(entity.GetId());
+        return m_Components.At(entity.GetId().Index);
     }
 
     /** @brief Returns the component belonging to an entity. */
-    T& operator[](const unsigned int entityId)
+    T& operator[](const EntityID entityId)
     {
-        return m_Components[entityId];
+        return m_Components[entityId.Index];
     }
 
     T& operator[](const Entity& entity)
     {
-        return m_Components[entity.GetId()];
+        return m_Components[entity.GetId().Index];
     }
 
     /** @brief Reserves storage for the specified number of components. */
@@ -145,9 +148,9 @@ template <IsComponent T> struct ComponentPool : IComponentPool
          *
          * @param entityId ID of the entity whose component should be removed.
          */
-    void Remove(const unsigned int entityId)
+    void Remove(const EntityID entityId)
     {
-        m_Components.Erase(entityId);
+        m_Components.Erase(entityId.Index);
 
         ComponentRemoved.EntityId = entityId;
         ComponentRemoved.Fire();
@@ -162,5 +165,6 @@ template <IsComponent T> struct ComponentPool : IComponentPool
   private:
     /** @brief Stores components with dense storage and sparse entity ID lookup. */
     U::SparseSetSoA<T> m_Components{};
+    friend struct ComponentPoolQuery;
 };
 } // namespace Ivy::C

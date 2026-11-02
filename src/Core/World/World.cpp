@@ -1,5 +1,6 @@
 #include "World.hpp"
 #include "Core/ECS/Entity.hpp"
+#include "Core/ECS/EntityID.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Systems/Transform3DSystem.hpp"
@@ -10,7 +11,7 @@
 namespace Ivy::C
 {
 
-void World::SetRoot(const unsigned int id)
+void World::SetRoot(const EntityID id)
 {
     m_Root = id;
 }
@@ -20,7 +21,7 @@ void World::SetRoot(const Entity& entity)
     m_Root = entity.GetId();
 }
 
-void World::SetCamera(const unsigned int id)
+void World::SetCamera(const EntityID id)
 {
     m_ActiveCamera = id;
 }

@@ -15,9 +15,9 @@ void Renderer2DSystem::Start()
         {
             for (auto& batch : Batches)
             {
-                if (batch.Instances.Contains(event.EntityId))
+                if (batch.Instances.Contains(event.EntityId.Index))
                 {
-                    batch.Instances.Erase(event.EntityId);
+                    batch.Instances.Erase(event.EntityId.Index);
                 }
             }
         });
