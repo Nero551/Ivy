@@ -1,10 +1,5 @@
-#include "Core/Engine.hpp"
-#include "Graphics/Context.hpp"
-#include "Math/Matrix/Matrix.hpp"
-#include "Math/Vector/Vector.hpp"
-#include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include "Ivy.hpp"
 #include "sketch.hpp"
-#include "tracy/Tracy.hpp"
 #include <string_view>
 
 int main(const int argc, char* argv[])
@@ -22,7 +17,7 @@ int main(const int argc, char* argv[])
     }
 
     Sketch::Test();
-    // return 0;
+    return 0;
 
     Ivy::G::Context::Initialize();
     Ivy::C::Engine engine;

@@ -2,6 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include "Math/Common/Constants.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Math.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
@@ -367,23 +368,18 @@ TEST_CASE("Function inverse (scalar‑to‑scalar)")
     auto f = Function<float, float>([](const float x) { return 2.0f * x + 3.0f; });
     SECTION("InverseEvaluate")
     {
-        REQUIRE(InverseEvaluate(f, 7.0f, -10.0f, 10.0f) == Approx(2.0f));
+        REQUIRE(EvaluateInverse(f, 7.0f, 0.7f) == Approx(2.0f));
     }
 
     SECTION("Inverse function")
     {
-        auto inv = Inverse(f, -10.0f, 10.0f);
+        auto inv = Inverse(f, 1.0f);
         REQUIRE(inv(7.0f) == Approx(2.0f));
         // Check f(inv(y)) ≈ y
         REQUIRE(f(inv(7.0f)) == Approx(7.0f));
-    }
 
-    SECTION("Non‑monotonic function throws? (not yet) but we test that it returns some value")
-    {
         auto g = Function<float, float>([](const float x) { return x * x; });
-        // This is not monotonic over [-10,10], but binary search will still find something.
-        // We just check it runs.
-        auto invG = Inverse(g, 0.0f, 10.0f); // restrict to positive domain
+        auto invG = Inverse(g, 1.0f);
         REQUIRE(invG(4.0f) == Approx(2.0f));
     }
 }
@@ -2065,8 +2061,8 @@ TEST_CASE("ODE explicit Euler error decreases with smaller step sizes")
     const auto [fineY] = fine.Variables;
 
     const double exact = 2.718281828459045;
-    const double coarseError = std::abs(coarseY - exact);
-    const double fineError = std::abs(fineY - exact);
+    const double coarseError = stl::abs(coarseY - exact);
+    const double fineError = stl::abs(fineY - exact);
 
     REQUIRE(fineError < coarseError);
     REQUIRE(fineError < 0.02);

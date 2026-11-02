@@ -199,11 +199,6 @@ void Engine::Stop()
     {
         service->Stop();
     }
-
-    if (Instance == this)
-    {
-        Instance.Reset();
-    }
     Window.Delete();
 }
 } // namespace Ivy::C

@@ -324,7 +324,7 @@ struct VectorFields : C::System
         using Equation = M::ODE<float, float>;
 
         const Equation equation{[g, D, p, A, m](float t, float v)
-            { return Equation::State{t, g - (D * p * A / (2.0f * m)) * v * std::abs(v)}; }};
+            { return Equation::State{t, g - (D * p * A / (2.0f * m)) * v * stl::abs(v)}; }};
 
         std::vector<float> magnitudes{};
 

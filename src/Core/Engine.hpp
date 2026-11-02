@@ -20,9 +20,7 @@ concept IsModule = std::derived_from<T, Module>;
 template <typename T>
 concept ServiceType = std::derived_from<T, Service>;
 
-/**
- * @brief Main Ivy engine and game loop. Manages the window, world, modules, ECS, and frame lifecycle.
- */
+/** @brief Main Ivy engine and game loop. Manages the window, world, modules, ECS, and frame lifecycle. */
 struct Engine
 {
     G::Window Window{};
@@ -79,14 +77,10 @@ struct Engine
     }
 
   private:
-    /** @brief Global engine instance. */
-    inline static U::CheckedPtr<Engine> Instance = nullptr;
-
     /** @brief Registered engine modules. */
     U::TypedVector<std::unique_ptr<Module>> m_Modules;
     U::TypedVector<std::unique_ptr<Service>> m_Services;
     TimeHandler m_TimeHandler;
-
     bool m_Running = false;
 
     /** @brief Initializes engine services, modules & custom configurations. */

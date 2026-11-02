@@ -7,6 +7,7 @@
 #include "Math/Concepts.hpp"
 #include "Math/Coordinates/Polar.hpp"
 #include "Vector.hpp"
+#include "stl.hpp"
 #include <ostream>
 
 namespace Ivy::M
@@ -128,7 +129,7 @@ template <Scalar T> struct Vector<2, T>
             return false;
         }
 
-        return std::abs(x * vector.y - y * vector.x) < EPSILON;
+        return stl::abs(x * vector.y - y * vector.x) < EPSILON;
     }
 
     /** @brief Determines whether two non-zero vectors are perpendicular. */
@@ -139,7 +140,7 @@ template <Scalar T> struct Vector<2, T>
             return false;
         }
 
-        return M::NearlyEquals(std::abs(Dot(vector)), 0);
+        return M::NearlyEquals(stl::abs(Dot(vector)), 0);
     }
 
     /** @brief Projects the vector stereographically onto a line. */

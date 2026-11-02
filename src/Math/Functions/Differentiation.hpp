@@ -1,5 +1,6 @@
 #pragma once
 #include "Function.hpp"
+#include "Math/Common/Constants.hpp"
 #include "Math/Concepts.hpp"
 
 namespace Ivy::M
@@ -33,7 +34,7 @@ Function<Output, Input> Differentiate(const Function<Output, Input>& f, Input dx
 {
     return [f, dx, method](const Input x)
     {
-        const Input h = dx * std::max(1.0f, std::abs(x));
+        const Input h = dx * std::max(1.0f, stl::abs(x));
         switch (method)
         {
         case DifferentiationMethod::Central:

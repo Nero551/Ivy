@@ -121,10 +121,7 @@ struct Shader
      *
      * @note The uniform name must be null-terminated when passed to OpenGL.
      */
-    void SetUniform(std::string_view name, const Uniform& uniform)
-    {
-        m_PendingUniforms[name] = UniformPair{.Uniform = uniform, .Location = GetUniformLocation(name)};
-    }
+    void SetUniform(std::string_view name, const Uniform& uniform);
 
     /**
      * @brief Associates a shader source with this program.

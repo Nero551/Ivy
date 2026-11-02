@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Common/Constants.hpp"
 #include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
 namespace Ivy::M
@@ -22,7 +23,7 @@ Function<Output, Input> Taylor(const Function<Output, Input>& f, unsigned int te
         for (unsigned int n = 0; n < terms; ++n)
         {
             result += currentFunc(a) * Pow(x - a, n) / Factorial(n);
-            currentFunc = Differentiate(currentFunc);
+            currentFunc = Differentiate(currentFunc, EPSILON * terms * 10);
         }
 
         return result;

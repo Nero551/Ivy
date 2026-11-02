@@ -12,6 +12,7 @@
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Functions/Integration.hpp"
+#include "Math/Functions/Inverse.hpp"
 #include "Math/Math.hpp"
 #include "Math/MathTuple.hpp"
 #include "Math/Matrix/Matrix.hpp"
@@ -223,7 +224,7 @@ template <M::Scalar T> struct Dual
 
     constexpr T Magnitude()
     {
-        return std::abs(Real);
+        return stl::abs(Real);
     }
 
     constexpr Dual Inverse()
@@ -279,7 +280,7 @@ using SelectBE = std::conditional_t<BE == GPUBackend::OpenGL, GL,
     std::conditional_t<BE == GPUBackend::Vulkan, VK,
         std::conditional_t<BE == GPUBackend::DX12, DX12, NoBEImpl>>>;
 
-static constexpr GPUBackend Backend = GPUBackend::DX12;
+static constexpr GPUBackend Backend = GPUBackend::OpenGL;
 
 struct Buffer : SelectBE<Backend, OpenGLBuffer, VulkanBuffer>
 {
@@ -287,6 +288,10 @@ struct Buffer : SelectBE<Backend, OpenGLBuffer, VulkanBuffer>
 
 // TODO: another idea could be to have free functions for each of openGL and vulkan, etc. structs (buffer) just selects based on backend.
 // and have my own custom api layer than unifies openGL and vulkan under custom api interface, convert vulkan and openGL to this api.
+
+//TODO: if i can't bind all gpu APIs under 1 interface, i could do a mix of both ideas.
+// have 2 modes , forward+ and compatibility, where forward+ uses the implementation for vk or dx12.
+// and compatibility uses gl or dx11/10. just like godot.
 
 void DoVulkan(unsigned int id) {}
 void DoOpenGL(unsigned int id) {}

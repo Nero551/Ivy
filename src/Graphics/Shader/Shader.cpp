@@ -36,6 +36,11 @@ void Shader::Use()
     UploadUniforms();
 }
 
+void Shader::SetUniform(std::string_view name, const Uniform& uniform)
+{
+    m_PendingUniforms[name] = UniformPair{.Uniform = uniform, .Location = GetUniformLocation(name)};
+}
+
 bool Shader::IsProgramCreated() const
 {
     return m_Id != 0;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Function.hpp"
+#include "Math/Common/Constants.hpp"
 #include "Math/Concepts.hpp"
 #include "Utilities/Debug/Log.hpp"
 
@@ -31,7 +32,7 @@ Output Average(const Function<Input, Output>& f, const Input start, const Input 
  */
 template <typename Output, Scalar Input>
 Output Integral(const Function<Output, Input>& f, const Input lowerBound, Input upperBound,
-    const Input dx = 0.001f, const IntegrationMethod method = IntegrationMethod::Midpoint)
+    const Input dx = EPSILON, const IntegrationMethod method = IntegrationMethod::Midpoint)
     requires(Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
 {
     return Integrate(f, lowerBound, dx, method)(upperBound);
@@ -45,7 +46,7 @@ Output Integral(const Function<Output, Input>& f, const Input lowerBound, Input 
  * @return A function whose value is the integral from lowerBound to its input.
  */
 template <typename Output, Scalar Input>
-Function<Output, Input> Integrate(const Function<Output, Input>& f, Input lowerBound, Input dx = 0.001f,
+Function<Output, Input> Integrate(const Function<Output, Input>& f, Input lowerBound, Input dx = EPSILON,
     IntegrationMethod method = IntegrationMethod::Midpoint)
     requires(Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
 {

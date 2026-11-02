@@ -231,7 +231,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix<4, 4, T>, 
 
         const T determinant = Determinant();
 
-        if (M::NearlyEquals(std::abs(determinant), 0.0f))
+        if (M::NearlyEquals(stl::abs(determinant), 0.0f))
         {
             U::Log::Error("Matrix is not invertible");
             return Matrix::Identity();
