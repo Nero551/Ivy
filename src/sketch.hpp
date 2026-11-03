@@ -419,6 +419,11 @@ struct F : Component
     int Number = 10;
 };
 
+struct G : Component
+{
+    int Number = 10;
+};
+
 using EntityID = U::GIndexPool<>::Handle;
 
 struct IArchetype
@@ -533,7 +538,6 @@ struct Query
 
         if (!m_Cache.Contains<Args...>())
         {
-
             for (auto& archetype : m_Archetypes)
             {
                 if (!archetype->Matches(wanted))
@@ -545,10 +549,13 @@ struct Query
                 m_Cache.Push<Args...>(row);
             }
         }
-        for (auto& [id, ptrs] : m_Cache.Get<Args...>())
+        if (m_Cache.Contains<Args...>())
         {
-            [&]<size_t... I>(std::index_sequence<I...>)
-            { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
+            for (auto& [id, ptrs] : m_Cache.Get<Args...>())
+            {
+                [&]<size_t... I>(std::index_sequence<I...>)
+                { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
+            }
         }
     }
 
@@ -559,13 +566,21 @@ struct Query
 void BenchArchetypeECS()
 {
     Query q;
-    auto& def = q.GetArchetype<D, E, F>();
+    auto& de = q.GetArchetype<D, E, G>();
+    auto& ef = q.GetArchetype<D, F, G>();
 
     unsigned int entities = 1000000;
 
     for (unsigned int i = 0; i < entities; ++i)
     {
-        def.Add({i, 0});
+        if (i % 2 == 0)
+        {
+            de.Add({i, 0});
+        }
+        else
+        {
+            ef.Add({i, 0});
+        }
         ZoneScopedN("Creation");
     }
 
@@ -576,17 +591,13 @@ void BenchArchetypeECS()
         {
             ZoneScopedN("Iteration");
             elapsed = 0;
-            q.ForEach<D, E, F>(
-                [](unsigned int id, D& d, E& e, F& f)
-                {
-                    d.Number += e.Number + f.Number;
-                    e.Number += d.Number + f.Number;
-                    f.Number += d.Number + e.Number;
-                });
+            q.ForEach<D, G>([](unsigned int id, D& d, G& g) { d.Number += id; });
         }
         elapsed += 0.016;
     }
 }
+
+//TODO: next step is figuring out entity creation, component adding, removing, and syncing the cache.
 
 inline void Test()
 {

@@ -88,6 +88,11 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         return m_Data[GetTypeId<Args...>()];
     }
 
+    T& operator[](TypeIdType index)
+    {
+        return m_Data[index];
+    }
+
     /** @brief its At() but without an implicit Contains() check. */
     template <typename... Args> T& Get()
     {
