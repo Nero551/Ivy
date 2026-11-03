@@ -19,7 +19,7 @@
 #include "Sandbox/Scenes/CoordinateAxes2D.hpp"
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
-#include "Sandbox/Systems/VectorFields.hpp"
+#include "Sandbox/Systems/VectorFields2D.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstdlib>
 namespace Ivy::Sandbox
@@ -90,10 +90,10 @@ void Sandbox2D::Start()
     // AddSystem<StressTester2D>();
     // GetSystem<StressTester2D>().ThreeDimensionalProjection(1);
 
-    AddSystem<VectorFields>();
-    GetSystem<VectorFields>().Start();
+    AddSystem<VectorFields2D>();
+    GetSystem<VectorFields2D>().Start();
 
-    GetSystem<VectorFields>().PendulumModel();
+    GetSystem<VectorFields2D>().PendulumModel();
     particleId = CreateSquare();
 }
 

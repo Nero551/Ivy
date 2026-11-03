@@ -64,7 +64,7 @@ void Engine::Configure()
     AddModule<R::Renderer>();
     AddModule<Profiling>();
     // AddModule<Physics>();
-    AddModule<Sandbox::Sandbox2D>();
+    AddModule<Sandbox::Sandbox3D>();
 }
 
 void Engine::Start()

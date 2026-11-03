@@ -10,7 +10,8 @@ Mesh CreateUVSphere(const std::string& name, float radius = 0.5, int sectors = 3
 Mesh CreateQuad(const std::string& name, unsigned int widthSegments = 1, unsigned int heightSegments = 1);
 Mesh CreateLine(const std::string& name);
 Mesh CreateCircle(const std::string& name, float radius = 0.5, int sectors = 32);
-Mesh CreateArrow(const std::string& name);
+Mesh CreateArrow2D(const std::string& name);
+Mesh CreateArrow3D(const std::string& name);
 
 Texture2D CreateWhiteTexture();
 Texture2D CreateBlackTexture();

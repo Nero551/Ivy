@@ -25,14 +25,14 @@
 
 namespace Ivy::Sandbox
 {
-struct VectorFields : C::System
+struct VectorFields2D : C::System
 {
     using C::System::System;
 
     void Start() override
     {
         auto& resources = m_Engine.GetService<C::ResourceManager>();
-        m_Mesh = &resources.Load(G::Primitives::CreateArrow("vectorArrow"));
+        m_Mesh = &resources.Load(G::Primitives::CreateArrow2D("vectorArrow"));
 
         auto& vertSource = resources.Load<G::ShaderSource>(
             "arrowShaderVert", "Assets/Shaders/arrow.vert", G::ShaderStage::Vertex);

@@ -118,6 +118,36 @@ template <Scalar T = float> struct Quaternion
         return rotation * rotation;
     }
 
+    static Quaternion FromTo(const Vector<3, T>& from, const Vector<3, T>& to)
+    {
+        Vector<3, T> A = from.Normalized();
+        Vector<3, T> B = to.Normalized();
+
+        T Dot = A.Dot(B);
+
+        if (Dot >= T(1.0) - EPSILON)
+        {
+            return Identity();
+        }
+
+        if (Dot <= T(-1.0) + EPSILON)
+        {
+            Vector<3, T> Axis = A.Cross(Vector<3, T>::Right()).Normalized();
+
+            if (Axis.LengthSquared() <= EPSILON)
+            {
+                Axis = A.Cross(Vector<3, T>::Up()).Normalized();
+            }
+
+            return FromQPolar({Axis, M::PI});
+        }
+
+        Vector<3, T> Axis = A.Cross(B).Normalized();
+        T Angle = std::acos(std::clamp(Dot, T(-1.0), T(1.0)));
+
+        return FromQPolar({Axis, Angle});
+    }
+
     /**
      * @brief Constructs a quaternion from XYZ Euler angles.
      *

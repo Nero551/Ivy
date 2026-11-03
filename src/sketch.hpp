@@ -3,6 +3,7 @@
 #include "Core/ECS/Component.hpp"
 #include "Core/ECS/ECS.hpp"
 #include "Core/ECS/Entity.hpp"
+#include "Core/ECS/EntityID.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Logarithms.hpp"
@@ -25,22 +26,31 @@
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Physics/DimensionalAnalysis/Dimensionals.hpp"
 #include "Physics/Units.hpp"
+#include "Utilities/DataStructures/SparseSetAoS.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Inspector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/Track.hpp"
 #include "tracy/Tracy.hpp"
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <concepts>
+#include <csignal>
 #include <cstdlib>
 #include <dlfcn.h>
 #include <functional>
 #include <ios>
+#include <memory>
 #include <ostream>
+#include <span>
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <typeindex>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 
@@ -381,5 +391,205 @@ inline void BenchECS()
 // TODO: wrap all used std stuff in stl wrapper. basically to avoid backward compatibility bs in std.
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
-inline void Test() {}
+//
+//
+// TODO: make ArchetypeAoS & ArchetypeSoA data structures
+// TODO: instead of checking
+
+struct Component
+{
+    Component() = default;
+    virtual ~Component() = default;
+    Component(const Component&) = default;
+    Component& operator=(const Component&) = default;
+    Component(Component&&) noexcept = default;
+    Component& operator=(Component&&) noexcept = default;
+};
+
+struct D : Component
+{
+    int Number = 10;
+};
+struct E : Component
+{
+    int Number = 10;
+};
+struct F : Component
+{
+    int Number = 10;
+};
+
+using EntityID = U::GIndexPool<>::Handle;
+
+struct IArchetype
+{
+    using ComponentCombo = std::tuple<>;
+    virtual ~IArchetype() = default;
+
+    virtual bool Matches(std::span<std::type_index> types) const = 0;
+    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRow(
+        std::span<const std::type_index> types) = 0;
+};
+
+template <typename... Args> requires(std::derived_from<Args, Component> && ...)
+struct Archetype : IArchetype
+{
+    using ComponentCombo = std::tuple<Args...>;
+    U::SparseSetAoS<ComponentCombo> m_Data{};
+
+    template <bool Const> struct BasicIterator
+    {
+    };
+
+    bool Matches(std::span<std::type_index> types) const override
+    {
+        return std::ranges::all_of(
+            types, [](const auto& id) { return ((id == std::type_index(typeid(Args))) || ...); });
+    }
+
+    template <typename T> static void* GetPtr(ComponentCombo& combo)
+    {
+        return &std::get<T>(combo);
+    }
+
+    std::vector<std::pair<unsigned int, std::vector<void*>>> GetRow(
+        std::span<const std::type_index> types) override
+    {
+        using Getter = void* (*)(ComponentCombo&);
+
+        static const std::array<std::type_index, sizeof...(Args)> mine{std::type_index(typeid(Args))...};
+        static const std::array<Getter, sizeof...(Args)> getters{&GetPtr<Args>...};
+
+        // Resolve once per call: which getter produces which requested component.
+        std::vector<Getter> selected{};
+        selected.reserve(types.size());
+
+        for (auto id : types)
+        {
+            auto it = std::ranges::find(mine, id);
+
+            U::Log::Assert(it != mine.end(), "Invalid archetype query");
+
+            selected.push_back(getters[it - mine.begin()]);
+        }
+
+        std::vector<std::pair<unsigned int, std::vector<void*>>> pairs{};
+        std::vector<void*> ptrs(types.size());
+        unsigned int p = 0;
+        for (auto& item : m_Data)
+        {
+            for (size_t i = 0; i < selected.size(); ++i)
+            {
+                ptrs[i] = selected[i](item.Value);
+            }
+
+            pairs.emplace_back(item.SparseIndex, ptrs);
+            ++p;
+        }
+        return pairs;
+    }
+
+    std::tuple<Args...>& Add(EntityID entityId)
+    {
+        return (*m_Data.Emplace(entityId.Index)).Value;
+    }
+
+    void Remove(EntityID entityId)
+    {
+        m_Data.Erase(entityId);
+    }
+
+    std::tuple<Args...>& Get(EntityID entityId)
+    {
+        U::Log::Assert(m_Data.Contains(entityId),
+            U::Log::Fatal("Archetype: [ ", typeid(Args)..., " ] doesn't contain entity: ", entityId));
+        return m_Data[entityId];
+    }
+
+    template <typename T> T& Get(EntityID entityId) requires(std::is_same_v<T, Args> || ...)
+    {
+        U::Log::Assert(m_Data.Contains(entityId),
+            U::Log::Fatal("Archetype: [ ", typeid(Args)..., " ] doesn't contain entity: ", entityId));
+        return std::get<T>(m_Data[entityId]);
+    }
+};
+
+struct Query
+{
+
+    Query() = default;
+    template <typename... Args>
+    Archetype<Args...>& GetArchetype() requires(std::derived_from<Args, Component> && ...)
+    {
+        return static_cast<Archetype<Args...>&>(
+            **m_Archetypes.Emplace<Args...>(std::make_unique<Archetype<Args...>>()));
+    }
+
+    template <typename... Args, typename F>
+    requires(std::derived_from<Args, Component> && ...) && std::invocable<F&, unsigned int, Args&...>
+    void ForEach(F&& action)
+    {
+        static std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+
+        if (!m_Cache.Contains<Args...>())
+        {
+
+            for (auto& archetype : m_Archetypes)
+            {
+                if (!archetype->Matches(wanted))
+                {
+                    continue;
+                }
+
+                auto row = archetype->GetRow(wanted);
+                m_Cache.Push<Args...>(row);
+            }
+        }
+        for (auto& [id, ptrs] : m_Cache.Get<Args...>())
+        {
+            [&]<size_t... I>(std::index_sequence<I...>)
+            { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
+        }
+    }
+
+    U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
+    U::TypedVector<std::vector<std::pair<unsigned int, std::vector<void*>>>> m_Cache;
+};
+
+void BenchArchetypeECS()
+{
+    Query q;
+    auto& def = q.GetArchetype<D, E, F>();
+
+    unsigned int entities = 1000000;
+
+    for (unsigned int i = 0; i < entities; ++i)
+    {
+        def.Add({i, 0});
+        ZoneScopedN("Creation");
+    }
+
+    double elapsed = 0;
+    while (true)
+    {
+        if (elapsed >= 10)
+        {
+            ZoneScopedN("Iteration");
+            elapsed = 0;
+            q.ForEach<D, E, F>(
+                [](unsigned int id, D& d, E& e, F& f)
+                {
+                    d.Number += e.Number + f.Number;
+                    e.Number += d.Number + f.Number;
+                    f.Number += d.Number + e.Number;
+                });
+        }
+        elapsed += 0.016;
+    }
+}
+
+inline void Test()
+{
+    BenchArchetypeECS();
+}
 } // namespace Sketch
