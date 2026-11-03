@@ -22,7 +22,7 @@ struct Entity
     Entity(const Entity&) = delete;
     Entity& operator=(const Entity&) = delete;
 
-    Entity(Entity&&) = default;
+    Entity(Entity&&) noexcept = default;
     Entity& operator=(Entity&& other) noexcept
     {
         Entity::operator=(std::move(other));

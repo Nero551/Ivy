@@ -157,6 +157,11 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         return m_Data.size();
     }
 
+    bool Empty() const
+    {
+        return m_Data.empty();
+    }
+
   private:
     TypeIdType m_NextTypeId{};
     std::vector<T> m_Data{};
