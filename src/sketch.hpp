@@ -432,7 +432,7 @@ struct IArchetype
     virtual ~IArchetype() = default;
 
     virtual bool Matches(std::span<std::type_index> types) const = 0;
-    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRow(
+    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
         std::span<const std::type_index> types) = 0;
 };
 
@@ -457,7 +457,7 @@ struct Archetype : IArchetype
         return &std::get<T>(combo);
     }
 
-    std::vector<std::pair<unsigned int, std::vector<void*>>> GetRow(
+    std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
         std::span<const std::type_index> types) override
     {
         using Getter = void* (*)(ComponentCombo&);
@@ -479,6 +479,7 @@ struct Archetype : IArchetype
         }
 
         std::vector<std::pair<unsigned int, std::vector<void*>>> pairs{};
+        pairs.reserve(m_Data.Size());
         std::vector<void*> ptrs(types.size());
         unsigned int p = 0;
         for (auto& item : m_Data)
@@ -545,22 +546,24 @@ struct Query
                     continue;
                 }
 
-                auto row = archetype->GetRow(wanted);
-                m_Cache.Push<Args...>(row);
+                (*m_Cache.Emplace<Args...>()).emplace_back(archetype->GetRows(wanted));
             }
         }
         if (m_Cache.Contains<Args...>())
         {
-            for (auto& [id, ptrs] : m_Cache.Get<Args...>())
+            for (auto& archetypeRow : m_Cache.Get<Args...>())
             {
-                [&]<size_t... I>(std::index_sequence<I...>)
-                { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
+                for (auto& [id, ptrs] : archetypeRow)
+                {
+                    [&]<size_t... I>(std::index_sequence<I...>)
+                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
+                }
             }
         }
     }
 
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
-    U::TypedVector<std::vector<std::pair<unsigned int, std::vector<void*>>>> m_Cache;
+    U::TypedVector<std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>> m_Cache;
 };
 
 void BenchArchetypeECS()
@@ -569,7 +572,7 @@ void BenchArchetypeECS()
     auto& de = q.GetArchetype<D, E, G>();
     auto& ef = q.GetArchetype<D, F, G>();
 
-    unsigned int entities = 1000000;
+    unsigned int entities = 10000000;
 
     for (unsigned int i = 0; i < entities; ++i)
     {
