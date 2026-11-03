@@ -8,6 +8,15 @@
 namespace Ivy::M
 {
 
+/**
+* @brief Numerically evaluates the inverse of a function using Newton's method.
+* @param f Function to invert.
+* @param y Target output value.
+* @param initialGuess Initial input estimate.
+* @param epsilon Convergence tolerance.
+* @param iterations Maximum number of iterations.
+* @return Approximation of the input corresponding to the target output.
+*/
 template <Scalar Input, Scalar Output>
 Input EvaluateInverse(const Function<Output, Input>& f, Output y, Input initialGuess, Input epsilon = EPSILON,
     unsigned int iterations = 100) requires(Additive<Input, Input>)
@@ -18,14 +27,12 @@ Input EvaluateInverse(const Function<Output, Input>& f, Output y, Input initialG
     {
         Output fx = f(x) - y;
 
-        U::Log::Info("Iteration: ", i, " | x: ", x, " | fx: ", fx);
-
-        if (stl::abs(fx) <= epsilon)
+        if (std::abs(fx) <= epsilon)
         {
             break;
         }
         Input dfx = Derivative(f, x);
-        U::Log::Assert(stl::abs(dfx) > epsilon, "InverseEvaluate: Derivative is too close to zero: ", dfx);
+        U::Log::Assert(std::abs(dfx) > epsilon, "InverseEvaluate: Derivative is too close to zero: ", dfx);
 
         x -= fx / dfx;
     }
@@ -33,6 +40,14 @@ Input EvaluateInverse(const Function<Output, Input>& f, Output y, Input initialG
     return x;
 }
 
+/**
+ * @brief Constructs a numerical inverse function using Newton's method.
+ * @param f Function to invert.
+ * @param initialGuess Initial input estimate for each evaluation.
+ * @param epsilon Convergence tolerance.
+ * @param iterations Maximum number of iterations.
+ * @return A function approximating the inverse of @p f.
+ */
 template <Scalar Input, Scalar Output>
 Function<Input, Output> Inverse(const Function<Output, Input>& f, Input initialGuess, Input epsilon = EPSILON,
     unsigned int iterations = 100) requires(Additive<Input, Input>)

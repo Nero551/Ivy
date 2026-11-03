@@ -32,7 +32,7 @@ function GenerateEngineUmbrella(name)
     local output = path.join(RootDir, name .. ".hpp")
 
     local subsystemDirs = os.dirs(path.join(RootDir, "*"))
-    local moduleHeaders = os.files(path.join(RootDir, "Modules/*/Header.hpp"))
+    local moduleHeaders = os.files(path.join(RootDir, "Modules/*/Include.hpp"))
 
     table.sort(subsystemDirs)
     table.sort(moduleHeaders)
@@ -45,7 +45,7 @@ function GenerateEngineUmbrella(name)
 
         if os.isfile(umbrella) then
             content = content ..
-                    '#include "' .. subsystem .. '/' .. subsystem .. '.hpp"\n'
+                '#include "' .. subsystem .. '/' .. subsystem .. '.hpp"\n'
         end
     end
 
@@ -54,7 +54,7 @@ function GenerateEngineUmbrella(name)
         local module = path.filename(moduleDir)
 
         content = content ..
-                '#include "Modules/' .. module .. '/Header.hpp"\n'
+            '#include "Modules/' .. module .. '/Include.hpp"\n'
     end
 
     io.writefile(output, content)

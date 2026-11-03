@@ -167,7 +167,7 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, 
 
         const T determinant = a * A + b * B + c * C;
 
-        if (stl::abs(determinant) < EPSILON)
+        if (std::abs(determinant) < EPSILON)
         {
             U::Log::Error("Matrix is not invertible");
             return Matrix::Identity();

@@ -7,11 +7,13 @@
 #include "Math/Math.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector.hpp"
+#include "stl.hpp"
 
 using Catch::Approx;
 using Catch::Matchers::WithinAbs;
 using Catch::Matchers::WithinRel;
 using namespace Ivy::M;
+using namespace Ivy;
 
 //==============================================================================
 // Common
@@ -2061,8 +2063,8 @@ TEST_CASE("ODE explicit Euler error decreases with smaller step sizes")
     const auto [fineY] = fine.Variables;
 
     const double exact = 2.718281828459045;
-    const double coarseError = stl::abs(coarseY - exact);
-    const double fineError = stl::abs(fineY - exact);
+    const double coarseError = std::abs(coarseY - exact);
+    const double fineError = std::abs(fineY - exact);
 
     REQUIRE(fineError < coarseError);
     REQUIRE(fineError < 0.02);

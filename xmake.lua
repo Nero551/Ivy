@@ -11,7 +11,7 @@ add_requires("assimp v6.0.5")
 add_requires("stb")
 add_requires("glad 0.1.36")
 
-add_requireconfs("**", { override = true, configs = { shared = false } })
+add_requireconfs("**", { override = true, configs = { shared = false, system = false } })
 
 target("Ivy")
     set_kind("binary")

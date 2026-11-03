@@ -20,5 +20,4 @@ Checks: >
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*/Ivy/src/.*'
-ExcludeHeaderFilterRegex: '.*/Ivy/External/.*'
 FormatStyle: file

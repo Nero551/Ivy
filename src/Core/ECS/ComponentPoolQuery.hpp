@@ -6,6 +6,7 @@
 #include "Core/ECS/Events/EntityCreated.hpp"
 #include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
+#include <concepts>
 
 namespace Ivy::C
 {
@@ -84,7 +85,7 @@ struct ComponentPoolQuery
             m_CachedQueries.Emplace<First, Rest...>();
         }
 
-        QueryCache& cache = m_CachedQueries.At<First, Rest...>();
+        QueryCache& cache = m_CachedQueries.Get<First, Rest...>();
 
         if (cache.Version == m_QueryVersion)
         {

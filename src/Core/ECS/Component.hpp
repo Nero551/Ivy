@@ -16,5 +16,7 @@ struct Component
     Component& operator=(const Component&) = default;
     Component(Component&&) noexcept = default;
     Component& operator=(Component&&) noexcept = default;
+
+    bool Invalid = false;
 };
 } // namespace Ivy::C

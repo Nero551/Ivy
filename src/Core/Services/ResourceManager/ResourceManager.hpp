@@ -26,7 +26,7 @@ struct ResourceManager : Service
      */
     template <typename T, typename... Args>
     Resource<T>& Load(const std::string& name, Args&&... args)
-        requires std::constructible_from<Resource<T>, const std::string&, Args...>
+        requires std::constructible_from<Resource<T>, const std::string&, Args...> && NamedResource<T>
     {
         std::string key = typeid(T).name() + name;
 
@@ -55,8 +55,7 @@ struct ResourceManager : Service
      * @return Reference to the loaded resource.
      */
     template <typename T>
-    Resource<T>& Load(T& object)
-        requires(std::move_constructible<T> && requires(T& value) { value.GetName(); })
+    Resource<T>& Load(T& object) requires(std::move_constructible<T> && NamedResource<T>)
     {
         std::string key = typeid(T).name() + object.GetName();
 

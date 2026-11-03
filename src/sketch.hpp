@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core/ECS/Component.hpp"
+#include "Core/ECS/ECS.hpp"
+#include "Core/ECS/Entity.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Logarithms.hpp"
@@ -27,6 +29,7 @@
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/Track.hpp"
+#include "tracy/Tracy.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
@@ -224,7 +227,7 @@ template <M::Scalar T> struct Dual
 
     constexpr T Magnitude()
     {
-        return stl::abs(Real);
+        return std::abs(Real);
     }
 
     constexpr Dual Inverse()
@@ -315,6 +318,55 @@ struct Shader
     }
 };
 
+struct A : Ivy::C::Component
+{
+    int Number = 10;
+};
+struct B : Ivy::C::Component
+{
+    int Number = 10;
+};
+struct C : Ivy::C::Component
+{
+    int Number = 10;
+};
+
+inline void BenchECS()
+{
+    Ivy::C::EntityComponentSystem ecs;
+    auto& aPool = ecs.Query.Pool<A>();
+    auto& bPool = ecs.Query.Pool<B>();
+    auto& cPool = ecs.Query.Pool<C>();
+    unsigned int entities = 1000000;
+
+    for (unsigned int i = 0; i < entities; ++i)
+    {
+        ZoneScopedN("Creation");
+        Ivy::C::Entity& e = ecs.CreateEntity<Ivy::C::Entity>();
+        aPool.Add(e);
+        bPool.Add(e);
+        cPool.Add(e);
+    }
+
+    double elapsed = 0;
+    while (true)
+    {
+        if (elapsed >= 10)
+        {
+            ZoneScopedN("Iteration");
+            elapsed = 0;
+            ecs.Query.ForEach<A, B, C>(
+                [](const unsigned int id, A& a, B& b, C& c)
+                {
+                    a.Number += b.Number + c.Number;
+                    b.Number += a.Number + c.Number;
+                    c.Number += a.Number + b.Number;
+                });
+        }
+        elapsed += 0.016;
+    }
+}
+
 //TODO: define VariableCount method to math objects (vector,quaternion,matrix,complex,math tuple,etc)
 // TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables.
 // this will be needed for partial derivatives specifically.
@@ -323,5 +375,11 @@ struct Shader
 // define them using the IsSpec family in Utilities/IsSpecialization.hpp
 //
 // TODO: prevent math tuples from being `input-able to Function.
+//
+// TODO: if i really want to optimize my ECS. i gotta take it out of the project, and optimize it on its own. so take ECS folder + Event.hpp
+//
+// TODO: wrap all used std stuff in stl wrapper. basically to avoid backward compatibility bs in std.
+// and also as a declaration and limitation that these are all the std stuff used in the codebase.
+// TODO: setup custom clang-tidy module/ check (IvyTidy)
 inline void Test() {}
 } // namespace Sketch

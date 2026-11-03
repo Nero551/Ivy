@@ -161,3 +161,7 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 
 - ODEs solver via explicit euler
 - colored vector fields for ODEs
+- inverse functions via Newton's method
+- math-tuple for representing multi-variable outputs/members
+
+### Week 19 · November 4–11

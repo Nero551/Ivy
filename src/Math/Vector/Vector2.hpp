@@ -129,7 +129,7 @@ template <Scalar T> struct Vector<2, T>
             return false;
         }
 
-        return stl::abs(x * vector.y - y * vector.x) < EPSILON;
+        return std::abs(x * vector.y - y * vector.x) < EPSILON;
     }
 
     /** @brief Determines whether two non-zero vectors are perpendicular. */
@@ -140,7 +140,7 @@ template <Scalar T> struct Vector<2, T>
             return false;
         }
 
-        return M::NearlyEquals(stl::abs(Dot(vector)), 0);
+        return M::NearlyEquals(std::abs(Dot(vector)), 0);
     }
 
     /** @brief Projects the vector stereographically onto a line. */

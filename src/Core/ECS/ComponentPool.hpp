@@ -104,6 +104,11 @@ template <IsComponent T> struct ComponentPool : IComponentPool
         return *component;
     }
 
+    T& Add(const Entity& entity)
+    {
+        return Add(entity.GetId());
+    }
+
     /** @brief Returns whether the specified entity has this component. */
     bool HasId(const EntityID entityId) const
     {

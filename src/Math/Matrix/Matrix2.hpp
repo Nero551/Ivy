@@ -57,7 +57,7 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix<2, 2, T>, 
     {
         const T determinant = Determinant();
 
-        if (stl::abs(determinant) < EPSILON)
+        if (std::abs(determinant) < EPSILON)
         {
             U::Log::Error("Matrix is not invertible");
             return Matrix::Identity();

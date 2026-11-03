@@ -27,6 +27,7 @@ void Texture2D::Generate()
 
     const int mipmapLevels =
         AutoMipmaps ? static_cast<int>(std::floor(std::log2(std::max(Width, Height)))) + 1 : 1;
+
     glTextureStorage2D(m_Id, mipmapLevels, static_cast<GLint>(InternalFormat), Width, Height);
 
     if (!Data.empty())

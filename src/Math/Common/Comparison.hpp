@@ -7,6 +7,6 @@ namespace Ivy::M
 {
 template <Scalar T> constexpr bool NearlyEquals(const T a, const T b, const T epsilon = EPSILON)
 {
-    return stl::abs(a - b) <= epsilon;
+    return std::abs(a - b) <= epsilon;
 }
 } // namespace Ivy::M

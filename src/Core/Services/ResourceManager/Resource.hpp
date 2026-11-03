@@ -6,8 +6,8 @@
 namespace Ivy::C
 {
 
-template <typename T, typename... Args>
-concept NamedResource = std::constructible_from<T, const std::string&, Args...>;
+template <typename T>
+concept NamedResource = requires(T object) { object.GetName(); };
 
 struct IResource
 {
@@ -24,11 +24,12 @@ template <typename T> struct Resource : IResource
     T m_Resource;
 
   public:
-    template <typename... Args> requires NamedResource<T, Args...>
+    template <typename... Args>
+    requires std::constructible_from<T, const std::string&, Args...> && NamedResource<T>
     Resource(const std::string& name, Args&&... args) : m_Resource(name, std::forward<Args>(args)...)
     {
     }
-    Resource(T&& object) requires(std::move_constructible<T>)
+    Resource(T&& object) requires(std::move_constructible<T> && NamedResource<T>)
         : m_Resource(std::move(object))
     {
     }

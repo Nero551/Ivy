@@ -88,7 +88,7 @@ void Sandbox2D::Start()
 
     AddSystem<Controller2D>();
     // AddSystem<StressTester2D>();
-    // GetSystem<StressTester2D>().FourDimensionalProjection(3);
+    // GetSystem<StressTester2D>().ThreeDimensionalProjection(1);
 
     AddSystem<VectorFields>();
     GetSystem<VectorFields>().Start();
@@ -210,7 +210,7 @@ void Sandbox2D::PlayWithBall(double fdt)
 
     if (p.Position.y < 0.5)
     {
-        if (stl::abs(p.Velocity.y) <= 1.5)
+        if (std::abs(p.Velocity.y) <= 1.5)
         {
             p.Velocity.y = 0;
         }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ECS/Scene.hpp"
+#include "../../Core/World/Scene.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Nodes.hpp"

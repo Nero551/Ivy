@@ -2,8 +2,8 @@
 
 #include "Core/ECS/Entity.hpp"
 #include "Core/ECS/EntityID.hpp"
-#include "Core/ECS/Scene.hpp"
 #include "Core/SystemOwner.hpp"
+#include "Scene.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <concepts>
 
