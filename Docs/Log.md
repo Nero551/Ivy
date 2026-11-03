@@ -12,7 +12,7 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 - EBOs, VBOs, and VAOs
 - Vertex color data
 
-![Colored quad](Screenshots/Colored%20Quad.png)
+![Colored quad](Screenshots/ColoredQuad.png)
 
 ---
 
@@ -27,7 +27,7 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 - Matrices
 - Coordinate systems
 
-![Textured quad](Screenshots/Textured%20Quad.png)
+![Textured quad](Screenshots/TexturedQuad.png)
 
 ---
 
@@ -40,7 +40,7 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 - Arbitrary-axis rotation
 - Input
 
-![3D cube](Screenshots/3D%20Cube.png)
+![3D cube](Screenshots/3DCube.png)
 
 ---
 
@@ -112,13 +112,13 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 - MSAA (multisample anti-aliasing)
 - DSA (Direct State Access)
 
-![4D projection — 10k entities](Screenshots/4D%20Projection.png)
+![4D projection — 10k entities](Screenshots/4DProjection.png)
 
 ---
 
 ### Week 11 · September 5–11
 
-- Performance optimizations: CPU handles approximately 370k entities at 40 FPS
+- Performance optimizations: CPU handles approximately 370k entities at 60 FPS
 
 ---
 
@@ -156,12 +156,15 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 ### Week 17 · October 19–26
 
 - made all project deps static libs
+- ODE vector fields
 
 ### Week 18 · October 27 – November 3
 
 - ODEs solver via explicit euler
-- colored vector fields for ODEs
+- ODE colored vector fields
 - inverse functions via Newton's method
 - math-tuple for representing multi-variable outputs/members
+
+![Dampened Spring Vector Field ](Screenshots/DampenedSpringField.png)
 
 ### Week 19 · November 4–11

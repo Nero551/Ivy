@@ -93,7 +93,7 @@ void Sandbox2D::Start()
     AddSystem<VectorFields>();
     GetSystem<VectorFields>().Start();
 
-    GetSystem<VectorFields>().DampenedSpringModel();
+    GetSystem<VectorFields>().PendulumModel();
     particleId = CreateSquare();
 }
 
