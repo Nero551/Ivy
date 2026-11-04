@@ -22,12 +22,11 @@ struct Query
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
-    template <typename... Args> requires(sizeof...(Args) != 1 && (std::derived_from<Args, Component> && ...))
-    std::tuple<Args...>& GetComponent(const Entity& entity) const
+    template <typename... Args>
+    std::tuple<Args&...> GetComponent(const Entity& entity) const
         requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...) && sizeof...(Args) != 1)
     {
-
-        return {GetComponent<Args>(entity)...};
+        return std::tie(GetComponent<Args>(entity)...);
     }
 
     template <typename T>

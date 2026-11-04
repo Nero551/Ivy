@@ -1,0 +1,1013 @@
+// ==================================================
+// FILE 1: Archetype.hpp
+// ==================================================
+
+#pragma once
+#include "Component.hpp"
+#include "Entity.hpp"
+#include "Utilities/DataStructures/SparseSetAoS.hpp"
+#include "Utilities/DataStructures/TypedVector.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include "Utilities/TupleUtils.hpp"
+#include <algorithm>
+#include <array>
+#include <concepts>
+#include <span>
+#include <tuple>
+#include <typeindex>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+namespace Ivy::C
+{
+
+struct IArchetype
+{
+    using ComponentCombo = std::tuple<>;
+    virtual ~IArchetype() = default;
+
+    virtual bool Matches(std::span<const std::type_index> types) const = 0;
+    virtual void Remove(const Entity& entity) = 0;
+    virtual bool Has(const Entity& entity) const = 0;
+    virtual void* GetTypeErased(const Entity& entity, std::type_index type) = 0;
+
+    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
+        std::span<const std::type_index> types) = 0;
+
+    U::TypedVector<std::type_index>& SupportedComponents()
+    {
+        return m_SupportedComponents;
+    }
+
+  protected:
+    U::TypedVector<std::type_index> m_SupportedComponents;
+};
+
+template <typename... Args> requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+struct Archetype : IArchetype
+{
+    using ComponentCombo = std::tuple<Args...>;
+    U::SparseSetAoS<ComponentCombo> m_Data{};
+
+    std::tuple<Args...>& Add(const Entity& entity)
+    {
+        return (*m_Data.Emplace(entity.GetId().Index)).Value;
+    }
+
+    Archetype()
+    {
+        (m_SupportedComponents.Emplace<Args>(typeid(Args)), ...);
+    }
+
+    bool Has(const Entity& entity) const override
+    {
+        return m_Data.Contains(entity.GetId().Index);
+    }
+
+    void Remove(const Entity& entity) override
+    {
+        m_Data.Erase(entity.GetId().Index);
+    }
+
+    void* GetTypeErased(const Entity& entity, std::type_index type) override
+    {
+        ComponentCombo& components = Get(entity);
+        void* result = nullptr;
+
+        auto GetComponent = [&]<typename T>()
+        {
+            if (type == std::type_index(typeid(T)))
+            {
+                result = static_cast<void*>(&std::get<T>(components));
+            }
+        };
+
+        (GetComponent.template operator()<Args>(), ...);
+
+        return result;
+    }
+    std::tuple<Args...>& Get(const Entity& entity)
+    {
+        U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
+            " ] doesn't contain entity: ", entity.GetId());
+        return m_Data[entity.GetId().Index];
+    }
+
+    template <typename T> T& GetOne(const Entity& entity) requires(std::is_same_v<T, Args> || ...)
+    {
+        U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
+            " ] doesn't contain entity: ", entity.GetId());
+        return std::get<T>(m_Data[entity.GetId().Index]);
+    }
+
+    bool Matches(std::span<const std::type_index> types) const override
+    {
+        return std::ranges::all_of(
+            types, [](const auto& id) { return ((id == std::type_index(typeid(Args))) || ...); });
+    }
+
+    template <typename T> static void* GetPtr(ComponentCombo& combo)
+    {
+        return &std::get<T>(combo);
+    }
+
+    std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
+        std::span<const std::type_index> types) override
+    {
+        using Getter = void* (*)(ComponentCombo&);
+
+        static const std::array<std::type_index, sizeof...(Args)> mine{std::type_index(typeid(Args))...};
+        static const std::array<Getter, sizeof...(Args)> getters{&GetPtr<Args>...};
+
+        // Resolve once per call: which getter produces which requested component.
+        std::vector<Getter> selected{};
+        selected.reserve(types.size());
+
+        for (auto id : types)
+        {
+            auto it = std::ranges::find(mine, id);
+
+            U::Log::Assert(it != mine.end(), "Invalid archetype query");
+
+            selected.push_back(getters[it - mine.begin()]);
+        }
+
+        std::vector<std::pair<unsigned int, std::vector<void*>>> pairs{};
+        pairs.reserve(m_Data.Size());
+        std::vector<void*> ptrs(selected.size());
+        unsigned int p = 0;
+        for (auto& item : m_Data)
+        {
+            for (unsigned int i = 0; i < selected.size(); ++i)
+            {
+                ptrs[i] = selected[i](item.Value);
+            }
+
+            pairs.emplace_back(item.SparseIndex, ptrs);
+            ++p;
+        }
+        return pairs;
+    }
+};
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 2: Component.hpp
+// ==================================================
+
+#pragma once
+namespace Ivy::C
+{
+struct Component
+{
+    Component() = default;
+    virtual ~Component() = default;
+    Component(const Component&) = default;
+    Component& operator=(const Component&) = default;
+    Component(Component&&) noexcept = default;
+    Component& operator=(Component&&) noexcept = default;
+};
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 3: ECS.hpp
+// ==================================================
+
+#pragma once
+#include "Entity.hpp"
+#include "EntityID.hpp"
+#include "Events/EntityCreated.hpp"
+#include "Events/EntityDestroyed.hpp"
+#include "Query.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
+namespace Ivy::C
+{
+struct EntityComponentSystem
+{
+    EntityDestroyed EntityDestroyed{};
+    EntityCreated EntityCreated{};
+
+    Query Query{};
+    void RemoveEntity(Entity& entity)
+    {
+        const auto descendants = entity.GetDescendants();
+
+        if (entity.HasParent())
+        {
+            entity.ClearParent();
+        }
+
+        EntityDestroyed.Entity = &entity;
+        EntityDestroyed.Fire();
+        m_Entities.Erase(entity.GetId().Index);
+        Query.RemoveAllComponents(entity);
+
+        for (auto& descendant : descendants)
+        {
+            EntityDestroyed.Entity = descendant;
+            EntityDestroyed.Fire();
+            m_Entities.Erase(descendant->GetId().Index);
+            Query.RemoveAllComponents(*descendant);
+        }
+    }
+
+    void ReserveEntities(size_t count)
+    {
+        m_Entities.ReserveDense(count);
+        m_Entities.ReserveSparse(count);
+    }
+
+    Entity& GetEntity(EntityID id)
+    {
+        return m_Entities[id.Index];
+    }
+
+    Entity& GetActiveEntity(unsigned int id)
+    {
+        return m_Entities[id];
+    }
+
+    template <typename T> Entity& CreateEntity() requires std::derived_from<T, Entity>
+    {
+        const EntityID id = m_Ids.Acquire();
+        T entity{*this};
+        entity.m_Id = id;
+        entity.Initialize();
+
+        auto it = m_Entities.Emplace(id.Index, std::move(entity));
+        EntityCreated.Entity = &*it;
+        EntityCreated.Fire();
+
+        return *it;
+    }
+
+    Entity& FindEntity(EntityID id)
+    {
+        if (!m_Ids.IsAcquired(id))
+        {
+            U::Log::Fatal("Entity Not Found: ", id);
+        }
+        return m_Entities[id.Index];
+    }
+
+    Entity& FindActiveEntity(unsigned int id)
+    {
+        if (!m_Entities.Contains(id))
+        {
+            U::Log::Fatal("Entity Not Found: ", id);
+        }
+        return m_Entities[id];
+    }
+
+    U::CheckedPtr<Entity> TryFindEntity(EntityID id)
+    {
+        if (!m_Ids.IsAcquired(id))
+        {
+            return nullptr;
+        }
+        return &m_Entities[id.Index];
+    }
+
+    U::CheckedPtr<Entity> TryFindActiveEntity(unsigned int id)
+    {
+        if (!m_Entities.Contains(id))
+        {
+            return nullptr;
+        }
+        return &m_Entities[id];
+    }
+
+    unsigned int EntityAmount() const
+    {
+        return m_Entities.Size();
+    }
+
+  private:
+    U::SparseSetSoA<Entity> m_Entities{};
+    U::GIndexPool<> m_Ids{};
+};
+
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 4: Entity.cpp
+// ==================================================
+
+#include "Entity.hpp"
+#include "ECS.hpp"
+#include "EntityID.hpp"
+#include "Utilities/CheckedPtr.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <format>
+#include <functional>
+#include <string>
+#include <vector>
+namespace Ivy::C
+{
+EntityID Entity::GetId() const
+{
+    return m_Id;
+}
+
+Entity& Entity::GetRoot()
+{
+    U::CheckedPtr<Entity> current = this;
+
+    while (current->HasParent())
+    {
+        current = &m_ECS.GetEntity(current->m_Parent);
+    }
+
+    return *current;
+}
+
+void Entity::Destroy()
+{
+    m_ECS.RemoveEntity(*this);
+}
+
+void Entity::AttachChild(Entity& child)
+{
+    if (HasChild(child))
+    {
+        U::Log::Fatal("Child Entity already exists: ", child.m_Id.Index);
+        return;
+    }
+
+    if (&child == this)
+    {
+        U::Log::Error("An entity cannot be its own child.");
+        return;
+    }
+
+    if (child.IsDescendantOf(*this))
+    {
+        U::Log::Error("An entity cannot have its descendant as a child.");
+        return;
+    }
+
+    if (child.IsAncestorOf(*this))
+    {
+        U::Log::Error("An entity cannot have its ancestor as a child.");
+        return;
+    }
+
+    m_Children.Emplace(child.m_Id.Index, child.m_Id);
+    child.m_Parent = m_Id;
+}
+
+void Entity::DetachChild(Entity& child)
+{
+    if (HasChild(child))
+    {
+        m_Children.Erase(child.GetId().Index);
+        child.ClearParent();
+    }
+}
+
+bool Entity::HasChild(const Entity& child) const
+{
+    return m_Children.Contains(child.GetId().Index) && m_Children[child.GetId().Index] == child.GetId();
+}
+
+Entity& Entity::GetChild(const EntityID id) const
+{
+    return m_ECS.GetEntity(id);
+}
+
+Entity& Entity::FindChild(const EntityID id) const
+{
+    if (m_Children.Contains(id.Index) && m_Children[id.Index] == id)
+    {
+        return m_ECS.FindEntity(id);
+    }
+
+    U::Log::Fatal(std::format("Entity {} has no child {}", m_Id.Index, id.Index));
+}
+
+U::CheckedPtr<Entity> Entity::TryFindChild(const EntityID id) const
+{
+    if (m_Children.Contains(id.Index) && m_Children[id.Index] == id)
+    {
+        return &m_ECS.GetEntity(id);
+    }
+
+    return {std::format("Entity {} has no child {}", m_Id.Index, id.Index)};
+}
+
+std::vector<U::CheckedPtr<Entity>> Entity::GetChildren() const
+{
+    std::vector<U::CheckedPtr<Entity>> children;
+    children.reserve(m_Children.Size());
+
+    for (auto id : m_Children)
+    {
+        children.emplace_back(&m_ECS.GetEntity(id));
+    }
+
+    return children;
+}
+
+unsigned int Entity::ChildCount() const
+{
+    return m_Children.Size();
+}
+
+void Entity::ForEachChild(std::function_ref<void(Entity&)> callback) const
+{
+    for (const EntityID id : m_Children)
+    {
+        callback(m_ECS.GetEntity(id));
+    }
+}
+
+void Entity::DestroyChild(Entity& child)
+{
+    if (!HasChild(child))
+    {
+        return;
+    }
+    child.Destroy();
+}
+
+void Entity::DestroyChildren()
+{
+    while (!m_Children.Empty())
+    {
+        DestroyChild(m_ECS.GetEntity(*m_Children.begin()));
+    }
+}
+
+bool Entity::HasDescendant(const Entity& descendant) const
+{
+    return IsAncestorOf(descendant);
+}
+
+bool Entity::IsDescendantOf(const Entity& ancestor) const
+{
+    EntityID current = m_Parent;
+
+    while (current != EntityID{0, 0})
+    {
+        if (current == ancestor.GetId())
+        {
+            return true;
+        }
+
+        current = m_ECS.GetEntity(current).m_Parent;
+    }
+
+    return false;
+}
+
+std::vector<U::CheckedPtr<Entity>> Entity::GetDescendants() const
+{
+    std::vector<U::CheckedPtr<Entity>> descendants;
+    descendants.reserve(m_Children.Size() * 3);
+
+    RecursiveChildren(descendants, *this);
+
+    return descendants;
+}
+
+void Entity::ForEachDescendant(std::function_ref<void(Entity&)> callback)
+{
+    for (EntityID id : m_Children)
+    {
+        auto& child = m_ECS.GetEntity(id);
+        callback(child);
+        child.ForEachDescendant(callback);
+    }
+}
+
+bool Entity::HasAncestor(const Entity& ancestor) const
+{
+    return IsDescendantOf(ancestor);
+}
+
+bool Entity::IsAncestorOf(const Entity& descendant) const
+{
+    for (auto id : m_Children)
+    {
+        if (id == descendant.GetId())
+        {
+            return true;
+        }
+
+        const Entity& child = m_ECS.GetEntity(id);
+
+        if (child.IsAncestorOf(descendant))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+std::vector<U::CheckedPtr<Entity>> Entity::GetAncestors() const
+{
+    std::vector<U::CheckedPtr<Entity>> ancestors;
+
+    EntityID current = m_Parent;
+
+    while (current != EntityID{0, 0})
+    {
+        Entity& entity = m_ECS.GetEntity(current);
+        ancestors.emplace_back(&entity);
+        current = entity.m_Parent;
+    }
+
+    return ancestors;
+}
+
+void Entity::ForEachAncestor(std::function_ref<void(Entity&)> callback)
+{
+    U::CheckedPtr<Entity> current = TryFindParent();
+
+    while (current)
+    {
+        callback(*current);
+        current = current->TryFindParent();
+    }
+}
+
+void Entity::SetParent(Entity& parent)
+{
+    parent.AttachChild(*this);
+}
+
+Entity& Entity::GetParent() const
+{
+    return m_ECS.GetEntity(m_Parent);
+}
+
+U::CheckedPtr<Entity> Entity::TryFindParent() const
+{
+    if (m_Parent == EntityID{0, 0})
+    {
+        return nullptr;
+    }
+    return m_ECS.TryFindEntity(m_Parent);
+}
+
+bool Entity::HasParent() const
+{
+    return m_Parent != EntityID{0, 0};
+}
+
+void Entity::ClearParent()
+{
+    if (HasParent())
+    {
+        GetParent().DetachChild(*this);
+    }
+}
+
+bool Entity::operator==(Entity& other) const
+{
+    return GetId() == other.GetId();
+}
+
+void Entity::RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity) const
+{
+    for (auto id : entity.m_Children)
+    {
+        Entity& child = m_ECS.GetEntity(id);
+
+        entities.emplace_back(&child);
+        RecursiveChildren(entities, child);
+    }
+}
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 5: Entity.hpp
+// ==================================================
+
+#pragma once
+#include "EntityID.hpp"
+#include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include <functional>
+#include <utility>
+#include <vector>
+namespace Ivy::C
+{
+
+struct EntityComponentSystem;
+struct IArchetype;
+struct Query;
+
+struct Entity
+{
+    virtual ~Entity() = default;
+    Entity(EntityComponentSystem& ecs) : m_ECS(ecs) {}
+    Entity(const Entity&) = delete;
+    Entity& operator=(const Entity&) = delete;
+    Entity(Entity&&) noexcept = default;
+    Entity& operator=(Entity&& other) noexcept
+    {
+        Entity::operator=(std::move(other));
+        return *this;
+    };
+
+    EntityID GetId() const;
+    Entity& GetRoot();
+    void Destroy();
+
+    void AttachChild(Entity& child);
+    void DetachChild(Entity& child);
+    bool HasChild(const Entity& child) const;
+    Entity& GetChild(const EntityID id) const;
+    Entity& FindChild(EntityID id) const;
+    U::CheckedPtr<Entity> TryFindChild(EntityID id) const;
+    std::vector<U::CheckedPtr<Entity>> GetChildren() const;
+    unsigned int ChildCount() const;
+    void ForEachChild(std::function_ref<void(Entity&)> callback) const;
+    void DestroyChild(Entity& child);
+    void DestroyChildren();
+
+    bool HasDescendant(const Entity& descendant) const;
+    bool IsDescendantOf(const Entity& ancestor) const;
+    std::vector<U::CheckedPtr<Entity>> GetDescendants() const;
+    void ForEachDescendant(std::function_ref<void(Entity&)> callback);
+
+    bool HasAncestor(const Entity& ancestor) const;
+    bool IsAncestorOf(const Entity& ancestor) const;
+    std::vector<U::CheckedPtr<Entity>> GetAncestors() const;
+    void ForEachAncestor(std::function_ref<void(Entity&)> callback);
+
+    void SetParent(Entity& parent);
+    Entity& GetParent() const;
+    U::CheckedPtr<Entity> TryFindParent() const;
+    bool HasParent() const;
+    void ClearParent();
+
+    bool operator==(Entity& other) const;
+
+  protected:
+    EntityComponentSystem& m_ECS;
+    virtual void Initialize() {}
+
+  private:
+    EntityID m_Id;
+    U::SparseSetSoA<EntityID> m_Children{};
+    EntityID m_Parent{0, 0};
+    U::CheckedPtr<IArchetype> m_Archetype;
+    void RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity) const;
+
+    friend struct Query;
+    friend struct EntityComponentSystem;
+};
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 6: EntityID.hpp
+// ==================================================
+
+#pragma once
+#include "Utilities/DataStructures/GIndexPool.hpp"
+namespace Ivy::C
+{
+using EntityID = U::GIndexPool<>::Handle;
+}
+
+
+// ==================================================
+// FILE 7: Events/EntityCreated.hpp
+// ==================================================
+
+#pragma once
+#include "../Entity.hpp"
+#include "Core/Services/EventBus/Event.hpp"
+#include "Utilities/CheckedPtr.hpp"
+
+namespace Ivy::C
+{
+struct EntityCreated : C::Event<EntityCreated>
+{
+
+    using Event::Event;
+    U::CheckedPtr<Entity> Entity;
+
+    EntityCreated(U::CheckedPtr<struct Entity> entity) : Entity(entity) {}
+};
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 8: Events/EntityDestroyed.hpp
+// ==================================================
+
+#pragma once
+#include "../Entity.hpp"
+#include "Core/Services/EventBus/Event.hpp"
+#include "Utilities/CheckedPtr.hpp"
+
+namespace Ivy::C
+{
+struct EntityDestroyed : C::Event<EntityDestroyed>
+{
+    using Event::Event;
+    U::CheckedPtr<Entity> Entity;
+
+    EntityDestroyed(U::CheckedPtr<struct Entity> entity) : Entity(entity) {}
+};
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 9: Query.hpp
+// ==================================================
+
+#pragma once
+#include "Archetype.hpp"
+#include "Component.hpp"
+#include "Entity.hpp"
+#include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/TypedVector.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include "Utilities/TupleUtils.hpp"
+#include <array>
+#include <concepts>
+#include <cstddef>
+#include <memory>
+#include <tuple>
+#include <typeindex>
+#include <utility>
+#include <vector>
+namespace Ivy::C
+{
+struct Query
+{
+
+    using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
+    Query() = default;
+
+    template <typename... Args> requires(sizeof...(Args) != 1 && (std::derived_from<Args, Component> && ...))
+    std::tuple<Args...>& GetComponent(const Entity& entity) const
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...) && sizeof...(Args) != 1)
+    {
+
+        return {GetComponent<Args>(entity)...};
+    }
+
+    template <typename T>
+    T& GetComponent(const Entity& entity) const requires(std::derived_from<T, Component>)
+    {
+        U::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype");
+        if (m_Archetypes.Contains<T>())
+        {
+            Archetype<T>& archetype = static_cast<Archetype<T>&>(*m_Archetypes.Get<T>());
+            if (archetype.Has(entity))
+            {
+                return archetype.template GetOne<T>(entity);
+            }
+        }
+
+        if (entity.m_Archetype->SupportedComponents().Contains<T>())
+        {
+            return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, std::type_index(typeid(T))));
+        }
+        U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
+    }
+
+    template <typename... Args>
+    bool HasComponent(const Entity& entity) const
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    {
+        if (entity.m_Archetype == nullptr)
+        {
+            return false;
+        }
+        if (m_Archetypes.Contains<Args...>())
+        {
+            return m_Archetypes.Get<Args...>()->Has(entity);
+        }
+
+        if ((!entity.m_Archetype->SupportedComponents().Contains<Args>() || ...))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    void RemoveAllComponents(Entity& entity)
+    {
+        if (entity.m_Archetype)
+        {
+            entity.m_Archetype->Remove(entity);
+            entity.m_Archetype.Reset();
+            m_RefreshCache = true;
+        }
+    }
+
+    template <typename... Args> decltype(auto) SetArchetype(Entity& entity) requires(U::AreUnique<Args...>)
+    {
+        using Components = U::ConnectArgsIntoTuple<Args...>;
+
+        auto action = [&]<typename... Ts>(Entity& entity) { return SetArchetypeTypes<Ts...>(entity); };
+
+        return U::UnpackAndRun<Components>(
+            std::make_index_sequence<std::tuple_size_v<Components>>{}, action, entity);
+    }
+
+    template <typename T> T& SetArchetype(Entity& entity) requires(std::derived_from<T, Component>)
+    {
+        return std::get<T>(SetArchetypeTypes<T>(entity));
+    }
+
+    template <typename... Args, typename F>
+    requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...)) &&
+        std::invocable<F&, unsigned int, Args&...>
+    void ForEach(F&& action)
+    {
+        if (m_RefreshCache == true)
+        {
+            m_Cache.Clear();
+            m_RefreshCache = false;
+        }
+        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+
+        if (!m_Cache.Contains<Args...>())
+        {
+            for (auto& archetype : m_Archetypes)
+            {
+                if (!archetype->Matches(wanted))
+                {
+                    continue;
+                }
+
+                auto rows = archetype->GetRows(wanted);
+                for (auto& [id, ptrs] : rows)
+                {
+                    [&]<size_t... I>(std::index_sequence<I...>)
+                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
+                }
+                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
+            }
+        }
+        else
+        {
+            for (auto& archetypeRow : m_Cache.Get<Args...>())
+            {
+                for (auto& [id, ptrs] : archetypeRow)
+                {
+                    [&]<size_t... I>(std::index_sequence<I...>)
+                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
+                }
+            }
+        }
+    }
+
+    template <typename... Args>
+    unsigned int NumberOfEntitiesWith()
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    {
+        unsigned int number = 0;
+
+        if (m_RefreshCache == true)
+        {
+            m_Cache.Clear();
+            m_RefreshCache = false;
+        }
+        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+
+        if (!m_Cache.Contains<Args...>())
+        {
+            for (auto& archetype : m_Archetypes)
+            {
+                if (!archetype->Matches(wanted))
+                {
+                    continue;
+                }
+
+                auto rows = archetype->GetRows(wanted);
+                for (auto& [id, ptrs] : rows)
+                {
+                    ++number;
+                }
+                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
+            }
+        }
+        else
+        {
+            for (auto& archetypeRow : m_Cache.Get<Args...>())
+            {
+                for (auto& [id, ptrs] : archetypeRow)
+                {
+                    ++number;
+                }
+            }
+        }
+
+        return number;
+    }
+
+  private:
+    template <typename... Args>
+    Archetype<Args...>& GetArchetype() requires(std::derived_from<Args, Component> && ...)
+    {
+        if (m_Archetypes.Contains<Args...>())
+        {
+            return static_cast<Archetype<Args...>&>(*m_Archetypes.Get<Args...>());
+        };
+        return static_cast<Archetype<Args...>&>(
+            **m_Archetypes.Emplace<Args...>(std::make_unique<Archetype<Args...>>()));
+    }
+
+    template <typename... Args>
+    std::tuple<Args&...> SetArchetypeTypes(Entity& entity)
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    {
+        auto& archetype = GetArchetype<Args...>();
+
+        if (entity.m_Archetype == &archetype)
+        {
+            return archetype.Get(entity);
+        }
+
+        U::CheckedPtr<std::tuple<Args...>> components;
+
+        if (!entity.m_Archetype)
+        {
+            components = &archetype.Add(entity);
+            entity.m_Archetype = &archetype;
+        }
+        else
+        {
+            U::CheckedPtr<IArchetype> previous = entity.m_Archetype;
+
+            components = &archetype.Add(entity);
+
+            (
+                [&]
+                {
+                    if (previous->SupportedComponents().Contains<Args>())
+                    {
+                        *static_cast<Args*>(archetype.GetTypeErased(entity, typeid(Args))) =
+                            std::move(*static_cast<Args*>(previous->GetTypeErased(entity, typeid(Args))));
+                    }
+                }(),
+                ...);
+
+            previous->Remove(entity);
+            entity.m_Archetype = &archetype;
+        }
+
+        //TODO: instead of completely refreshing the cache. i could do a search and \
+        // invalidate only caches associated with the modified components. \
+        // can make cache a runtime map with type_index as well if i need that.
+
+        m_RefreshCache = true;
+        return *components;
+    }
+    U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
+    U::TypedVector<Cache> m_Cache;
+    bool m_RefreshCache = false;
+};
+} // namespace Ivy::C
+
+
+// ==================================================
+// FILE 10: System.hpp
+// ==================================================
+
+#pragma once
+
+namespace Ivy::C
+{
+struct Engine;
+
+struct System
+{
+    virtual ~System() {}
+
+    System(Engine& engine) : m_Engine(engine) {}
+
+    virtual void Start() {}
+
+    virtual void Update(double dt) {}
+
+    virtual void FixedUpdate(double fdt) {}
+
+    virtual void Stop() {}
+
+    virtual void BeginFrame(double dt) {}
+
+    virtual void Render() {}
+
+    virtual void EndFrame(double dt) {}
+
+  protected:
+    Engine& m_Engine;
+};
+} // namespace Ivy::C
+
+
