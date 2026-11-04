@@ -233,8 +233,7 @@ struct Query
     {
         using Components = U::ConnectArgsIntoTuple<Args...>;
 
-        auto action = [&]<typename... Components>(Entity& entity)
-        { SetArchetypeTypes<Components...>(entity); };
+        auto action = [&]<typename... Ts>(Entity& entity) { SetArchetypeTypes<Ts...>(entity); };
 
         U::UnpackAndRun<Components>(
             std::make_index_sequence<std::tuple_size_v<Components>>{}, action, entity);
@@ -245,6 +244,11 @@ struct Query
         std::invocable<F&, unsigned int, Args&...>
     void ForEach(F&& action)
     {
+        if (m_RefreshCache == true)
+        {
+            m_Cache.Clear();
+            m_RefreshCache = false;
+        }
         static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
 
         if (!m_Cache.Contains<Args...>())
@@ -310,10 +314,11 @@ struct Query
             entity.Archetype = &archetype;
         }
 
-        m_Cache.Clear();
+        m_RefreshCache = true;
     }
 
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
     U::TypedVector<Cache> m_Cache;
+    bool m_RefreshCache = false;
 };
 } // namespace ECS

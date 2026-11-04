@@ -418,16 +418,7 @@ struct G : ECS::Component
 void BenchArchetypeECS()
 {
     ECS::Query q;
-    unsigned int entities = 1000;
-
-    // ECS::Entity s = {
-    // .Id = {1001, 0}
-    // };
-
-    // q.SetArchetype<D, E, F>(s);
-    // q.GetComponent<D>(s).Number = 200;
-
-    // U::Log::Info(q.GetComponent<D>(s).Number);
+    unsigned int entities = 100000;
 
     for (unsigned int i = 0; i < entities; ++i)
     {
@@ -440,6 +431,7 @@ void BenchArchetypeECS()
         }
         else
         {
+            q.SetArchetype<D, E, F>(e);
         }
         ZoneScopedN("Creation");
     }
@@ -451,13 +443,12 @@ void BenchArchetypeECS()
         {
             ZoneScopedN("Iteration");
             elapsed = 0;
-            q.ForEach<D, G>([](unsigned int id, D& d, G& g) { d.Number += id; });
+            q.ForEach<D>([](unsigned int id, D& d) { d.Number += id; });
         }
         elapsed += 0.016;
     }
 }
 
-//TODO: next step is figuring out syncing the cache.
 inline void Test()
 {
     BenchArchetypeECS();
