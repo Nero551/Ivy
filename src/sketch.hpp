@@ -3,57 +3,22 @@
 #include "Core/ECS/Component.hpp"
 #include "Core/ECS/ECS.hpp"
 #include "Core/ECS/Entity.hpp"
-#include "Core/ECS/EntityID.hpp"
-#include "Math/Common/Constants.hpp"
-#include "Math/Common/Exponentials.hpp"
-#include "Math/Common/Logarithms.hpp"
-#include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
-#include "Math/Equations/LinearEquation.hpp"
-#include "Math/Equations/LinearSystem.hpp"
-#include "Math/Equations/ODE.hpp"
-#include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Math/Functions/Integration.hpp"
-#include "Math/Functions/Inverse.hpp"
-#include "Math/Math.hpp"
-#include "Math/MathTuple.hpp"
-#include "Math/Matrix/Matrix.hpp"
-#include "Math/Quaternion/Quaternion.hpp"
-#include "Math/Set.hpp"
-#include "Math/Vector/Vector.hpp"
-#include "Physics/DimensionalAnalysis/Dimension.hpp"
-#include "Physics/DimensionalAnalysis/Dimensional.hpp"
-#include "Physics/DimensionalAnalysis/Dimensionals.hpp"
-#include "Physics/Units.hpp"
-#include "Protos/ECS.hpp"
-#include "Utilities/DataStructures/SparseSetAoS.hpp"
-#include "Utilities/DataStructures/SparseSetSoA.hpp"
-#include "Utilities/DataStructures/TypedVector.hpp"
-#include "Utilities/Debug/Inspector.hpp"
+#include "Protos/ECS/Component.hpp"
+#include "Protos/ECS/ECS.hpp"
+#include "Protos/ECS/Entity.hpp"
+#include "Protos/ECS/Query.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include "Utilities/IsSpecialization.hpp"
-#include "Utilities/Track.hpp"
 #include "tracy/Tracy.hpp"
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <concepts>
-#include <csignal>
 #include <cstdlib>
 #include <dlfcn.h>
-#include <functional>
-#include <ios>
-#include <memory>
 #include <ostream>
-#include <span>
 #include <string>
-#include <tuple>
 #include <type_traits>
-#include <typeindex>
-#include <typeinfo>
-#include <utility>
-#include <vector>
 
 namespace Sketch
 {
@@ -417,21 +382,20 @@ struct G : ECS::Component
 
 void BenchArchetypeECS()
 {
-    ECS::Query q;
-    unsigned int entities = 100000;
+    ECS::EntityComponentSystem ecs{};
+    unsigned int entities = 10000000;
 
     for (unsigned int i = 0; i < entities; ++i)
     {
-        ECS::Entity e = {
-            .Id = {i, 0}
-        };
+
+        auto& e = ecs.CreateEntity<ECS::Entity>();
         if (i % 2 == 0)
         {
-            q.SetArchetype<D, E, G>(e);
+            ecs.Query.SetArchetype<D, E, G>(e);
         }
         else
         {
-            q.SetArchetype<D, E, F>(e);
+            ecs.Query.SetArchetype<D, E, F>(e);
         }
         ZoneScopedN("Creation");
     }
@@ -443,7 +407,7 @@ void BenchArchetypeECS()
         {
             ZoneScopedN("Iteration");
             elapsed = 0;
-            q.ForEach<D>([](unsigned int id, D& d) { d.Number += id; });
+            ecs.Query.ForEach<D>([](unsigned int id, D& d) { d.Number += id; });
         }
         elapsed += 0.016;
     }
