@@ -13,6 +13,7 @@
 #include <concepts>
 #include <cstddef>
 #include <memory>
+#include <numbers>
 #include <span>
 #include <tuple>
 #include <type_traits>
@@ -57,6 +58,8 @@ struct IArchetype
     virtual bool Matches(std::span<const std::type_index> types) const = 0;
     virtual void Remove(const Entity& entity) = 0;
     virtual bool Has(const Entity& entity) const = 0;
+    virtual void* GetTypeErased(const Entity& entity) = 0;
+    virtual void* GetTypeErased(const Entity& entity, std::type_index type) = 0;
 
     virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
         std::span<const std::type_index> types) = 0;
@@ -85,17 +88,33 @@ struct Archetype : IArchetype
         m_Data.Erase(entity.Id.Index);
     }
 
+    void* GetTypeErased(const Entity& entity) override
+    {
+        return &Get(entity);
+    }
+
+    void* GetTypeErased(const Entity& entity, std::type_index type) override
+    {
+        ComponentCombo& components = Get(entity);
+        void* result = nullptr;
+
+        ((type == std::type_index(typeid(Args)) ? result = static_cast<void*>(&std::get<Args>(components)) :
+                                                  result),
+            ...);
+
+        return result;
+    }
     std::tuple<Args...>& Get(const Entity& entity)
     {
-        U::Log::Assert(m_Data.Contains(entity.Id.Index),
-            U::Log::Fatal("Archetype: [ ", typeid(Args)..., " ] doesn't contain entity: ", entity.Id));
+        U::Log::Assert(m_Data.Contains(entity.Id.Index), "Archetype: [ ", typeid(Args).name()...,
+            " ] doesn't contain entity: ", entity.Id);
         return m_Data[entity.Id.Index];
     }
 
     template <typename T> T& Get(const Entity& entity) requires(std::is_same_v<T, Args> || ...)
     {
-        U::Log::Assert(m_Data.Contains(entity.Id.Index),
-            U::Log::Fatal("Archetype: [ ", typeid(Args)..., " ] doesn't contain entity: ", entity.Id));
+        U::Log::Assert(m_Data.Contains(entity.Id.Index), "Archetype: [ ", typeid(Args).name()...,
+            " ] doesn't contain entity: ", entity.Id);
         return std::get<T>(m_Data[entity.Id.Index]);
     }
 
@@ -154,6 +173,21 @@ struct Query
 
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
+
+    template <typename T> T& GetComponent(Entity& entity)
+    {
+        U::Log::Assert(entity.Archetype != nullptr, "Entity is not Connected To Any Archetype ");
+        if (m_Archetypes.Contains<T>() && m_Archetypes.Get<T>()->Has(entity))
+        {
+            return static_cast<Archetype<T>&>(*m_Archetypes.Get<T>()).template Get<T>(entity);
+        }
+
+        if (entity.Archetype->SupportedComponents.contains(std::type_index(typeid(T))))
+        {
+            return *static_cast<T*>(entity.Archetype->GetTypeErased(entity, std::type_index(typeid(T))));
+        }
+        U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.Id.Index);
+    }
 
     template <typename... Args> bool HasComponent(Entity& entity)
     {
@@ -254,15 +288,14 @@ struct Query
         {
             entity.Archetype = &archetype;
             archetype.Add(entity);
-            if (m_Cache.Contains<Args...>())
-            {
-                m_Cache.Get<Args...>().clear();
-            }
-            return;
         }
-        entity.Archetype->Remove(entity);
-        archetype.Add(entity);
-        entity.Archetype = &archetype;
+        else
+        {
+            entity.Archetype->Remove(entity);
+            archetype.Add(entity);
+            entity.Archetype = &archetype;
+        }
+
         m_Cache.Clear();
     }
 
