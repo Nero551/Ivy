@@ -1,16 +1,14 @@
 #pragma once
 
 #include "Core.hpp"
+#include "ECS/Archetype.hpp"
 #include "ECS/Component.hpp"
-#include "ECS/ComponentPool.hpp"
-#include "ECS/ComponentPoolQuery.hpp"
 #include "ECS/ECS.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
-#include "ECS/Events/ComponentAdded.hpp"
-#include "ECS/Events/ComponentRemoved.hpp"
 #include "ECS/Events/EntityCreated.hpp"
 #include "ECS/Events/EntityDestroyed.hpp"
+#include "ECS/Query.hpp"
 #include "ECS/System.hpp"
 #include "Engine.hpp"
 #include "Module.hpp"

@@ -1,14 +1,7 @@
 #pragma once
 
-#include "Core/ECS/Component.hpp"
-#include "Core/ECS/ECS.hpp"
-#include "Core/ECS/Entity.hpp"
 #include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Protos/ECS/Component.hpp"
-#include "Protos/ECS/ECS.hpp"
-#include "Protos/ECS/Entity.hpp"
-#include "Protos/ECS/Query.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "tracy/Tracy.hpp"
 #include <array>
@@ -294,55 +287,6 @@ struct Shader
     }
 };
 
-struct A : Ivy::C::Component
-{
-    int Number = 10;
-};
-struct B : Ivy::C::Component
-{
-    int Number = 10;
-};
-struct C : Ivy::C::Component
-{
-    int Number = 10;
-};
-
-inline void BenchECS()
-{
-    Ivy::C::EntityComponentSystem ecs;
-    auto& aPool = ecs.Query.Pool<A>();
-    auto& bPool = ecs.Query.Pool<B>();
-    auto& cPool = ecs.Query.Pool<C>();
-    unsigned int entities = 1000000;
-
-    for (unsigned int i = 0; i < entities; ++i)
-    {
-        ZoneScopedN("Creation");
-        Ivy::C::Entity& e = ecs.CreateEntity<Ivy::C::Entity>();
-        aPool.Add(e);
-        bPool.Add(e);
-        cPool.Add(e);
-    }
-
-    double elapsed = 0;
-    while (true)
-    {
-        if (elapsed >= 10)
-        {
-            ZoneScopedN("Iteration");
-            elapsed = 0;
-            ecs.Query.ForEach<A, B, C>(
-                [](const unsigned int id, A& a, B& b, C& c)
-                {
-                    a.Number += b.Number + c.Number;
-                    b.Number += a.Number + c.Number;
-                    c.Number += a.Number + b.Number;
-                });
-        }
-        elapsed += 0.016;
-    }
-}
-
 //TODO: define VariableCount method to math objects (vector,quaternion,matrix,complex,math tuple,etc)
 // TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables. \
 // this will be needed for partial derivatives specifically.
@@ -358,65 +302,7 @@ inline void BenchECS()
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //
-//
-// TODO: make ArchetypeAoS & ArchetypeSoA data structures
-// TODO: instead of checking
+//TODO: now only remains integration of the ecs into the engine.
 
-struct D : ECS::Component
-{
-    int Number = 10;
-};
-struct E : ECS::Component
-{
-    int Number = 10;
-};
-struct F : ECS::Component
-{
-    int Number = 10;
-};
-
-struct G : ECS::Component
-{
-    int Number = 10;
-};
-
-void BenchArchetypeECS()
-{
-    ECS::EntityComponentSystem ecs{};
-    unsigned int entities = 1000000;
-
-    for (unsigned int i = 0; i < entities; ++i)
-    {
-
-        auto& e = ecs.CreateEntity<ECS::Entity>();
-        if (i % 2 == 0)
-        {
-            ecs.Query.SetArchetype<D, E, G>(e);
-        }
-        else
-        {
-            ecs.Query.SetArchetype<D, E, F>(e);
-        }
-        ZoneScopedN("Creation");
-    }
-
-    double elapsed = 0;
-    while (true)
-    {
-        if (elapsed >= 10)
-        {
-            ZoneScopedN("Iteration");
-            elapsed = 0;
-            ecs.Query.ForEach<D, E>([](unsigned int id, D& d, E& e) { d.Number += e.Number; });
-        }
-        elapsed += 0.016;
-    }
-}
-
-//TODO: last step is to remake the ECS events, and that should be all. just entity added and entity destroyed
-
-inline void Test()
-{
-    BenchArchetypeECS();
-}
+inline void Test() {}
 } // namespace Sketch

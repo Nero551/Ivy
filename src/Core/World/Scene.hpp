@@ -18,18 +18,8 @@ struct Scene
 
     Scene(Scene&&) = default;
 
-    EntityID GetRoot() const
-    {
-        return m_Root;
-    }
-    void SetRoot(const Entity& entity)
-    {
-        m_Root = entity.GetId();
-    }
-    void SetRoot(EntityID entityId)
-    {
-        m_Root = entityId;
-    }
+    Entity& GetRoot() const;
+    void SetRoot(const Entity& entity);
 
     virtual void Initialize() {}
 

@@ -5,7 +5,6 @@
 #include "ECS/ECS.hpp"
 #include "Graphics/Window.hpp"
 #include "Module.hpp"
-#include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <concepts>
@@ -18,7 +17,7 @@ namespace Ivy::C
 template <typename T>
 concept IsModule = std::derived_from<T, Module>;
 template <typename T>
-concept ServiceType = std::derived_from<T, Service>;
+concept IsService = std::derived_from<T, Service>;
 
 /** @brief Main Ivy engine and game loop. Manages the window, world, modules, ECS, and frame lifecycle. */
 struct Engine
@@ -56,7 +55,7 @@ struct Engine
         return static_cast<T&>(**module);
     }
 
-    template <ServiceType T> T& GetService()
+    template <IsService T> T& GetService()
     {
         auto service = m_Services.Find<T>();
         if (service == m_Services.end())
@@ -93,7 +92,7 @@ struct Engine
         return static_cast<T&>(*m_Modules.Get<T>());
     }
 
-    template <ServiceType T> T& AddService()
+    template <IsService T> T& AddService()
     {
         if (m_Services.Contains<T>())
         {

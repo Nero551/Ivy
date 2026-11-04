@@ -1,3 +1,4 @@
+#include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
 #include "Core/World/Systems/Trarnsform2DSystem.hpp"
@@ -10,27 +11,24 @@ void Transform2DSystem::Update(double dt)
     auto& world = m_Engine.World;
     auto& ecs = m_Engine.ECS;
     auto& query = m_Engine.ECS.Query;
-    auto& transformPool = query.Pool<CMP::Transform2D>();
 
     world.GetRoot().ForEachDescendant(
-        [&](const EntityID entityId)
+        [&](Entity& entity)
         {
-            auto& entity = ecs.GetEntity(entityId);
-
-            if (!transformPool.HasId(entityId))
+            if (!query.HasComponent<CMP::Transform2D>(entity))
             {
                 return;
             }
 
-            auto& transform = transformPool[entityId];
+            auto& transform = query.GetComponent<CMP::Transform2D>(entity);
 
             if (transform.InheritTransform)
             {
                 auto& parent = entity.GetParent();
 
-                if (transformPool.HasId(parent.GetId()))
+                if (query.HasComponent<CMP::Transform2D>(parent))
                 {
-                    auto& parentTransform = transformPool[parent.GetId()];
+                    auto& parentTransform = query.GetComponent<CMP::Transform2D>(parent);
 
                     transform.m_GlobalPosition = parentTransform.m_GlobalPosition + transform.Position;
                     transform.m_GlobalRotation = parentTransform.m_GlobalRotation + transform.Rotation;

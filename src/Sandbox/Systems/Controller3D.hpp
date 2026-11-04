@@ -34,8 +34,8 @@ struct Controller3D : C::System
         auto& input = m_Engine.GetModule<I::Input>();
         auto& camera = m_Engine.World.GetCamera();
 
-        auto& transform = query.Pool<CMP::Transform3D>().GetComponent(camera.GetId());
-        auto& cameraComponent = query.Pool<CMP::Camera>().GetComponent(camera.GetId());
+        auto& transform = query.GetComponent<CMP::Transform3D>(camera);
+        auto& cameraComponent = query.GetComponent<CMP::Camera>(camera);
 
         cameraComponent.ProjectionMode = R::ProjectionMode::Perspective;
         cameraComponent.Left = 0;

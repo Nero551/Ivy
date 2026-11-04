@@ -21,11 +21,9 @@ struct World : SystemOwner
     using SystemOwner::SystemOwner;
 
     int MaxLights = 24;
-    void SetRoot(const EntityID id);
     void SetRoot(const Entity& entity);
     Entity& GetRoot();
     void SetCamera(const Entity& entity);
-    void SetCamera(const EntityID id);
     Entity& GetCamera();
 
     template <typename T, typename... Args> T CreateScene(Args&&... args)

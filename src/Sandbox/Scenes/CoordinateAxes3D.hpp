@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../Core/World/Scene.hpp"
-#include "Core/ECS/ComponentPool.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
@@ -45,12 +44,12 @@ struct CoordinateAxes3D : C::Scene
         lightMaterial().Shader = &lightShader();
 
         auto& light = m_Engine.ECS.CreateEntity<R::Light3D>();
-        query.Pool<CMP::Transform3D>().GetComponent(light.GetId()).Rotation =
+        query.GetComponent<CMP::Transform3D>(light).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5)});
         light.SetParent(GetRoot());
 
         auto& light2 = m_Engine.ECS.CreateEntity<R::Light3D>();
-        query.Pool<CMP::Transform3D>().GetComponent(light2.GetId()).Rotation =
+        query.GetComponent<CMP::Transform3D>(light2).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5)});
         light2.SetParent(GetRoot());
 
@@ -64,39 +63,42 @@ struct CoordinateAxes3D : C::Scene
         auto& line = resourceManager.Load<G::Mesh>(m);
 
         auto& xAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-        query.Pool<CMP::Mesh>().GetComponent(xAxis.GetId()).Mesh = &line;
-        auto& xMaterial = query.Pool<CMP::Material>().GetComponent(xAxis.GetId());
+        query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
+        auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
         xMaterial.Material = &resourceManager.Load<G::Material>("X-Axis Material");
         xMaterial.Material->Get().Shader = &shader();
 
-        query.Pool<CMP::Transform3D>().GetComponent(xAxis.GetId()).Scale = {200, 1, 1};
+        query.GetComponent<CMP::Transform3D>(xAxis).Scale = {200, 1, 1};
         xMaterial.Material->Get().Color = M::Color::Red;
 
         xAxis.SetParent(GetRoot());
 
         auto& yAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-        query.Pool<CMP::Mesh>().GetComponent(yAxis.GetId()).Mesh = &line;
-        auto& yMaterial = query.Pool<CMP::Material>().GetComponent(yAxis.GetId());
+
+        query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
+
+        auto& yTransform = query.GetComponent<CMP::Transform3D>(yAxis);
+        yTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)});
+        yTransform.Scale = {200, 1, 1};
+
+        auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
         yMaterial.Material = &resourceManager.Load<G::Material>("Y-Axis Material");
         yMaterial.Material->Get().Shader = &shader();
-
-        query.Pool<CMP::Transform3D>().GetComponent(yAxis.GetId()).Rotation =
-            M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)});
-        query.Pool<CMP::Transform3D>().GetComponent(yAxis.GetId()).Scale = {200, 1, 1};
         yMaterial.Material->Get().Color = M::Color::Green;
 
         yAxis.SetParent(GetRoot());
 
         auto& zAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-        query.Pool<CMP::Mesh>().GetComponent(zAxis.GetId()).Mesh = &line;
 
-        query.Pool<CMP::Transform3D>().GetComponent(zAxis.GetId()).Rotation =
-            M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0});
-        auto& zMaterial = query.Pool<CMP::Material>().GetComponent(zAxis.GetId());
+        query.GetComponent<CMP::Mesh>(zAxis).Mesh = &line;
+
+        auto& zTransform = query.GetComponent<CMP::Transform3D>(zAxis);
+        zTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0});
+        zTransform.Scale = {200, 1, 1};
+
+        auto& zMaterial = query.GetComponent<CMP::Material>(zAxis);
         zMaterial.Material = &resourceManager.Load<G::Material>("Z-Axis Material");
         zMaterial.Material->Get().Shader = &shader();
-
-        query.Pool<CMP::Transform3D>().GetComponent(zAxis.GetId()).Scale = {200, 1, 1};
         zMaterial.Material->Get().Color = M::Color::Blue;
 
         zAxis.SetParent(GetRoot());

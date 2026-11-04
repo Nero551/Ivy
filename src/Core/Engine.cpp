@@ -5,7 +5,6 @@
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Graphics/Context.hpp"
 #include "Modules/Input/Input.hpp"
-#include "Modules/Physics/Physics.hpp"
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
 #include "Sandbox/Sandbox2D.hpp"
@@ -63,7 +62,6 @@ void Engine::Configure()
     AddModule<I::Input>();
     AddModule<R::Renderer>();
     AddModule<Profiling>();
-    // AddModule<Physics>();
     AddModule<Sandbox::Sandbox3D>();
 }
 

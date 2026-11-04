@@ -1,16 +1,16 @@
 #pragma once
-#include "Core/ECS/Entity.hpp"
-#include "Core/ECS/EntityID.hpp"
+#include "../Entity.hpp"
 #include "Core/Services/EventBus/Event.hpp"
+#include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::C
 {
-struct EntityCreated : Event<EntityCreated>
+struct EntityCreated : C::Event<EntityCreated>
 {
 
     using Event::Event;
-    EntityID EntityId;
+    U::CheckedPtr<Entity> Entity;
 
-    EntityCreated(EntityID entityId) : EntityId(entityId) {}
+    EntityCreated(U::CheckedPtr<struct Entity> entity) : Entity(entity) {}
 };
 } // namespace Ivy::C

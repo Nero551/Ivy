@@ -1,7 +1,7 @@
 #pragma once
-#include "Protos/ECS/Archetype.hpp"
-#include "Protos/ECS/Component.hpp"
-#include "Protos/ECS/Entity.hpp"
+#include "Archetype.hpp"
+#include "Component.hpp"
+#include "Entity.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
@@ -14,7 +14,7 @@
 #include <typeindex>
 #include <utility>
 #include <vector>
-namespace Ivy::ECS
+namespace Ivy::C
 {
 struct Query
 {
@@ -22,23 +22,28 @@ struct Query
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
-    template <typename... Args>
-    std::tuple<Args...> GetComponent(Entity& entity) const
-        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    template <typename... Args> requires(sizeof...(Args) != 1 && (std::derived_from<Args, Component> && ...))
+    std::tuple<Args...>& GetComponent(const Entity& entity) const
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...) && sizeof...(Args) != 1)
     {
 
         return {GetComponent<Args>(entity)...};
     }
 
-    template <typename T> T& GetComponent(Entity& entity) const requires(std::derived_from<T, Component>)
+    template <typename T>
+    T& GetComponent(const Entity& entity) const requires(std::derived_from<T, Component>)
     {
-        U::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype ");
-        if (m_Archetypes.Contains<T>() && m_Archetypes.Get<T>()->Has(entity))
+        U::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype");
+        if (m_Archetypes.Contains<T>())
         {
-            return static_cast<Archetype<T>&>(*m_Archetypes.Get<T>()).template Get<T>(entity);
+            Archetype<T>& archetype = static_cast<Archetype<T>&>(*m_Archetypes.Get<T>());
+            if (archetype.Has(entity))
+            {
+                return archetype.template GetOne<T>(entity);
+            }
         }
 
-        if (entity.m_Archetype->SupportedComponents.contains(std::type_index(typeid(T))))
+        if (entity.m_Archetype->SupportedComponents().Contains<T>())
         {
             return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, std::type_index(typeid(T))));
         }
@@ -46,29 +51,21 @@ struct Query
     }
 
     template <typename... Args>
-    bool HasComponent(Entity& entity) const
+    bool HasComponent(const Entity& entity) const
         requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
     {
-        if (!entity.m_Archetype)
+        if (entity.m_Archetype == nullptr)
         {
-            U::Log::Info("First");
             return false;
         }
         if (m_Archetypes.Contains<Args...>())
         {
-            U::Log::Info("Second");
             return m_Archetypes.Get<Args...>()->Has(entity);
         }
 
-        std::array<std::type_index, sizeof...(Args)> specifiedTypes{std::type_index(typeid(Args))...};
-
-        for (auto& specifiedType : specifiedTypes)
+        if ((!entity.m_Archetype->SupportedComponents().Contains<Args>() || ...))
         {
-            if (!entity.m_Archetype->SupportedComponents.contains(specifiedType))
-            {
-                U::Log::Info("Third");
-                return false;
-            }
+            return false;
         }
         return true;
     }
@@ -83,9 +80,7 @@ struct Query
         }
     }
 
-    template <typename... Args>
-    decltype(auto) SetArchetype(Entity& entity)
-        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    template <typename... Args> decltype(auto) SetArchetype(Entity& entity) requires(U::AreUnique<Args...>)
     {
         using Components = U::ConnectArgsIntoTuple<Args...>;
 
@@ -143,6 +138,50 @@ struct Query
         }
     }
 
+    template <typename... Args>
+    unsigned int NumberOfEntitiesWith()
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    {
+        unsigned int number = 0;
+
+        if (m_RefreshCache == true)
+        {
+            m_Cache.Clear();
+            m_RefreshCache = false;
+        }
+        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+
+        if (!m_Cache.Contains<Args...>())
+        {
+            for (auto& archetype : m_Archetypes)
+            {
+                if (!archetype->Matches(wanted))
+                {
+                    continue;
+                }
+
+                auto rows = archetype->GetRows(wanted);
+                for (auto& [id, ptrs] : rows)
+                {
+                    ++number;
+                }
+                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
+            }
+        }
+        else
+        {
+            for (auto& archetypeRow : m_Cache.Get<Args...>())
+            {
+                for (auto& [id, ptrs] : archetypeRow)
+                {
+                    ++number;
+                }
+            }
+        }
+
+        return number;
+    }
+
   private:
     template <typename... Args>
     Archetype<Args...>& GetArchetype() requires(std::derived_from<Args, Component> && ...)
@@ -155,7 +194,9 @@ struct Query
             **m_Archetypes.Emplace<Args...>(std::make_unique<Archetype<Args...>>()));
     }
 
-    template <typename... Args> std::tuple<Args...>& SetArchetypeTypes(Entity& entity)
+    template <typename... Args>
+    std::tuple<Args&...> SetArchetypeTypes(Entity& entity)
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
     {
         auto& archetype = GetArchetype<Args...>();
 
@@ -180,7 +221,7 @@ struct Query
             (
                 [&]
                 {
-                    if (previous->SupportedComponents.contains(typeid(Args)))
+                    if (previous->SupportedComponents().Contains<Args>())
                     {
                         *static_cast<Args*>(archetype.GetTypeErased(entity, typeid(Args))) =
                             std::move(*static_cast<Args*>(previous->GetTypeErased(entity, typeid(Args))));
@@ -203,4 +244,4 @@ struct Query
     U::TypedVector<Cache> m_Cache;
     bool m_RefreshCache = false;
 };
-} // namespace Ivy::ECS
+} // namespace Ivy::C

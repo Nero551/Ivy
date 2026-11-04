@@ -1,25 +1,20 @@
 #pragma once
 
 #include "../../Core/World/Scene.hpp"
-#include "Core/ECS/ComponentPool.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
-#include "Graphics/Mesh/Topology.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Grid2D.hpp"
 #include "Math/Color/Color.hpp"
-#include "Math/Common/Trigonometry.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
-#include <assimp/postprocess.h>
-#include <utility>
 
 namespace Ivy::Sandbox
 {
@@ -43,30 +38,30 @@ struct CoordinateAxes2D : C::Scene
         auto& line = resourceManager.Load<G::Mesh>(m);
 
         auto& xAxis = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
-        query.Pool<CMP::Mesh>().GetComponent(xAxis.GetId()).Mesh = &line;
-        auto& xMaterial = query.Pool<CMP::Material>().GetComponent(xAxis.GetId());
+        query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
+        auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
         xMaterial.Material = &resourceManager.Load<G::Material>("X-Axis Material");
         xMaterial.Material->Get().Shader = &shader();
 
-        query.Pool<CMP::Transform2D>().GetComponent(xAxis.GetId()).Scale = {200, 1};
+        query.GetComponent<CMP::Transform2D>(xAxis).Scale = {200, 1};
         xMaterial.Material->Get().Color = M::Color::Red;
 
         xAxis.SetParent(GetRoot());
 
         auto& yAxis = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
-        query.Pool<CMP::Mesh>().GetComponent(yAxis.GetId()).Mesh = &line;
-        auto& yMaterial = query.Pool<CMP::Material>().GetComponent(yAxis.GetId());
+        query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
+        auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
         yMaterial.Material = &resourceManager.Load<G::Material>("Y-Axis Material");
         yMaterial.Material->Get().Shader = &shader();
 
-        query.Pool<CMP::Transform2D>().GetComponent(yAxis.GetId()).Rotation = M::Rad(90);
-        query.Pool<CMP::Transform2D>().GetComponent(yAxis.GetId()).Scale = {200, 1};
+        query.GetComponent<CMP::Transform2D>(yAxis).Rotation = M::Rad(90);
+        query.GetComponent<CMP::Transform2D>(yAxis).Scale = {200, 1};
         yMaterial.Material->Get().Color = M::Color::Green;
 
         yAxis.SetParent(GetRoot());
 
         Grid2D grid = m_Engine.World.CreateScene<Grid2D>();
-        m_Engine.ECS.FindEntity(GetRoot()).AttachChild(grid.GetRoot());
+        GetRoot().AttachChild(grid.GetRoot());
     }
 };
 } // namespace Ivy::Sandbox

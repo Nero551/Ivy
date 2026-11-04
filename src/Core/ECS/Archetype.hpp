@@ -1,7 +1,8 @@
 #pragma once
-#include "Protos/ECS/Component.hpp"
-#include "Protos/ECS/Entity.hpp"
+#include "Component.hpp"
+#include "Entity.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
+#include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/TupleUtils.hpp"
 #include <algorithm>
@@ -13,17 +14,13 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-namespace Ivy::ECS
+namespace Ivy::C
 {
 
 struct IArchetype
 {
     using ComponentCombo = std::tuple<>;
     virtual ~IArchetype() = default;
-
-    const std::unordered_set<std::type_index> SupportedComponents;
-
-    IArchetype(const std::unordered_set<std::type_index>& sc) : SupportedComponents(sc) {}
 
     virtual bool Matches(std::span<const std::type_index> types) const = 0;
     virtual void Remove(const Entity& entity) = 0;
@@ -32,6 +29,14 @@ struct IArchetype
 
     virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
         std::span<const std::type_index> types) = 0;
+
+    U::TypedVector<std::type_index>& SupportedComponents()
+    {
+        return m_SupportedComponents;
+    }
+
+  protected:
+    U::TypedVector<std::type_index> m_SupportedComponents;
 };
 
 template <typename... Args> requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
@@ -45,7 +50,10 @@ struct Archetype : IArchetype
         return (*m_Data.Emplace(entity.GetId().Index)).Value;
     }
 
-    Archetype() : IArchetype({std::type_index(typeid(Args))...}) {}
+    Archetype()
+    {
+        (m_SupportedComponents.Emplace<Args>(typeid(Args)), ...);
+    }
 
     bool Has(const Entity& entity) const override
     {
@@ -81,7 +89,7 @@ struct Archetype : IArchetype
         return m_Data[entity.GetId().Index];
     }
 
-    template <typename T> T& Get(const Entity& entity) requires(std::is_same_v<T, Args> || ...)
+    template <typename T> T& GetOne(const Entity& entity) requires(std::is_same_v<T, Args> || ...)
     {
         U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
             " ] doesn't contain entity: ", entity.GetId());
@@ -137,4 +145,4 @@ struct Archetype : IArchetype
         return pairs;
     }
 };
-} // namespace Ivy::ECS
+} // namespace Ivy::C

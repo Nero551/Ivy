@@ -9,12 +9,13 @@
 #include "Modules/Renderer/ProjectionMode.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <algorithm>
+
 namespace Ivy::Sandbox
 {
-
 struct Controller2D : C::System
 {
     using C::System::System;
+
     void Update(double dt) override
     {
         if (m_Engine.GetModule<I::Input>().IsKeyPressed(G::Key::T))
@@ -26,7 +27,7 @@ struct Controller2D : C::System
         auto& input = m_Engine.GetModule<I::Input>();
         auto& camera = m_Engine.World.GetCamera();
 
-        if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::LeftControl))
+        if (input.IsKeyHeld(G::Key::LeftControl))
         {
             m_Zoom += input.GetScrollDelta().y * M::PI * M::PHI;
         }
@@ -37,8 +38,8 @@ struct Controller2D : C::System
 
         m_Zoom = std::max(m_Zoom, 2.0f);
 
-        auto& transform = query.Pool<CMP::Transform2D>().GetComponent(camera);
-        auto& cameraComponent = query.Pool<CMP::Camera>().GetComponent(camera);
+        auto& transform = query.GetComponent<CMP::Transform2D>(camera);
+        auto& cameraComponent = query.GetComponent<CMP::Camera>(camera);
 
         cameraComponent.ProjectionMode = R::ProjectionMode::Orthographic;
         cameraComponent.Left = -m_Engine.Window.GetWidth() / m_Zoom;

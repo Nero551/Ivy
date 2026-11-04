@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
@@ -69,6 +70,8 @@ struct VectorFields2D : C::System
 
         std::vector<float> magnitudes{};
 
+        auto& query = m_Engine.ECS.Query;
+
         for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
         {
             for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
@@ -83,9 +86,9 @@ struct VectorFields2D : C::System
                 }
 
                 // Create one arrow for this grid point.
-                const auto& arrow = Arrow();
+                auto& arrow = Arrow();
 
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
                 transform.Position = M::Vector<2>{theta, omega} * 2;
                 transform.Scale = M::Vector<2>{0.2, 0.1};
@@ -93,7 +96,7 @@ struct VectorFields2D : C::System
 
                 magnitudes.push_back(M::Vector<2>{thetaDot, omegaDot}.Length());
 
-                m_Engine.World.GetRoot().AttachChild(arrow.GetId());
+                m_Engine.World.GetRoot().AttachChild(arrow);
             }
         }
 
@@ -104,6 +107,7 @@ struct VectorFields2D : C::System
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
+
     void ExponentialModel()
     {
         const float k = 0.2f;
@@ -113,6 +117,8 @@ struct VectorFields2D : C::System
         const Equation equation{[k](float t, float p) { return Equation::State{t, k * p}; }};
 
         std::vector<float> magnitudes{};
+
+        auto& query = m_Engine.ECS.Query;
 
         for (float p = 0; p <= 50; p += 0.5f)
         {
@@ -127,7 +133,7 @@ struct VectorFields2D : C::System
 
                 magnitudes.push_back(target.Length());
 
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
                 transform.Position = pos;
                 transform.Scale = {0.5f, 0.25f};
@@ -144,6 +150,7 @@ struct VectorFields2D : C::System
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
+
     void LogisticModel()
     {
         const float k = 0.05f;
@@ -155,6 +162,8 @@ struct VectorFields2D : C::System
 
         std::vector<float> magnitudes{};
 
+        auto& query = m_Engine.ECS.Query;
+
         for (float p = 0; p <= 50; p += 0.5f)
         {
             for (float t = 0; t < 50; t += 0.5f)
@@ -168,7 +177,7 @@ struct VectorFields2D : C::System
 
                 magnitudes.push_back(target.Length());
 
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
                 transform.Position = pos;
                 transform.Scale = {0.5f, 0.25f};
@@ -185,6 +194,7 @@ struct VectorFields2D : C::System
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
+
     void SpringModel()
     {
         const float k = 0.8f;
@@ -196,6 +206,8 @@ struct VectorFields2D : C::System
             [k, m](float t, float x, float v) { return Equation::State{t, v, -k * x / m}; }};
 
         std::vector<float> magnitudes{};
+
+        auto& query = m_Engine.ECS.Query;
 
         for (float v = -25; v <= 25; v += 0.5f)
         {
@@ -210,7 +222,7 @@ struct VectorFields2D : C::System
 
                 magnitudes.push_back(target.Length());
 
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
                 transform.Position = pos;
                 transform.Scale = {0.5f, 0.25f};
@@ -227,6 +239,7 @@ struct VectorFields2D : C::System
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
+
     void DampenedSpringModel()
     {
         const float k = 0.8f;
@@ -240,6 +253,8 @@ struct VectorFields2D : C::System
 
         std::vector<float> magnitudes{};
 
+        auto& query = m_Engine.ECS.Query;
+
         for (float v = -25; v <= 25; v += 0.5f)
         {
             for (float x = -25; x < 25; x += 0.5f)
@@ -253,7 +268,7 @@ struct VectorFields2D : C::System
 
                 magnitudes.push_back(target.Length());
 
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
                 transform.Position = pos;
                 transform.Scale = {0.5f, 0.25f};
@@ -270,6 +285,7 @@ struct VectorFields2D : C::System
         m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
+
     void LinearResistiveForceModel()
     {
         const float b = 0.8f;
@@ -281,6 +297,8 @@ struct VectorFields2D : C::System
         const Equation equation{[b, m, g](float t, float v) { return Equation::State{t, g - (b / m) * v}; }};
 
         std::vector<float> magnitudes{};
+
+        auto& query = m_Engine.ECS.Query;
 
         for (float v = -25; v <= 25; v += 0.5f)
         {
@@ -295,7 +313,7 @@ struct VectorFields2D : C::System
 
                 magnitudes.push_back(target.Length());
 
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
                 transform.Position = pos;
                 transform.Scale = {0.5f, 0.25f};
@@ -328,6 +346,8 @@ struct VectorFields2D : C::System
 
         std::vector<float> magnitudes{};
 
+        auto& query = m_Engine.ECS.Query;
+
         for (float v = -25; v <= 25; v += 0.5f)
         {
             for (float t = 0; t < 50; t += 0.5f)
@@ -341,7 +361,7 @@ struct VectorFields2D : C::System
 
                 magnitudes.push_back(target.Length());
 
-                CMP::Transform2D& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(arrow);
+                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
                 transform.Position = pos;
                 transform.Scale = {0.5f, 0.25f};
@@ -361,9 +381,12 @@ struct VectorFields2D : C::System
 
     C::Entity& Arrow()
     {
+        auto& query = m_Engine.ECS.Query;
+
         auto& arrow = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
-        m_Engine.ECS.Query.Pool<CMP::Mesh>().GetComponent(arrow).Mesh = m_Mesh;
-        m_Engine.ECS.Query.Pool<CMP::Material>().GetComponent(arrow).Material = m_Material;
+        query.GetComponent<CMP::Mesh>(arrow).Mesh = m_Mesh;
+        query.GetComponent<CMP::Material>(arrow).Material = m_Material;
+
         return arrow;
     }
 

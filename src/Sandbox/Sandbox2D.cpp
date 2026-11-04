@@ -22,6 +22,7 @@
 #include "Sandbox/Systems/VectorFields2D.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstdlib>
+
 namespace Ivy::Sandbox
 {
 
@@ -30,7 +31,7 @@ C::EntityID Sandbox2D::CreateCircle()
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
     auto& circle = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
-    query.Pool<CMP::Mesh>().GetComponent(circle).Mesh = &resources.Load(G::Primitives::CreateCircle("ball"));
+    query.GetComponent<CMP::Mesh>(circle).Mesh = &resources.Load(G::Primitives::CreateCircle("ball"));
 
     auto& vertSource = resources.Load<G::ShaderSource>(
         "circleShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
@@ -42,9 +43,9 @@ C::EntityID Sandbox2D::CreateCircle()
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 
-    query.Pool<CMP::Material>().GetComponent(circle).Material = &mat;
+    query.GetComponent<CMP::Material>(circle).Material = &mat;
     m_Engine.World.GetRoot().AttachChild(circle);
-    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(circle);
+    auto& transform = query.GetComponent<CMP::Transform2D>(circle);
     transform.Position = {0, 1};
 
     return circle.GetId();
@@ -55,7 +56,7 @@ C::EntityID Sandbox2D::CreateSquare()
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
     auto& square = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
-    query.Pool<CMP::Mesh>().GetComponent(square).Mesh = &resources.Load(G::Primitives::CreateQuad("cube"));
+    query.GetComponent<CMP::Mesh>(square).Mesh = &resources.Load(G::Primitives::CreateQuad("cube"));
 
     auto& vertSource = resources.Load<G::ShaderSource>(
         "squareShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
@@ -67,18 +68,18 @@ C::EntityID Sandbox2D::CreateSquare()
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 
-    query.Pool<CMP::Material>().GetComponent(square).Material = &mat;
+    query.GetComponent<CMP::Material>(square).Material = &mat;
     m_Engine.World.GetRoot().AttachChild(square);
-    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(square);
+    auto& transform = query.GetComponent<CMP::Transform2D>(square);
     transform.Position = {0, 1};
 
     return square.GetId();
 }
 
 static C::EntityID particleId;
+
 void Sandbox2D::Start()
 {
-
     auto& camera = m_Engine.ECS.CreateEntity<R::Camera2D>();
     m_Engine.World.GetRoot().AttachChild(camera);
     m_Engine.World.SetCamera(camera);
@@ -139,7 +140,7 @@ void Sandbox2D::FixedUpdate(double fdt)
 
     auto& query = m_Engine.ECS.Query;
     auto& input = m_Engine.GetModule<I::Input>();
-    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(particleId));
+    auto& transform = query.GetComponent<CMP::Transform2D>(m_Engine.ECS.GetEntity(particleId));
 
     p.Position.y = 0.5;
     M::Vector<2> f{0, 0};
@@ -178,7 +179,7 @@ void Sandbox2D::PlayWithBall(double fdt)
     constexpr float restitution = 0.8;
     auto& query = m_Engine.ECS.Query;
     auto& input = m_Engine.GetModule<I::Input>();
-    auto& transform = query.Pool<CMP::Transform2D>().GetComponent(m_Engine.ECS.GetEntity(particleId));
+    auto& transform = query.GetComponent<CMP::Transform2D>(m_Engine.ECS.GetEntity(particleId));
 
     M::Vector<2> f{0, 0};
 

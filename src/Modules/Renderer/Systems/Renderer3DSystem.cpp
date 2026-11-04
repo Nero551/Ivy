@@ -12,9 +12,9 @@ void Renderer3DSystem::Start()
         {
             for (auto& batch : Batches)
             {
-                if (batch.Instances.Contains(event.EntityId.Index))
+                if (batch.Instances.Contains(event.Entity->GetId().Index))
                 {
-                    batch.Instances.Erase(event.EntityId.Index);
+                    batch.Instances.Erase(event.Entity->GetId().Index);
                 }
             }
         });
@@ -26,15 +26,15 @@ void Renderer3DSystem::Render()
     auto& query = m_Engine.ECS.Query;
     auto& rendererModule = m_Engine.GetModule<Renderer>();
 
-    if (!query.Pool<CMP::Transform3D>().HasId(camera.GetId()))
+    if (!query.HasComponent<CMP::Transform3D>(camera))
     {
         return;
     }
 
-    const M::Matrix<4, 4> projection = query.Pool<CMP::Camera>().GetComponent(camera).GetProjectionMatrix();
+    const M::Matrix<4, 4> projection = query.GetComponent<CMP::Camera>(camera).GetProjectionMatrix();
 
     //View Matrix
-    auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(camera);
+    auto& transform = m_Engine.ECS.Query.GetComponent<CMP::Transform3D>(camera);
     const M::Vector<3> pos = transform.Position;
     const M::Vector<3> forward = transform.GetForward();
     const M::Vector<3> up = transform.GetUp();
@@ -43,8 +43,7 @@ void Renderer3DSystem::Render()
     rendererModule.GUniformbuffer.Set(view, 0);
     rendererModule.GUniformbuffer.Set(projection, 64);
     rendererModule.GUniformbuffer.Set(m_Engine.GetTime(), 128);
-    rendererModule.GUniformbuffer.Set(
-        query.Pool<CMP::Transform3D>().GetComponent(camera.GetId()).m_GlobalPosition, 144);
+    rendererModule.GUniformbuffer.Set(query.GetComponent<CMP::Transform3D>(camera).m_GlobalPosition, 144);
     rendererModule.GUniformbuffer.Bind();
 
     query.ForEach<CMP::Material, CMP::Transform3D, CMP::Mesh>(

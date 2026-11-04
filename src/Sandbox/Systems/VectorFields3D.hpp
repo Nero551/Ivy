@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
@@ -63,15 +64,17 @@ struct VectorFields3D : C::System
 
         std::vector<float> magnitudes{};
 
+        auto& query = m_Engine.ECS.Query;
+
         eq.Solve({0, 0.9, 1, 1.1}, 100, 0.001f,
             [&](const M::ODE<float, float, float, float>::State& state)
             {
                 auto [x, y, z] = state.Variables;
                 auto [dx, dy, dz] = eq.Derivative(state).Variables;
 
-                const auto& arrow = Arrow();
+                auto& arrow = Arrow();
 
-                CMP::Transform3D& transform = m_Engine.ECS.Query.Pool<CMP::Transform3D>().GetComponent(arrow);
+                CMP::Transform3D& transform = query.GetComponent<CMP::Transform3D>(arrow);
 
                 transform.Position = M::Vector<3>{x, y, z};
                 // transform.Scale = M::Vector<3>{0.2, 0.1, 0.2};
@@ -79,7 +82,7 @@ struct VectorFields3D : C::System
                     M::Quaternion<>::FromTo(M::Vector<3>{1.0f, 0.0f, 0.0f}, M::Vector<3>{dx, dy, dz});
                 magnitudes.push_back(0.3f);
 
-                m_Engine.World.GetRoot().AttachChild(arrow.GetId());
+                m_Engine.World.GetRoot().AttachChild(arrow);
             });
 
         G::ArrayBuffer buffer{};
@@ -92,9 +95,12 @@ struct VectorFields3D : C::System
 
     C::Entity& Arrow()
     {
+        auto& query = m_Engine.ECS.Query;
+
         auto& arrow = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
-        m_Engine.ECS.Query.Pool<CMP::Mesh>().GetComponent(arrow).Mesh = m_Mesh;
-        m_Engine.ECS.Query.Pool<CMP::Material>().GetComponent(arrow).Material = m_Material;
+        query.GetComponent<CMP::Mesh>(arrow).Mesh = m_Mesh;
+        query.GetComponent<CMP::Material>(arrow).Material = m_Material;
+
         return arrow;
     }
 

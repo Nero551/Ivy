@@ -1,7 +1,10 @@
 #include "Renderer2DSystem.hpp"
+#include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
+#include "Math/Matrix/Matrix4.hpp"
 #include "Math/Vector/Vector.hpp"
+#include "Math/Vector/Vector3.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Renderer.hpp"
 #include "Utilities/Debug/Log.hpp"
@@ -15,9 +18,9 @@ void Renderer2DSystem::Start()
         {
             for (auto& batch : Batches)
             {
-                if (batch.Instances.Contains(event.EntityId.Index))
+                if (batch.Instances.Contains(event.Entity->GetId().Index))
                 {
-                    batch.Instances.Erase(event.EntityId.Index);
+                    batch.Instances.Erase(event.Entity->GetId().Index);
                 }
             }
         });
@@ -29,15 +32,15 @@ void Renderer2DSystem::Render()
     auto& query = m_Engine.ECS.Query;
     auto& rendererModule = m_Engine.GetModule<Renderer>();
 
-    if (!query.Pool<CMP::Transform2D>().HasId(camera.GetId()))
+    if (!query.HasComponent<CMP::Transform2D>(camera))
     {
         return;
     }
 
-    const M::Matrix<4, 4> projection = query.Pool<CMP::Camera>().GetComponent(camera).GetProjectionMatrix();
+    const M::Matrix<4, 4> projection = query.GetComponent<CMP::Camera>(camera).GetProjectionMatrix();
 
     //View Matrix
-    auto& transform = m_Engine.ECS.Query.Pool<CMP::Transform2D>().GetComponent(camera);
+    auto& transform = m_Engine.ECS.Query.GetComponent<CMP::Transform2D>(camera);
     M::Matrix<4, 4> view = transform.GetModelMatrix().Inverse();
     auto& camPos = transform.m_GlobalPosition;
 

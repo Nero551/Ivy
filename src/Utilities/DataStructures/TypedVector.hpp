@@ -78,6 +78,12 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         return typeId < m_Data.size();
     }
 
+    template <typename... Args> bool Contains() const
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+        return typeId < m_Data.size();
+    }
+
     template <typename... Args> T& At()
     {
         if (!Contains<Args...>())
@@ -93,7 +99,11 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         return m_Data[index];
     }
 
-    /** @brief its At() but without an implicit Contains() check. */
+    template <typename... Args> const T& Get() const
+    {
+        return m_Data[GetTypeId<Args...>()];
+    }
+
     template <typename... Args> T& Get()
     {
         return m_Data[GetTypeId<Args...>()];
@@ -111,29 +121,36 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         return {.TypedVector = this, .Index = typeId};
     }
 
+    template <typename... Args> ConstIterator Find() const
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+
+        if (typeId >= m_Data.size())
+        {
+            return end();
+        }
+
+        return {.TypedVector = this, .Index = typeId};
+    }
+
     /** @brief Stores a value for the specified type combination if it does not exist. */
-    template <typename... Args> T& Push(T& value)
+    template <typename... Args> T& Push(const T& value)
     {
         const TypeIdType typeId = GetTypeId<Args...>();
 
         if (!Contains<Args...>())
         {
-            if (m_Data.size() <= typeId)
-            {
-                m_Data.resize(typeId + 1);
-            }
-
-            m_Data[typeId] = value;
+            U::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
+            m_Data.push_back(value);
         }
-
         return m_Data[typeId];
     }
-
     void Clear()
     {
         m_Data.clear();
+        m_TypeIds.clear();
+        m_NextTypeId = 0;
     }
-
     /** @brief Constructs a value for the specified type combination if it does not exist. */
     template <typename... Args, typename... Params> Iterator Emplace(Params&&... parameters)
     {
@@ -141,17 +158,11 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
 
         if (!Contains<Args...>())
         {
-            if (m_Data.size() <= typeId)
-            {
-                m_Data.resize(typeId + 1);
-            }
-
-            m_Data[typeId] = T{std::forward<Params>(parameters)...};
+            U::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
+            m_Data.emplace_back(std::forward<Params>(parameters)...);
         }
-
         return {this, typeId};
     }
-
     TypeIdType Size() const
     {
         return m_Data.size();
@@ -185,6 +196,16 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         }
 
         return localId;
+    }
+
+    template <typename... Args> TypeIdType GetTypeId() const
+    {
+        const TypeIdType globalId = GetGlobalTypeId<Args...>();
+        if (m_TypeIds.size() > globalId)
+        {
+            return m_TypeIds[globalId];
+        }
+        return InvalidTypeId;
     }
 
     template <typename... Args> static TypeIdType GetGlobalTypeId()

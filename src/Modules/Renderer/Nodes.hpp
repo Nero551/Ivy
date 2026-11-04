@@ -7,55 +7,53 @@ namespace Ivy::R
 {
 struct Camera2D : C::Node2D
 {
+    using ComponentCombo = C::ExtendComponents<Node2D::ComponentCombo, CMP::Camera>;
     using Node2D::Node2D;
     void Initialize() override
     {
-        Node2D::Initialize();
-        m_ECS.Query.Pool<CMP::Camera>().Add(GetId());
-        m_ECS.Query.Pool<CMP::Camera>().GetComponent(GetId()).ProjectionMode = ProjectionMode::Orthographic;
+        std::get<CMP::Camera&>(m_ECS.Query.SetArchetype<ComponentCombo>(*this)).ProjectionMode =
+            ProjectionMode::Orthographic;
     }
 };
 
 struct Camera3D : C::Node3D
 {
+    using ComponentCombo = C::ExtendComponents<Node3D::ComponentCombo, CMP::Camera>;
     using Node3D::Node3D;
     void Initialize() override
     {
-        Node3D::Initialize();
-        m_ECS.Query.Pool<CMP::Camera>().Add(GetId());
-        m_ECS.Query.Pool<CMP::Camera>().GetComponent(GetId()).ProjectionMode = ProjectionMode::Perspective;
+        std::get<CMP::Camera&>(m_ECS.Query.SetArchetype<ComponentCombo>(*this)).ProjectionMode =
+            ProjectionMode::Perspective;
     }
 };
 
 struct Light3D : C::Node3D
 {
+    using ComponentCombo = C::ExtendComponents<Node3D::ComponentCombo, CMP::Light>;
     using Node3D::Node3D;
     void Initialize() override
     {
-        Node3D::Initialize();
-        m_ECS.Query.Pool<CMP::Light>().Add(GetId());
+        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 
 struct MeshInstance2D : C::Node2D
 {
+    using ComponentCombo = C::ExtendComponents<Node2D::ComponentCombo, CMP::Material, CMP::Mesh>;
     using Node2D::Node2D;
     void Initialize() override
     {
-        Node2D::Initialize();
-        m_ECS.Query.Pool<CMP::Material>().Add(GetId());
-        m_ECS.Query.Pool<CMP::Mesh>().Add(GetId());
+        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 
 struct MeshInstance3D : C::Node3D
 {
+    using ComponentCombo = C::ExtendComponents<Node3D::ComponentCombo, CMP::Material, CMP::Mesh>;
     using Node3D::Node3D;
     void Initialize() override
     {
-        Node3D::Initialize();
-        m_ECS.Query.Pool<CMP::Material>().Add(GetId());
-        m_ECS.Query.Pool<CMP::Mesh>().Add(GetId());
+        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 } // namespace Ivy::R
