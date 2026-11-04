@@ -174,6 +174,14 @@ struct Query
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
+    template <typename... Args>
+    std::tuple<Args...> GetComponent(Entity& entity)
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    {
+
+        return {GetComponent<Args>(entity)...};
+    }
+
     template <typename T> T& GetComponent(Entity& entity) requires(std::derived_from<T, Component>)
     {
         U::Log::Assert(entity.Archetype != nullptr, "Entity is not Connected To Any Archetype ");
