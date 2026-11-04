@@ -1,9 +1,12 @@
 #pragma once
 
+#include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/IsSpecialization.hpp"
+#include "Utilities/TupleUtils.hpp"
 #include <algorithm>
 #include <array>
 #include <concepts>
@@ -11,6 +14,7 @@
 #include <memory>
 #include <span>
 #include <tuple>
+#include <type_traits>
 #include <typeindex>
 #include <utility>
 #include <vector>
@@ -30,22 +34,25 @@ struct Component
 
 using EntityID = U::GIndexPool<>::Handle;
 
-struct IArchetype
-{
-    using ComponentCombo = std::tuple<>;
-    virtual ~IArchetype() = default;
-
-    virtual bool Matches(std::span<std::type_index> types) const = 0;
-
-    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
-        std::span<const std::type_index> types) = 0;
-};
+struct IArchetype;
 
 struct Entity
 {
     using EntityID = U::GIndexPool<>::Handle;
     EntityID Id;
-    IArchetype* Archetype;
+    U::CheckedPtr<IArchetype> Archetype;
+};
+
+struct IArchetype
+{
+    using ComponentCombo = std::tuple<>;
+    virtual ~IArchetype() = default;
+
+    virtual bool Matches(std::span<const std::type_index> types) const = 0;
+    virtual void Remove(const Entity& entity) = 0;
+
+    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
+        std::span<const std::type_index> types) = 0;
 };
 
 template <typename... Args> requires(std::derived_from<Args, Component> && ...)
@@ -59,7 +66,7 @@ struct Archetype : IArchetype
         return (*m_Data.Emplace(entity.Id.Index)).Value;
     }
 
-    void Remove(const Entity& entity)
+    void Remove(const Entity& entity) override
     {
         m_Data.Erase(entity.Id.Index);
     }
@@ -78,7 +85,7 @@ struct Archetype : IArchetype
         return std::get<T>(m_Data[entity.Id.Index]);
     }
 
-    bool Matches(std::span<std::type_index> types) const override
+    bool Matches(std::span<const std::type_index> types) const override
     {
         return std::ranges::all_of(
             types, [](const auto& id) { return ((id == std::type_index(typeid(Args))) || ...); });
@@ -134,39 +141,22 @@ struct Query
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
-    template <typename... Args> void AddComponent(Entity& entity)
+    template <typename... Args> void SetArchetype(Entity& entity)
     {
-        if (entity.Archetype == nullptr)
-        {
-            auto& archetype = GetArchetype<Args...>();
-            entity.Archetype = &archetype;
-            archetype.Add(entity);
-        }
-        if (entity.Archetype == &GetArchetype<Args...>())
-        {
-            return;
-        }
-    }
+        using Components = U::ConnectArgsIntoTuple<Args...>;
 
-    template <typename... Args> void AddComponent(Entity&& entity)
-    {
-        if (entity.Archetype == nullptr)
-        {
-            auto& archetype = GetArchetype<Args...>();
-            entity.Archetype = &archetype;
-            archetype.Add(entity);
-        }
-        if (entity.Archetype == &GetArchetype<Args...>())
-        {
-            return;
-        }
+        auto action = [&]<typename... Components>(Entity& entity)
+        { SetArchetypeTypes<Components...>(entity); };
+
+        U::UnpackAndRun<Components>(
+            std::make_index_sequence<std::tuple_size_v<Components>>{}, action, entity);
     }
 
     template <typename... Args, typename F>
     requires(std::derived_from<Args, Component> && ...) && std::invocable<F&, unsigned int, Args&...>
     void ForEach(F&& action)
     {
-        static std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
 
         if (!m_Cache.Contains<Args...>())
         {
@@ -209,6 +199,23 @@ struct Query
         };
         return static_cast<Archetype<Args...>&>(
             **m_Archetypes.Emplace<Args...>(std::make_unique<Archetype<Args...>>()));
+    }
+
+    template <typename... Args> void SetArchetypeTypes(Entity& entity)
+    {
+        auto& archetype = GetArchetype<Args...>();
+        if (!entity.Archetype)
+        {
+            entity.Archetype = &GetArchetype<Args...>();
+            GetArchetype<Args...>().Add(entity);
+        }
+        if (entity.Archetype == &GetArchetype<Args...>())
+        {
+            return;
+        }
+        entity.Archetype->Remove(entity);
+        GetArchetype<Args...>().Add(entity);
+        entity.Archetype = &GetArchetype<Args...>();
     }
 
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;

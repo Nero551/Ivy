@@ -418,21 +418,20 @@ struct G : ECS::Component
 void BenchArchetypeECS()
 {
     ECS::Query q;
-    unsigned int entities = 10000000;
+    unsigned int entities = 1000000;
 
     for (unsigned int i = 0; i < entities; ++i)
     {
+        ECS::Entity e = {
+            .Id = {i, 0}
+        };
         if (i % 2 == 0)
         {
-            q.AddComponent<D, E, G>({
-                .Id = {i, 0}
-            });
+            q.SetArchetype<D, E, G>(e);
         }
         else
         {
-            q.AddComponent<D, F, G>({
-                .Id = {i, 0}
-            });
+            q.SetArchetype<D, F, G>(e);
         }
         ZoneScopedN("Creation");
     }

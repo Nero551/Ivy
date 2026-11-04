@@ -19,4 +19,5 @@
 #include "Sort.hpp"
 #include "StringUtils.hpp"
 #include "Track.hpp"
+#include "TupleUtils.hpp"
 #include "Utilities.hpp"
