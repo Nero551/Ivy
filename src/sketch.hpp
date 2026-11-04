@@ -420,29 +420,29 @@ void BenchArchetypeECS()
     ECS::Query q;
     unsigned int entities = 1000;
 
-    ECS::Entity s = {
-        .Id = {1001, 0}
-    };
+    // ECS::Entity s = {
+    // .Id = {1001, 0}
+    // };
 
-    q.SetArchetype<D, E, F>(s);
-    q.GetComponent<D>(s).Number = 200;
+    // q.SetArchetype<D, E, F>(s);
+    // q.GetComponent<D>(s).Number = 200;
 
-    U::Log::Info(q.GetComponent<D>(s).Number);
+    // U::Log::Info(q.GetComponent<D>(s).Number);
 
-    // for (unsigned int i = 0; i < entities; ++i)
-    // {
-    //     ECS::Entity e = {
-    //         .Id = {i, 0}
-    //     };
-    //     if (i % 2 == 0)
-    //     {
-    //         q.SetArchetype<D, E, G>(e);
-    //     }
-    //     else
-    //     {
-    //     }
-    //     ZoneScopedN("Creation");
-    // }
+    for (unsigned int i = 0; i < entities; ++i)
+    {
+        ECS::Entity e = {
+            .Id = {i, 0}
+        };
+        if (i % 2 == 0)
+        {
+            q.SetArchetype<D, E, G>(e);
+        }
+        else
+        {
+        }
+        ZoneScopedN("Creation");
+    }
 
     double elapsed = 0;
     while (true)

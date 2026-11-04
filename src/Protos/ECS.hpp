@@ -218,6 +218,15 @@ struct Query
         return true;
     }
 
+    void RemoveAllComponents(Entity& entity)
+    {
+        if (entity.Archetype)
+        {
+            entity.Archetype->Remove(entity);
+            entity.Archetype.Reset();
+        }
+    }
+
     template <typename... Args>
     void SetArchetype(Entity& entity)
         requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
