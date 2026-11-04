@@ -302,7 +302,15 @@ struct Shader
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //
-//TODO: now only remains integration of the ecs into the engine.
+//
+// TODO: learn bitsets, bitmasks, bit manipulation, change ForEach to use stride and offset of selected archetypes \
+//  to the wanted components in each archetype. each archetype stores its offset of each component and stride
+//
+//TODO: replace the current ForEach loop with one that uses stride and offset of components in archetype.
+//
+// TODO: look into memory/bit/address manipulation. its the thing i need most for any optimization.
+//
+// TODO: implement a child, parent, nextSibling, prevSibling hierarchy for entities instead of vector of children.
 
 inline void Test() {}
 } // namespace Sketch

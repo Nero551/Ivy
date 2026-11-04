@@ -42,7 +42,8 @@ struct Query
             }
         }
 
-        if (entity.m_Archetype->SupportedComponents().Contains<T>())
+        const Signature sig = MakeSignature<T>();
+        if ((sig & entity.m_Archetype->Supported) == sig)
         {
             return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, std::type_index(typeid(T))));
         }
@@ -57,16 +58,10 @@ struct Query
         {
             return false;
         }
-        if (m_Archetypes.Contains<Args...>())
-        {
-            return m_Archetypes.Get<Args...>()->Has(entity);
-        }
 
-        if ((!entity.m_Archetype->SupportedComponents().Contains<Args>() || ...))
-        {
-            return false;
-        }
-        return true;
+        const Signature sig = MakeSignature<Args...>();
+
+        return (entity.m_Archetype->Supported & sig).count() == sizeof...(Args);
     }
 
     void RemoveAllComponents(Entity& entity)
@@ -105,12 +100,13 @@ struct Query
             m_RefreshCache = false;
         }
         static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+        static const Signature sig = MakeSignature<Args...>();
 
         if (!m_Cache.Contains<Args...>())
         {
             for (auto& archetype : m_Archetypes)
             {
-                if (!archetype->Matches(wanted))
+                if ((sig & archetype->Supported) != sig)
                 {
                     continue;
                 }
@@ -135,50 +131,6 @@ struct Query
                 }
             }
         }
-    }
-
-    template <typename... Args>
-    unsigned int NumberOfEntitiesWith()
-        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
-    {
-        unsigned int number = 0;
-
-        if (m_RefreshCache == true)
-        {
-            m_Cache.Clear();
-            m_RefreshCache = false;
-        }
-        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
-
-        if (!m_Cache.Contains<Args...>())
-        {
-            for (auto& archetype : m_Archetypes)
-            {
-                if (!archetype->Matches(wanted))
-                {
-                    continue;
-                }
-
-                auto rows = archetype->GetRows(wanted);
-                for (auto& [id, ptrs] : rows)
-                {
-                    ++number;
-                }
-                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
-            }
-        }
-        else
-        {
-            for (auto& archetypeRow : m_Cache.Get<Args...>())
-            {
-                for (auto& [id, ptrs] : archetypeRow)
-                {
-                    ++number;
-                }
-            }
-        }
-
-        return number;
     }
 
   private:
@@ -220,7 +172,7 @@ struct Query
             (
                 [&]
                 {
-                    if (previous->SupportedComponents().Contains<Args>())
+                    if ((MakeSignature<Args>() & previous->Supported).count() != 0)
                     {
                         *static_cast<Args*>(archetype.GetTypeErased(entity, typeid(Args))) =
                             std::move(*static_cast<Args*>(previous->GetTypeErased(entity, typeid(Args))));

@@ -7,6 +7,7 @@
 #include "Utilities/TupleUtils.hpp"
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <concepts>
 #include <span>
 #include <tuple>
@@ -22,21 +23,14 @@ struct IArchetype
     using ComponentCombo = std::tuple<>;
     virtual ~IArchetype() = default;
 
-    virtual bool Matches(std::span<const std::type_index> types) const = 0;
+    Signature Supported;
+
     virtual void Remove(const Entity& entity) = 0;
     virtual bool Has(const Entity& entity) const = 0;
     virtual void* GetTypeErased(const Entity& entity, std::type_index type) = 0;
 
     virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
         std::span<const std::type_index> types) = 0;
-
-    U::TypedVector<std::type_index>& SupportedComponents()
-    {
-        return m_SupportedComponents;
-    }
-
-  protected:
-    U::TypedVector<std::type_index> m_SupportedComponents;
 };
 
 template <typename... Args> requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
@@ -52,7 +46,7 @@ struct Archetype : IArchetype
 
     Archetype()
     {
-        (m_SupportedComponents.Emplace<Args>(typeid(Args)), ...);
+        Supported = MakeSignature<Args...>();
     }
 
     bool Has(const Entity& entity) const override
@@ -96,12 +90,6 @@ struct Archetype : IArchetype
         return std::get<T>(m_Data[entity.GetId().Index]);
     }
 
-    bool Matches(std::span<const std::type_index> types) const override
-    {
-        return std::ranges::all_of(
-            types, [](const auto& id) { return ((id == std::type_index(typeid(Args))) || ...); });
-    }
-
     template <typename T> static void* GetPtr(ComponentCombo& combo)
     {
         return &std::get<T>(combo);
@@ -122,7 +110,6 @@ struct Archetype : IArchetype
         for (auto id : types)
         {
             auto it = std::ranges::find(mine, id);
-
             U::Log::Assert(it != mine.end(), "Invalid archetype query");
 
             selected.push_back(getters[it - mine.begin()]);
@@ -131,7 +118,6 @@ struct Archetype : IArchetype
         std::vector<std::pair<unsigned int, std::vector<void*>>> pairs{};
         pairs.reserve(m_Data.Size());
         std::vector<void*> ptrs(selected.size());
-        unsigned int p = 0;
         for (auto& item : m_Data)
         {
             for (unsigned int i = 0; i < selected.size(); ++i)
@@ -140,7 +126,6 @@ struct Archetype : IArchetype
             }
 
             pairs.emplace_back(item.SparseIndex, ptrs);
-            ++p;
         }
         return pairs;
     }
