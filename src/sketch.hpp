@@ -383,7 +383,7 @@ struct G : ECS::Component
 void BenchArchetypeECS()
 {
     ECS::EntityComponentSystem ecs{};
-    unsigned int entities = 10000000;
+    unsigned int entities = 1000000;
 
     for (unsigned int i = 0; i < entities; ++i)
     {
@@ -407,7 +407,7 @@ void BenchArchetypeECS()
         {
             ZoneScopedN("Iteration");
             elapsed = 0;
-            ecs.Query.ForEach<D>([](unsigned int id, D& d) { d.Number += id; });
+            ecs.Query.ForEach<D, E>([](unsigned int id, D& d, E& e) { d.Number += e.Number; });
         }
         elapsed += 0.016;
     }

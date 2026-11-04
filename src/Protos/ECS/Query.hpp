@@ -84,15 +84,20 @@ struct Query
     }
 
     template <typename... Args>
-    void SetArchetype(Entity& entity)
+    decltype(auto) SetArchetype(Entity& entity)
         requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
     {
         using Components = U::ConnectArgsIntoTuple<Args...>;
 
-        auto action = [&]<typename... Ts>(Entity& entity) { SetArchetypeTypes<Ts...>(entity); };
+        auto action = [&]<typename... Ts>(Entity& entity) { return SetArchetypeTypes<Ts...>(entity); };
 
-        U::UnpackAndRun<Components>(
+        return U::UnpackAndRun<Components>(
             std::make_index_sequence<std::tuple_size_v<Components>>{}, action, entity);
+    }
+
+    template <typename T> T& SetArchetype(Entity& entity) requires(std::derived_from<T, Component>)
+    {
+        return std::get<T>(SetArchetypeTypes<T>(entity));
     }
 
     template <typename... Args, typename F>
@@ -150,25 +155,27 @@ struct Query
             **m_Archetypes.Emplace<Args...>(std::make_unique<Archetype<Args...>>()));
     }
 
-    template <typename... Args> void SetArchetypeTypes(Entity& entity)
+    template <typename... Args> std::tuple<Args...>& SetArchetypeTypes(Entity& entity)
     {
         auto& archetype = GetArchetype<Args...>();
 
         if (entity.m_Archetype == &archetype)
         {
-            return;
+            return archetype.Get(entity);
         }
+
+        U::CheckedPtr<std::tuple<Args...>> components;
 
         if (!entity.m_Archetype)
         {
-            archetype.Add(entity);
+            components = &archetype.Add(entity);
             entity.m_Archetype = &archetype;
         }
         else
         {
             U::CheckedPtr<IArchetype> previous = entity.m_Archetype;
 
-            archetype.Add(entity);
+            components = &archetype.Add(entity);
 
             (
                 [&]
@@ -186,6 +193,7 @@ struct Query
         }
 
         m_RefreshCache = true;
+        return *components;
     }
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
     U::TypedVector<Cache> m_Cache;

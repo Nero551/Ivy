@@ -34,9 +34,9 @@ template <typename T, typename... Rest> struct ConnectIntoTuple<T, Rest...>
 template <typename... Args> using ConnectArgsIntoTuple = ConnectIntoTuple<Args...>::Type;
 
 template <typename Tuple, typename F, std::size_t... I, typename... Args>
-void UnpackAndRun(std::index_sequence<I...>, F&& action, Args&... otherParams)
+decltype(auto) UnpackAndRun(std::index_sequence<I...>, F&& action, Args&... otherParams)
 {
-    std::forward<F>(action).template operator()<std::tuple_element_t<I, Tuple>...>(otherParams...);
+    return std::forward<F>(action).template operator()<std::tuple_element_t<I, Tuple>...>(otherParams...);
 }
 
 template <typename... Args> struct AreUniqueTrait : std::true_type
