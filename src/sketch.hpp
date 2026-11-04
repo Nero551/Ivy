@@ -413,6 +413,8 @@ void BenchArchetypeECS()
     }
 }
 
+//TODO: last step is to remake the ECS events, and that should be all.
+
 inline void Test()
 {
     BenchArchetypeECS();

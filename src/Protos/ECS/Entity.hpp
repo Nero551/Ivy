@@ -2,7 +2,6 @@
 #include "Protos/ECS/EntityID.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
-#include <cstddef>
 #include <functional>
 #include <utility>
 #include <vector>

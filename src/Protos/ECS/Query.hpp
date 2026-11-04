@@ -2,6 +2,7 @@
 #include "Protos/ECS/Archetype.hpp"
 #include "Protos/ECS/Component.hpp"
 #include "Protos/ECS/Entity.hpp"
+#include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/TupleUtils.hpp"
@@ -58,7 +59,6 @@ struct Query
             U::Log::Info("Second");
             return m_Archetypes.Get<Args...>()->Has(entity);
         }
-        //TODO: as for GetComponent(). u can make a Get() method for archetypes that just returns a void* to the component tuple.
 
         std::array<std::type_index, sizeof...(Args)> specifiedTypes{std::type_index(typeid(Args))...};
 
@@ -153,6 +153,7 @@ struct Query
     template <typename... Args> void SetArchetypeTypes(Entity& entity)
     {
         auto& archetype = GetArchetype<Args...>();
+
         if (entity.m_Archetype == &archetype)
         {
             return;
@@ -160,19 +161,32 @@ struct Query
 
         if (!entity.m_Archetype)
         {
-            entity.m_Archetype = &archetype;
             archetype.Add(entity);
+            entity.m_Archetype = &archetype;
         }
         else
         {
-            entity.m_Archetype->Remove(entity);
+            U::CheckedPtr<IArchetype> previous = entity.m_Archetype;
+
             archetype.Add(entity);
+
+            (
+                [&]
+                {
+                    if (previous->SupportedComponents.contains(typeid(Args)))
+                    {
+                        *static_cast<Args*>(archetype.GetTypeErased(entity, typeid(Args))) =
+                            std::move(*static_cast<Args*>(previous->GetTypeErased(entity, typeid(Args))));
+                    }
+                }(),
+                ...);
+
+            previous->Remove(entity);
             entity.m_Archetype = &archetype;
         }
 
         m_RefreshCache = true;
     }
-
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
     U::TypedVector<Cache> m_Cache;
     bool m_RefreshCache = false;
