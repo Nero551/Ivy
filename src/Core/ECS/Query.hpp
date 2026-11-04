@@ -45,7 +45,7 @@ struct Query
         const Signature sig = MakeSignature<T>();
         if ((sig & entity.m_Archetype->Supported) == sig)
         {
-            return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, std::type_index(typeid(T))));
+            return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, sig));
         }
         U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
     }
@@ -70,7 +70,6 @@ struct Query
         {
             entity.m_Archetype->Remove(entity);
             entity.m_Archetype.Reset();
-            m_RefreshCache = true;
         }
     }
 
@@ -94,43 +93,37 @@ struct Query
         std::invocable<F&, unsigned int, Args&...>
     void ForEach(F&& action)
     {
-        if (m_RefreshCache == true)
-        {
-            m_Cache.Clear();
-            m_RefreshCache = false;
-        }
-        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
         static const Signature sig = MakeSignature<Args...>();
 
-        if (!m_Cache.Contains<Args...>())
+        for (auto& ptr : m_Archetypes)
         {
-            for (auto& archetype : m_Archetypes)
-            {
-                if ((sig & archetype->Supported) != sig)
-                {
-                    continue;
-                }
+            auto& archetype = *ptr;
 
-                auto rows = archetype->GetRows(wanted);
-                for (auto& [id, ptrs] : rows)
-                {
-                    [&]<size_t... I>(std::index_sequence<I...>)
-                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
-                }
-                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
-            }
-        }
-        else
-        {
-            for (auto& archetypeRow : m_Cache.Get<Args...>())
+            if ((sig & archetype.Supported) != sig)
             {
-                for (auto& [id, ptrs] : archetypeRow)
-                {
-                    [&]<size_t... I>(std::index_sequence<I...>)
-                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
-                }
+                continue;
+            }
+
+            const std::array<size_t, sizeof...(Args)> offsets{archetype.Offsets.at(MakeSignature<Args>())...};
+
+            std::byte* base = archetype.GetBase();
+
+            for (unsigned int i = 0; i < archetype.Size(); ++i)
+            {
+                std::byte* row = base + i * archetype.Stride;
+
+                unsigned int entityIndex = *reinterpret_cast<unsigned int*>(row + archetype.EntityOffset);
+
+                Invoke<Args...>(action, entityIndex, row, offsets, std::index_sequence_for<Args...>{});
             }
         }
+    }
+
+    template <typename... Args, size_t... I>
+    static void Invoke(auto& action, unsigned int entityIndex, std::byte* row,
+        const std::array<size_t, sizeof...(Args)>& offsets, std::index_sequence<I...>)
+    {
+        action(entityIndex, *reinterpret_cast<Args*>(row + offsets[I])...);
     }
 
   private:
@@ -174,8 +167,9 @@ struct Query
                 {
                     if ((MakeSignature<Args>() & previous->Supported).count() != 0)
                     {
-                        *static_cast<Args*>(archetype.GetTypeErased(entity, typeid(Args))) =
-                            std::move(*static_cast<Args*>(previous->GetTypeErased(entity, typeid(Args))));
+                        *static_cast<Args*>(archetype.GetTypeErased(entity, MakeSignature<Args>())) =
+                            std::move(
+                                *static_cast<Args*>(previous->GetTypeErased(entity, MakeSignature<Args>())));
                     }
                 }(),
                 ...);
@@ -188,11 +182,8 @@ struct Query
         // invalidate only caches associated with the modified components. \
         // can make cache a runtime map with type_index as well if i need that.
 
-        m_RefreshCache = true;
         return *components;
     }
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
-    U::TypedVector<Cache> m_Cache;
-    bool m_RefreshCache = false;
 };
 } // namespace Ivy::C

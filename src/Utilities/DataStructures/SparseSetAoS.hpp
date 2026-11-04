@@ -295,7 +295,7 @@ struct SparseSetAoS
     }
 
     /** @brief Returns the densely stored entries. */
-    std::vector<Entry>& Data()
+    std::vector<Entry>& DenseData()
     {
         return m_Dense;
     }
