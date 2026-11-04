@@ -418,7 +418,7 @@ struct G : ECS::Component
 void BenchArchetypeECS()
 {
     ECS::Query q;
-    unsigned int entities = 1000000;
+    unsigned int entities = 1000;
 
     for (unsigned int i = 0; i < entities; ++i)
     {
@@ -431,7 +431,6 @@ void BenchArchetypeECS()
         }
         else
         {
-            q.SetArchetype<D, F, G>(e);
         }
         ZoneScopedN("Creation");
     }
@@ -449,11 +448,7 @@ void BenchArchetypeECS()
     }
 }
 
-//TODO: next step is figuring out entity creation, component adding, removing, and syncing the cache.
-// TODO: gonna need to make Archetype dynamic. meaning no templates :( so i can dynamically move entities between archetypes. \
-// meaning i have to somehow create a dynamic storage that doesn't use tuples. or has any info about type on compile time. \
-// gotta pass some sort of signature containing the type at runtime.
-
+//TODO: next step is figuring out syncing the cache.
 inline void Test()
 {
     BenchArchetypeECS();

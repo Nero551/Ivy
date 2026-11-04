@@ -3,6 +3,7 @@
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/IsSpecialization.hpp"
@@ -16,6 +17,7 @@
 #include <tuple>
 #include <type_traits>
 #include <typeindex>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 using namespace Ivy;
@@ -48,8 +50,13 @@ struct IArchetype
     using ComponentCombo = std::tuple<>;
     virtual ~IArchetype() = default;
 
+    const std::unordered_set<std::type_index> SupportedComponents;
+
+    IArchetype(const std::unordered_set<std::type_index>& sc) : SupportedComponents(sc) {}
+
     virtual bool Matches(std::span<const std::type_index> types) const = 0;
     virtual void Remove(const Entity& entity) = 0;
+    virtual bool Has(const Entity& entity) const = 0;
 
     virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
         std::span<const std::type_index> types) = 0;
@@ -64,6 +71,13 @@ struct Archetype : IArchetype
     std::tuple<Args...>& Add(const Entity& entity)
     {
         return (*m_Data.Emplace(entity.Id.Index)).Value;
+    }
+
+    Archetype() : IArchetype({std::type_index(typeid(Args))...}) {}
+
+    bool Has(const Entity& entity) const override
+    {
+        return m_Data.Contains(entity.Id.Index);
     }
 
     void Remove(const Entity& entity) override
@@ -141,6 +155,33 @@ struct Query
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
+    template <typename... Args> bool HasComponent(Entity& entity)
+    {
+        if (!entity.Archetype)
+        {
+            U::Log::Info("First");
+            return false;
+        }
+        if (m_Archetypes.Contains<Args...>())
+        {
+            U::Log::Info("Second");
+            return m_Archetypes.Get<Args...>()->Has(entity);
+        }
+        //TODO: as for GetComponent(). u can make a Get() method for archetypes that just returns a void* to the component tuple.
+
+        std::array<std::type_index, sizeof...(Args)> specifiedTypes{std::type_index(typeid(Args))...};
+
+        for (auto& specifiedType : specifiedTypes)
+        {
+            if (!entity.Archetype->SupportedComponents.contains(specifiedType))
+            {
+                U::Log::Info("Third");
+                return false;
+            }
+        }
+        return true;
+    }
+
     template <typename... Args> void SetArchetype(Entity& entity)
     {
         using Components = U::ConnectArgsIntoTuple<Args...>;
@@ -204,18 +245,25 @@ struct Query
     template <typename... Args> void SetArchetypeTypes(Entity& entity)
     {
         auto& archetype = GetArchetype<Args...>();
-        if (!entity.Archetype)
-        {
-            entity.Archetype = &GetArchetype<Args...>();
-            GetArchetype<Args...>().Add(entity);
-        }
-        if (entity.Archetype == &GetArchetype<Args...>())
+        if (entity.Archetype == &archetype)
         {
             return;
         }
+
+        if (!entity.Archetype)
+        {
+            entity.Archetype = &archetype;
+            archetype.Add(entity);
+            if (m_Cache.Contains<Args...>())
+            {
+                m_Cache.Get<Args...>().clear();
+            }
+            return;
+        }
         entity.Archetype->Remove(entity);
-        GetArchetype<Args...>().Add(entity);
-        entity.Archetype = &GetArchetype<Args...>();
+        archetype.Add(entity);
+        entity.Archetype = &archetype;
+        m_Cache.Clear();
     }
 
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
