@@ -23,14 +23,14 @@ struct Query
     Query() = default;
 
     template <typename... Args>
-    std::tuple<Args...> GetComponent(Entity& entity)
+    std::tuple<Args...> GetComponent(Entity& entity) const
         requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
     {
 
         return {GetComponent<Args>(entity)...};
     }
 
-    template <typename T> T& GetComponent(Entity& entity) requires(std::derived_from<T, Component>)
+    template <typename T> T& GetComponent(Entity& entity) const requires(std::derived_from<T, Component>)
     {
         U::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype ");
         if (m_Archetypes.Contains<T>() && m_Archetypes.Get<T>()->Has(entity))
@@ -46,7 +46,7 @@ struct Query
     }
 
     template <typename... Args>
-    bool HasComponent(Entity& entity)
+    bool HasComponent(Entity& entity) const
         requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
     {
         if (!entity.m_Archetype)
@@ -191,6 +191,10 @@ struct Query
             previous->Remove(entity);
             entity.m_Archetype = &archetype;
         }
+
+        //TODO: instead of completely refreshing the cache. i could do a search and \
+        // invalidate only caches associated with the modified components. \
+        // can make cache a runtime map with type_index as well if i need that.
 
         m_RefreshCache = true;
         return *components;

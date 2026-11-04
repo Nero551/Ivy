@@ -1,6 +1,8 @@
 #pragma once
 #include "Protos/ECS/Entity.hpp"
 #include "Protos/ECS/EntityID.hpp"
+#include "Protos/ECS/Events/EntityCreated.hpp"
+#include "Protos/ECS/Events/EntityDestroyed.hpp"
 #include "Protos/ECS/Query.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 namespace Ivy::ECS
@@ -14,8 +16,8 @@ namespace Ivy::ECS
 
 struct EntityComponentSystem
 {
-    // EntityDestroyed EntityDestroyed{};
-    // EntityCreated EntityCreated{};
+    EntityDestroyed EntityDestroyed{};
+    EntityCreated EntityCreated{};
 
     Query Query{};
     void RemoveEntity(Entity& entity)
@@ -27,15 +29,15 @@ struct EntityComponentSystem
             entity.ClearParent();
         }
 
-        // EntityDestroyed.EntityId = id;
-        // EntityDestroyed.Fire();
+        EntityDestroyed.Entity = &entity;
+        EntityDestroyed.Fire();
         m_Entities.Erase(entity.GetId().Index);
         Query.RemoveAllComponents(entity);
 
         for (auto& descendant : descendants)
         {
-            // EntityDestroyed.EntityId = descendant->GetId();
-            // EntityDestroyed.Fire();
+            EntityDestroyed.Entity = descendant;
+            EntityDestroyed.Fire();
             m_Entities.Erase(descendant->GetId().Index);
             Query.RemoveAllComponents(*descendant);
         }
@@ -57,16 +59,6 @@ struct EntityComponentSystem
         return m_Entities[id];
     }
 
-    /**
-         * @brief Creates and registers an entity.
-         *
-         * Constructs an entity of type T, assigns it a unique ID, initializes it,
-         * and moves it into the ECS storage. An EntityCreated event is emitted
-         * after registration.
-         *
-         * @tparam T Concrete entity type. Must derive from Entity.
-         * @return Reference to the newly created entity.
-         */
     template <typename T> Entity& CreateEntity() requires std::derived_from<T, Entity>
     {
         const EntityID id = m_Ids.Acquire();
@@ -75,8 +67,8 @@ struct EntityComponentSystem
         entity.Initialize();
 
         auto it = m_Entities.Emplace(id.Index, std::move(entity));
-        // EntityCreated.EntityId = id;
-        // EntityCreated.Fire();
+        EntityCreated.Entity = &*it;
+        EntityCreated.Fire();
 
         return *it;
     }
@@ -123,7 +115,6 @@ struct EntityComponentSystem
     }
 
   private:
-    /** @brief Storage for entities, indexed by their unique IDs. */
     U::SparseSetSoA<Entity> m_Entities{};
     U::GIndexPool<> m_Ids{};
 };

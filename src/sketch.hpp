@@ -413,7 +413,7 @@ void BenchArchetypeECS()
     }
 }
 
-//TODO: last step is to remake the ECS events, and that should be all.
+//TODO: last step is to remake the ECS events, and that should be all. just entity added and entity destroyed
 
 inline void Test()
 {
