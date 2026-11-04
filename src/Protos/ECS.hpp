@@ -58,14 +58,13 @@ struct IArchetype
     virtual bool Matches(std::span<const std::type_index> types) const = 0;
     virtual void Remove(const Entity& entity) = 0;
     virtual bool Has(const Entity& entity) const = 0;
-    virtual void* GetTypeErased(const Entity& entity) = 0;
     virtual void* GetTypeErased(const Entity& entity, std::type_index type) = 0;
 
     virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
         std::span<const std::type_index> types) = 0;
 };
 
-template <typename... Args> requires(std::derived_from<Args, Component> && ...)
+template <typename... Args> requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
 struct Archetype : IArchetype
 {
     using ComponentCombo = std::tuple<Args...>;
@@ -88,19 +87,20 @@ struct Archetype : IArchetype
         m_Data.Erase(entity.Id.Index);
     }
 
-    void* GetTypeErased(const Entity& entity) override
-    {
-        return &Get(entity);
-    }
-
     void* GetTypeErased(const Entity& entity, std::type_index type) override
     {
         ComponentCombo& components = Get(entity);
         void* result = nullptr;
 
-        ((type == std::type_index(typeid(Args)) ? result = static_cast<void*>(&std::get<Args>(components)) :
-                                                  result),
-            ...);
+        auto GetComponent = [&]<typename T>()
+        {
+            if (type == std::type_index(typeid(T)))
+            {
+                result = static_cast<void*>(&std::get<T>(components));
+            }
+        };
+
+        (GetComponent.template operator()<Args>(), ...);
 
         return result;
     }
@@ -174,7 +174,7 @@ struct Query
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
-    template <typename T> T& GetComponent(Entity& entity)
+    template <typename T> T& GetComponent(Entity& entity) requires(std::derived_from<T, Component>)
     {
         U::Log::Assert(entity.Archetype != nullptr, "Entity is not Connected To Any Archetype ");
         if (m_Archetypes.Contains<T>() && m_Archetypes.Get<T>()->Has(entity))
@@ -189,7 +189,9 @@ struct Query
         U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.Id.Index);
     }
 
-    template <typename... Args> bool HasComponent(Entity& entity)
+    template <typename... Args>
+    bool HasComponent(Entity& entity)
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
     {
         if (!entity.Archetype)
         {
@@ -216,7 +218,9 @@ struct Query
         return true;
     }
 
-    template <typename... Args> void SetArchetype(Entity& entity)
+    template <typename... Args>
+    void SetArchetype(Entity& entity)
+        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
     {
         using Components = U::ConnectArgsIntoTuple<Args...>;
 
@@ -228,7 +232,8 @@ struct Query
     }
 
     template <typename... Args, typename F>
-    requires(std::derived_from<Args, Component> && ...) && std::invocable<F&, unsigned int, Args&...>
+    requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...)) &&
+        std::invocable<F&, unsigned int, Args&...>
     void ForEach(F&& action)
     {
         static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};

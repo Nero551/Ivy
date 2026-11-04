@@ -423,6 +423,7 @@ void BenchArchetypeECS()
     ECS::Entity s = {
         .Id = {1001, 0}
     };
+
     q.SetArchetype<D, E, F>(s);
     q.GetComponent<D>(s).Number = 200;
 

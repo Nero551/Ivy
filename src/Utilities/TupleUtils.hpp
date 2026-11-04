@@ -1,7 +1,10 @@
 #pragma once
+#include <array>
+#include <concepts>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
+#include <typeindex>
 #include <utility>
 namespace Ivy::U
 {
@@ -35,4 +38,17 @@ void UnpackAndRun(std::index_sequence<I...>, F&& action, Args&... otherParams)
 {
     std::forward<F>(action).template operator()<std::tuple_element_t<I, Tuple>...>(otherParams...);
 }
+
+template <typename... Args> struct AreUniqueTrait : std::true_type
+{
+};
+
+template <typename T, typename... Args>
+struct AreUniqueTrait<T, Args...>
+    : std::bool_constant<((!std::same_as<T, Args>) && ...) && AreUniqueTrait<Args...>::value>
+{
+};
+
+template <typename... Args>
+concept AreUnique = AreUniqueTrait<Args...>::value;
 } // namespace Ivy::U
