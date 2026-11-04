@@ -25,6 +25,7 @@ struct IArchetype
     virtual bool Matches(std::span<const std::type_index> types) const = 0;
     virtual void Remove(const Entity& entity) = 0;
     virtual bool Has(const Entity& entity) const = 0;
+    virtual const void* GetTypeErased(const Entity& entity, std::type_index type) const = 0;
     virtual void* GetTypeErased(const Entity& entity, std::type_index type) = 0;
 
     virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
@@ -82,6 +83,31 @@ struct Archetype : IArchetype
 
         return result;
     }
+
+    const void* GetTypeErased(const Entity& entity, std::type_index type) const override
+    {
+        const ComponentCombo& components = Get(entity);
+        const void* result = nullptr;
+
+        auto GetComponent = [&]<typename T>()
+        {
+            if (type == std::type_index(typeid(T)))
+            {
+                result = static_cast<const void*>(&std::get<T>(components));
+            }
+        };
+
+        (GetComponent.template operator()<Args>(), ...);
+
+        return result;
+    }
+    const std::tuple<Args...>& Get(const Entity& entity) const
+    {
+        U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
+            " ] doesn't contain entity: ", entity.GetId());
+        return m_Data[entity.GetId().Index];
+    }
+
     std::tuple<Args...>& Get(const Entity& entity)
     {
         U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,

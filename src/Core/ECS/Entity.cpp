@@ -122,7 +122,7 @@ void Entity::ForEachChild(std::function_ref<void(Entity&)> callback) const
 {
     for (const EntityID id : m_Children)
     {
-        callback(m_ECS.GetEntity(id));
+        callback(GetChild(id));
     }
 }
 
@@ -177,9 +177,9 @@ std::vector<U::CheckedPtr<Entity>> Entity::GetDescendants() const
 
 void Entity::ForEachDescendant(std::function_ref<void(Entity&)> callback)
 {
-    for (EntityID id : m_Children)
+    for (const EntityID id : m_Children)
     {
-        auto& child = m_ECS.GetEntity(id);
+        auto& child = GetChild(id);
         callback(child);
         child.ForEachDescendant(callback);
     }
