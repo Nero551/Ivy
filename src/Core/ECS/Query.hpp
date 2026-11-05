@@ -177,11 +177,6 @@ struct Query
             previous->Remove(entity);
             entity.m_Archetype = &archetype;
         }
-
-        //TODO: instead of completely refreshing the cache. i could do a search and \
-        // invalidate only caches associated with the modified components. \
-        // can make cache a runtime map with type_index as well if i need that.
-
         return *components;
     }
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;

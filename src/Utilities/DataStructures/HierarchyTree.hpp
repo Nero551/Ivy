@@ -11,6 +11,7 @@ template <std::unsigned_integral T> struct HierarchyTree
 
     struct Node
     {
+        T ChildCount = 0;
         T Parent = Invalid;
         T FirstChild = Invalid;
         T LastChild = Invalid;
@@ -30,6 +31,7 @@ template <std::unsigned_integral T> struct HierarchyTree
             m_Nodes.resize(index + 1);
         }
     }
+
     bool Exists(T index) const
     {
         return index < m_Nodes.size();
@@ -65,10 +67,15 @@ template <std::unsigned_integral T> struct HierarchyTree
             p.FirstChild = child;
         }
 
+        ++p.ChildCount;
         p.LastChild = child;
     }
     void Detach(T child)
     {
+        if (!Exists(child))
+        {
+            return;
+        }
         Node& c = m_Nodes[child];
 
         if (c.Parent != Invalid)
@@ -83,6 +90,7 @@ template <std::unsigned_integral T> struct HierarchyTree
             {
                 p.LastChild = c.PrevSibling;
             }
+            --p.ChildCount;
         }
         if (c.NextSibling != Invalid)
         {
@@ -101,6 +109,10 @@ template <std::unsigned_integral T> struct HierarchyTree
         c.Parent = Invalid;
     }
 
+    bool IsLeaf(T node) const
+    {
+        return Exists(node) && m_Nodes[node].FirstChild == Invalid && m_Nodes[node].LastChild == Invalid;
+    }
     bool IsChildOf(T child, T parent) const
     {
         return Exists(child) && Exists(parent) && m_Nodes[child].Parent == parent;
@@ -114,7 +126,6 @@ template <std::unsigned_integral T> struct HierarchyTree
         return Exists(node) && Exists(sibling) && node != sibling && m_Nodes[node].Parent != Invalid &&
             m_Nodes[node].Parent == m_Nodes[sibling].Parent;
     }
-
     bool IsDescendantOf(T descendant, T ancestor) const
     {
         if (!Exists(descendant) || !Exists(ancestor))
@@ -237,11 +248,74 @@ template <std::unsigned_integral T> struct HierarchyTree
         }
         return ancestors;
     }
+    T GetChildCount(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].ChildCount : 0;
+    }
 
-    void ForEachChild(std::function_ref<void(T)> action) const {}
-    void ForEachSibling(std::function_ref<void(T)> action) const {}
-    void ForEachDescendant(std::function_ref<void(T)> action) const {}
-    void ForEachAncestor(std::function_ref<void(T)> action) const {}
+    void ForEachChild(T node, std::function_ref<void(T)> action) const
+    {
+        if (!Exists(node))
+        {
+            return;
+        }
+        T current = m_Nodes[node].FirstChild;
+        while (current != Invalid)
+        {
+            action(current);
+            current = m_Nodes[current].NextSibling;
+        }
+    }
+    void ForEachSibling(T node, std::function_ref<void(T)> action) const
+    {
+        if (!Exists(node) || !Exists(m_Nodes[node].Parent))
+        {
+            return;
+        }
+
+        ForEachChild(m_Nodes[node].Parent,
+            [&](T sibling)
+            {
+                if (sibling != node)
+                {
+                    action(sibling);
+                }
+            });
+    }
+    void ForEachDescendant(T node, std::function_ref<void(T)> action) const
+    {
+        if (!Exists(node))
+        {
+            return;
+        }
+
+        const auto Visit = [&](const auto& self, T parent)
+        {
+            T current = m_Nodes[parent].FirstChild;
+
+            while (current != Invalid)
+            {
+                action(current);
+                self(self, current);
+                current = m_Nodes[current].NextSibling;
+            }
+        };
+
+        Visit(Visit, node);
+    }
+    void ForEachAncestor(T node, std::function_ref<void(T)> action) const
+    {
+        if (!Exists(node))
+        {
+            return;
+        }
+        T current = m_Nodes[node].Parent;
+        while (current != Invalid)
+        {
+            action(current);
+            current = m_Nodes[current].Parent;
+        }
+    }
 
   private:
     std::vector<Node> m_Nodes;

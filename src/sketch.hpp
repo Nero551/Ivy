@@ -298,23 +298,14 @@ struct Shader
 // define them using the IsSpec family in Utilities/IsSpecialization.hpp
 //
 // TODO: prevent math tuples from being `input-able to Function.
-//
-// TODO: if i really want to optimize my ECS. i gotta take it out of the project, and optimize it on its own. so take ECS folder + Event.hpp
-//
+////
 // TODO: wrap all used std stuff in stl wrapper. basically to avoid backward compatibility bs in std. \
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //
 //
-// TODO: learn bitsets, bitmasks, bit manipulation, change ForEach to use stride and offset of selected archetypes \
-//  to the wanted components in each archetype. each archetype stores its offset of each component and stride
-//
-//TODO: replace the current ForEach loop with one that uses stride and offset of components in archetype.
-//
-// TODO: look into memory/bit/address manipulation. its the thing i need most for any optimization.
-//
-// TODO: implement a generic child, parent, nextSibling, prevSibling hierarchy for entities instead of vector of children. \
-// ecs will own that hierarchy. other entities just reference.
+// TODO: HierarchyTree is complete, now integrate it into ECS. ECS struct will own the hierarchy, entity will modify it. \
+// possible modification targets: ECS::RemoveEntity(), ECS::CreateEntity(), everything in Entity struct.
 //
 
 struct A : C::Component
