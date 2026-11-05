@@ -6,6 +6,7 @@
 #include "Modules/Renderer/Nodes.hpp"
 #include "Sandbox/Scenes/CoordinateAxes3D.hpp"
 #include "Sandbox/Systems/Controller3D.hpp"
+#include "Sandbox/Systems/StressTester3D.hpp"
 #include "Sandbox/Systems/VectorFields3D.hpp"
 
 namespace Ivy::Sandbox
@@ -30,7 +31,8 @@ void Sandbox3D::Start()
     GetSystem<VectorFields3D>().Start();
     // AddSystem<StressTester3D>();
 
-    // GetSystem<StressTester3D>().Spawn(3, 5);
+    // GetSystem<StressTester3D>().Spawn(4, 3);
+    GetSystem<VectorFields3D>().LorenzSystem();
 
     // auto& resources = m_Engine.GetService<C::ResourceManager>();
     // auto& square = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
@@ -53,8 +55,6 @@ void Sandbox3D::Start()
     // transform.Rotation = M::Quaternion<>::FromEulerXYZ({M::Rad(90), 0, 0});
     // transform.Scale = {5, 5, 1};
     // m_Engine.World.GetRoot().AttachChild(square);
-
-    GetSystem<VectorFields3D>().LorenzSystem();
 }
 
 void Sandbox3D::FixedUpdate(double dt)

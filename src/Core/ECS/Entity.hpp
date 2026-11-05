@@ -14,7 +14,6 @@ struct Query;
 
 struct Entity
 {
-    virtual ~Entity() = default;
     Entity(EntityComponentSystem& ecs) : m_ECS(ecs) {}
     Entity(const Entity&) = delete;
     Entity& operator=(const Entity&) = delete;

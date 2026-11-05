@@ -1,0 +1,170 @@
+#pragma once
+#include <concepts>
+#include <functional>
+#include <limits>
+#include <vector>
+namespace Ivy::U
+{
+template <std::unsigned_integral T> struct HierarchyTree
+{
+    static constexpr T Invalid = std::numeric_limits<T>::max();
+
+    struct Node
+    {
+        T Parent = Invalid;
+        T FirstChild = Invalid;
+        T LastChild = Invalid;
+        T NextSibling = Invalid;
+        T PrevSibling = Invalid;
+    };
+
+    void Ensure(T index)
+    {
+        if (index == Invalid)
+        {
+            return;
+        }
+
+        if (index >= m_Nodes.size())
+        {
+            m_Nodes.resize(index + 1);
+        }
+    }
+    bool Exists(T index) const
+    {
+        return index < m_Nodes.size();
+    }
+
+    void Attach(T parent, T child)
+    {
+        if (!Exists(parent) || !Exists(child) || parent == child)
+        {
+            return;
+        }
+
+        if (IsDescendantOf(parent, child))
+        {
+            return;
+        }
+
+        Detach(child);
+
+        Node& p = m_Nodes[parent];
+        Node& c = m_Nodes[child];
+
+        c.Parent = parent;
+        c.PrevSibling = p.LastChild;
+        c.NextSibling = Invalid;
+
+        if (p.LastChild != Invalid)
+        {
+            m_Nodes[p.LastChild].NextSibling = child;
+        }
+        else
+        {
+            p.FirstChild = child;
+        }
+
+        p.LastChild = child;
+    }
+    void Detach(T child)
+    {
+        Node& c = m_Nodes[child];
+
+        if (c.Parent != Invalid)
+        {
+            Node& p = m_Nodes[c.Parent];
+            if (p.FirstChild == child)
+            {
+                p.FirstChild = c.NextSibling;
+            }
+
+            if (p.LastChild == child)
+            {
+                p.LastChild = c.PrevSibling;
+            }
+        }
+        if (c.NextSibling != Invalid)
+        {
+            Node& ns = m_Nodes[c.NextSibling];
+            ns.PrevSibling = c.PrevSibling;
+        }
+
+        if (c.PrevSibling != Invalid)
+        {
+            Node& ps = m_Nodes[c.PrevSibling];
+            ps.NextSibling = c.NextSibling;
+        }
+
+        c.PrevSibling = Invalid;
+        c.NextSibling = Invalid;
+        c.Parent = Invalid;
+    }
+
+    bool IsChildOf(T child, T parent) const
+    {
+        return Exists(child) && Exists(parent) && m_Nodes[child].Parent == parent;
+    }
+    bool IsParentOf(T parent, T child) const
+    {
+        return IsChildOf(child, parent);
+    }
+    bool IsSiblingOf(T node, T sibling) const
+    {
+        return Exists(node) && Exists(sibling) && node != sibling && m_Nodes[node].Parent != Invalid &&
+            m_Nodes[node].Parent == m_Nodes[sibling].Parent;
+    }
+
+    bool IsDescendantOf(T descendant, T ancestor) const
+    {
+        if (!Exists(descendant) || !Exists(ancestor))
+        {
+            return false;
+        }
+        T current = m_Nodes[descendant].Parent;
+
+        while (current != ancestor && current != Invalid)
+        {
+            current = m_Nodes[current].Parent;
+        }
+        return current == ancestor;
+    }
+    bool IsAncestorOf(T ancestor, T descendant) const
+    {
+        return IsDescendantOf(descendant, ancestor);
+    }
+
+    T GetParent(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].Parent : Invalid;
+    }
+    T GetFirstChild(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].FirstChild : Invalid;
+    }
+    T GetLastChild(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].LastChild : Invalid;
+    }
+    T GetNextSibling(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].NextSibling : Invalid;
+    }
+    T GetPrevSibling(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].PrevSibling : Invalid;
+    }
+
+    std::vector<T> GetChildren(T node) const;
+    std::vector<T> GetDescendants(T node) const;
+    std::vector<T> GetAncestors(T node) const;
+
+    void ForEachSibling(std::function_ref<void(T)> action) const {}
+    void ForEachChild(std::function_ref<void(T)> action) const {}
+    void ForEachDescendant(std::function_ref<void(T)> action) const {}
+    void ForEachAncestor(std::function_ref<void(T)> action) const {}
+
+  private:
+    std::vector<Node> m_Nodes;
+};
+} // namespace Ivy::U

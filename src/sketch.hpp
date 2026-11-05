@@ -313,7 +313,9 @@ struct Shader
 //
 // TODO: look into memory/bit/address manipulation. its the thing i need most for any optimization.
 //
-// TODO: implement a child, parent, nextSibling, prevSibling hierarchy for entities instead of vector of children.
+// TODO: implement a generic child, parent, nextSibling, prevSibling hierarchy for entities instead of vector of children. \
+// ecs will own that hierarchy. other entities just reference.
+//
 
 struct A : C::Component
 {

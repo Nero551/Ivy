@@ -11,10 +11,13 @@
 #include "Utilities/TupleUtils.hpp"
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <concepts>
+#include <cstddef>
 #include <span>
 #include <tuple>
 #include <typeindex>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -26,21 +29,16 @@ struct IArchetype
     using ComponentCombo = std::tuple<>;
     virtual ~IArchetype() = default;
 
-    virtual bool Matches(std::span<const std::type_index> types) const = 0;
+    Signature Supported;
+    size_t Stride;
+    size_t EntityOffset;
+    std::unordered_map<Signature, size_t> Offsets;
+
     virtual void Remove(const Entity& entity) = 0;
     virtual bool Has(const Entity& entity) const = 0;
-    virtual void* GetTypeErased(const Entity& entity, std::type_index type) = 0;
-
-    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
-        std::span<const std::type_index> types) = 0;
-
-    U::TypedVector<std::type_index>& SupportedComponents()
-    {
-        return m_SupportedComponents;
-    }
-
-  protected:
-    U::TypedVector<std::type_index> m_SupportedComponents;
+    virtual void* GetTypeErased(const Entity& entity, Signature typeSig) = 0;
+    virtual std::byte* GetBase() = 0;
+    virtual unsigned int Size() const = 0;
 };
 
 template <typename... Args> requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
@@ -56,7 +54,31 @@ struct Archetype : IArchetype
 
     Archetype()
     {
-        (m_SupportedComponents.Emplace<Args>(typeid(Args)), ...);
+        using Entry = typename U::SparseSetAoS<ComponentCombo>::Entry;
+        (Supported.set(ComponentId<Args>()), ...);
+        Stride = sizeof(Entry);
+
+        Entry entry{};
+        EntityOffset = reinterpret_cast<const std::byte*>(&entry.SparseIndex) -
+            reinterpret_cast<const std::byte*>(&entry);
+        ((Offsets[MakeSignature<Args>()] = GetOffset<Args>(entry)), ...);
+    }
+    template <typename T> size_t GetOffset(const typename U::SparseSetAoS<ComponentCombo>::Entry& entry)
+    {
+        const std::byte* base = reinterpret_cast<const std::byte*>(&entry);
+        const std::byte* component = reinterpret_cast<const std::byte*>(&std::get<T>(entry.Value));
+
+        return component - base;
+    }
+
+    std::byte* GetBase() override
+    {
+        return reinterpret_cast<std::byte*>(m_Data.DenseData().data());
+    }
+
+    unsigned int Size() const override
+    {
+        return m_Data.Size();
     }
 
     bool Has(const Entity& entity) const override
@@ -69,14 +91,14 @@ struct Archetype : IArchetype
         m_Data.Erase(entity.GetId().Index);
     }
 
-    void* GetTypeErased(const Entity& entity, std::type_index type) override
+    void* GetTypeErased(const Entity& entity, Signature typeSig) override
     {
         ComponentCombo& components = Get(entity);
         void* result = nullptr;
 
         auto GetComponent = [&]<typename T>()
         {
-            if (type == std::type_index(typeid(T)))
+            if (typeSig == MakeSignature<T>())
             {
                 result = static_cast<void*>(&std::get<T>(components));
             }
@@ -99,55 +121,6 @@ struct Archetype : IArchetype
             " ] doesn't contain entity: ", entity.GetId());
         return std::get<T>(m_Data[entity.GetId().Index]);
     }
-
-    bool Matches(std::span<const std::type_index> types) const override
-    {
-        return std::ranges::all_of(
-            types, [](const auto& id) { return ((id == std::type_index(typeid(Args))) || ...); });
-    }
-
-    template <typename T> static void* GetPtr(ComponentCombo& combo)
-    {
-        return &std::get<T>(combo);
-    }
-
-    std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
-        std::span<const std::type_index> types) override
-    {
-        using Getter = void* (*)(ComponentCombo&);
-
-        static const std::array<std::type_index, sizeof...(Args)> mine{std::type_index(typeid(Args))...};
-        static const std::array<Getter, sizeof...(Args)> getters{&GetPtr<Args>...};
-
-        // Resolve once per call: which getter produces which requested component.
-        std::vector<Getter> selected{};
-        selected.reserve(types.size());
-
-        for (auto id : types)
-        {
-            auto it = std::ranges::find(mine, id);
-
-            U::Log::Assert(it != mine.end(), "Invalid archetype query");
-
-            selected.push_back(getters[it - mine.begin()]);
-        }
-
-        std::vector<std::pair<unsigned int, std::vector<void*>>> pairs{};
-        pairs.reserve(m_Data.Size());
-        std::vector<void*> ptrs(selected.size());
-        unsigned int p = 0;
-        for (auto& item : m_Data)
-        {
-            for (unsigned int i = 0; i < selected.size(); ++i)
-            {
-                ptrs[i] = selected[i](item.Value);
-            }
-
-            pairs.emplace_back(item.SparseIndex, ptrs);
-            ++p;
-        }
-        return pairs;
-    }
 };
 } // namespace Ivy::C
 
@@ -157,16 +130,35 @@ struct Archetype : IArchetype
 // ==================================================
 
 #pragma once
+#include "Utilities/Debug/Log.hpp"
+#include <bitset>
 namespace Ivy::C
 {
+
+inline unsigned int NextComponentId()
+{
+    static unsigned int counter = 0;
+    U::Log::Assert(counter < 64, "Too many component types for Signature");
+    return ++counter;
+}
+
+template <typename T> inline unsigned int ComponentId()
+{
+    static const unsigned int id = NextComponentId();
+    return id;
+}
+
+using Signature = std::bitset<64>;
+
+template <typename... Args> Signature MakeSignature()
+{
+    Signature s;
+    (s.set(ComponentId<Args>()), ...);
+    return s;
+}
+
 struct Component
 {
-    Component() = default;
-    virtual ~Component() = default;
-    Component(const Component&) = default;
-    Component& operator=(const Component&) = default;
-    Component(Component&&) noexcept = default;
-    Component& operator=(Component&&) noexcept = default;
 };
 } // namespace Ivy::C
 
@@ -770,9 +762,10 @@ struct Query
             }
         }
 
-        if (entity.m_Archetype->SupportedComponents().Contains<T>())
+        const Signature sig = MakeSignature<T>();
+        if ((sig & entity.m_Archetype->Supported) == sig)
         {
-            return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, std::type_index(typeid(T))));
+            return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, sig));
         }
         U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
     }
@@ -785,16 +778,10 @@ struct Query
         {
             return false;
         }
-        if (m_Archetypes.Contains<Args...>())
-        {
-            return m_Archetypes.Get<Args...>()->Has(entity);
-        }
 
-        if ((!entity.m_Archetype->SupportedComponents().Contains<Args>() || ...))
-        {
-            return false;
-        }
-        return true;
+        const Signature sig = MakeSignature<Args...>();
+
+        return (entity.m_Archetype->Supported & sig).count() == sizeof...(Args);
     }
 
     void RemoveAllComponents(Entity& entity)
@@ -803,7 +790,6 @@ struct Query
         {
             entity.m_Archetype->Remove(entity);
             entity.m_Archetype.Reset();
-            m_RefreshCache = true;
         }
     }
 
@@ -827,86 +813,37 @@ struct Query
         std::invocable<F&, unsigned int, Args&...>
     void ForEach(F&& action)
     {
-        if (m_RefreshCache == true)
-        {
-            m_Cache.Clear();
-            m_RefreshCache = false;
-        }
-        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+        static const Signature sig = MakeSignature<Args...>();
 
-        if (!m_Cache.Contains<Args...>())
+        for (auto& ptr : m_Archetypes)
         {
-            for (auto& archetype : m_Archetypes)
+            auto& archetype = *ptr;
+
+            if ((sig & archetype.Supported) != sig)
             {
-                if (!archetype->Matches(wanted))
-                {
-                    continue;
-                }
-
-                auto rows = archetype->GetRows(wanted);
-                for (auto& [id, ptrs] : rows)
-                {
-                    [&]<size_t... I>(std::index_sequence<I...>)
-                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
-                }
-                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
+                continue;
             }
-        }
-        else
-        {
-            for (auto& archetypeRow : m_Cache.Get<Args...>())
+
+            const std::array<size_t, sizeof...(Args)> offsets{archetype.Offsets.at(MakeSignature<Args>())...};
+
+            std::byte* base = archetype.GetBase();
+
+            for (unsigned int i = 0; i < archetype.Size(); ++i)
             {
-                for (auto& [id, ptrs] : archetypeRow)
-                {
-                    [&]<size_t... I>(std::index_sequence<I...>)
-                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
-                }
+                std::byte* row = base + i * archetype.Stride;
+
+                unsigned int entityIndex = *reinterpret_cast<unsigned int*>(row + archetype.EntityOffset);
+
+                Invoke<Args...>(action, entityIndex, row, offsets, std::index_sequence_for<Args...>{});
             }
         }
     }
 
-    template <typename... Args>
-    unsigned int NumberOfEntitiesWith()
-        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    template <typename... Args, size_t... I>
+    static void Invoke(auto& action, unsigned int entityIndex, std::byte* row,
+        const std::array<size_t, sizeof...(Args)>& offsets, std::index_sequence<I...>)
     {
-        unsigned int number = 0;
-
-        if (m_RefreshCache == true)
-        {
-            m_Cache.Clear();
-            m_RefreshCache = false;
-        }
-        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
-
-        if (!m_Cache.Contains<Args...>())
-        {
-            for (auto& archetype : m_Archetypes)
-            {
-                if (!archetype->Matches(wanted))
-                {
-                    continue;
-                }
-
-                auto rows = archetype->GetRows(wanted);
-                for (auto& [id, ptrs] : rows)
-                {
-                    ++number;
-                }
-                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
-            }
-        }
-        else
-        {
-            for (auto& archetypeRow : m_Cache.Get<Args...>())
-            {
-                for (auto& [id, ptrs] : archetypeRow)
-                {
-                    ++number;
-                }
-            }
-        }
-
-        return number;
+        action(entityIndex, *reinterpret_cast<Args*>(row + offsets[I])...);
     }
 
   private:
@@ -948,10 +885,11 @@ struct Query
             (
                 [&]
                 {
-                    if (previous->SupportedComponents().Contains<Args>())
+                    if ((MakeSignature<Args>() & previous->Supported).count() != 0)
                     {
-                        *static_cast<Args*>(archetype.GetTypeErased(entity, typeid(Args))) =
-                            std::move(*static_cast<Args*>(previous->GetTypeErased(entity, typeid(Args))));
+                        *static_cast<Args*>(archetype.GetTypeErased(entity, MakeSignature<Args>())) =
+                            std::move(
+                                *static_cast<Args*>(previous->GetTypeErased(entity, MakeSignature<Args>())));
                     }
                 }(),
                 ...);
@@ -964,12 +902,9 @@ struct Query
         // invalidate only caches associated with the modified components. \
         // can make cache a runtime map with type_index as well if i need that.
 
-        m_RefreshCache = true;
         return *components;
     }
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
-    U::TypedVector<Cache> m_Cache;
-    bool m_RefreshCache = false;
 };
 } // namespace Ivy::C
 

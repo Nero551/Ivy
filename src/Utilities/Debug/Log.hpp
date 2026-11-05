@@ -1,5 +1,6 @@
 #pragma once
 #include <exception>
+#include <expected>
 #include <iostream>
 #include <source_location>
 #include <stdexcept>
@@ -66,7 +67,7 @@ struct Log
         std::cout << m_Red << "💀 [FATAL] " << m_Reset;
         (..., (std::cout << args));
         std::cout << '\n';
-        throw std::runtime_error("");
+        throw std::exception();
     }
 
     /** @brief Validates a raw pointer and returns the dereferenced object. */

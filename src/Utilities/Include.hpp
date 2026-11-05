@@ -3,6 +3,7 @@
 #include "CheckedPtr.hpp"
 #include "Concepts.hpp"
 #include "DataStructures/GIndexPool.hpp"
+#include "DataStructures/HierarchyTree.hpp"
 #include "DataStructures/IndexPool.hpp"
 #include "DataStructures/Indirect2DVector.hpp"
 #include "DataStructures/SparseSetAoS.hpp"
