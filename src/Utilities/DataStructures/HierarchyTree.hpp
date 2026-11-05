@@ -31,7 +31,6 @@ template <std::unsigned_integral T> struct HierarchyTree
             m_Nodes.resize(index + 1);
         }
     }
-
     bool Exists(T index) const
     {
         return index < m_Nodes.size();
@@ -181,6 +180,28 @@ template <std::unsigned_integral T> struct HierarchyTree
 
         return current;
     }
+    T GetDepth(T node) const
+    {
+        if (!Exists(node))
+        {
+            return Invalid;
+        }
+
+        T depth = 0;
+        T current = node;
+
+        while (m_Nodes[current].Parent != Invalid)
+        {
+            ++depth;
+            current = m_Nodes[current].Parent;
+        }
+
+        return depth;
+    }
+    T GetChildCount(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].ChildCount : 0;
+    }
 
     std::vector<T> GetChildren(T node) const
     {
@@ -247,10 +268,6 @@ template <std::unsigned_integral T> struct HierarchyTree
             current = m_Nodes[current].Parent;
         }
         return ancestors;
-    }
-    T GetChildCount(T node) const
-    {
-        return Exists(node) ? m_Nodes[node].ChildCount : 0;
     }
 
     void ForEachChild(T node, std::function_ref<void(T)> action) const
