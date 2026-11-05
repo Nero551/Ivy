@@ -75,31 +75,6 @@ bool Entity::HasChild(const Entity& child) const
     return m_Children.Contains(child.GetId().Index) && m_Children[child.GetId().Index] == child.GetId();
 }
 
-Entity& Entity::GetChild(const EntityID id) const
-{
-    return m_ECS.GetEntity(id);
-}
-
-Entity& Entity::FindChild(const EntityID id) const
-{
-    if (m_Children.Contains(id.Index) && m_Children[id.Index] == id)
-    {
-        return m_ECS.FindEntity(id);
-    }
-
-    U::Log::Fatal(std::format("Entity {} has no child {}", m_Id.Index, id.Index));
-}
-
-U::CheckedPtr<Entity> Entity::TryFindChild(const EntityID id) const
-{
-    if (m_Children.Contains(id.Index) && m_Children[id.Index] == id)
-    {
-        return &m_ECS.GetEntity(id);
-    }
-
-    return {std::format("Entity {} has no child {}", m_Id.Index, id.Index)};
-}
-
 std::vector<U::CheckedPtr<Entity>> Entity::GetChildren() const
 {
     std::vector<U::CheckedPtr<Entity>> children;

@@ -31,9 +31,6 @@ struct Entity
     void AttachChild(Entity& child);
     void DetachChild(Entity& child);
     bool HasChild(const Entity& child) const;
-    Entity& GetChild(const EntityID id) const;
-    Entity& FindChild(EntityID id) const;
-    U::CheckedPtr<Entity> TryFindChild(EntityID id) const;
     std::vector<U::CheckedPtr<Entity>> GetChildren() const;
     unsigned int ChildCount() const;
     void ForEachChild(std::function_ref<void(Entity&)> callback) const;

@@ -154,13 +154,92 @@ template <std::unsigned_integral T> struct HierarchyTree
     {
         return Exists(node) ? m_Nodes[node].PrevSibling : Invalid;
     }
+    T GetRoot(T node) const
+    {
+        if (!Exists(node))
+        {
+            return Invalid;
+        }
 
-    std::vector<T> GetChildren(T node) const;
-    std::vector<T> GetDescendants(T node) const;
-    std::vector<T> GetAncestors(T node) const;
+        T current = node;
 
-    void ForEachSibling(std::function_ref<void(T)> action) const {}
+        while (m_Nodes[current].Parent != Invalid)
+        {
+            current = m_Nodes[current].Parent;
+        }
+
+        return current;
+    }
+
+    std::vector<T> GetChildren(T node) const
+    {
+        if (!Exists(node))
+        {
+            return {};
+        }
+        std::vector<T> children{};
+        T current = m_Nodes[node].FirstChild;
+        while (current != Invalid)
+        {
+            children.push_back(current);
+            current = m_Nodes[current].NextSibling;
+        }
+        return children;
+    }
+    std::vector<T> GetSiblings(T node) const
+    {
+        if (!Exists(node) || !Exists(m_Nodes[node].Parent))
+        {
+            return {};
+        }
+
+        std::vector<T> siblings = GetChildren(m_Nodes[node].Parent);
+        std::erase(siblings, node);
+        return siblings;
+    }
+    std::vector<T> GetDescendants(T node) const
+    {
+        if (!Exists(node))
+        {
+            return {};
+        }
+
+        std::vector<T> descendants{};
+
+        const auto Visit = [&](const auto& self, T parent)
+        {
+            T current = m_Nodes[parent].FirstChild;
+
+            while (current != Invalid)
+            {
+                descendants.push_back(current);
+                self(self, current);
+                current = m_Nodes[current].NextSibling;
+            }
+        };
+
+        Visit(Visit, node);
+
+        return descendants;
+    }
+    std::vector<T> GetAncestors(T node) const
+    {
+        if (!Exists(node))
+        {
+            return {};
+        }
+        std::vector<T> ancestors{};
+        T current = m_Nodes[node].Parent;
+        while (current != Invalid)
+        {
+            ancestors.push_back(current);
+            current = m_Nodes[current].Parent;
+        }
+        return ancestors;
+    }
+
     void ForEachChild(std::function_ref<void(T)> action) const {}
+    void ForEachSibling(std::function_ref<void(T)> action) const {}
     void ForEachDescendant(std::function_ref<void(T)> action) const {}
     void ForEachAncestor(std::function_ref<void(T)> action) const {}
 
