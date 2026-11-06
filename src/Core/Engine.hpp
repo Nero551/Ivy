@@ -9,6 +9,7 @@
 #include "Utilities/Debug/Log.hpp"
 #include <concepts>
 #include <format>
+#include <functional>
 #include <memory>
 
 /** @brief Root namespace for Ivy engine functionality. */
@@ -26,7 +27,11 @@ struct Engine
     World World{*this};
     EntityComponentSystem ECS{};
 
-    Engine() = default;
+    template <typename F>
+    Engine(F&& configure) requires(std::invocable<F, Engine&>)
+        : World(*this), m_Configuration(std::forward<F>(configure))
+    {
+    }
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
     Engine(Engine&&) = delete;
@@ -75,16 +80,6 @@ struct Engine
         return m_Services;
     }
 
-  private:
-    /** @brief Registered engine modules. */
-    U::TypedVector<std::unique_ptr<Module>> m_Modules;
-    U::TypedVector<std::unique_ptr<Service>> m_Services;
-    TimeHandler m_TimeHandler;
-    bool m_Running = false;
-
-    /** @brief Initializes engine services, modules & custom configurations. */
-    void Configure();
-
     /** @brief Creates and registers a module. */
     template <IsModule T> T& AddModule()
     {
@@ -104,6 +99,14 @@ struct Engine
 
         return static_cast<T&>(*m_Services.Get<T>());
     }
+
+  private:
+    /** @brief Registered engine modules. */
+    U::TypedVector<std::unique_ptr<Module>> m_Modules;
+    U::TypedVector<std::unique_ptr<Service>> m_Services;
+    TimeHandler m_TimeHandler;
+    const std::function<void(Engine&)> m_Configuration;
+    bool m_Running = false;
 
     void Start();
     void BeginFrame();

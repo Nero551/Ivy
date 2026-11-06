@@ -56,7 +56,7 @@ template <unsigned int Components, Scalar T = float> struct Vector
     constexpr T LengthSquared() const
     {
         T result = 0;
-        for (T& fl : m_Data)
+        for (const T& fl : m_Data)
         {
             result += fl * fl;
         }

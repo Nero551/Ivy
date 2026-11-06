@@ -17,7 +17,7 @@ namespace Ivy::M
  *
  * For column vectors, the rightmost transformation is applied first.
  */
-template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix<2, 2, T>, T>
+template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix, T>
 {
     using BasicMatrix<2, 2, Matrix, T>::BasicMatrix;
     using BasicMatrix<2, 2, Matrix, T>::operator*;

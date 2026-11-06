@@ -37,8 +37,8 @@ using AngularSpeed = OperationDimensional<Dimensionless, Time<-1>, M::Greek::OME
 
 using Area = Length<2>;
 using Volume = Length<3>;
-using Density = OperationDimensional<Mass<1>, Volume::WithExponent<-1>, M::Greek::RHO>;
-using SurfaceDensity = OperationDimensional<Mass<1>, Area::WithExponent<-1>, M::Greek::SIGMA>;
+using Density = OperationDimensional<Mass<1>, Volume::MultiplyExponentBy<-1>, M::Greek::RHO>;
+using SurfaceDensity = OperationDimensional<Mass<1>, Area::MultiplyExponentBy<-1>, M::Greek::SIGMA>;
 
 using Joule = OperationDimensional<Force, Length<1>, "J">;
 

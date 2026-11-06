@@ -1,14 +1,7 @@
 #include "Engine.hpp"
 
 #include "Core/Service.hpp"
-#include "Core/Services/EventBus/EventBus.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Graphics/Context.hpp"
-#include "Modules/Input/Input.hpp"
-#include "Modules/Profiling/Profiling.hpp"
-#include "Modules/Renderer/Renderer.hpp"
-#include "Sandbox/Sandbox2D.hpp"
-#include "Sandbox/Sandbox3D.hpp"
 #include "tracy/Tracy.hpp"
 #define TRACY_OPENGL_AUTO_CALIBRATION
 #include "tracy/TracyOpenGL.hpp"
@@ -48,28 +41,9 @@ double Engine::GetTime() const
     return m_TimeHandler.GetTime();
 }
 
-void Engine::Configure()
-{
-    Window.Config.X11ClassName = "ivy_engine";
-    Window.Config.WaylandAppId = "ivy_engine";
-    Window.SetIcon({"Assets/icon.png"});
-    Window.SetCursor({"Assets/cursor.png"});
-    // Window.SetSize(1920, 1200);
-    // G::Context::SwapInterval(0);
-
-    AddService<EventBus>();
-    AddService<ResourceManager>();
-
-    AddModule<I::Input>();
-    AddModule<R::Renderer>();
-    AddModule<Profiling>();
-    AddModule<Sandbox::Sandbox2D>();
-}
-
 void Engine::Start()
 {
-    Window.Generate(800, 600, "Ivy");
-    Configure();
+    m_Configuration(*this);
 
     TracyGpuContext;
     ZoneScopedN("Start");

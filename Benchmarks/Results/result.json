@@ -1,0 +1,117 @@
+{
+  "context": {
+    "date": "2026-11-06T12:44:46+02:00",
+    "host_name": "pendragon",
+    "executable": "/home/nero551/Main/Dev/Ivy/build/linux/x86_64/release/IvyBenchmarks",
+    "num_cpus": 8,
+    "mhz_per_cpu": 4400,
+    "cpu_scaling_enabled": true,
+    "aslr_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 6291456,
+        "num_sharing": 8
+      }
+    ],
+    "load_avg": [1.32715,0.987305,0.730469],
+    "library_version": "v1.9.5",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "BM_VectorAddition",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_VectorAddition",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 716158857,
+      "real_time": 9.6489441587955427e-01,
+      "cpu_time": 9.6335162828266185e-01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_EntityCreation/1000",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "BM_EntityCreation/1000",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 22934,
+      "real_time": 3.0612065579217815e+04,
+      "cpu_time": 3.0473267375948373e+04,
+      "time_unit": "ns",
+      "items_per_second": 3.2815647487452224e+07
+    },
+    {
+      "name": "BM_EntityCreation/10000",
+      "family_index": 1,
+      "per_family_instance_index": 1,
+      "run_name": "BM_EntityCreation/10000",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1135,
+      "real_time": 5.9538136564204388e+05,
+      "cpu_time": 5.9318337180616718e+05,
+      "time_unit": "ns",
+      "items_per_second": 1.6858193393977452e+07
+    },
+    {
+      "name": "BM_EntityCreation/100000",
+      "family_index": 1,
+      "per_family_instance_index": 2,
+      "run_name": "BM_EntityCreation/100000",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 137,
+      "real_time": 5.1578972919888282e+06,
+      "cpu_time": 5.1229528978102179e+06,
+      "time_unit": "ns",
+      "items_per_second": 1.9519992081665348e+07
+    },
+    {
+      "name": "BM_EntityCreation/1000000",
+      "family_index": 1,
+      "per_family_instance_index": 3,
+      "run_name": "BM_EntityCreation/1000000",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 22,
+      "real_time": 3.1401038090817485e+07,
+      "cpu_time": 3.1223373045454528e+07,
+      "time_unit": "ns",
+      "items_per_second": 3.2027289253605455e+07
+    }
+  ]
+}

@@ -1,10 +1,7 @@
 #pragma once
 
-#include "Math/Matrix/Matrix.hpp"
-#include "Math/Matrix/Matrix2.hpp"
-#include "Math/Vector/Vector3.hpp"
-
 #include "../../Utilities/Debug/Log.hpp"
+#include "Math/Matrix/Matrix.hpp"
 
 namespace Ivy::M
 {
@@ -20,7 +17,7 @@ namespace Ivy::M
  *
  * For column vectors, the rightmost transformation is applied first.
  */
-template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix<3, 3, T>, T>
+template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix, T>
 {
     using BasicMatrix<3, 3, Matrix, T>::BasicMatrix;
     using BasicMatrix<3, 3, Matrix, T>::operator*;

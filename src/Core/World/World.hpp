@@ -4,8 +4,6 @@
 #include "Core/ECS/EntityID.hpp"
 #include "Core/SystemOwner.hpp"
 #include "Scene.hpp"
-#include "Utilities/Debug/Log.hpp"
-#include <concepts>
 
 namespace Ivy::C
 {
@@ -19,7 +17,6 @@ struct Engine;
 struct World : SystemOwner
 {
     using SystemOwner::SystemOwner;
-
     int MaxLights = 24;
     void SetRoot(const Entity& entity);
     Entity& GetRoot();

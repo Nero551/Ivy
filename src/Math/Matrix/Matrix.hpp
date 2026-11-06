@@ -19,7 +19,7 @@ namespace Ivy::M
  * For column vectors, the rightmost transformation is applied first.
  */
 template <unsigned int Row, unsigned int Column, Scalar T = float>
-struct Matrix : BasicMatrix<Row, Column, Matrix<Row, Column, T>, T>
+struct Matrix : BasicMatrix<Row, Column, Matrix, T>
 {
     using BasicMatrix<Row, Column, Matrix, T>::BasicMatrix;
     using BasicMatrix<Row, Column, Matrix, T>::operator*;

@@ -5,7 +5,9 @@
 
 namespace Ivy::M
 {
-template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> struct BasicMatrix
+template <unsigned int Row, unsigned int Column,
+    template <unsigned int, unsigned int, Scalar> typename Derived, Scalar T>
+struct BasicMatrix
 {
     static constexpr unsigned int Size = Row * Column;
 
@@ -83,9 +85,9 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Returns the transpose of the matrix. */
-    constexpr Derived Transpose() const
+    constexpr Derived<Column, Row, T> Transpose() const
     {
-        Derived result = AsDerived();
+        Derived<Column, Row, T> result{0};
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -100,7 +102,7 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
 
     constexpr unsigned int Rank() const
     {
-        const Derived echelon = RowEchelon();
+        const Derived<Row, Column, T> echelon = RowEchelon();
         unsigned int rank = 0;
 
         for (unsigned int row = 0; row < Row; ++row)
@@ -135,9 +137,9 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
             }};
     }
 
-    constexpr Derived RowEchelon() const
+    constexpr Derived<Row, Column, T> RowEchelon() const
     {
-        Derived result = AsDerived();
+        Derived<Row, Column, T> result = AsDerived();
         unsigned int pivotRow = 0;
         for (unsigned int pivotCol = 0; pivotCol < Column && pivotRow < Row; ++pivotCol)
         {
@@ -171,13 +173,11 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
 
         return result;
     }
-    const
 
-        constexpr Derived
-        MultiplyRow(unsigned int r, T scalar)
+    constexpr Derived<Row, Column, T> MultiplyRow(unsigned int r, T scalar)
     {
         U::Log::Assert(r < Row, "Matrix: Row index out of bounds.");
-        Derived result = *this;
+        Derived<Row, Column, T> result = AsDerived();
 
         for (unsigned int column = 0; column < Column; ++column)
         {
@@ -187,12 +187,12 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
         return result;
     }
 
-    constexpr Derived AddRow(unsigned int target, unsigned int source) const
+    constexpr Derived<Row, Column, T> AddRow(unsigned int target, unsigned int source) const
     {
         U::Log::Assert(target < Row, "Matrix: Row index out of bounds.");
         U::Log::Assert(source < Row, "Matrix: Row index out of bounds.");
 
-        Derived result = *this;
+        Derived<Row, Column, T> result = AsDerived();
 
         for (unsigned int column = 0; column < Column; ++column)
         {
@@ -202,10 +202,10 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
         return result;
     }
 
-    constexpr Derived SwapRow(unsigned int r1, unsigned int r2)
+    constexpr Derived<Row, Column, T> SwapRow(unsigned int r1, unsigned int r2)
     {
         U::Log::Assert(r1 < Row && r2 < Row, "Matrix: Row index out of bounds.");
-        Derived result = Zero();
+        Derived<Row, Column, T> result = Zero();
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -229,15 +229,15 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Returns the zero matrix. */
-    static constexpr Derived Zero()
+    static constexpr Derived<Row, Column, T> Zero()
     {
-        return Derived{0};
+        return Derived<Row, Column, T>{0};
     }
 
     /** @brief Returns the identity matrix. */
-    static constexpr Derived Identity() requires(Row == Column)
+    static constexpr Derived<Row, Column, T> Identity() requires(Row == Column)
     {
-        Derived result{0};
+        Derived<Row, Column, T> result{0};
 
         for (unsigned int i = 0; i < Row; ++i)
         {
@@ -248,9 +248,9 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Adds another matrix component-wise. */
-    constexpr Derived operator+(const BasicMatrix& matrix) const
+    constexpr Derived<Row, Column, T> operator+(const BasicMatrix& matrix) const
     {
-        Derived result{0};
+        Derived<Row, Column, T> result{0};
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -264,9 +264,9 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Subtracts another matrix component-wise. */
-    constexpr Derived operator-(const BasicMatrix& matrix) const
+    constexpr Derived<Row, Column, T> operator-(const BasicMatrix& matrix) const
     {
-        Derived result{0};
+        Derived<Row, Column, T> result{0};
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -296,9 +296,9 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Multiplies every matrix element by a scalar. */
-    constexpr Derived operator*(const T scalar) const
+    constexpr Derived<Row, Column, T> operator*(const T scalar) const
     {
-        Derived result{0};
+        Derived<Row, Column, T> result{0};
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -312,9 +312,9 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Divides every matrix element by a scalar. */
-    constexpr Derived operator/(const T scalar) const
+    constexpr Derived<Row, Column, T> operator/(const T scalar) const
     {
-        Derived result{0};
+        Derived<Row, Column, T> result{0};
 
         for (unsigned int row = 0; row < Row; ++row)
         {
@@ -328,31 +328,31 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Adds another matrix to this matrix. */
-    constexpr Derived& operator+=(const BasicMatrix& matrix)
+    constexpr Derived<Row, Column, T>& operator+=(const BasicMatrix& matrix)
     {
-        return static_cast<Derived&>(*this) = *this + matrix;
+        return static_cast<Derived<Row, Column, T>&>(*this) = *this + matrix;
     }
 
     /** @brief Subtracts another matrix from this matrix. */
-    constexpr Derived& operator-=(const BasicMatrix& matrix)
+    constexpr Derived<Row, Column, T>& operator-=(const BasicMatrix& matrix)
     {
-        return static_cast<Derived&>(*this) = *this - matrix;
+        return static_cast<Derived<Row, Column, T>&>(*this) = *this - matrix;
     }
 
     /** @brief Multiplies this matrix by a scalar in place. */
-    constexpr Derived& operator*=(const T scalar)
+    constexpr Derived<Row, Column, T>& operator*=(const T scalar)
     {
-        return static_cast<Derived&>(*this) = *this * scalar;
+        return static_cast<Derived<Row, Column, T>&>(*this) = *this * scalar;
     }
 
     /** @brief Divides this matrix by a scalar in place. */
-    constexpr Derived& operator/=(const T scalar)
+    constexpr Derived<Row, Column, T>& operator/=(const T scalar)
     {
-        return static_cast<Derived&>(*this) = *this / scalar;
+        return static_cast<Derived<Row, Column, T>&>(*this) = *this / scalar;
     }
 
     /** @brief Returns the negated matrix. */
-    constexpr Derived operator-() const
+    constexpr Derived<Row, Column, T> operator-() const
     {
         return *this * -1;
     }
@@ -409,7 +409,7 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     }
 
     /** @brief Multiplies a matrix by a scalar. */
-    friend constexpr Derived operator*(const T scalar, const BasicMatrix& matrix)
+    friend constexpr Derived<Row, Column, T> operator*(const T scalar, const BasicMatrix& matrix)
     {
         return matrix * scalar;
     }
@@ -418,14 +418,14 @@ template <unsigned int Row, unsigned int Column, typename Derived, Scalar T> str
     std::array<std::array<T, Row>, Column> m_Data{};
 
   private:
-    constexpr const Derived& AsDerived() const
+    constexpr const Derived<Row, Column, T>& AsDerived() const
     {
-        return static_cast<const Derived&>(*this);
+        return static_cast<const Derived<Row, Column, T>&>(*this);
     }
 
-    constexpr Derived& AsDerived()
+    constexpr Derived<Row, Column, T>& AsDerived()
     {
-        return static_cast<Derived&>(*this);
+        return static_cast<Derived<Row, Column, T>&>(*this);
     }
 };
 

@@ -2,6 +2,11 @@
 
 #include "Utilities/FixedString.hpp"
 #include "Utilities/IsSpecialization.hpp"
+#include <concepts>
+#include <cstddef>
+#include <ostream>
+#include <string_view>
+#include <type_traits>
 namespace Ivy::P
 {
 
@@ -69,6 +74,7 @@ template <template <int> typename Derived, int Exp, int Ord> struct Dimensional
     static constexpr int Order = Ord;
 
     template <int E> using WithExponent = Derived<E>;
+    template <int E> using MultiplyExponentBy = Derived<Exp * E>;
     template <int E> requires(Exponent % E == 0)
     using WithRoot = Derived<Exponent / E>;
 

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Math/Concepts.hpp"
-#include "Math/Equations/LinearEquation.hpp"
-#include "Math/Equations/QuadraticEquationSolver.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
@@ -294,6 +292,9 @@ struct Shader
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //
 //TODO: new performance bottleneck: renderer.
+
+//TODO: make tests math & physics. make benchmarks for math, physics, ecs \
+// gtests & google benchmark.
 
 inline void Test() {}
 } // namespace Sketch

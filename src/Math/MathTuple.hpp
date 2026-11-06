@@ -73,7 +73,7 @@ template <typename... Args> struct MathTuple
     MathTuple<SubtractionResult<T, Args>...> constexpr operator-(const T& value) const
         requires(Subtractive<T, Args> && ...)
     {
-        return Apply([value](const Args... args) { return MathTuple{(value - args)...}; });
+        return Apply([value](const Args... args) { return MathTuple{(args - value)...}; });
     }
 
     template <typename T>
@@ -87,7 +87,7 @@ template <typename... Args> struct MathTuple
     MathTuple<DivisionResult<T, Args>...> constexpr operator/(const T& value) const
         requires(Divisible<T, Args> && ...)
     {
-        return Apply([value](const Args... args) { return MathTuple{(value / args)...}; });
+        return Apply([value](const Args... args) { return MathTuple{(args / value)...}; });
     }
 
     template <unsigned int I> constexpr decltype(auto) Get()

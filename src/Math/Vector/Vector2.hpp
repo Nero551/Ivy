@@ -140,7 +140,7 @@ template <Scalar T> struct Vector<2, T>
             return false;
         }
 
-        return M::NearlyEquals(std::abs(Dot(vector)), 0);
+        return M::NearlyEquals(std::abs(Dot(vector)), 0.0f);
     }
 
     /** @brief Projects the vector stereographically onto a line. */
