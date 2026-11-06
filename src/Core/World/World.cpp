@@ -3,8 +3,7 @@
 #include "Core/ECS/EntityID.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Nodes.hpp"
-#include "Core/World/Systems/Transform3DSystem.hpp"
-#include "Core/World/Systems/Trarnsform2DSystem.hpp"
+#include "Systems/TransformSystem.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/Debug/Log.hpp"
 
@@ -43,8 +42,7 @@ Entity& World::GetCamera()
 void World::Start()
 {
     SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
-    AddSystem<Transform3DSystem>();
-    AddSystem<Transform2DSystem>();
+    AddSystem<TransformSystem>();
 
     for (auto& system : m_Systems)
     {

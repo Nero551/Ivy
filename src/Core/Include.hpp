@@ -22,6 +22,5 @@
 #include "World/Components.hpp"
 #include "World/Nodes.hpp"
 #include "World/Scene.hpp"
-#include "World/Systems/Transform3DSystem.hpp"
-#include "World/Systems/Trarnsform2DSystem.hpp"
+#include "World/Systems/TransformSystem.hpp"
 #include "World/World.hpp"

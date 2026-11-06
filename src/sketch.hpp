@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Core/ECS/Component.hpp"
+#include "Core/ECS/ECS.hpp"
+#include "Core/ECS/Entity.hpp"
 #include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Utilities/Debug/Log.hpp"
@@ -20,15 +23,7 @@ namespace Sketch
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
-
-//TODO: make transform system cache its own vector of the root's children that's updated on events \
-// that will make it way less expensive performance-wise.
-//TODO: not running renderer module sends fps from 15 to 34 (on 1.7m entities). \
-//not running renderer + transform system sends fps from 34 to 6500 (on 1.7m entities). \
-// its the ForEachDescendant thing.
-//
-// TODO: use a GetSmallestPool in ComponentPoolQuery instead of using the first pool as the driver.
-//
+//TODO: new performance bottleneck: renderer.
 // TODO: need particle system (cpu particle & gpu particle(compute shaders))
 // TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
 
@@ -295,14 +290,62 @@ struct Shader
 // define them using the IsSpec family in Utilities/IsSpecialization.hpp
 //
 // TODO: prevent math tuples from being `input-able to Function.
-//
-// TODO: if i really want to optimize my ECS. i gotta take it out of the project, and optimize it on its own. so take ECS folder + Event.hpp
-//
+////
 // TODO: wrap all used std stuff in stl wrapper. basically to avoid backward compatibility bs in std. \
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //
-//TODO: now only remains integration of the ecs into the engine.
+// TODO: combine Transform2DSystem and Transform3DSystem into 1 with 2 methods.
+//
+struct A : C::Component
+{
+    int Number = 10;
+};
+struct B : C::Component
+{
+    int Number = 10;
+};
+struct D : C::Component
+{
+    int Number = 10;
+};
 
-inline void Test() {}
+struct G : C::Component
+{
+    int Number = 10;
+};
+void BenchECS()
+{
+    C::EntityComponentSystem ecs;
+    for (int i = 0; i < 10000000; ++i)
+    {
+        auto& e = ecs.CreateEntity<C::Entity>();
+        if (i % 2 == 0)
+        {
+            ecs.Query.SetArchetype<A, B, D>(e);
+        }
+        else
+        {
+            ecs.Query.SetArchetype<D, B, G>(e);
+        }
+        ZoneScopedN("Creation");
+    }
+
+    double elapsed = 0;
+    while (true)
+    {
+        if (elapsed >= 10)
+        {
+            ZoneScopedN("Iteration");
+            elapsed = 0;
+            ecs.Query.ForEach<D>([](unsigned int id, D& d) { d.Number += id; });
+        }
+        elapsed += 0.016;
+    }
+}
+
+inline void Test()
+{
+    BenchECS();
+}
 } // namespace Sketch

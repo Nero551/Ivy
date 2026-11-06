@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <memory>
 #include <tuple>
-#include <typeindex>
 #include <utility>
 #include <vector>
 namespace Ivy::C
@@ -22,30 +21,44 @@ struct Query
     using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
-    template <typename... Args> requires(sizeof...(Args) != 1 && (std::derived_from<Args, Component> && ...))
-    std::tuple<Args...>& GetComponent(const Entity& entity) const
+    template <typename... Args>
+    std::tuple<Args&...> GetComponent(const Entity& entity) const
         requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...) && sizeof...(Args) != 1)
     {
+        return std::tie(GetComponent<Args>(entity)...);
+    }
 
-        return {GetComponent<Args>(entity)...};
+    template <typename T>
+    U::CheckedPtr<T> TryGetComponent(const Entity& entity) const requires(std::derived_from<T, Component>)
+    {
+        if (entity.m_Archetype == nullptr)
+        {
+            return nullptr;
+        }
+        IArchetype& archetype = *entity.m_Archetype;
+        const Signature sig = MakeSignature<T>();
+        if ((sig & archetype.Supported) == sig)
+        {
+            size_t offset = archetype.Offsets[ComponentId<T>()];
+            std::byte* base = archetype.Base;
+            std::byte* row = base + archetype.GetDenseIndex(entity.GetId().Index) * archetype.Stride;
+            return reinterpret_cast<T*>(row + offset);
+        }
+        return nullptr;
     }
 
     template <typename T>
     T& GetComponent(const Entity& entity) const requires(std::derived_from<T, Component>)
     {
         U::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype");
-        if (m_Archetypes.Contains<T>())
+        IArchetype& archetype = *entity.m_Archetype;
+        const Signature sig = MakeSignature<T>();
+        if ((sig & archetype.Supported) == sig)
         {
-            Archetype<T>& archetype = static_cast<Archetype<T>&>(*m_Archetypes.Get<T>());
-            if (archetype.Has(entity))
-            {
-                return archetype.template GetOne<T>(entity);
-            }
-        }
-
-        if (entity.m_Archetype->SupportedComponents().Contains<T>())
-        {
-            return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, std::type_index(typeid(T))));
+            size_t offset = archetype.Offsets[ComponentId<T>()];
+            std::byte* base = archetype.Base;
+            std::byte* row = base + archetype.GetDenseIndex(entity.GetId().Index) * archetype.Stride;
+            return *reinterpret_cast<T*>(row + offset);
         }
         U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
     }
@@ -58,16 +71,9 @@ struct Query
         {
             return false;
         }
-        if (m_Archetypes.Contains<Args...>())
-        {
-            return m_Archetypes.Get<Args...>()->Has(entity);
-        }
 
-        if ((!entity.m_Archetype->SupportedComponents().Contains<Args>() || ...))
-        {
-            return false;
-        }
-        return true;
+        const Signature sig = MakeSignature<Args...>();
+        return (entity.m_Archetype->Supported & sig) == sig;
     }
 
     void RemoveAllComponents(Entity& entity)
@@ -76,7 +82,6 @@ struct Query
         {
             entity.m_Archetype->Remove(entity);
             entity.m_Archetype.Reset();
-            m_RefreshCache = true;
         }
     }
 
@@ -100,86 +105,38 @@ struct Query
         std::invocable<F&, unsigned int, Args&...>
     void ForEach(F&& action)
     {
-        if (m_RefreshCache == true)
-        {
-            m_Cache.Clear();
-            m_RefreshCache = false;
-        }
-        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
+        static const Signature sig = MakeSignature<Args...>();
 
-        if (!m_Cache.Contains<Args...>())
+        for (auto& ptr : m_Archetypes)
         {
-            for (auto& archetype : m_Archetypes)
+            auto& archetype = *ptr;
+
+            if ((sig & archetype.Supported) != sig)
             {
-                if (!archetype->Matches(wanted))
-                {
-                    continue;
-                }
-
-                auto rows = archetype->GetRows(wanted);
-                for (auto& [id, ptrs] : rows)
-                {
-                    [&]<size_t... I>(std::index_sequence<I...>)
-                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
-                }
-                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
+                continue;
             }
-        }
-        else
-        {
-            for (auto& archetypeRow : m_Cache.Get<Args...>())
+
+            const std::array<size_t, sizeof...(Args)> offsets{archetype.Offsets[ComponentId<Args>()]...};
+
+            const unsigned n = archetype.Size;
+            const size_t stride = archetype.Stride;
+            const size_t entityOffset = archetype.EntityOffset;
+            std::byte* row = archetype.Base;
+
+            for (unsigned int i = 0; i < n; ++i, row += stride)
             {
-                for (auto& [id, ptrs] : archetypeRow)
-                {
-                    [&]<size_t... I>(std::index_sequence<I...>)
-                    { action(id, *static_cast<Args*>(ptrs[I])...); }(std::index_sequence_for<Args...>{});
-                }
+                const unsigned int entityIndex = *reinterpret_cast<const unsigned int*>(row + entityOffset);
+
+                Invoke<Args...>(action, entityIndex, row, offsets, std::index_sequence_for<Args...>{});
             }
         }
     }
 
-    template <typename... Args>
-    unsigned int NumberOfEntitiesWith()
-        requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
+    template <typename... Args, size_t... I>
+    static void Invoke(auto& action, unsigned int entityIndex, std::byte* row,
+        const std::array<size_t, sizeof...(Args)>& offsets, std::index_sequence<I...>)
     {
-        unsigned int number = 0;
-
-        if (m_RefreshCache == true)
-        {
-            m_Cache.Clear();
-            m_RefreshCache = false;
-        }
-        static const std::array<std::type_index, sizeof...(Args)> wanted{std::type_index(typeid(Args))...};
-
-        if (!m_Cache.Contains<Args...>())
-        {
-            for (auto& archetype : m_Archetypes)
-            {
-                if (!archetype->Matches(wanted))
-                {
-                    continue;
-                }
-
-                auto rows = archetype->GetRows(wanted);
-                for (auto& [id, ptrs] : rows)
-                {
-                    ++number;
-                }
-                (*m_Cache.Emplace<Args...>()).emplace_back(std::move(rows));
-            }
-        }
-        else
-        {
-            for (auto& archetypeRow : m_Cache.Get<Args...>())
-            {
-                for (auto& [id, ptrs] : archetypeRow)
-                {
-                    ++number;
-                }
-            }
-        }
-
-        return number;
+        action(entityIndex, *reinterpret_cast<Args*>(row + offsets[I])...);
     }
 
   private:
@@ -221,10 +178,11 @@ struct Query
             (
                 [&]
                 {
-                    if (previous->SupportedComponents().Contains<Args>())
+                    if ((MakeSignature<Args>() & previous->Supported).count() != 0)
                     {
-                        *static_cast<Args*>(archetype.GetTypeErased(entity, typeid(Args))) =
-                            std::move(*static_cast<Args*>(previous->GetTypeErased(entity, typeid(Args))));
+                        *static_cast<Args*>(archetype.GetTypeErased(entity, MakeSignature<Args>())) =
+                            std::move(
+                                *static_cast<Args*>(previous->GetTypeErased(entity, MakeSignature<Args>())));
                     }
                 }(),
                 ...);
@@ -232,16 +190,8 @@ struct Query
             previous->Remove(entity);
             entity.m_Archetype = &archetype;
         }
-
-        //TODO: instead of completely refreshing the cache. i could do a search and \
-        // invalidate only caches associated with the modified components. \
-        // can make cache a runtime map with type_index as well if i need that.
-
-        m_RefreshCache = true;
         return *components;
     }
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
-    U::TypedVector<Cache> m_Cache;
-    bool m_RefreshCache = false;
 };
 } // namespace Ivy::C

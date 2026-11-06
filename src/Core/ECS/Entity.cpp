@@ -6,6 +6,7 @@
 #include <format>
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 namespace Ivy::C
 {
@@ -14,133 +15,54 @@ EntityID Entity::GetId() const
     return m_Id;
 }
 
-Entity& Entity::GetRoot()
+Entity& Entity::GetRoot() const
 {
-    U::CheckedPtr<Entity> current = this;
-
-    while (current->HasParent())
-    {
-        current = &m_ECS.GetEntity(current->m_Parent);
-    }
-
-    return *current;
+    return m_ECS->GetActiveEntity(m_ECS->EntityHierarchy.GetRoot(GetId().Index));
 }
 
 void Entity::Destroy()
 {
-    m_ECS.RemoveEntity(*this);
+    m_ECS->RemoveEntity(*this);
 }
 
 void Entity::AttachChild(Entity& child)
 {
-    if (HasChild(child))
-    {
-        U::Log::Fatal("Child Entity already exists: ", child.m_Id.Index);
-        return;
-    }
-
-    if (&child == this)
-    {
-        U::Log::Error("An entity cannot be its own child.");
-        return;
-    }
-
-    if (child.IsDescendantOf(*this))
-    {
-        U::Log::Error("An entity cannot have its descendant as a child.");
-        return;
-    }
-
-    if (child.IsAncestorOf(*this))
-    {
-        U::Log::Error("An entity cannot have its ancestor as a child.");
-        return;
-    }
-
-    m_Children.Emplace(child.m_Id.Index, child.m_Id);
-    child.m_Parent = m_Id;
+    m_ECS->EntityHierarchy.Attach(m_Id.Index, child.m_Id.Index);
 }
 
 void Entity::DetachChild(Entity& child)
 {
-    if (HasChild(child))
-    {
-        m_Children.Erase(child.GetId().Index);
-        child.ClearParent();
-    }
+    m_ECS->EntityHierarchy.Detach(child.GetId().Index);
 }
 
 bool Entity::HasChild(const Entity& child) const
 {
-    return m_Children.Contains(child.GetId().Index) && m_Children[child.GetId().Index] == child.GetId();
-}
-
-Entity& Entity::GetChild(const EntityID id) const
-{
-    return m_ECS.GetEntity(id);
-}
-
-Entity& Entity::FindChild(const EntityID id) const
-{
-    if (m_Children.Contains(id.Index) && m_Children[id.Index] == id)
-    {
-        return m_ECS.FindEntity(id);
-    }
-
-    U::Log::Fatal(std::format("Entity {} has no child {}", m_Id.Index, id.Index));
-}
-
-U::CheckedPtr<Entity> Entity::TryFindChild(const EntityID id) const
-{
-    if (m_Children.Contains(id.Index) && m_Children[id.Index] == id)
-    {
-        return &m_ECS.GetEntity(id);
-    }
-
-    return {std::format("Entity {} has no child {}", m_Id.Index, id.Index)};
+    return m_ECS->EntityHierarchy.IsChildOf(child.GetId().Index, GetId().Index);
 }
 
 std::vector<U::CheckedPtr<Entity>> Entity::GetChildren() const
 {
-    std::vector<U::CheckedPtr<Entity>> children;
-    children.reserve(m_Children.Size());
-
-    for (auto id : m_Children)
-    {
-        children.emplace_back(&m_ECS.GetEntity(id));
-    }
-
+    std::vector<U::CheckedPtr<Entity>> children{};
+    m_ECS->EntityHierarchy.ForEachChild(
+        GetId().Index, [&](unsigned int id) { children.emplace_back(&m_ECS->GetActiveEntity(id)); });
     return children;
 }
 
 unsigned int Entity::ChildCount() const
 {
-    return m_Children.Size();
+    return m_ECS->EntityHierarchy.GetChildCount(GetId().Index);
 }
 
 void Entity::ForEachChild(std::function_ref<void(Entity&)> callback) const
 {
-    for (const EntityID id : m_Children)
-    {
-        callback(GetChild(id));
-    }
-}
-
-void Entity::DestroyChild(Entity& child)
-{
-    if (!HasChild(child))
-    {
-        return;
-    }
-    child.Destroy();
+    m_ECS->EntityHierarchy.ForEachChild(
+        GetId().Index, [&](unsigned int id) { callback(m_ECS->GetActiveEntity(id)); });
 }
 
 void Entity::DestroyChildren()
 {
-    while (!m_Children.Empty())
-    {
-        DestroyChild(m_ECS.GetEntity(*m_Children.begin()));
-    }
+    m_ECS->EntityHierarchy.ForEachChild(
+        GetId().Index, [&](unsigned int id) { m_ECS->GetActiveEntity(id).Destroy(); });
 }
 
 bool Entity::HasDescendant(const Entity& descendant) const
@@ -150,39 +72,21 @@ bool Entity::HasDescendant(const Entity& descendant) const
 
 bool Entity::IsDescendantOf(const Entity& ancestor) const
 {
-    EntityID current = m_Parent;
-
-    while (current != EntityID{0, 0})
-    {
-        if (current == ancestor.GetId())
-        {
-            return true;
-        }
-
-        current = m_ECS.GetEntity(current).m_Parent;
-    }
-
-    return false;
+    return m_ECS->EntityHierarchy.IsDescendantOf(GetId().Index, ancestor.GetId().Index);
 }
 
 std::vector<U::CheckedPtr<Entity>> Entity::GetDescendants() const
 {
-    std::vector<U::CheckedPtr<Entity>> descendants;
-    descendants.reserve(m_Children.Size() * 3);
-
-    RecursiveChildren(descendants, *this);
-
+    std::vector<U::CheckedPtr<Entity>> descendants{};
+    m_ECS->EntityHierarchy.ForEachDescendant(
+        GetId().Index, [&](unsigned int id) { descendants.emplace_back(&m_ECS->GetActiveEntity(id)); });
     return descendants;
 }
 
 void Entity::ForEachDescendant(std::function_ref<void(Entity&)> callback)
 {
-    for (const EntityID id : m_Children)
-    {
-        auto& child = GetChild(id);
-        callback(child);
-        child.ForEachDescendant(callback);
-    }
+    m_ECS->EntityHierarchy.ForEachDescendant(
+        GetId().Index, [&](unsigned int id) { callback(m_ECS->GetActiveEntity(id)); });
 }
 
 bool Entity::HasAncestor(const Entity& ancestor) const
@@ -192,49 +96,21 @@ bool Entity::HasAncestor(const Entity& ancestor) const
 
 bool Entity::IsAncestorOf(const Entity& descendant) const
 {
-    for (auto id : m_Children)
-    {
-        if (id == descendant.GetId())
-        {
-            return true;
-        }
-
-        const Entity& child = m_ECS.GetEntity(id);
-
-        if (child.IsAncestorOf(descendant))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return m_ECS->EntityHierarchy.IsAncestorOf(GetId().Index, descendant.GetId().Index);
 }
 
 std::vector<U::CheckedPtr<Entity>> Entity::GetAncestors() const
 {
-    std::vector<U::CheckedPtr<Entity>> ancestors;
-
-    EntityID current = m_Parent;
-
-    while (current != EntityID{0, 0})
-    {
-        Entity& entity = m_ECS.GetEntity(current);
-        ancestors.emplace_back(&entity);
-        current = entity.m_Parent;
-    }
-
+    std::vector<U::CheckedPtr<Entity>> ancestors{};
+    m_ECS->EntityHierarchy.ForEachAncestor(
+        GetId().Index, [&](unsigned int id) { ancestors.emplace_back(&m_ECS->GetActiveEntity(id)); });
     return ancestors;
 }
 
 void Entity::ForEachAncestor(std::function_ref<void(Entity&)> callback)
 {
-    U::CheckedPtr<Entity> current = TryFindParent();
-
-    while (current)
-    {
-        callback(*current);
-        current = current->TryFindParent();
-    }
+    m_ECS->EntityHierarchy.ForEachAncestor(
+        GetId().Index, [&](unsigned int id) { callback(m_ECS->GetActiveEntity(id)); });
 }
 
 void Entity::SetParent(Entity& parent)
@@ -244,21 +120,17 @@ void Entity::SetParent(Entity& parent)
 
 Entity& Entity::GetParent() const
 {
-    return m_ECS.GetEntity(m_Parent);
+    return m_ECS->GetActiveEntity(m_ECS->EntityHierarchy.GetParent(GetId().Index));
 }
 
 U::CheckedPtr<Entity> Entity::TryFindParent() const
 {
-    if (m_Parent == EntityID{0, 0})
-    {
-        return nullptr;
-    }
-    return m_ECS.TryFindEntity(m_Parent);
+    return m_ECS->TryFindActiveEntity(m_ECS->EntityHierarchy.GetParent(GetId().Index));
 }
 
 bool Entity::HasParent() const
 {
-    return m_Parent != EntityID{0, 0};
+    return m_ECS->EntityHierarchy.HasParent(GetId().Index);
 }
 
 void Entity::ClearParent()
@@ -272,16 +144,5 @@ void Entity::ClearParent()
 bool Entity::operator==(Entity& other) const
 {
     return GetId() == other.GetId();
-}
-
-void Entity::RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity) const
-{
-    for (auto id : entity.m_Children)
-    {
-        Entity& child = m_ECS.GetEntity(id);
-
-        entities.emplace_back(&child);
-        RecursiveChildren(entities, child);
-    }
 }
 } // namespace Ivy::C

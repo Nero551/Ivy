@@ -25,7 +25,7 @@ struct Node2D : Node
     using Node::Node;
     void Initialize() override
     {
-        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
+        m_ECS->Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 
@@ -35,7 +35,7 @@ struct Node3D : Node
     using Node::Node;
     void Initialize() override
     {
-        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
+        m_ECS->Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 } // namespace Ivy::C

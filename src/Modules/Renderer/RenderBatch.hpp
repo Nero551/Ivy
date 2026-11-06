@@ -1,9 +1,17 @@
 #pragma once
 #include "Core/Services/ResourceManager/Resource.hpp"
+#include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
+#include "Graphics/Buffers/BufferUsage.hpp"
+#include "Graphics/Buffers/VertexArray/VertexArray.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Math/Matrix/Matrix3.hpp"
 #include "Math/Matrix/Matrix4.hpp"
+#include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include <cstddef>
+#include <functional>
+#include <utility>
 
 namespace Ivy::R
 {
@@ -25,6 +33,7 @@ struct RenderBatch
     U::SparseSetSoA<InstanceData> Instances;
     G::ArrayBuffer Buffer;
     G::VertexArray VAO;
+    bool DataChanged = false;
 
     RenderBatch(
         const U::CheckedPtr<C::Resource<G::Mesh>>& mesh, const U::CheckedPtr<C::Resource<G::Material>>& mat)
@@ -39,13 +48,16 @@ struct RenderBatch
         Material->Get().Use();
 
         unsigned int instanceCount = Instances.Size();
-        Buffer.SetData(Instances.Data());
+        if (DataChanged)
+        {
+            DataChanged = false;
+            Buffer.SetData(Instances.Data());
+            Mesh->Get().VAO.SetVertexBuffer(Buffer, 1, sizeof(InstanceData));
 
-        Mesh->Get().VAO.SetVertexBuffer(Buffer, 1, sizeof(InstanceData));
-
-        Mesh->Get().VAO.SetMatrix4AttribPointer(4, offsetof(InstanceData, ModelMatrix), 1);
-        Mesh->Get().VAO.SetMatrix3AttribPointer(8, offsetof(InstanceData, NormalMatrix), 1);
-        Mesh->Get().VAO.SetAttribDivisor(1, 1);
+            Mesh->Get().VAO.SetMatrix4AttribPointer(4, offsetof(InstanceData, ModelMatrix), 1);
+            Mesh->Get().VAO.SetMatrix3AttribPointer(8, offsetof(InstanceData, NormalMatrix), 1);
+            Mesh->Get().VAO.SetAttribDivisor(1, 1);
+        }
 
         Mesh->Get().DrawInstanced(instanceCount);
     }

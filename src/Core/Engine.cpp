@@ -10,6 +10,7 @@
 #include "Sandbox/Sandbox2D.hpp"
 #include "Sandbox/Sandbox3D.hpp"
 #include "tracy/Tracy.hpp"
+#define TRACY_OPENGL_AUTO_CALIBRATION
 #include "tracy/TracyOpenGL.hpp"
 
 namespace Ivy::C
@@ -54,7 +55,7 @@ void Engine::Configure()
     Window.SetIcon({"Assets/icon.png"});
     Window.SetCursor({"Assets/cursor.png"});
     // Window.SetSize(1920, 1200);
-    // G::Context::SwapInterval(0);
+    G::Context::SwapInterval(0);
 
     AddService<EventBus>();
     AddService<ResourceManager>();
@@ -62,7 +63,7 @@ void Engine::Configure()
     AddModule<I::Input>();
     AddModule<R::Renderer>();
     AddModule<Profiling>();
-    AddModule<Sandbox::Sandbox3D>();
+    AddModule<Sandbox::Sandbox2D>();
 }
 
 void Engine::Start()

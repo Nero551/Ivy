@@ -2,18 +2,13 @@
 #include "Component.hpp"
 #include "Entity.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
-#include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/TupleUtils.hpp"
-#include <algorithm>
 #include <array>
+#include <bitset>
 #include <concepts>
-#include <span>
+#include <cstddef>
 #include <tuple>
-#include <typeindex>
-#include <unordered_set>
-#include <utility>
-#include <vector>
 namespace Ivy::C
 {
 
@@ -22,22 +17,16 @@ struct IArchetype
     using ComponentCombo = std::tuple<>;
     virtual ~IArchetype() = default;
 
-    virtual bool Matches(std::span<const std::type_index> types) const = 0;
+    Signature Supported;
+    size_t Stride;
+    size_t EntityOffset;
+    std::array<size_t, MaxComponentTypes> Offsets;
+    std::byte* Base;
+    unsigned int Size;
+
+    virtual unsigned int GetDenseIndex(unsigned int sparse) = 0;
     virtual void Remove(const Entity& entity) = 0;
-    virtual bool Has(const Entity& entity) const = 0;
-    virtual const void* GetTypeErased(const Entity& entity, std::type_index type) const = 0;
-    virtual void* GetTypeErased(const Entity& entity, std::type_index type) = 0;
-
-    virtual std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
-        std::span<const std::type_index> types) = 0;
-
-    U::TypedVector<std::type_index>& SupportedComponents()
-    {
-        return m_SupportedComponents;
-    }
-
-  protected:
-    U::TypedVector<std::type_index> m_SupportedComponents;
+    virtual void* GetTypeErased(const Entity& entity, Signature typeSig) = 0;
 };
 
 template <typename... Args> requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
@@ -45,35 +34,56 @@ struct Archetype : IArchetype
 {
     using ComponentCombo = std::tuple<Args...>;
     U::SparseSetAoS<ComponentCombo> m_Data{};
+    Archetype()
+    {
+        using Entry = typename U::SparseSetAoS<ComponentCombo>::Entry;
+        (Supported.set(ComponentId<Args>()), ...);
+        Stride = sizeof(Entry);
+
+        Entry entry{};
+        EntityOffset = reinterpret_cast<const std::byte*>(&entry.SparseIndex) -
+            reinterpret_cast<const std::byte*>(&entry);
+        ((Offsets[ComponentId<Args>()] = GetOffset<Args>(entry)), ...);
+        Size = m_Data.Size();
+        Base = reinterpret_cast<std::byte*>(m_Data.DenseData().data());
+    }
 
     std::tuple<Args...>& Add(const Entity& entity)
     {
-        return (*m_Data.Emplace(entity.GetId().Index)).Value;
+        auto& tuple = (*m_Data.Emplace(entity.GetId().Index)).Value;
+        Size = m_Data.Size();
+        Base = reinterpret_cast<std::byte*>(m_Data.DenseData().data());
+        return tuple;
     }
 
-    Archetype()
+    template <typename T> size_t GetOffset(const typename U::SparseSetAoS<ComponentCombo>::Entry& entry)
     {
-        (m_SupportedComponents.Emplace<Args>(typeid(Args)), ...);
-    }
+        const std::byte* base = reinterpret_cast<const std::byte*>(&entry);
+        const std::byte* component = reinterpret_cast<const std::byte*>(&std::get<T>(entry.Value));
 
-    bool Has(const Entity& entity) const override
-    {
-        return m_Data.Contains(entity.GetId().Index);
+        return component - base;
     }
 
     void Remove(const Entity& entity) override
     {
         m_Data.Erase(entity.GetId().Index);
+        Size = m_Data.Size();
+        Base = reinterpret_cast<std::byte*>(m_Data.DenseData().data());
     }
 
-    void* GetTypeErased(const Entity& entity, std::type_index type) override
+    unsigned int GetDenseIndex(unsigned int sparse) override
+    {
+        return m_Data.DenseIndexOf(sparse);
+    }
+
+    void* GetTypeErased(const Entity& entity, Signature typeSig) override
     {
         ComponentCombo& components = Get(entity);
         void* result = nullptr;
 
         auto GetComponent = [&]<typename T>()
         {
-            if (type == std::type_index(typeid(T)))
+            if (typeSig == MakeSignature<T>())
             {
                 result = static_cast<void*>(&std::get<T>(components));
             }
@@ -82,30 +92,6 @@ struct Archetype : IArchetype
         (GetComponent.template operator()<Args>(), ...);
 
         return result;
-    }
-
-    const void* GetTypeErased(const Entity& entity, std::type_index type) const override
-    {
-        const ComponentCombo& components = Get(entity);
-        const void* result = nullptr;
-
-        auto GetComponent = [&]<typename T>()
-        {
-            if (type == std::type_index(typeid(T)))
-            {
-                result = static_cast<const void*>(&std::get<T>(components));
-            }
-        };
-
-        (GetComponent.template operator()<Args>(), ...);
-
-        return result;
-    }
-    const std::tuple<Args...>& Get(const Entity& entity) const
-    {
-        U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
-            " ] doesn't contain entity: ", entity.GetId());
-        return m_Data[entity.GetId().Index];
     }
 
     std::tuple<Args...>& Get(const Entity& entity)
@@ -120,55 +106,6 @@ struct Archetype : IArchetype
         U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
             " ] doesn't contain entity: ", entity.GetId());
         return std::get<T>(m_Data[entity.GetId().Index]);
-    }
-
-    bool Matches(std::span<const std::type_index> types) const override
-    {
-        return std::ranges::all_of(
-            types, [](const auto& id) { return ((id == std::type_index(typeid(Args))) || ...); });
-    }
-
-    template <typename T> static void* GetPtr(ComponentCombo& combo)
-    {
-        return &std::get<T>(combo);
-    }
-
-    std::vector<std::pair<unsigned int, std::vector<void*>>> GetRows(
-        std::span<const std::type_index> types) override
-    {
-        using Getter = void* (*)(ComponentCombo&);
-
-        static const std::array<std::type_index, sizeof...(Args)> mine{std::type_index(typeid(Args))...};
-        static const std::array<Getter, sizeof...(Args)> getters{&GetPtr<Args>...};
-
-        // Resolve once per call: which getter produces which requested component.
-        std::vector<Getter> selected{};
-        selected.reserve(types.size());
-
-        for (auto id : types)
-        {
-            auto it = std::ranges::find(mine, id);
-
-            U::Log::Assert(it != mine.end(), "Invalid archetype query");
-
-            selected.push_back(getters[it - mine.begin()]);
-        }
-
-        std::vector<std::pair<unsigned int, std::vector<void*>>> pairs{};
-        pairs.reserve(m_Data.Size());
-        std::vector<void*> ptrs(selected.size());
-        unsigned int p = 0;
-        for (auto& item : m_Data)
-        {
-            for (unsigned int i = 0; i < selected.size(); ++i)
-            {
-                ptrs[i] = selected[i](item.Value);
-            }
-
-            pairs.emplace_back(item.SparseIndex, ptrs);
-            ++p;
-        }
-        return pairs;
     }
 };
 } // namespace Ivy::C
