@@ -11,7 +11,7 @@ struct Camera2D : C::Node2D
     using Node2D::Node2D;
     void Initialize() override
     {
-        std::get<CMP::Camera&>(m_ECS.Query.SetArchetype<ComponentCombo>(*this)).ProjectionMode =
+        std::get<CMP::Camera&>(m_ECS->Query.SetArchetype<ComponentCombo>(*this)).ProjectionMode =
             ProjectionMode::Orthographic;
     }
 };
@@ -22,7 +22,7 @@ struct Camera3D : C::Node3D
     using Node3D::Node3D;
     void Initialize() override
     {
-        std::get<CMP::Camera&>(m_ECS.Query.SetArchetype<ComponentCombo>(*this)).ProjectionMode =
+        std::get<CMP::Camera&>(m_ECS->Query.SetArchetype<ComponentCombo>(*this)).ProjectionMode =
             ProjectionMode::Perspective;
     }
 };
@@ -33,7 +33,7 @@ struct Light3D : C::Node3D
     using Node3D::Node3D;
     void Initialize() override
     {
-        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
+        m_ECS->Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 
@@ -43,7 +43,7 @@ struct MeshInstance2D : C::Node2D
     using Node2D::Node2D;
     void Initialize() override
     {
-        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
+        m_ECS->Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 
@@ -53,7 +53,7 @@ struct MeshInstance3D : C::Node3D
     using Node3D::Node3D;
     void Initialize() override
     {
-        m_ECS.Query.SetArchetype<ComponentCombo>(*this);
+        m_ECS->Query.SetArchetype<ComponentCombo>(*this);
     }
 };
 } // namespace Ivy::R

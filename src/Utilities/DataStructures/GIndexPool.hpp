@@ -75,9 +75,14 @@ struct GIndexPool
         m_Free.push_back(handle.Index);
     }
 
+    void Release(IndexType index)
+    {
+        Release({index, GetGeneration(index)});
+    }
+
     GenType GetGeneration(IndexType index)
     {
-        if (!index < m_Generations.size())
+        if (index >= m_Generations.size())
         {
             Log::Fatal("GIndexPool: Index Out of bounds");
         }

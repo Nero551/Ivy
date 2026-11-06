@@ -23,15 +23,7 @@ namespace Sketch
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
-
-//TODO: make transform system cache its own vector of the root's children that's updated on events \
-// that will make it way less expensive performance-wise.
-//TODO: not running renderer module sends fps from 15 to 34 (on 1.7m entities). \
-//not running renderer + transform system sends fps from 34 to 6500 (on 1.7m entities). \
-// its the ForEachDescendant thing.
-//
-// TODO: use a GetSmallestPool in ComponentPoolQuery instead of using the first pool as the driver.
-//
+//TODO: new performance bottleneck: renderer.
 // TODO: need particle system (cpu particle & gpu particle(compute shaders))
 // TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
 
@@ -303,11 +295,6 @@ struct Shader
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //
-//
-// TODO: HierarchyTree is complete, now integrate it into ECS. ECS struct will own the hierarchy, entity will modify it. \
-// possible modification targets: ECS::RemoveEntity(), ECS::CreateEntity(), everything in Entity struct.
-//
-
 struct A : C::Component
 {
     int Number = 10;

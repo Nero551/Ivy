@@ -30,22 +30,36 @@ struct Query
     }
 
     template <typename T>
+    U::CheckedPtr<T> TryGetComponent(const Entity& entity) const requires(std::derived_from<T, Component>)
+    {
+        if (entity.m_Archetype == nullptr)
+        {
+            return nullptr;
+        }
+        IArchetype& archetype = *entity.m_Archetype;
+        const Signature sig = MakeSignature<T>();
+        if ((sig & archetype.Supported) == sig)
+        {
+            size_t offset = archetype.Offsets[ComponentId<T>()];
+            std::byte* base = archetype.Base;
+            std::byte* row = base + archetype.GetDenseIndex(entity.GetId().Index) * archetype.Stride;
+            return reinterpret_cast<T*>(row + offset);
+        }
+        return nullptr;
+    }
+
+    template <typename T>
     T& GetComponent(const Entity& entity) const requires(std::derived_from<T, Component>)
     {
         U::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype");
-        if (m_Archetypes.Contains<T>())
-        {
-            Archetype<T>& archetype = static_cast<Archetype<T>&>(*m_Archetypes.Get<T>());
-            if (archetype.Has(entity))
-            {
-                return archetype.template GetOne<T>(entity);
-            }
-        }
-
+        IArchetype& archetype = *entity.m_Archetype;
         const Signature sig = MakeSignature<T>();
-        if ((sig & entity.m_Archetype->Supported) == sig)
+        if ((sig & archetype.Supported) == sig)
         {
-            return *static_cast<T*>(entity.m_Archetype->GetTypeErased(entity, sig));
+            size_t offset = archetype.Offsets[ComponentId<T>()];
+            std::byte* base = archetype.Base;
+            std::byte* row = base + archetype.GetDenseIndex(entity.GetId().Index) * archetype.Stride;
+            return *reinterpret_cast<T*>(row + offset);
         }
         U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
     }
@@ -59,9 +73,7 @@ struct Query
             return false;
         }
 
-        const Signature sig = MakeSignature<Args...>();
-
-        return (entity.m_Archetype->Supported & sig).count() == sizeof...(Args);
+        return (entity.m_Archetype->Supported & MakeSignature<Args...>()).count() == sizeof...(Args);
     }
 
     void RemoveAllComponents(Entity& entity)
@@ -104,11 +116,11 @@ struct Query
                 continue;
             }
 
-            const std::array<size_t, sizeof...(Args)> offsets{archetype.Offsets.at(MakeSignature<Args>())...};
+            const std::array<size_t, sizeof...(Args)> offsets{archetype.Offsets[ComponentId<Args>()]...};
 
-            std::byte* base = archetype.GetBase();
+            std::byte* base = archetype.Base;
 
-            for (unsigned int i = 0; i < archetype.Size(); ++i)
+            for (unsigned int i = 0; i < archetype.Size; ++i)
             {
                 std::byte* row = base + i * archetype.Stride;
 

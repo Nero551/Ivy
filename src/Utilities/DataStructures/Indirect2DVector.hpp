@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Debug/Log.hpp"
+#include <vector>
 
 namespace Ivy::U
 {
@@ -115,6 +116,24 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
         }
 
         return m_Data[m_Lookup[a][b]];
+    }
+
+    template <typename... Args> T& GetOrEmplace(IndexType a, IndexType b, Args&&... args)
+    {
+        std::vector<IndexType>& row = ResizeLookup(a, b);
+        IndexType& index = row[b];
+
+        if (index != InvalidIndex)
+        {
+            return m_Data[index];
+        }
+
+        index = static_cast<IndexType>(m_Data.size());
+
+        m_Data.emplace_back(std::forward<Args>(args)...);
+        m_Indices.push_back({a, b});
+
+        return m_Data.back();
     }
 
     /** @brief Constructs a value if the key does not exist and returns its iterator. */

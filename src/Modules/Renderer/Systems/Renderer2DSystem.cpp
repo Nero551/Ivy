@@ -6,6 +6,7 @@
 #include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector3.hpp"
 #include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/RenderBatch.hpp"
 #include "Modules/Renderer/Renderer.hpp"
 #include "Utilities/Debug/Log.hpp"
 namespace Ivy::R
@@ -54,10 +55,10 @@ void Renderer2DSystem::Render()
         [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform2D& transform,
             CMP::Mesh& meshComponent)
         {
-            // if (materialComponent.Material->Get().Shader->HotReload == true)
-            // {
-            //     materialComponent.Material->Get().Shader->Delete();
-            // }
+            if (materialComponent.Material->Get().Shader->HotReload == true)
+            {
+                materialComponent.Material->Get().Shader->Delete();
+            }
 
             FillBatches(entityId, transform, materialComponent, meshComponent);
         });
@@ -73,17 +74,13 @@ void Renderer2DSystem::FillBatches(unsigned int entityId, CMP::Transform2D& tran
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
 
-    auto batch = Batches.Find(materialId, meshId);
+    RenderBatch& batch =
+        Batches.GetOrEmplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
 
-    if (batch == Batches.end())
-    {
-        batch = Batches.Emplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
-    }
-
-    if (!batch->Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
+    if (!batch.Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
         transformComponent.m_GlobalRotation.IsChanged() || transformComponent.m_GlobalScale.IsChanged())
     {
-        batch->Instances.EmplaceOrReplace(
+        batch.Instances.EmplaceOrReplace(
             entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
         transformComponent.m_GlobalPosition.ClearChanged();
         transformComponent.m_GlobalRotation.ClearChanged();
@@ -91,6 +88,7 @@ void Renderer2DSystem::FillBatches(unsigned int entityId, CMP::Transform2D& tran
         transformComponent.Rotation.ClearChanged();
         transformComponent.Position.ClearChanged();
         transformComponent.Scale.ClearChanged();
+        batch.DataChanged = true;
     }
 }
 } // namespace Ivy::R

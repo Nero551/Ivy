@@ -68,6 +68,7 @@ template <std::unsigned_integral T> struct HierarchyTree
 
         ++p.ChildCount;
         p.LastChild = child;
+        ++m_Version;
     }
     void Detach(T child)
     {
@@ -106,6 +107,7 @@ template <std::unsigned_integral T> struct HierarchyTree
         c.PrevSibling = Invalid;
         c.NextSibling = Invalid;
         c.Parent = Invalid;
+        ++m_Version;
     }
 
     bool IsLeaf(T node) const
@@ -142,6 +144,11 @@ template <std::unsigned_integral T> struct HierarchyTree
     bool IsAncestorOf(T ancestor, T descendant) const
     {
         return IsDescendantOf(descendant, ancestor);
+    }
+
+    bool HasParent(T node) const
+    {
+        return Exists(node) && m_Nodes[node].Parent != Invalid;
     }
 
     T GetParent(T node) const
@@ -236,22 +243,30 @@ template <std::unsigned_integral T> struct HierarchyTree
             return {};
         }
 
-        std::vector<T> descendants{};
+        std::vector<T> descendants;
 
-        const auto Visit = [&](const auto& self, T parent)
+        const Node* nodes = m_Nodes.data();
+        T current = nodes[node].FirstChild;
+
+        while (current != Invalid)
         {
-            T current = m_Nodes[parent].FirstChild;
-
-            while (current != Invalid)
+            descendants.emplace_back(current);
+            if (nodes[current].FirstChild != Invalid)
             {
-                descendants.push_back(current);
-                self(self, current);
-                current = m_Nodes[current].NextSibling;
+                current = nodes[current].FirstChild;
+                continue;
             }
-        };
 
-        Visit(Visit, node);
-
+            while (nodes[current].NextSibling == Invalid)
+            {
+                current = nodes[current].Parent;
+                if (current == node)
+                {
+                    return descendants;
+                }
+            }
+            current = nodes[current].NextSibling;
+        }
         return descendants;
     }
     std::vector<T> GetAncestors(T node) const
@@ -270,7 +285,7 @@ template <std::unsigned_integral T> struct HierarchyTree
         return ancestors;
     }
 
-    void ForEachChild(T node, std::function_ref<void(T)> action) const
+    template <typename F> void ForEachChild(T node, F&& action) const requires(std::invocable<F, T>)
     {
         if (!Exists(node))
         {
@@ -279,11 +294,12 @@ template <std::unsigned_integral T> struct HierarchyTree
         T current = m_Nodes[node].FirstChild;
         while (current != Invalid)
         {
+            T next = m_Nodes[current].NextSibling;
             action(current);
-            current = m_Nodes[current].NextSibling;
+            current = next;
         }
     }
-    void ForEachSibling(T node, std::function_ref<void(T)> action) const
+    template <typename F> void ForEachSibling(T node, F&& action) const requires(std::invocable<F, T>)
     {
         if (!Exists(node) || !Exists(m_Nodes[node].Parent))
         {
@@ -299,28 +315,38 @@ template <std::unsigned_integral T> struct HierarchyTree
                 }
             });
     }
-    void ForEachDescendant(T node, std::function_ref<void(T)> action) const
+    template <typename F> void ForEachDescendant(T node, F&& action) const requires(std::invocable<F, T>)
     {
         if (!Exists(node))
         {
             return;
         }
 
-        const auto Visit = [&](const auto& self, T parent)
+        const Node* nodes = m_Nodes.data();
+        T current = nodes[node].FirstChild;
+
+        while (current != Invalid)
         {
-            T current = m_Nodes[parent].FirstChild;
+            action(current);
 
-            while (current != Invalid)
+            if (nodes[current].FirstChild != Invalid)
             {
-                action(current);
-                self(self, current);
-                current = m_Nodes[current].NextSibling;
+                current = nodes[current].FirstChild;
+                continue;
             }
-        };
 
-        Visit(Visit, node);
+            while (nodes[current].NextSibling == Invalid)
+            {
+                current = nodes[current].Parent;
+                if (current == node)
+                {
+                    return;
+                }
+            }
+            current = nodes[current].NextSibling;
+        }
     }
-    void ForEachAncestor(T node, std::function_ref<void(T)> action) const
+    template <typename F> void ForEachAncestor(T node, F&& action) const requires(std::invocable<F, T>)
     {
         if (!Exists(node))
         {
@@ -334,7 +360,13 @@ template <std::unsigned_integral T> struct HierarchyTree
         }
     }
 
+    size_t Version() const
+    {
+        return m_Version;
+    }
+
   private:
     std::vector<Node> m_Nodes;
+    size_t m_Version = 0;
 };
 } // namespace Ivy::U

@@ -4,7 +4,13 @@
 #include "Events/EntityCreated.hpp"
 #include "Events/EntityDestroyed.hpp"
 #include "Query.hpp"
+#include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/GIndexPool.hpp"
+#include "Utilities/DataStructures/HierarchyTree.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <concepts>
+#include <cstddef>
 namespace Ivy::C
 {
 struct EntityComponentSystem
@@ -12,28 +18,29 @@ struct EntityComponentSystem
     EntityDestroyed EntityDestroyed{};
     EntityCreated EntityCreated{};
 
+    U::HierarchyTree<unsigned int> EntityHierarchy;
     Query Query{};
+    unsigned int Version = 0;
     void RemoveEntity(Entity& entity)
     {
-        const auto descendants = entity.GetDescendants();
+        const unsigned int root = entity.GetId().Index;
 
-        if (entity.HasParent())
+        std::vector<unsigned int> doomed;
+        doomed.push_back(root);
+        EntityHierarchy.ForEachDescendant(root, [&](unsigned int i) { doomed.push_back(i); });
+
+        EntityHierarchy.Detach(root);
+
+        for (unsigned int i : doomed)
         {
-            entity.ClearParent();
-        }
-
-        EntityDestroyed.Entity = &entity;
-        EntityDestroyed.Fire();
-        m_Entities.Erase(entity.GetId().Index);
-        Query.RemoveAllComponents(entity);
-
-        for (auto& descendant : descendants)
-        {
-            EntityDestroyed.Entity = descendant;
+            EntityDestroyed.Entity = &m_Entities[i];
             EntityDestroyed.Fire();
-            m_Entities.Erase(descendant->GetId().Index);
-            Query.RemoveAllComponents(*descendant);
+            Query.RemoveAllComponents(m_Entities[i]);
+            EntityHierarchy.Detach(i);
+            m_Ids.Release(i);
+            m_Entities.Erase(i);
         }
+        ++Version;
     }
 
     void ReserveEntities(size_t count)
@@ -59,10 +66,12 @@ struct EntityComponentSystem
         entity.m_Id = id;
         entity.Initialize();
 
+        EntityHierarchy.Ensure(id.Index);
         auto it = m_Entities.Emplace(id.Index, std::move(entity));
         EntityCreated.Entity = &*it;
         EntityCreated.Fire();
 
+        ++Version;
         return *it;
     }
 

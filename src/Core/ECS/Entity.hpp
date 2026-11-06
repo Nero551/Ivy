@@ -1,7 +1,6 @@
 #pragma once
 #include "EntityID.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <functional>
 #include <utility>
 #include <vector>
@@ -14,15 +13,11 @@ struct Query;
 
 struct Entity
 {
-    Entity(EntityComponentSystem& ecs) : m_ECS(ecs) {}
+    Entity(EntityComponentSystem& ecs) : m_ECS(&ecs) {}
     Entity(const Entity&) = delete;
     Entity& operator=(const Entity&) = delete;
     Entity(Entity&&) noexcept = default;
-    Entity& operator=(Entity&& other) noexcept
-    {
-        Entity::operator=(std::move(other));
-        return *this;
-    };
+    Entity& operator=(Entity&& other) noexcept = default;
 
     EntityID GetId() const;
     Entity& GetRoot();
@@ -34,7 +29,6 @@ struct Entity
     std::vector<U::CheckedPtr<Entity>> GetChildren() const;
     unsigned int ChildCount() const;
     void ForEachChild(std::function_ref<void(Entity&)> callback) const;
-    void DestroyChild(Entity& child);
     void DestroyChildren();
 
     bool HasDescendant(const Entity& descendant) const;
@@ -56,15 +50,12 @@ struct Entity
     bool operator==(Entity& other) const;
 
   protected:
-    EntityComponentSystem& m_ECS;
+    U::CheckedPtr<EntityComponentSystem> m_ECS;
     virtual void Initialize() {}
 
   private:
     EntityID m_Id;
-    U::SparseSetSoA<EntityID> m_Children{};
-    EntityID m_Parent{0, 0};
     U::CheckedPtr<IArchetype> m_Archetype;
-    void RecursiveChildren(std::vector<U::CheckedPtr<Entity>>& entities, const Entity& entity) const;
 
     friend struct Query;
     friend struct EntityComponentSystem;

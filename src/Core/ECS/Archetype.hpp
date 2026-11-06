@@ -28,13 +28,13 @@ struct IArchetype
     Signature Supported;
     size_t Stride;
     size_t EntityOffset;
-    std::unordered_map<Signature, size_t> Offsets;
+    std::array<size_t, MaxComponentTypes> Offsets;
+    std::byte* Base;
+    unsigned int Size;
 
+    virtual unsigned int GetDenseIndex(unsigned int sparse) = 0;
     virtual void Remove(const Entity& entity) = 0;
-    virtual bool Has(const Entity& entity) const = 0;
     virtual void* GetTypeErased(const Entity& entity, Signature typeSig) = 0;
-    virtual std::byte* GetBase() = 0;
-    virtual unsigned int Size() const = 0;
 };
 
 template <typename... Args> requires(U::AreUnique<Args...> && (std::derived_from<Args, Component> && ...))
@@ -42,12 +42,6 @@ struct Archetype : IArchetype
 {
     using ComponentCombo = std::tuple<Args...>;
     U::SparseSetAoS<ComponentCombo> m_Data{};
-
-    std::tuple<Args...>& Add(const Entity& entity)
-    {
-        return (*m_Data.Emplace(entity.GetId().Index)).Value;
-    }
-
     Archetype()
     {
         using Entry = typename U::SparseSetAoS<ComponentCombo>::Entry;
@@ -57,8 +51,19 @@ struct Archetype : IArchetype
         Entry entry{};
         EntityOffset = reinterpret_cast<const std::byte*>(&entry.SparseIndex) -
             reinterpret_cast<const std::byte*>(&entry);
-        ((Offsets[MakeSignature<Args>()] = GetOffset<Args>(entry)), ...);
+        ((Offsets[ComponentId<Args>()] = GetOffset<Args>(entry)), ...);
+        Size = m_Data.Size();
+        Base = reinterpret_cast<std::byte*>(m_Data.DenseData().data());
     }
+
+    std::tuple<Args...>& Add(const Entity& entity)
+    {
+        auto& tuple = (*m_Data.Emplace(entity.GetId().Index)).Value;
+        Size = m_Data.Size();
+        Base = reinterpret_cast<std::byte*>(m_Data.DenseData().data());
+        return tuple;
+    }
+
     template <typename T> size_t GetOffset(const typename U::SparseSetAoS<ComponentCombo>::Entry& entry)
     {
         const std::byte* base = reinterpret_cast<const std::byte*>(&entry);
@@ -67,24 +72,16 @@ struct Archetype : IArchetype
         return component - base;
     }
 
-    std::byte* GetBase() override
-    {
-        return reinterpret_cast<std::byte*>(m_Data.DenseData().data());
-    }
-
-    unsigned int Size() const override
-    {
-        return m_Data.Size();
-    }
-
-    bool Has(const Entity& entity) const override
-    {
-        return m_Data.Contains(entity.GetId().Index);
-    }
-
     void Remove(const Entity& entity) override
     {
         m_Data.Erase(entity.GetId().Index);
+        Size = m_Data.Size();
+        Base = reinterpret_cast<std::byte*>(m_Data.DenseData().data());
+    }
+
+    unsigned int GetDenseIndex(unsigned int sparse) override
+    {
+        return m_Data.DenseIndexOf(sparse);
     }
 
     void* GetTypeErased(const Entity& entity, Signature typeSig) override
@@ -104,6 +101,7 @@ struct Archetype : IArchetype
 
         return result;
     }
+
     std::tuple<Args...>& Get(const Entity& entity)
     {
         U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,

@@ -8,7 +8,7 @@ inline unsigned int NextComponentId()
 {
     static unsigned int counter = 0;
     U::Log::Assert(counter < 64, "Too many component types for Signature");
-    return ++counter;
+    return counter++;
 }
 
 template <typename T> inline unsigned int ComponentId()
@@ -17,13 +17,19 @@ template <typename T> inline unsigned int ComponentId()
     return id;
 }
 
-using Signature = std::bitset<64>;
+static constexpr int MaxComponentTypes = 64;
+using Signature = std::bitset<MaxComponentTypes>;
 
 template <typename... Args> Signature MakeSignature()
 {
-    Signature s;
-    (s.set(ComponentId<Args>()), ...);
-    return s;
+    static const Signature signature = []
+    {
+        Signature result;
+        (result.set(ComponentId<Args>()), ...);
+        return result;
+    }();
+
+    return signature;
 }
 
 struct Component
