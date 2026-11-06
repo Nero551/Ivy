@@ -7,7 +7,6 @@
 
 namespace Ivy
 {
-void Profiling::Start() {}
 
 void Profiling::Update(const double dt)
 {

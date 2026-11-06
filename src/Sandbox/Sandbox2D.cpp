@@ -89,7 +89,7 @@ void Sandbox2D::Start()
 
     AddSystem<Controller2D>();
     // AddSystem<StressTester2D>();
-    // GetSystem<StressTester2D>().FourDimensionalProjection(5);
+    // GetSystem<StressTester2D>().FourDimensionalProjection(4);
 
     AddSystem<VectorFields2D>();
     GetSystem<VectorFields2D>().Start();

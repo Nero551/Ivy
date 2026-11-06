@@ -145,6 +145,7 @@ struct StressTester2D : C::System
                 "pointFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
             material().Shader = &shader();
+            material().Color = {1, 1, 1, 1};
 
             query.GetComponent<CMP::Material>(point).Material = &material;
         }

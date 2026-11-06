@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Concepts.hpp"
+#include <ostream>
 
 namespace Ivy::M
 {

@@ -1,4 +1,5 @@
 #pragma once
+#include <random>
 namespace Ivy::M
 {
 inline std::mt19937 rng(std::random_device{}());

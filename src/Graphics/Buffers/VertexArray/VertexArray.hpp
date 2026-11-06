@@ -2,6 +2,7 @@
 
 #include "../../DataType.hpp"
 #include "../IndexBuffer/IndexBuffer.hpp"
+#include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 
 namespace Ivy::G
 {

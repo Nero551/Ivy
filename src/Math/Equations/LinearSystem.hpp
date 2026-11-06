@@ -119,7 +119,7 @@ struct LinearSystem
                 augmentedMatrix(r, c) = equation(c);
                 coefficientMatrix(r, c) = equation(c);
             }
-            augmentedMatrix(r, Variables) = equation.Result;
+            augmentedMatrix(r, Variables) = equation.Constant;
         }
         augmentedMatrix = augmentedMatrix.RowEchelon();
 
@@ -189,7 +189,7 @@ struct LinearSystem
             {
                 for (const auto& equation : equations)
                 {
-                    T result = -equation.Result;
+                    T result = -equation.Constant;
 
                     for (int variable = 0; variable < Variables; ++variable)
                     {

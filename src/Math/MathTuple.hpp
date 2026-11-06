@@ -2,6 +2,7 @@
 #include "Math/Concepts.hpp"
 #include "Utilities/Concepts.hpp"
 #include <cstddef>
+#include <functional>
 #include <ostream>
 #include <tuple>
 #include <type_traits>

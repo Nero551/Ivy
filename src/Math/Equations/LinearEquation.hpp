@@ -9,12 +9,12 @@ namespace Ivy::M
 /** @brief Represents a linear equation in the form ax + by + ... = c. */
 template <int Variables, Scalar T = float> struct LinearEquation
 {
-    T Result;
+    T Constant;
 
     template <typename... Args>
-    constexpr LinearEquation(const T result, Args... coefficients)
+    constexpr LinearEquation(const T constant, Args... coefficients)
         requires(sizeof...(Args) == Variables && (std::convertible_to<Args, T> && ...))
-        : Result(result), m_Coefficients{static_cast<T>(coefficients)...}
+        : Constant(constant), m_Coefficients{static_cast<T>(coefficients)...}
     {
     }
 
@@ -40,7 +40,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     constexpr LinearEquation operator*(T scalar) const
     {
         LinearEquation result{};
-        result.Result = Result * scalar;
+        result.Constant = Constant * scalar;
 
         for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
         {
@@ -54,7 +54,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     constexpr LinearEquation operator/(T scalar) const
     {
         LinearEquation result{};
-        result.Result = Result / scalar;
+        result.Constant = Constant / scalar;
 
         for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
         {
@@ -68,7 +68,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     constexpr LinearEquation operator+(const LinearEquation& other) const
     {
         LinearEquation result{};
-        result.Result = Result + other.Result;
+        result.Constant = Constant + other.Constant;
 
         for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
         {
@@ -82,7 +82,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     constexpr LinearEquation operator-(const LinearEquation& other) const
     {
         LinearEquation result{};
-        result.Result = Result - other.Result;
+        result.Constant = Constant - other.Constant;
 
         for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
         {
@@ -95,7 +95,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     /** @brief Adds another equation to this equation. */
     constexpr LinearEquation& operator+=(const LinearEquation& other)
     {
-        Result += other.Result;
+        Constant += other.Constant;
 
         for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
         {
@@ -108,7 +108,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     /** @brief Subtracts another equation from this equation. */
     constexpr LinearEquation& operator-=(const LinearEquation& other)
     {
-        Result -= other.Result;
+        Constant -= other.Constant;
 
         for (unsigned int i = 0; i < m_Coefficients.size(); ++i)
         {
@@ -121,7 +121,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     /** @brief Multiplies this equation by a scalar. */
     constexpr LinearEquation& operator*=(T scalar)
     {
-        Result *= scalar;
+        Constant *= scalar;
 
         for (auto& coefficient : m_Coefficients)
         {
@@ -134,7 +134,7 @@ template <int Variables, Scalar T = float> struct LinearEquation
     /** @brief Divides this equation by a scalar. */
     constexpr LinearEquation& operator/=(T scalar)
     {
-        Result /= scalar;
+        Constant /= scalar;
 
         for (auto& coefficient : m_Coefficients)
         {

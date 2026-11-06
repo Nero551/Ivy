@@ -2,6 +2,7 @@
 
 #include "Math/Common/Exponentials.hpp"
 #include <concepts>
+#include <iostream>
 #include <utility>
 namespace Ivy::M
 {

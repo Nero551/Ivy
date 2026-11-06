@@ -19,7 +19,6 @@
 #include "Math/Vector/Vector3.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
-#include <assimp/postprocess.h>
 #include <utility>
 
 namespace Ivy::Sandbox

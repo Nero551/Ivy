@@ -1,9 +1,8 @@
 #pragma once
+#include <cstddef>
 #include <exception>
-#include <expected>
 #include <iostream>
-#include <source_location>
-#include <stdexcept>
+#include <vector>
 
 namespace Ivy::U
 {
@@ -23,90 +22,81 @@ template <typename T> std::ostream& operator<<(std::ostream& os, const std::vect
 }
 
 /** @brief Provides formatted console logging and pointer validation. */
-struct Log
+namespace Log
 {
+
+/** @brief Resets the console text color. */
+constexpr const char* Reset = "\033[0m";
+/** @brief Sets the console text color to red. */
+constexpr const char* Red = "\033[31m";
+/** @brief Sets the console text color to green. */
+constexpr const char* Green = "\033[32m";
+/** @brief Sets the console text color to yellow. */
+constexpr const char* Yellow = "\033[33m";
+/** @brief Sets the console text color to blue. */
+constexpr const char* Blue = "\033[34m";
 
 #define LOG()                                                                                                \
     std::cout << source.file_name() << " " << source.function_name() << " " << source.line() << " "          \
               << source.column() << "\n";
 
-    /** @brief Prints a message to the console. */
-    template <typename... Args> static void Print(const Args&... args)
+/** @brief Prints a message to the console. */
+template <typename... Args> void Print(const Args&... args)
+{
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs an informational message. */
+template <typename... Args> void Info(const Args&... args)
+{
+    std::cout << Green << "ℹ️ [INFO] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs a warning message. */
+template <typename... Args> void Warning(const Args&... args)
+{
+    std::cout << Yellow << "⚠️ [WARNING] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs an error message. */
+template <typename... Args> void Error(const Args&... args)
+{
+    std::cout << Red << "❌ [ERROR] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs a fatal error and throws an exception. */
+template <typename... Args> [[noreturn]] static void Fatal(const Args&... args)
+{
+    std::cout << Red << "💀 [FATAL] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+    throw std::exception();
+}
+
+/** @brief Validates a raw pointer and returns the dereferenced object. */
+template <typename T, typename... Args> static T& Require(T* rawPtr, const Args&... args)
+{
+    if (!rawPtr)
     {
-        (..., (std::cout << args));
-        std::cout << '\n';
+        Fatal(args...);
     }
+    return *rawPtr;
+}
 
-    /** @brief Logs an informational message. */
-    template <typename... Args> static void Info(const Args&... args)
+/** @brief its assert but cleaner. */
+template <typename... Args> static constexpr void Assert(const bool condition, const Args&... args)
+{
+    if (!condition)
     {
-        std::cout << m_Green << "ℹ️ [INFO] " << m_Reset;
-        (..., (std::cout << args));
-        std::cout << '\n';
+        Fatal(args...);
     }
-
-    /** @brief Logs a warning message. */
-    template <typename... Args> static void Warning(const Args&... args)
-    {
-        std::cout << m_Yellow << "⚠️ [WARNING] " << m_Reset;
-        (..., (std::cout << args));
-        std::cout << '\n';
-    }
-
-    /** @brief Logs an error message. */
-    template <typename... Args> static void Error(const Args&... args)
-    {
-        std::cout << m_Red << "❌ [ERROR] " << m_Reset;
-        (..., (std::cout << args));
-        std::cout << '\n';
-    }
-
-    /** @brief Logs a fatal error and throws an exception. */
-    template <typename... Args> [[noreturn]] static void Fatal(const Args&... args)
-    {
-        std::cout << m_Red << "💀 [FATAL] " << m_Reset;
-        (..., (std::cout << args));
-        std::cout << '\n';
-        throw std::exception();
-    }
-
-    /** @brief Validates a raw pointer and returns the dereferenced object. */
-    template <typename T, typename... Args> static T& Require(T* rawPtr, const Args&... args)
-    {
-        if (!rawPtr)
-        {
-            Fatal(args...);
-        }
-        return *rawPtr;
-    }
-
-    /** @brief its assert but cleaner. */
-    template <typename... Args> static constexpr void Assert(const bool condition, const Args&... args)
-    {
-        if (!condition)
-        {
-            Fatal(args...);
-        }
-    }
-
-    Log() = delete;
-    ~Log() = delete;
-    Log& operator=(Log&) = delete;
-
-  private:
-    /** @brief Resets the console text color. */
-    static constexpr auto m_Reset = "\033[0m";
-
-    /** @brief Sets the console text color to red. */
-    static constexpr auto m_Red = "\033[31m";
-
-    /** @brief Sets the console text color to green. */
-    static constexpr auto m_Green = "\033[32m";
-
-    /** @brief Sets the console text color to yellow. */
-    static constexpr auto m_Yellow = "\033[33m";
-
-    /** @brief Sets the console text color to blue. */
-    static constexpr auto m_Blue = "\033[34m";
+}
 }; // namespace Log
 } // namespace Ivy::U

@@ -1,27 +1,85 @@
 #pragma once
 #include "Math/Common/Exponentials.hpp"
+#include "Math/Complex/Complex.hpp"
+#include "Math/MathTuple.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <cstdlib>
+#include <optional>
+#include <ostream>
 namespace Ivy::M
 {
 
 struct QuadraticResult
 {
-    float x1;
-    float x2;
+
+    QuadraticResult() = default;
+    QuadraticResult(float x1, float x2) : m_X1(x1), m_X2(x2), HasRealSolution(true) {}
+    QuadraticResult(const Complex<>& x) : m_ComplexRoot(x), HasRealSolution(false) {}
+
+    MathTuple<float, float> GetRealRoots() const
+    {
+        U::Log::Assert(HasRealRoots(), "Quadratic Equation has no real roots");
+        return {m_X1, m_X2};
+    }
+
+    MathTuple<Complex<>, Complex<>> GetComplexRoots() const
+    {
+        U::Log::Assert(HasComplexRoots(), "Quadratic Equation has no complex roots");
+        return {(*m_ComplexRoot), (*m_ComplexRoot).Conjugate()};
+    }
+
+    bool HasComplexRoots() const
+    {
+        return !HasRealSolution;
+    }
+    bool HasRealRoots() const
+    {
+        return HasRealSolution;
+    }
+    bool HasSingleRealRoot() const
+    {
+        return HasRealSolution && m_X1 == m_X2;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const QuadraticResult& result)
+    {
+        if (result.HasRealRoots())
+        {
+            os << "{ " << result.m_X1 << ", " << result.m_X2 << " ]";
+        }
+        else if (result.HasSingleRealRoot())
+        {
+            os << "{ " << result.m_X1 << " ]";
+        }
+        else if (result.HasComplexRoots())
+        {
+            os << "{ " << *result.m_ComplexRoot << ", " << (*result.m_ComplexRoot).Conjugate() << " ]";
+        }
+        return os;
+    }
+
+  private:
+    std::optional<Complex<>> m_ComplexRoot;
+    float m_X1 = 0;
+    float m_X2 = 0;
     bool HasRealSolution = true;
 };
 
 constexpr QuadraticResult SolveQuadratic(const float a, const float b, const float c)
 {
+    U::Log::Assert(a != 0, "[Quadratic Equation] a can't be equal to 0");
+
+    const float denominator = 2.0f * a;
     const float d = b * b - 4.0f * a * c;
 
     if (d < 0.0f)
     {
-        return {.HasRealSolution = false};
+        const Complex<> sqrtD = {-b, Sqrt(std::abs(d))};
+        return {sqrtD / denominator};
     }
 
     const float sqrtD = Sqrt(d);
-    const float denominator = 2.0f * a;
 
-    return {.x1 = (-b + sqrtD) / denominator, .x2 = (-b - sqrtD) / denominator, .HasRealSolution = true};
+    return {(-b + sqrtD) / denominator, (-b - sqrtD) / denominator};
 }
 } // namespace Ivy::M

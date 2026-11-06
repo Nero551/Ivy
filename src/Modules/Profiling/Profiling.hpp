@@ -13,8 +13,6 @@ struct Profiling : C::Module
     int FrameCount{0};
 
   protected:
-    void Start() override;
-
     void Update(double dt) override;
 
   private:

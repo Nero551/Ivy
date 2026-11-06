@@ -3,6 +3,12 @@
 #include "Core/Service.hpp"
 #include "Core/Services/EventBus/Event.hpp"
 #include "stl.hpp"
+#include <concepts>
+#include <cstddef>
+#include <memory>
+#include <typeindex>
+#include <unordered_map>
+#include <vector>
 
 namespace Ivy::C
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Set.hpp"
 #include "Math/Vector/Vector.hpp"
+#include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M
 {

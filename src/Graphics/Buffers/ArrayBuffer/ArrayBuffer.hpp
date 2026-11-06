@@ -2,6 +2,7 @@
 #include "../../OpenGL.hpp"
 #include "../BufferUsage.hpp"
 #include <utility>
+#include <vector>
 
 namespace Ivy::G
 {

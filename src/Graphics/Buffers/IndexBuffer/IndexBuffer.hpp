@@ -1,7 +1,7 @@
 #pragma once
-#include "../ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/Buffers/BufferUsage.hpp"
 #include <utility>
+#include <vector>
 
 namespace Ivy::G
 {
