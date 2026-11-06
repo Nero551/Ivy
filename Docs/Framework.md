@@ -1,6 +1,6 @@
 @mainpage Ivy
 
-# Framework (ECS)
+# Framework (Archetype ECS)
 
 ## Architecture
 
@@ -73,7 +73,7 @@ owns core systems (ex: transform system).
 
 ## ECS (Entity Component System)
 
-Owns the entities and the component pool query (which owns component pools and those own components).
+Owns the entities and the query (which owns archetypes and those own components).
 It is responsible for creating, storing & removing entities.
 
 ---
@@ -84,7 +84,6 @@ Entities are lightweight objects.
 An entity is simply:
 
 - A unique ID
-- Ids of children and parent
 
 Entities contain no game logic.
 

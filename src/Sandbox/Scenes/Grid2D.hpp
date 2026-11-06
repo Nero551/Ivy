@@ -14,7 +14,6 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
-#include <utility>
 
 namespace Ivy
 {

@@ -22,6 +22,7 @@ namespace Ivy
 struct Grid3D : C::Scene
 {
     using C::Scene::Scene;
+    int Number = 100;
 
     void Initialize() override
     {
@@ -69,7 +70,7 @@ struct Grid3D : C::Scene
 
         transformComponent.Rotation = rotation;
         transformComponent.Position = position;
-        transformComponent.Scale = {40, 1, 1};
+        transformComponent.Scale = {200, 1, 1};
 
         materialComponent.Material->Get().Color = M::Color::Gray;
 
@@ -78,7 +79,7 @@ struct Grid3D : C::Scene
 
     void CreateXY()
     {
-        for (int x = -20; x < 20; ++x)
+        for (int x = -Number; x < Number; ++x)
         {
             if (x != 0)
             {
@@ -87,7 +88,7 @@ struct Grid3D : C::Scene
             }
         }
 
-        for (int y = -20; y < 20; ++y)
+        for (int y = -Number; y < Number; ++y)
         {
             if (y != 0)
             {
@@ -98,7 +99,7 @@ struct Grid3D : C::Scene
 
     void CreateXZ()
     {
-        for (int x = -20; x < 20; ++x)
+        for (int x = -Number; x < Number; ++x)
         {
             if (x != 0)
             {
@@ -107,7 +108,7 @@ struct Grid3D : C::Scene
             }
         }
 
-        for (int z = -20; z < 20; ++z)
+        for (int z = -Number; z < Number; ++z)
         {
             if (z != 0)
             {
@@ -118,7 +119,7 @@ struct Grid3D : C::Scene
 
     void CreateYZ()
     {
-        for (int y = -20; y < 20; ++y)
+        for (int y = -Number; y < Number; ++y)
         {
             if (y != 0)
             {
@@ -127,7 +128,7 @@ struct Grid3D : C::Scene
             }
         }
 
-        for (int z = -20; z < 20; ++z)
+        for (int z = -Number; z < Number; ++z)
         {
             if (z != 0)
             {

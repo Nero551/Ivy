@@ -31,7 +31,7 @@ void Sandbox3D::Start()
     GetSystem<VectorFields3D>().Start();
     // AddSystem<StressTester3D>();
 
-    // GetSystem<StressTester3D>().Spawn(4, 3);
+    // GetSystem<StressTester3D>().Spawn(4, 4);
     GetSystem<VectorFields3D>().LorenzSystem();
 
     // auto& resources = m_Engine.GetService<C::ResourceManager>();

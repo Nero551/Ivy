@@ -1,6 +1,7 @@
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
 #include "Modules/Renderer/Components.hpp"
+#include "Modules/Renderer/RenderBatch.hpp"
 #include "Modules/Renderer/Renderer.hpp"
 namespace Ivy::R
 {
@@ -69,17 +70,13 @@ void Renderer3DSystem::FillBatches(unsigned int entityId, CMP::Transform3D& tran
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
 
-    auto batch = Batches.Find(materialId, meshId);
+    RenderBatch& batch =
+        Batches.GetOrEmplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
 
-    if (batch == Batches.end())
-    {
-        batch = Batches.Emplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
-    }
-
-    if (!batch->Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
+    if (!batch.Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
         transformComponent.m_GlobalRotation.IsChanged() || transformComponent.m_GlobalScale.IsChanged())
     {
-        batch->Instances.EmplaceOrReplace(
+        batch.Instances.EmplaceOrReplace(
             entityId, transformComponent.GetModelMatrix(), transformComponent.GetNormalMatrix());
         transformComponent.m_GlobalPosition.ClearChanged();
         transformComponent.m_GlobalRotation.ClearChanged();
@@ -87,6 +84,7 @@ void Renderer3DSystem::FillBatches(unsigned int entityId, CMP::Transform3D& tran
         transformComponent.Rotation.ClearChanged();
         transformComponent.Position.ClearChanged();
         transformComponent.Scale.ClearChanged();
+        batch.DataChanged = true;
     }
 }
 } // namespace Ivy::R

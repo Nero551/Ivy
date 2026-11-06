@@ -135,7 +135,6 @@ struct ResourceManager : Service
      */
     template <typename T> Resource<T>& Acquire(const IResource::Handle handle) const
     {
-        U::Log::Assert(m_Handles.IsAcquired(handle), "Invalid Resource Handle");
         return static_cast<Resource<T>&>(*m_Resources[handle.Index]);
     }
     /**

@@ -24,13 +24,22 @@ void TransformSystem::Update(double dt)
     for (U::CheckedPtr<Entity> descendant : descendants)
     {
         auto& entity = *descendant;
+        U::CheckedPtr<Entity> parent = entity.TryFindParent();
         U::CheckedPtr<CMP::Transform2D> transform2D = query.TryGetComponent<CMP::Transform2D>(entity);
         if (transform2D)
         {
+            if (parent)
+            {
+                parentTransform2D = query.TryGetComponent<CMP::Transform2D>(*parent);
+            }
             Do2D(transform2D, parentTransform2D);
         }
         else
         {
+            if (parent)
+            {
+                parentTransform3D = query.TryGetComponent<CMP::Transform3D>(*parent);
+            }
             U::CheckedPtr<CMP::Transform3D> transform3D = query.TryGetComponent<CMP::Transform3D>(entity);
             Do3D(transform3D, parentTransform3D);
         }

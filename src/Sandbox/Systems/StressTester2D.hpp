@@ -5,14 +5,28 @@
 #include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/Components.hpp"
 #include "Graphics/InputEnums/Key.hpp"
+#include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
+#include "Graphics/Shader/Shader.hpp"
+#include "Graphics/Shader/ShaderSource.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
+#include "Math/Common/Exponentials.hpp"
+#include "Math/Common/Trigonometry.hpp"
+#include "Math/Coordinates/HyperSpherical.hpp"
 #include "Math/Vector/Vector.hpp"
+#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vector4.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <format>
+#include <vector>
 
 namespace Ivy::Sandbox
 {
@@ -59,22 +73,22 @@ struct StressTester2D : C::System
     //     }
     // }
 
-    void ThreeDimensionalProjection(int increase)
-    {
-        U::Log::Info(M::Pow(360.0f / increase, 2));
-        points.reserve(M::Pow(360.0f / increase, 2));
+    // void ThreeDimensionalProjection(int increase)
+    // {
+    //     U::Log::Info(M::Pow(360.0f / increase, 2));
+    //     points.reserve(M::Pow(360.0f / increase, 2));
 
-        for (int theta = -180; theta < 180; theta += increase)
-        {
-            for (int phi = -180; phi < 180; phi += increase)
-            {
-                M::Vector<3> v3 = M::Vector<3>::FromSpherical(M::Spherical(M::Rad(theta), M::Rad(phi)));
-                M::Vector<2> proj = v3.StereoProject();
-                auto& point = Plot({proj.x, proj.y});
-                points.emplace_back(point.GetId());
-            }
-        }
-    }
+    //     for (int theta = -180; theta < 180; theta += increase)
+    //     {
+    //         for (int phi = -180; phi < 180; phi += increase)
+    //         {
+    //             M::Vector<3> v3 = M::Vector<3>::FromSpherical(M::Spherical(M::Rad(theta), M::Rad(phi)));
+    //             M::Vector<2> proj = v3.StereoProject();
+    //             auto& point = Plot({proj.x, proj.y});
+    //             points.emplace_back(point.GetId());
+    //         }
+    //     }
+    // }
 
     void FourDimensionalProjection(int increase)
     {
@@ -98,28 +112,30 @@ struct StressTester2D : C::System
         }
     }
 
-    C::Entity& CreatePoint(M::Vector<4> col)
+    C::Entity& CreatePoint()
     {
         auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
         auto& query = m_Engine.ECS.Query;
 
-        G::Mesh m = G::Primitives::CreateQuad("point");
-        auto& mesh = resourceManager.Load<G::Mesh>(m);
-
+        if (!resourceManager.Exists<G::Mesh>("stressPoint"))
+        {
+            G::Mesh m = G::Primitives::CreateQuad("stressPoint");
+            resourceManager.Load<G::Mesh>(m);
+        }
+        auto& mesh = resourceManager.Load<G::Mesh>("stressPoint");
         auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
 
         query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
         query.GetComponent<CMP::Transform2D>(point).Scale = M::Vector<2>{0.2};
 
-        if (resourceManager.Exists<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y)))
+        if (resourceManager.Exists<G::Material>("stressMat"))
         {
-            auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
+            auto& material = resourceManager.Load<G::Material>("stressMat");
             query.GetComponent<CMP::Material>(point).Material = &material;
         }
         else
         {
-            auto& material = resourceManager.Load<G::Material>(std::format("m{}{}{}", col.z, col.x, col.y));
-            material().Color = col;
+            auto& material = resourceManager.Load<G::Material>("stressMat");
 
             auto& shader = resourceManager.Load<G::Shader>("pointShader");
 
@@ -137,11 +153,11 @@ struct StressTester2D : C::System
         return point;
     }
 
-    C::Entity& Plot(const M::Vector<2> vec2, const M::Vector<4> col = {1, 1, 1, 1})
+    C::Entity& Plot(const M::Vector<2> vec2)
     {
         auto& query = m_Engine.ECS.Query;
 
-        auto& point = CreatePoint(col);
+        auto& point = CreatePoint();
         auto& transform = query.GetComponent<CMP::Transform2D>(point);
 
         transform.Position().x = vec2.x;

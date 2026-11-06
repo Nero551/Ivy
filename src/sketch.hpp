@@ -23,7 +23,6 @@ namespace Sketch
 // type and explicit conversion between the two. it will just be a unit quaternion with half angle representation.
 
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
-//TODO: new performance bottleneck: renderer.
 // TODO: need particle system (cpu particle & gpu particle(compute shaders))
 // TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
 
@@ -294,9 +293,8 @@ struct Shader
 // TODO: wrap all used std stuff in stl wrapper. basically to avoid backward compatibility bs in std. \
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
-//
-// TODO: combine Transform2DSystem and Transform3DSystem into 1 with 2 methods.
-//
+//TODO: new performance bottleneck: renderer.
+
 struct A : C::Component
 {
     int Number = 10;
@@ -344,8 +342,5 @@ void BenchECS()
     }
 }
 
-inline void Test()
-{
-    BenchECS();
-}
+inline void Test() {}
 } // namespace Sketch

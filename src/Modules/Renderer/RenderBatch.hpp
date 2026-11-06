@@ -47,13 +47,12 @@ struct RenderBatch
     {
         Material->Get().Use();
 
+        Mesh->Get().VAO.SetVertexBuffer(Buffer, 1, sizeof(InstanceData));
         unsigned int instanceCount = Instances.Size();
         if (DataChanged)
         {
             DataChanged = false;
             Buffer.SetData(Instances.Data());
-            Mesh->Get().VAO.SetVertexBuffer(Buffer, 1, sizeof(InstanceData));
-
             Mesh->Get().VAO.SetMatrix4AttribPointer(4, offsetof(InstanceData, ModelMatrix), 1);
             Mesh->Get().VAO.SetMatrix3AttribPointer(8, offsetof(InstanceData, NormalMatrix), 1);
             Mesh->Get().VAO.SetAttribDivisor(1, 1);

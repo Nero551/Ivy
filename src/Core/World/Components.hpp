@@ -26,7 +26,7 @@ struct Transform2D : C::Component
     U::Track<M::Vector<2>> Position = M::Vector<2>::Zero();
     U::Track<M::Vector<2>> Scale = M::Vector<2>::One();
     U::Track<float> Rotation = 0;
-    bool InheritTransform = false;
+    bool InheritTransform = true;
 
     M::Matrix<4, 4> GetModelMatrix() const
     {

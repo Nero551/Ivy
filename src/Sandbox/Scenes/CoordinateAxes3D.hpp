@@ -71,7 +71,7 @@ struct CoordinateAxes3D : C::Scene
         query.GetComponent<CMP::Transform3D>(xAxis).Scale = {200, 1, 1};
         xMaterial.Material->Get().Color = M::Color::Red;
 
-        xAxis.SetParent(GetRoot());
+        GetRoot().AttachChild(xAxis);
 
         auto& yAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
 
@@ -103,8 +103,8 @@ struct CoordinateAxes3D : C::Scene
 
         zAxis.SetParent(GetRoot());
 
-        // Grid3D grid = m_Engine.World.CreateScene<Grid3D>();
-        // m_Engine.ECS.FindEntity(GetRoot()).AttachChild(grid.GetRoot());
+        Grid3D grid = m_Engine.World.CreateScene<Grid3D>();
+        GetRoot().AttachChild(grid.GetRoot());
     }
 };
 } // namespace Ivy::Sandbox

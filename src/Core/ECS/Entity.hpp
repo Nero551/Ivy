@@ -47,7 +47,7 @@ struct Entity
     bool HasParent() const;
     void ClearParent();
 
-    bool operator==(Entity& other) const;
+    bool operator==(const Entity& other) const;
 
   protected:
     U::CheckedPtr<EntityComponentSystem> m_ECS;

@@ -141,8 +141,8 @@ void Entity::ClearParent()
     }
 }
 
-bool Entity::operator==(Entity& other) const
+bool Entity::operator==(const Entity& other) const
 {
-    return GetId() == other.GetId();
+    return m_ECS == other.m_ECS && m_Id == other.m_Id;
 }
 } // namespace Ivy::C

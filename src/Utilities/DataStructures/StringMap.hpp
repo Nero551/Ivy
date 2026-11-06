@@ -1,4 +1,5 @@
 #pragma once
+#include "Utilities/Debug/Log.hpp"
 #include <concepts>
 #include <cstddef>
 #include <functional>
@@ -179,6 +180,42 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
         return m_Data.back();
     }
 
+    T& At(const std::string_view key)
+    {
+        if (const auto it = m_IndicesMap.find(key); it != m_IndicesMap.end())
+        {
+            return m_Data[it->second];
+        }
+        Log::Fatal("[StringMap] Key: ", key, " Doesn't Exist");
+    }
+
+    const T& At(const std::string_view key) const
+    {
+        if (const auto it = m_IndicesMap.find(key); it != m_IndicesMap.end())
+        {
+            return m_Data[it->second];
+        }
+        Log::Fatal("[StringMap] Key: ", key, " Doesn't Exist");
+    }
+
+    Iterator Find(const std::string_view key)
+    {
+        if (m_IndicesMap.contains(key))
+        {
+            return {this, m_IndicesMap.at(key)};
+        }
+        return end();
+    }
+
+    ConstIterator Find(const std::string_view key) const
+    {
+        if (m_IndicesMap.contains(key))
+        {
+            return {this, m_IndicesMap.at(key)};
+        }
+        return end();
+    }
+
     /**
      * @brief Checks whether a key exists in the map.
      * @param name Key to search for.
@@ -221,6 +258,17 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
         };
     }
 
+    void Erase(const std::string_view key)
+    {
+        m_Data[m_IndicesMap.at(key)];
+        m_IndicesMap.erase(key);
+    }
+
+    void Clear()
+    {
+        m_Data.clear();
+        m_IndicesMap.clear();
+    }
     /**
      * @brief Gets the number of stored values.
      * @return Number of entries in the map.
@@ -231,9 +279,6 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
     }
 
   private:
-    /** @brief Next index reserved for future allocation. */
-    IndexType m_Next = 0;
-
     /** @brief Maps owning string keys to their corresponding value indices. */
     std::unordered_map<std::string, IndexType, StringHash, std::equal_to<>> m_IndicesMap{};
 
