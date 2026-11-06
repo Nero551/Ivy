@@ -194,7 +194,7 @@ struct SparseSetAoS
             }
 
             m_Sparse[index] = m_Dense.size();
-            m_Dense.push_back({.Value = std::forward<U>(value), .SparseIndex = index});
+            m_Dense.push_back({.SparseIndex = index, .Value = std::forward<U>(value)});
         }
 
         return m_Dense[m_Sparse[index]].Value;
@@ -246,9 +246,9 @@ struct SparseSetAoS
 
         if (denseIndex != m_Dense.size() - 1)
         {
-            Entry& lastEntry = m_Dense.back();
+            Entry lastEntry = m_Dense.back();
 
-            std::swap(m_Dense[denseIndex], lastEntry);
+            std::swap(m_Dense[denseIndex], m_Dense.back());
 
             m_Sparse[lastEntry.SparseIndex] = denseIndex;
         }

@@ -15,6 +15,7 @@ template <std::size_t N> struct FixedString
 {
     char Data[N];
 
+    constexpr FixedString() = default;
     /** @brief Constructs a FixedString from a string literal. */
     constexpr FixedString(const char (&string)[N])
     {
@@ -33,7 +34,7 @@ template <std::size_t N> struct FixedString
         return Data[0] == '\0';
     }
 
-    constexpr std::uint64_t HashString(const std::string_view value)
+    constexpr std::uint64_t HashString(const std::string_view value) const
     {
         std::uint64_t hash = 14695981039346656037ULL;
 
@@ -48,7 +49,7 @@ template <std::size_t N> struct FixedString
 
     template <std::size_t M> constexpr FixedString<N + M - 1> operator+(const FixedString<M>& other) const
     {
-        FixedString<N + M - 1> result{""};
+        FixedString<N + M - 1> result{};
 
         for (std::size_t i = 0; i < N - 1; ++i)
         {

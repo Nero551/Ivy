@@ -110,7 +110,7 @@ target("IvyTests")
     set_rundir(os.projectdir())
 
     add_files("Tests/**.cpp")
-    add_deps("IvyMath", "IvyPhysics")
+    add_deps("IvyMath", "IvyPhysics", "IvyUtilities")
     add_packages("gtest")
 
 target("IvyBenchmarks")

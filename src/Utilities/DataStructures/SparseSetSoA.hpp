@@ -220,10 +220,10 @@ struct SparseSetSoA
 
         if (denseIndex != m_Dense.size() - 1)
         {
-            SparseIndexType& lastSparseIndex = m_Indices.back();
+            const SparseIndexType lastSparseIndex = m_Indices.back();
 
             std::swap(m_Dense[denseIndex], m_Dense.back());
-            std::swap(m_Indices[denseIndex], lastSparseIndex);
+            std::swap(m_Indices[denseIndex], m_Indices.back());
 
             m_Sparse[lastSparseIndex] = denseIndex;
         }

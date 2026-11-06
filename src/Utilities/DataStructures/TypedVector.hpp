@@ -72,12 +72,6 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         return {.TypedVector = this, .Index = Size()};
     }
 
-    template <typename... Args> bool Contains()
-    {
-        const TypeIdType typeId = GetTypeId<Args...>();
-        return typeId < m_Data.size();
-    }
-
     template <typename... Args> bool Contains() const
     {
         const TypeIdType typeId = GetTypeId<Args...>();

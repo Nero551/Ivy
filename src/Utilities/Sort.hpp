@@ -1,7 +1,10 @@
 #pragma once
+#include <array>
+#include <concepts>
+#include <cstddef>
 namespace Ivy::U
 {
-template <typename T, int N>
+template <typename T, size_t N>
 constexpr void Swap(std::array<T, N>& arr, size_t a, size_t b) requires std::totally_ordered<T>
 {
     T value = arr[a];

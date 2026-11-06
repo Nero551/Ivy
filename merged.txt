@@ -1,0 +1,3235 @@
+// ==================================================
+// FILE 1: CheckedPtr.hpp
+// ==================================================
+
+#pragma once
+
+#include <string_view>
+namespace Ivy::U
+{
+/**
+ * @brief Non-owning pointer wrapper that checks for null dereferences.
+ * @note Does not track object lifetime or prevent dangling pointers.
+ */
+template <typename T> struct CheckedPtr
+{
+    /** @brief Constructs a null CheckedPtr. */
+    CheckedPtr() = default;
+
+    /** @brief Constructs a CheckedPtr from a raw pointer. */
+    CheckedPtr(T* objectPtr) noexcept
+    {
+        m_Ptr = objectPtr;
+    }
+
+    /** @brief Constructs a null CheckedPtr with a custom error message. */
+    CheckedPtr(std::string_view nullMessage) noexcept
+    {
+        this->m_NullMessage = nullMessage;
+    }
+
+    /** @brief Constructs a CheckedPtr from a pointer with a custom error message. */
+    CheckedPtr(T* objectPtr, std::string_view nullMessage) noexcept
+    {
+        m_Ptr = objectPtr;
+        this->m_NullMessage = nullMessage;
+    }
+
+    /** @brief Assigns a raw pointer to the CheckedPtr. */
+    CheckedPtr& operator=(T* objectPtr) noexcept
+    {
+        m_Ptr = objectPtr;
+        return *this;
+    }
+
+    /** @brief Accesses a member through the pointer, checking for null. */
+    T* operator->() const
+    {
+        return m_Ptr;
+    }
+
+    /** @brief Compares the stored pointer with a raw pointer. */
+    bool operator==(T* otherPtr) const
+    {
+        return m_Ptr == otherPtr;
+    }
+
+    /** @brief Compares the stored pointer with another checked pointer. */
+    bool operator==(const CheckedPtr& otherCheckedPtr) const
+    {
+        return m_Ptr == otherCheckedPtr.m_Ptr;
+    }
+
+    /** @brief Dereferences the pointer, checking for null. */
+    T& operator*() const
+    {
+        return *m_Ptr;
+    }
+
+    /** @brief Checks whether the pointer is non-null. */
+    explicit operator bool() const
+    {
+        return m_Ptr != nullptr;
+    }
+
+    /** @brief Resets the pointer to null. */
+    void Reset()
+    {
+        m_Ptr = nullptr;
+    }
+
+    /** @brief Returns the stored raw pointer without validation. */
+    T* Get() const
+    {
+        return m_Ptr;
+    }
+
+    /** @brief Checks whether the pointer is null. */
+    bool IsNull() const
+    {
+        return m_Ptr == nullptr;
+    }
+
+  private:
+    T* m_Ptr = nullptr;
+    std::string_view m_NullMessage = "[NULL PTR] ";
+};
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 2: Concepts.hpp
+// ==================================================
+
+#pragma once
+#include <tuple>
+
+namespace Ivy::U
+{
+template <unsigned int I, typename... Args> using Select = std::tuple_element_t<I, std::tuple<Args...>>;
+}
+
+
+// ==================================================
+// FILE 3: DataStructures/GIndexPool.hpp
+// ==================================================
+
+#pragma once
+#include "../Debug/Log.hpp"
+
+namespace Ivy::U
+{
+
+/**
+ * @brief Manages reusable indices with generation-based handles.
+ *
+ * Released indices are reused, while their generation is incremented so that
+ * previously issued handles become invalid.
+ */
+template <std::unsigned_integral IndexType = unsigned int, std::unsigned_integral GenType = unsigned int>
+struct GIndexPool
+{
+    /**
+     * @brief Identifies an acquired index and its current generation.
+     *
+     * A handle is valid only while its index is acquired and its generation
+     * matches the generation stored by the pool.
+     */
+    struct Handle
+    {
+        IndexType Index = 0;
+        GenType Generation = 0;
+
+        Handle() = default;
+        Handle(IndexType index, GenType gen) : Index(index), Generation(gen) {}
+
+        bool operator==(const Handle& other) const
+        {
+            return Index == other.Index && Generation == other.Generation;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, Handle handle)
+        {
+            return os << "[" << handle.Index << " | " << handle.Generation << "]";
+        }
+    };
+
+    /** @brief Returns whether the handle currently refers to an acquired index. */
+    bool IsAcquired(Handle handle) const
+    {
+        return handle.Index < m_Acquired.size() && m_Acquired[handle.Index] &&
+            m_Generations[handle.Index] == handle.Generation;
+    }
+
+    /** @brief Acquires an index and returns its current handle. */
+    Handle Acquire()
+    {
+        if (m_Free.empty())
+        {
+            m_Acquired.push_back(true);
+            m_Generations.push_back(1);
+            return {FullSize() - 1, 1};
+        }
+
+        IndexType index = m_Free.back();
+        m_Free.pop_back();
+
+        m_Acquired[index] = true;
+        return {index, m_Generations[index]};
+    }
+
+    /** @brief Releases an index, invalidating its current handle. */
+    void Release(Handle handle)
+    {
+        if (!IsAcquired(handle))
+        {
+            return;
+        }
+
+        m_Acquired[handle.Index] = false;
+        m_Generations[handle.Index] += 1;
+        m_Free.push_back(handle.Index);
+    }
+
+    void Release(IndexType index)
+    {
+        Release({index, GetGeneration(index)});
+    }
+
+    GenType GetGeneration(IndexType index)
+    {
+        if (index >= m_Generations.size())
+        {
+            Log::Fatal("GIndexPool: Index Out of bounds");
+        }
+        return m_Generations[index];
+    }
+
+    /** @brief Returns the number of currently acquired indices. */
+    IndexType AcquiredSize() const
+    {
+        return m_Acquired.size() - m_Free.size();
+    }
+
+    /** @brief Returns the total number of indices owned by the pool. */
+    IndexType FullSize() const
+    {
+        return m_Acquired.size();
+    }
+
+    /** @brief Releases all indices and resets the pool. */
+    void Clear()
+    {
+        m_Acquired.clear();
+        m_Generations.clear();
+        m_Free.clear();
+    }
+
+    /** @brief Returns whether no indices are currently acquired. */
+    bool Empty() const
+    {
+        return AcquiredSize() == 0;
+    }
+
+    /** @brief Reserves storage for the specified number of indices. */
+    void Reserve(IndexType capacity)
+    {
+        m_Acquired.reserve(capacity);
+        m_Generations.reserve(capacity);
+    }
+
+  private:
+    std::vector<bool> m_Acquired{};
+    std::vector<GenType> m_Generations{};
+    std::vector<IndexType> m_Free{};
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 4: DataStructures/HierarchyTree.hpp
+// ==================================================
+
+#pragma once
+#include <concepts>
+#include <functional>
+#include <limits>
+#include <vector>
+namespace Ivy::U
+{
+template <std::unsigned_integral T> struct HierarchyTree
+{
+    static constexpr T Invalid = std::numeric_limits<T>::max();
+
+    struct Node
+    {
+        T ChildCount = 0;
+        T Parent = Invalid;
+        T FirstChild = Invalid;
+        T LastChild = Invalid;
+        T NextSibling = Invalid;
+        T PrevSibling = Invalid;
+    };
+
+    void Ensure(T index)
+    {
+        if (index == Invalid)
+        {
+            return;
+        }
+
+        if (index >= m_Nodes.size())
+        {
+            m_Nodes.resize(index + 1);
+        }
+    }
+    bool Exists(T index) const
+    {
+        return index < m_Nodes.size();
+    }
+
+    void Attach(T parent, T child)
+    {
+        if (!Exists(parent) || !Exists(child) || parent == child)
+        {
+            return;
+        }
+
+        if (IsDescendantOf(parent, child))
+        {
+            return;
+        }
+
+        Detach(child);
+
+        Node& p = m_Nodes[parent];
+        Node& c = m_Nodes[child];
+
+        c.Parent = parent;
+        c.PrevSibling = p.LastChild;
+        c.NextSibling = Invalid;
+
+        if (p.LastChild != Invalid)
+        {
+            m_Nodes[p.LastChild].NextSibling = child;
+        }
+        else
+        {
+            p.FirstChild = child;
+        }
+
+        ++p.ChildCount;
+        p.LastChild = child;
+        ++m_Version;
+    }
+    void Detach(T child)
+    {
+        if (!Exists(child))
+        {
+            return;
+        }
+        Node& c = m_Nodes[child];
+
+        if (c.Parent != Invalid)
+        {
+            Node& p = m_Nodes[c.Parent];
+            if (p.FirstChild == child)
+            {
+                p.FirstChild = c.NextSibling;
+            }
+
+            if (p.LastChild == child)
+            {
+                p.LastChild = c.PrevSibling;
+            }
+            --p.ChildCount;
+        }
+        if (c.NextSibling != Invalid)
+        {
+            Node& ns = m_Nodes[c.NextSibling];
+            ns.PrevSibling = c.PrevSibling;
+        }
+
+        if (c.PrevSibling != Invalid)
+        {
+            Node& ps = m_Nodes[c.PrevSibling];
+            ps.NextSibling = c.NextSibling;
+        }
+
+        c.PrevSibling = Invalid;
+        c.NextSibling = Invalid;
+        c.Parent = Invalid;
+        ++m_Version;
+    }
+
+    bool IsLeaf(T node) const
+    {
+        return Exists(node) && m_Nodes[node].FirstChild == Invalid && m_Nodes[node].LastChild == Invalid;
+    }
+    bool IsChildOf(T child, T parent) const
+    {
+        return Exists(child) && Exists(parent) && m_Nodes[child].Parent == parent;
+    }
+    bool IsParentOf(T parent, T child) const
+    {
+        return IsChildOf(child, parent);
+    }
+    bool IsSiblingOf(T node, T sibling) const
+    {
+        return Exists(node) && Exists(sibling) && node != sibling && m_Nodes[node].Parent != Invalid &&
+            m_Nodes[node].Parent == m_Nodes[sibling].Parent;
+    }
+    bool IsDescendantOf(T descendant, T ancestor) const
+    {
+        if (!Exists(descendant) || !Exists(ancestor))
+        {
+            return false;
+        }
+        T current = m_Nodes[descendant].Parent;
+
+        while (current != ancestor && current != Invalid)
+        {
+            current = m_Nodes[current].Parent;
+        }
+        return current == ancestor;
+    }
+    bool IsAncestorOf(T ancestor, T descendant) const
+    {
+        return IsDescendantOf(descendant, ancestor);
+    }
+
+    bool HasParent(T node) const
+    {
+        return Exists(node) && m_Nodes[node].Parent != Invalid;
+    }
+
+    T GetParent(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].Parent : Invalid;
+    }
+    T GetFirstChild(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].FirstChild : Invalid;
+    }
+    T GetLastChild(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].LastChild : Invalid;
+    }
+    T GetNextSibling(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].NextSibling : Invalid;
+    }
+    T GetPrevSibling(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].PrevSibling : Invalid;
+    }
+    T GetRoot(T node) const
+    {
+        if (!Exists(node))
+        {
+            return Invalid;
+        }
+
+        T current = node;
+
+        while (m_Nodes[current].Parent != Invalid)
+        {
+            current = m_Nodes[current].Parent;
+        }
+
+        return current;
+    }
+    T GetDepth(T node) const
+    {
+        if (!Exists(node))
+        {
+            return Invalid;
+        }
+
+        T depth = 0;
+        T current = node;
+
+        while (m_Nodes[current].Parent != Invalid)
+        {
+            ++depth;
+            current = m_Nodes[current].Parent;
+        }
+
+        return depth;
+    }
+    T GetChildCount(T node) const
+    {
+        return Exists(node) ? m_Nodes[node].ChildCount : 0;
+    }
+
+    std::vector<T> GetChildren(T node) const
+    {
+        if (!Exists(node))
+        {
+            return {};
+        }
+        std::vector<T> children{};
+        T current = m_Nodes[node].FirstChild;
+        while (current != Invalid)
+        {
+            children.push_back(current);
+            current = m_Nodes[current].NextSibling;
+        }
+        return children;
+    }
+    std::vector<T> GetSiblings(T node) const
+    {
+        if (!Exists(node) || !Exists(m_Nodes[node].Parent))
+        {
+            return {};
+        }
+
+        std::vector<T> siblings = GetChildren(m_Nodes[node].Parent);
+        std::erase(siblings, node);
+        return siblings;
+    }
+    std::vector<T> GetDescendants(T node) const
+    {
+        if (!Exists(node))
+        {
+            return {};
+        }
+
+        std::vector<T> descendants;
+
+        const Node* nodes = m_Nodes.data();
+        T current = nodes[node].FirstChild;
+
+        while (current != Invalid)
+        {
+            descendants.emplace_back(current);
+            if (nodes[current].FirstChild != Invalid)
+            {
+                current = nodes[current].FirstChild;
+                continue;
+            }
+
+            while (nodes[current].NextSibling == Invalid)
+            {
+                current = nodes[current].Parent;
+                if (current == node)
+                {
+                    return descendants;
+                }
+            }
+            current = nodes[current].NextSibling;
+        }
+        return descendants;
+    }
+    std::vector<T> GetAncestors(T node) const
+    {
+        if (!Exists(node))
+        {
+            return {};
+        }
+        std::vector<T> ancestors{};
+        T current = m_Nodes[node].Parent;
+        while (current != Invalid)
+        {
+            ancestors.push_back(current);
+            current = m_Nodes[current].Parent;
+        }
+        return ancestors;
+    }
+
+    template <typename F> void ForEachChild(T node, F&& action) const requires(std::invocable<F, T>)
+    {
+        if (!Exists(node))
+        {
+            return;
+        }
+        T current = m_Nodes[node].FirstChild;
+        while (current != Invalid)
+        {
+            T next = m_Nodes[current].NextSibling;
+            action(current);
+            current = next;
+        }
+    }
+    template <typename F> void ForEachSibling(T node, F&& action) const requires(std::invocable<F, T>)
+    {
+        if (!Exists(node) || !Exists(m_Nodes[node].Parent))
+        {
+            return;
+        }
+
+        ForEachChild(m_Nodes[node].Parent,
+            [&](T sibling)
+            {
+                if (sibling != node)
+                {
+                    action(sibling);
+                }
+            });
+    }
+    template <typename F> void ForEachDescendant(T node, F&& action) const requires(std::invocable<F, T>)
+    {
+        if (!Exists(node))
+        {
+            return;
+        }
+
+        const Node* nodes = m_Nodes.data();
+        T current = nodes[node].FirstChild;
+
+        while (current != Invalid)
+        {
+            action(current);
+
+            if (nodes[current].FirstChild != Invalid)
+            {
+                current = nodes[current].FirstChild;
+                continue;
+            }
+
+            while (nodes[current].NextSibling == Invalid)
+            {
+                current = nodes[current].Parent;
+                if (current == node)
+                {
+                    return;
+                }
+            }
+            current = nodes[current].NextSibling;
+        }
+    }
+    template <typename F> void ForEachAncestor(T node, F&& action) const requires(std::invocable<F, T>)
+    {
+        if (!Exists(node))
+        {
+            return;
+        }
+        T current = m_Nodes[node].Parent;
+        while (current != Invalid)
+        {
+            action(current);
+            current = m_Nodes[current].Parent;
+        }
+    }
+
+    size_t Version() const
+    {
+        return m_Version;
+    }
+
+  private:
+    std::vector<Node> m_Nodes;
+    size_t m_Version = 0;
+};
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 5: DataStructures/IndexPool.hpp
+// ==================================================
+
+#pragma once
+
+namespace Ivy::U
+{
+/**
+ * @brief Manages a pool of reusable integer indices.
+ *
+ * Indices are acquired and released independently of the objects they identify,
+ * allowing external storage to use the indices as stable IDs while released
+ * indices are reused by later acquisitions.
+ */
+template <std::unsigned_integral IndexType = unsigned int> struct IndexPool
+{
+    /** @brief Returns whether the index is currently being used. */
+    bool IsAcquired(IndexType index) const
+    {
+        return index < m_Acquired.size() && m_Acquired[index];
+    }
+
+    /** @brief Acquires a new index or reuses a previously released one. */
+    IndexType Acquire()
+    {
+        if (m_Free.empty())
+        {
+            m_Acquired.push_back(true);
+            return FullSize() - 1;
+        }
+
+        IndexType index = m_Free.back();
+        m_Free.pop_back();
+
+        m_Acquired[index] = true;
+        return index;
+    }
+
+    /** @brief Releases an index, making it available for reuse. */
+    void Release(IndexType index)
+    {
+        if (!IsAcquired(index))
+        {
+            return;
+        }
+
+        m_Acquired[index] = false;
+        m_Free.push_back(index);
+    }
+
+    /** @brief Returns the number of currently acquired indices. */
+    IndexType AcquiredSize() const
+    {
+        return m_Acquired.size() - m_Free.size();
+    }
+
+    /** @brief Returns the total number of indices ever allocated by the pool. */
+    IndexType FullSize() const
+    {
+        return m_Acquired.size();
+    }
+
+    /** @brief Releases all acquired indices and resets the pool. */
+    void Clear()
+    {
+        m_Acquired.clear();
+        m_Free.clear();
+    }
+
+    /** @brief Returns whether no indices are currently acquired. */
+    bool Empty() const
+    {
+        return AcquiredSize() == 0;
+    }
+
+    /** @brief Reserves storage for the specified number of indices. */
+    void Reserve(IndexType capacity)
+    {
+        m_Acquired.reserve(capacity);
+    }
+
+  private:
+    std::vector<bool> m_Acquired;
+    std::vector<IndexType> m_Free;
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 6: DataStructures/Indirect2DVector.hpp
+// ==================================================
+
+#pragma once
+
+#include "../Debug/Log.hpp"
+#include <vector>
+
+namespace Ivy::U
+{
+
+/**
+ * @brief Indirect two-dimensional storage with dense iteration.
+ *
+ * Maps a pair of indices `(A, B)` to densely packed values. Lookup is O(1)
+ * after row/column storage is allocated, while iteration traverses only
+ * active values. Erasing uses swap-and-pop, so dense indices can change.
+ */
+template <typename T, std::unsigned_integral IndexType = unsigned int> struct Indirect2DVector
+{
+    static constexpr IndexType InvalidIndex = std::numeric_limits<IndexType>::max();
+
+    struct Key
+    {
+        IndexType A;
+        IndexType B;
+    };
+
+    template <bool Const> struct BasicIterator
+    {
+        using IndirectVectorType = std::conditional_t<Const, const Indirect2DVector, Indirect2DVector>;
+        using ReturnType = std::conditional_t<Const, const T, T>;
+
+        IndirectVectorType* IndirectVector;
+        IndexType Index;
+
+        BasicIterator& operator++()
+        {
+            ++Index;
+            return *this;
+        }
+
+        ReturnType& operator*() const
+        {
+            return IndirectVector->m_Data[Index];
+        }
+
+        ReturnType* operator->() const
+        {
+            return &IndirectVector->m_Data[Index];
+        }
+
+        bool operator!=(const BasicIterator& other) const
+        {
+            return Index != other.Index;
+        }
+
+        bool operator==(const BasicIterator& other) const
+        {
+            return Index == other.Index;
+        }
+    };
+
+    using Iterator = BasicIterator<false>;
+    using ConstIterator = BasicIterator<true>;
+
+    Iterator begin()
+    {
+        return {this, 0};
+    }
+
+    Iterator end()
+    {
+        return {this, Size()};
+    }
+
+    /** @brief Inserts a value if the key does not exist and returns the stored value. */
+    T& Push(IndexType a, IndexType b, const T& value)
+    {
+        IndexType& index = ResizeLookup(a, b)[b];
+
+        if (index == InvalidIndex)
+        {
+            index = static_cast<IndexType>(m_Data.size());
+            m_Data.push_back(value);
+            m_Indices.push_back({a, b});
+        }
+
+        return m_Data[index];
+    }
+
+    bool Contains(const IndexType a, const IndexType b) const
+    {
+        if (a >= m_Lookup.size())
+        {
+            return false;
+        }
+
+        const auto& row = m_Lookup[a];
+
+        return b < row.size() && row[b] != InvalidIndex;
+    }
+
+    T& At(const IndexType a, const IndexType b)
+    {
+        if (!Contains(a, b))
+        {
+            Log::Fatal("Indirect2DVector: Index does not exist.");
+        }
+
+        return m_Data[m_Lookup[a][b]];
+    }
+
+    const T& At(const IndexType a, const IndexType b) const
+    {
+        if (!Contains(a, b))
+        {
+            Log::Fatal("Indirect2DVector: Index does not exist.");
+        }
+
+        return m_Data[m_Lookup[a][b]];
+    }
+
+    template <typename... Args> T& GetOrEmplace(IndexType a, IndexType b, Args&&... args)
+    {
+        std::vector<IndexType>& row = ResizeLookup(a, b);
+        IndexType& index = row[b];
+
+        if (index != InvalidIndex)
+        {
+            return m_Data[index];
+        }
+
+        index = static_cast<IndexType>(m_Data.size());
+
+        m_Data.emplace_back(std::forward<Args>(args)...);
+        m_Indices.push_back({a, b});
+
+        return m_Data.back();
+    }
+
+    /** @brief Constructs a value if the key does not exist and returns its iterator. */
+    template <typename... Args> Iterator Emplace(IndexType a, IndexType b, Args&&... args)
+    {
+        IndexType& index = ResizeLookup(a, b)[b];
+
+        if (index == InvalidIndex)
+        {
+            index = static_cast<IndexType>(m_Data.size());
+            m_Data.emplace_back(std::forward<Args>(args)...);
+            m_Indices.push_back({a, b});
+        }
+
+        return {.IndirectVector = this, .Index = index};
+    }
+
+    Iterator Find(const IndexType a, const IndexType b)
+    {
+        if (a >= m_Lookup.size())
+        {
+            return end();
+        }
+
+        const auto& row = m_Lookup[a];
+
+        if (b >= row.size())
+        {
+            return end();
+        }
+
+        const IndexType index = row[b];
+
+        if (index == InvalidIndex)
+        {
+            return end();
+        }
+
+        return {.IndirectVector = this, .Index = index};
+    }
+
+    /**
+     * @brief Removes a value using swap-and-pop.
+     * The dense index of the last value may change as a result.
+     */
+    void Erase(const IndexType a, const IndexType b)
+    {
+        if (!Contains(a, b))
+        {
+            return;
+        }
+
+        const IndexType index = m_Lookup[a][b];
+        const IndexType lastIndex = m_Data.size() - 1;
+
+        if (index != lastIndex)
+        {
+            const Key lastKey = m_Indices.back();
+
+            std::swap(m_Data[index], m_Data.back());
+            std::swap(m_Indices[index], m_Indices.back());
+
+            m_Lookup[lastKey.A][lastKey.B] = index;
+        }
+
+        m_Data.pop_back();
+        m_Indices.pop_back();
+        m_Lookup[a][b] = InvalidIndex;
+    }
+
+    void Reserve(IndexType count)
+    {
+        m_Data.reserve(count);
+        m_Indices.reserve(count);
+    }
+
+    IndexType Size() const
+    {
+        return m_Data.size();
+    }
+
+  private:
+    std::vector<std::vector<IndexType>> m_Lookup{};
+    std::vector<T> m_Data{};
+    std::vector<Key> m_Indices{};
+
+    std::vector<IndexType>& ResizeLookup(const IndexType a, const IndexType b)
+    {
+        if (m_Lookup.size() <= a)
+        {
+            m_Lookup.resize(a + 1);
+        }
+
+        auto& row = m_Lookup[a];
+
+        if (row.size() <= b)
+        {
+            row.resize(b + 1, InvalidIndex);
+        }
+
+        return row;
+    }
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 7: DataStructures/SparseSetAoS.hpp
+// ==================================================
+
+#pragma once
+
+#include "../Debug/Log.hpp"
+
+#include <concepts>
+#include <limits>
+#include <type_traits>
+#include <vector>
+
+namespace Ivy::U
+{
+
+/**
+ * @brief Sparse-indexed storage with densely packed entries.
+ *
+ * Each sparse index maps to a dense index, allowing O(1) lookup while keeping
+ * active entries contiguous. Each dense entry stores both its sparse index
+ * and its associated value.
+ *
+ * Erasing an entry uses swap-and-pop, so dense indices can change after an erase.
+ *
+ * @tparam T The stored value type.
+ * @tparam SparseIndexType The type used for sparse indices.
+ * @tparam DenseIndexType The type used for dense indices.
+ */
+template <typename T, std::unsigned_integral SparseIndexType = unsigned int,
+    std::unsigned_integral DenseIndexType = unsigned int>
+struct SparseSetAoS
+{
+    /** @brief Sentinel value representing an invalid sparse index. */
+    static constexpr auto InvalidSparseIndex = std::numeric_limits<SparseIndexType>::max();
+
+    /** @brief Sentinel value representing an invalid dense index. */
+    static constexpr auto InvalidDenseIndex = std::numeric_limits<DenseIndexType>::max();
+
+    /** @brief A densely stored value and its associated sparse index. */
+    struct Entry
+    {
+        SparseIndexType SparseIndex;
+        T Value;
+    };
+
+    /** @brief Iterator over densely stored entries. */
+    template <bool Const> struct BasicIterator
+    {
+        using SetType = std::conditional_t<Const, const SparseSetAoS, SparseSetAoS>;
+        using EntryType = std::conditional_t<Const, const Entry, Entry>;
+
+        SetType* Set;
+        DenseIndexType Index;
+
+        BasicIterator& operator++()
+        {
+            ++Index;
+            return *this;
+        }
+
+        EntryType& operator*() const
+        {
+            return Set->m_Dense[Index];
+        }
+
+        EntryType* operator->() const
+        {
+            return &Set->m_Dense[Index];
+        }
+
+        bool operator==(const BasicIterator& other) const
+        {
+            return Index == other.Index;
+        }
+
+        bool operator!=(const BasicIterator& other) const
+        {
+            return !(*this == other);
+        }
+    };
+
+    /** @brief Mutable iterator over densely stored entries. */
+    using Iterator = BasicIterator<false>;
+
+    /** @brief Read-only iterator over densely stored entries. */
+    using ConstIterator = BasicIterator<true>;
+
+    Iterator begin()
+    {
+        return {.Set = this, .Index = 0};
+    }
+
+    Iterator end()
+    {
+        return {.Set = this, .Index = Size()};
+    }
+
+    ConstIterator begin() const
+    {
+        return {.Set = this, .Index = 0};
+    }
+
+    ConstIterator end() const
+    {
+        return {.Set = this, .Index = Size()};
+    }
+
+    /** @brief Checks whether a sparse index is present. */
+    bool Contains(const SparseIndexType index) const
+    {
+        return index < m_Sparse.size() && m_Sparse[index] != InvalidDenseIndex;
+    }
+
+    /** @brief Returns the value associated with a sparse index. */
+    T& At(const SparseIndexType index)
+    {
+        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        return m_Dense[m_Sparse[index]].Value;
+    }
+
+    /** @brief Returns the value associated with a sparse index. */
+    const T& At(const SparseIndexType index) const
+    {
+        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        return m_Dense[m_Sparse[index]].Value;
+    }
+
+    /** @brief Returns the value associated with a sparse index without bounds checking. */
+    T& operator[](const SparseIndexType index)
+    {
+        return m_Dense[m_Sparse[index]].Value;
+    }
+
+    /** @brief Returns the value associated with a sparse index without bounds checking. */
+    const T& operator[](const SparseIndexType index) const
+    {
+        return m_Dense[m_Sparse[index]].Value;
+    }
+
+    /** @brief Returns the entry at a dense index. */
+    Entry& AtDense(const DenseIndexType index)
+    {
+        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        return m_Dense[index];
+    }
+
+    /** @brief Returns the entry at a dense index. */
+    const Entry& AtDense(const DenseIndexType index) const
+    {
+        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        return m_Dense[index];
+    }
+
+    /** @brief Finds the entry associated with a sparse index. */
+    Iterator Find(const SparseIndexType index)
+    {
+        if (!Contains(index))
+        {
+            return end();
+        }
+
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    /** @brief Finds the entry associated with a sparse index. */
+    ConstIterator Find(const SparseIndexType index) const
+    {
+        if (!Contains(index))
+        {
+            return end();
+        }
+
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    /** @brief Returns the dense index associated with a sparse index. */
+    DenseIndexType DenseIndexOf(const SparseIndexType index) const
+    {
+        return m_Sparse[index];
+    }
+
+    /** @brief Returns the sparse index associated with a dense index. */
+    SparseIndexType SparseIndexOf(const DenseIndexType index) const
+    {
+        return m_Dense[index].SparseIndex;
+    }
+
+    /** @brief Adds a value if the sparse index is unused, otherwise returns the existing value. */
+    template <typename U> requires std::constructible_from<T, U&&>
+    T& Push(const SparseIndexType index, U&& value)
+    {
+        if (!Contains(index))
+        {
+            if (index >= m_Sparse.size())
+            {
+                m_Sparse.resize(index + 1, InvalidSparseIndex);
+            }
+
+            m_Sparse[index] = m_Dense.size();
+            m_Dense.push_back({.Value = std::forward<U>(value), .SparseIndex = index});
+        }
+
+        return m_Dense[m_Sparse[index]].Value;
+    }
+
+    /** @brief Constructs a value at the sparse index if it is unused. */
+    template <typename... Args> Iterator Emplace(const SparseIndexType index, Args&&... args)
+    {
+        if (!Contains(index))
+        {
+            if (index >= m_Sparse.size())
+            {
+                m_Sparse.resize(index + 1, InvalidSparseIndex);
+            }
+
+            m_Sparse[index] = m_Dense.size();
+            m_Dense.emplace_back(Entry{.SparseIndex = index, .Value = T{std::forward<Args>(args)...}});
+        }
+
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    /** @brief Constructs or replaces the value at a sparse index. */
+    template <typename... Args> Iterator EmplaceOrReplace(const SparseIndexType index, Args&&... args)
+    {
+        if (!Contains(index))
+        {
+            return Emplace(index, std::forward<Args>(args)...);
+        }
+
+        m_Dense[m_Sparse[index]].Value = T{std::forward<Args>(args)...};
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    /**
+     * @brief Removes an entry while keeping dense storage packed.
+     *
+     * The last entry is moved into the erased entry's position, so dense
+     * indices are not stable across erases.
+     */
+    bool Erase(const SparseIndexType index)
+    {
+        if (!Contains(index))
+        {
+            return false;
+        }
+
+        const DenseIndexType denseIndex = m_Sparse[index];
+
+        if (denseIndex != m_Dense.size() - 1)
+        {
+            Entry& lastEntry = m_Dense.back();
+
+            std::swap(m_Dense[denseIndex], lastEntry);
+
+            m_Sparse[lastEntry.SparseIndex] = denseIndex;
+        }
+
+        m_Dense.pop_back();
+        m_Sparse[index] = InvalidSparseIndex;
+
+        return true;
+    }
+
+    /** @brief Removes the entry at a dense index. */
+    bool EraseByDense(const DenseIndexType index)
+    {
+        return Erase(m_Dense[index].SparseIndex);
+    }
+
+    /** @brief Removes all entries from the set. */
+    void Clear()
+    {
+        m_Dense.clear();
+
+        for (DenseIndexType& index : m_Sparse)
+        {
+            index = InvalidSparseIndex;
+        }
+    }
+
+    /** @brief Reserves capacity for dense entries. */
+    void ReserveDense(const DenseIndexType size)
+    {
+        m_Dense.reserve(size);
+    }
+
+    /** @brief Reserves capacity for sparse indices. */
+    void ReserveSparse(const SparseIndexType size)
+    {
+        m_Sparse.reserve(size);
+    }
+
+    /** @brief Returns the number of entries in the set. */
+    DenseIndexType Size() const
+    {
+        return m_Dense.size();
+    }
+
+    /** @brief Returns the densely stored entries. */
+    std::vector<Entry>& DenseData()
+    {
+        return m_Dense;
+    }
+
+    /** @brief Returns the densely stored entries. */
+    const std::vector<Entry>& DenseData() const
+    {
+        return m_Dense;
+    }
+
+    /** @brief Checks whether the set contains no entries. */
+    bool Empty() const
+    {
+        return m_Dense.empty();
+    }
+
+  private:
+    std::vector<Entry> m_Dense{};
+    std::vector<DenseIndexType> m_Sparse{};
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 8: DataStructures/SparseSetSoA.hpp
+// ==================================================
+
+#pragma once
+#include "../Debug/Log.hpp"
+
+#include <vector>
+namespace Ivy::U
+{
+/**
+ * @brief Sparse-indexed storage with separately packed indices and values.
+ *
+ * Each sparse index maps to a dense index, allowing O(1) lookup while keeping
+ * active values contiguous. Dense values and their corresponding sparse indices
+ * are stored in separate arrays.
+ *
+ * Unlike SparseSetAoS, the sparse index is not stored alongside each value.
+ * This can reduce per-value storage overhead and keeps the value array free of
+ * index metadata.
+ *
+ * Erasing an entry uses swap-and-pop, so dense indices can change after an erase.
+ *
+ * @tparam T The stored value type.
+ * @tparam SparseIndexType The type used for sparse indices.
+ * @tparam DenseIndexType The type used for dense indices.
+ */
+template <typename T, std::unsigned_integral SparseIndexType = unsigned int,
+    std::unsigned_integral DenseIndexType = unsigned int>
+struct SparseSetSoA
+{
+    static constexpr auto InvalidSparseIndex = std::numeric_limits<SparseIndexType>::max();
+    static constexpr auto InvalidDenseIndex = std::numeric_limits<DenseIndexType>::max();
+
+    template <bool Const> struct BasicIterator
+    {
+
+        using SetType = std::conditional_t<Const, const SparseSetSoA, SparseSetSoA>;
+        using ReturnType = std::conditional_t<Const, const T, T>;
+
+        SetType* Set;
+        DenseIndexType Index;
+
+        BasicIterator& operator++()
+        {
+            ++Index;
+            return *this;
+        }
+
+        ReturnType& operator*() const
+        {
+            return Set->m_Dense[Index];
+        }
+
+        ReturnType* operator->() const
+        {
+            return &Set->m_Dense[Index];
+        }
+
+        bool operator==(const BasicIterator& other) const
+        {
+            return Set == other.Set && Index == other.Index;
+        }
+        bool operator!=(const BasicIterator& other) const
+        {
+            return !(*this == other);
+        }
+    };
+
+    using Iterator = BasicIterator<false>;
+    using ConstIterator = BasicIterator<true>;
+
+    Iterator begin()
+    {
+        return {.Set = this, .Index = 0};
+    }
+
+    Iterator end()
+    {
+        return {.Set = this, .Index = Size()};
+    }
+
+    ConstIterator begin() const
+    {
+        return {.Set = this, .Index = 0};
+    }
+
+    ConstIterator end() const
+    {
+        return {.Set = this, .Index = Size()};
+    }
+
+    Iterator Find(const SparseIndexType index)
+    {
+        if (!Contains(index))
+        {
+            return end();
+        }
+
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    ConstIterator Find(const SparseIndexType index) const
+    {
+        if (!Contains(index))
+        {
+            return end();
+        }
+
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    bool Contains(const SparseIndexType index) const
+    {
+        return index < m_Sparse.size() && m_Sparse[index] != InvalidDenseIndex;
+    }
+
+    T& At(const SparseIndexType index)
+    {
+        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        return m_Dense[m_Sparse[index]];
+    }
+
+    const T& At(const SparseIndexType index) const
+    {
+        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        return m_Dense[m_Sparse[index]];
+    }
+
+    T& operator[](const SparseIndexType index)
+    {
+        return m_Dense[m_Sparse[index]];
+    }
+
+    const T& operator[](const SparseIndexType index) const
+    {
+        return m_Dense[m_Sparse[index]];
+    }
+
+    T& AtDense(const DenseIndexType index)
+    {
+        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        return m_Dense[index];
+    }
+
+    const T& AtDense(const DenseIndexType index) const
+    {
+        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        return m_Dense[index];
+    }
+
+    DenseIndexType DenseIndexOf(const SparseIndexType index) const
+    {
+        return m_Sparse[index];
+    }
+
+    SparseIndexType SparseIndexOf(const DenseIndexType index) const
+    {
+        return m_Indices[index];
+    }
+
+    /** @brief Adds a value if the sparse index is unused, otherwise returns the existing value. */
+    template <typename U> requires std::constructible_from<T, U&&>
+    T& Push(const SparseIndexType index, U&& value)
+    {
+        if (!Contains(index))
+        {
+            if (index >= m_Sparse.size())
+            {
+                m_Sparse.resize(index + 1, InvalidDenseIndex);
+            }
+
+            m_Sparse[index] = m_Dense.size();
+            m_Dense.push_back(std::forward<U>(value));
+            m_Indices.push_back(index);
+        }
+
+        return m_Dense[m_Sparse[index]];
+    }
+
+    /** @brief Constructs a value at the sparse index if it is unused. */
+    template <typename... Args> Iterator Emplace(const SparseIndexType index, Args&&... args)
+    {
+        if (!Contains(index))
+        {
+            if (index >= m_Sparse.size())
+            {
+                m_Sparse.resize(index + 1, InvalidDenseIndex);
+            }
+
+            m_Sparse[index] = m_Dense.size();
+            m_Dense.emplace_back(std::forward<Args>(args)...);
+            m_Indices.push_back(index);
+        }
+
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    template <typename... Args> Iterator EmplaceOrReplace(const SparseIndexType index, Args&&... args)
+    {
+        if (!Contains(index))
+        {
+            return Emplace(index, std::forward<Args>(args)...);
+        }
+
+        m_Dense[m_Sparse[index]] = T{std::forward<Args>(args)...};
+        return {.Set = this, .Index = m_Sparse[index]};
+    }
+
+    /**
+     * @brief Removes an entry while keeping the dense storage packed.
+     *
+     * The last entry is moved into the erased entry's position, so dense
+     * indices are not stable across erases.
+     */
+    bool Erase(const SparseIndexType index)
+    {
+        if (!Contains(index))
+        {
+            return false;
+        }
+
+        const DenseIndexType denseIndex = m_Sparse[index];
+
+        if (denseIndex != m_Dense.size() - 1)
+        {
+            SparseIndexType& lastSparseIndex = m_Indices.back();
+
+            std::swap(m_Dense[denseIndex], m_Dense.back());
+            std::swap(m_Indices[denseIndex], lastSparseIndex);
+
+            m_Sparse[lastSparseIndex] = denseIndex;
+        }
+
+        m_Dense.pop_back();
+        m_Indices.pop_back();
+        m_Sparse[index] = InvalidDenseIndex;
+
+        return true;
+    }
+
+    bool EraseByDense(const DenseIndexType index)
+    {
+        return Erase(m_Indices[index]);
+    }
+
+    void Clear()
+    {
+        m_Dense.clear();
+        m_Indices.clear();
+
+        for (DenseIndexType& index : m_Sparse)
+        {
+            index = InvalidDenseIndex;
+        }
+    }
+
+    void ReserveDense(const DenseIndexType size)
+    {
+        m_Dense.reserve(size);
+        m_Indices.reserve(size);
+    }
+
+    void ReserveSparse(const SparseIndexType size)
+    {
+        m_Sparse.reserve(size);
+    }
+
+    DenseIndexType Size() const
+    {
+        return m_Dense.size();
+    }
+
+    std::vector<T>& Data()
+    {
+        return m_Dense;
+    }
+
+    const std::vector<T>& Data() const
+    {
+        return m_Dense;
+    }
+
+    bool Empty() const
+    {
+        return m_Dense.empty();
+    }
+
+  private:
+    std::vector<T> m_Dense{};
+    std::vector<DenseIndexType> m_Sparse{};
+    std::vector<SparseIndexType> m_Indices{};
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 9: DataStructures/StringMap.hpp
+// ==================================================
+
+#pragma once
+#include "Utilities/Debug/Log.hpp"
+#include <concepts>
+#include <cstddef>
+#include <functional>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+namespace Ivy::U
+{
+
+/**
+ * @brief Associates string keys with densely stored values.
+ *
+ * Maps string keys to indices in an internal vector, providing key-based
+ * lookup while storing values contiguously.
+ *
+ * @tparam T Type of values stored in the map.
+ * @tparam IndexType Unsigned integer type used to represent value indices.
+ *
+ * @note Keys are stored as owning std::string objects. Lookups accept
+ * std::string_view and use transparent hashing and equality to avoid creating
+ * temporary strings.
+ */
+template <typename T, std::unsigned_integral IndexType = unsigned int> struct StringMap
+{
+    /**
+     * @brief Hashes strings and string views using their character contents.
+     *
+     * Declares transparent lookup support so the unordered map can search
+     * using std::string_view without constructing a std::string.
+     */
+    struct StringHash
+    {
+        using is_transparent = void;
+
+        /**
+         * @brief Computes the hash of a string-like value.
+         * @param value String contents to hash.
+         * @return Hash value.
+         */
+        std::size_t operator()(const std::string_view value) const noexcept
+        {
+            return std::hash<std::string_view>{}(value);
+        }
+    };
+
+    /**
+     * @brief Iterator over values stored in the map.
+     *
+     * Iterates through the internal value vector in index order.
+     *
+     * @tparam Const Whether the iterator provides read-only access.
+     */
+    template <bool Const> struct BasicIterator
+    {
+        /** @brief Map whose values are being iterated. */
+        std::conditional_t<Const, const StringMap, StringMap>* Map;
+
+        /** @brief Index of the current value. */
+        IndexType Index;
+
+        /** @brief Reference type returned by dereferencing the iterator. */
+        using ReturnType = std::conditional_t<Const, const T, T>;
+
+        /**
+         * @brief Advances the iterator to the next value.
+         * @return Reference to this iterator.
+         */
+        BasicIterator& operator++()
+        {
+            ++Index;
+            return *this;
+        }
+
+        /**
+         * @brief Accesses the current value.
+         * @return Reference to the current value.
+         */
+        ReturnType& operator*() const
+        {
+            return Map->m_Data[Index];
+        }
+
+        /**
+         * @brief Accesses a member of the current value.
+         * @return Pointer to the current value.
+         */
+        ReturnType* operator->() const
+        {
+            return &Map->m_Data[Index];
+        }
+
+        /**
+         * @brief Checks whether two iterators have the same index.
+         * @param other Iterator to compare against.
+         * @return True if both iterators have the same index.
+         */
+        bool operator==(const BasicIterator& other) const
+        {
+            return Index == other.Index;
+        }
+
+        /**
+         * @brief Checks whether two iterators have different indices.
+         * @param other Iterator to compare against.
+         * @return True if the indices differ.
+         */
+        bool operator!=(const BasicIterator& other) const
+        {
+            return !(*this == other);
+        }
+    };
+
+    /** @brief Mutable iterator type. */
+    using Iterator = BasicIterator<false>;
+
+    /** @brief Read-only iterator type. */
+    using ConstIterator = BasicIterator<true>;
+
+    /**
+     * @brief Gets an iterator to the first value.
+     * @return Iterator to the first value, or the end iterator if empty.
+     */
+    Iterator begin()
+    {
+        return {this, 0};
+    }
+
+    /**
+     * @brief Gets the end iterator.
+     * @return Iterator one position past the last value.
+     */
+    Iterator end()
+    {
+        return {this, Size()};
+    }
+
+    /**
+     * @brief Gets a read-only iterator to the first value.
+     * @return Const iterator to the first value, or the end iterator if empty.
+     */
+    ConstIterator begin() const
+    {
+        return {this, 0};
+    }
+
+    /**
+     * @brief Gets the read-only end iterator.
+     * @return Const iterator one position past the last value.
+     */
+    ConstIterator end() const
+    {
+        return {this, Size()};
+    }
+
+    /**
+     * @brief Gets the value associated with a key, inserting it if absent.
+     *
+     * If the key already exists, returns its associated value. Otherwise,
+     * inserts the key and value-initializes a new value.
+     *
+     * @param key Key to look up or insert.
+     * @return Reference to the associated value.
+     */
+    T& operator[](const std::string_view key)
+    {
+        if (const auto it = m_IndicesMap.find(key); it != m_IndicesMap.end())
+        {
+            return m_Data[it->second];
+        }
+
+        m_IndicesMap.emplace(std::string(key), Size());
+        m_Data.emplace_back();
+
+        return m_Data.back();
+    }
+
+    T& At(const std::string_view key)
+    {
+        if (const auto it = m_IndicesMap.find(key); it != m_IndicesMap.end())
+        {
+            return m_Data[it->second];
+        }
+        Log::Fatal("[StringMap] Key: ", key, " Doesn't Exist");
+    }
+
+    const T& At(const std::string_view key) const
+    {
+        if (const auto it = m_IndicesMap.find(key); it != m_IndicesMap.end())
+        {
+            return m_Data[it->second];
+        }
+        Log::Fatal("[StringMap] Key: ", key, " Doesn't Exist");
+    }
+
+    Iterator Find(const std::string_view key)
+    {
+        if (m_IndicesMap.contains(key))
+        {
+            return {this, m_IndicesMap.at(key)};
+        }
+        return end();
+    }
+
+    ConstIterator Find(const std::string_view key) const
+    {
+        if (m_IndicesMap.contains(key))
+        {
+            return {this, m_IndicesMap.at(key)};
+        }
+        return end();
+    }
+
+    /**
+     * @brief Checks whether a key exists in the map.
+     * @param name Key to search for.
+     * @return True if the key exists.
+     */
+    bool Contains(std::string_view name) const
+    {
+        return m_IndicesMap.contains(name);
+    }
+
+    /**
+     * @brief Constructs and inserts a value if its key is absent.
+     *
+     * If the key already exists, leaves its value unchanged.
+     *
+     * @tparam Args Argument types forwarded to the value constructor.
+     * @param key Key associated with the value.
+     * @param args Arguments forwarded to the value constructor.
+     * @return A pair containing an iterator to the associated value and a
+     * Boolean indicating whether insertion occurred.
+     */
+    template <typename... Args> std::pair<Iterator, bool> Emplace(const std::string_view key, Args&&... args)
+    {
+        if (const auto it = m_IndicesMap.find(key); it != m_IndicesMap.end())
+        {
+            return {
+                Iterator{this, it->second},
+                false
+            };
+        }
+
+        const IndexType index = Size();
+
+        m_Data.emplace_back(std::forward<Args>(args)...);
+        m_IndicesMap.emplace(std::string(key), index);
+
+        return {
+            Iterator{this, index},
+            true
+        };
+    }
+
+    void Erase(const std::string_view key)
+    {
+        m_Data[m_IndicesMap.at(key)];
+        m_IndicesMap.erase(key);
+    }
+
+    void Clear()
+    {
+        m_Data.clear();
+        m_IndicesMap.clear();
+    }
+    /**
+     * @brief Gets the number of stored values.
+     * @return Number of entries in the map.
+     */
+    IndexType Size() const
+    {
+        return m_Data.size();
+    }
+
+  private:
+    /** @brief Maps owning string keys to their corresponding value indices. */
+    std::unordered_map<std::string, IndexType, StringHash, std::equal_to<>> m_IndicesMap{};
+
+    /** @brief Stores values contiguously in index order. */
+    std::vector<T> m_Data{};
+};
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 10: DataStructures/TypeTree.hpp
+// ==================================================
+
+#pragma once
+namespace Ivy::U
+{
+struct TypeTree
+{
+    template <typename... T> struct List;
+    template <typename Left, typename Right> struct Node;
+
+  private:
+    template <typename List> struct Rebuild;
+
+    template <typename T> struct Rebuild<List<T>>
+    {
+        using Type = T;
+    };
+
+    template <typename First, typename Second, typename... Rest> struct Rebuild<List<First, Second, Rest...>>
+    {
+      private:
+        using Tail = typename Rebuild<List<Second, Rest...>>::Type;
+
+      public:
+        using Type = Node<First, Tail>;
+    };
+
+    template <typename List, typename T> struct Append;
+
+    template <typename... Ts, typename T> struct Append<List<Ts...>, T>
+    {
+        using Type = List<Ts..., T>;
+    };
+
+  public:
+    template <typename Left, typename Right> struct Concat;
+    template <typename... Ls, typename... Rs> struct Concat<List<Ls...>, List<Rs...>>
+    {
+
+        using Type = List<Ls..., Rs...>;
+    };
+
+    template <typename... Ts> struct List
+    {
+        static constexpr std::size_t Size = sizeof...(Ts);
+        using Rebuild = Rebuild<List<Ts...>>::Type;
+        template <typename T> using Append = Append<List<Ts...>, T>::Type;
+    };
+
+    template <typename T> struct Leaf
+    {
+        using Type = T;
+        using Flatten = List<T>;
+        using Left = Leaf;
+        using Right = Leaf;
+    };
+
+    template <typename L, typename R> struct Node
+    {
+        using Left = L;
+        using Right = R;
+
+        using Flatten = typename Concat<typename Left::Flatten, typename Right::Flatten>::Type;
+    };
+
+    TypeTree() = delete;
+    ~TypeTree() = delete;
+    TypeTree& operator=(TypeTree&) = delete;
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 11: DataStructures/TypedVector.hpp
+// ==================================================
+
+#pragma once
+
+#include "../Debug/Log.hpp"
+
+namespace Ivy::U
+{
+
+/**
+ * @brief Vector storage indexed by a unique ID for each template type combination.
+ *
+ * Each TypedVector instance assigns TypeIds sequentially as new type combinations
+ * are requested. The TypeId is then used directly as the index into the dense
+ * storage.
+ */
+template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct TypedVector
+{
+    template <bool Const> struct BasicIterator
+    {
+        using TypedVectorType = std::conditional_t<Const, const TypedVector, TypedVector>;
+        using ReturnType = std::conditional_t<Const, const T, T>;
+
+        TypedVectorType* TypedVector;
+        TypeIdType Index;
+
+        BasicIterator& operator++()
+        {
+            ++Index;
+            return *this;
+        }
+
+        ReturnType& operator*() const
+        {
+            return TypedVector->m_Data[Index];
+        }
+
+        ReturnType* operator->() const
+        {
+            return &TypedVector->m_Data[Index];
+        }
+
+        bool operator!=(const BasicIterator& other) const
+        {
+            return Index != other.Index;
+        }
+
+        bool operator==(const BasicIterator& other) const
+        {
+            return Index == other.Index;
+        }
+    };
+
+    using Iterator = BasicIterator<false>;
+    using ConstIterator = BasicIterator<true>;
+
+    Iterator begin()
+    {
+        return {.TypedVector = this, .Index = 0};
+    }
+
+    Iterator end()
+    {
+        return {.TypedVector = this, .Index = Size()};
+    }
+
+    ConstIterator begin() const
+    {
+        return {.TypedVector = this, .Index = 0};
+    }
+
+    ConstIterator end() const
+    {
+        return {.TypedVector = this, .Index = Size()};
+    }
+
+    template <typename... Args> bool Contains()
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+        return typeId < m_Data.size();
+    }
+
+    template <typename... Args> bool Contains() const
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+        return typeId < m_Data.size();
+    }
+
+    template <typename... Args> T& At()
+    {
+        if (!Contains<Args...>())
+        {
+            Log::Fatal("TypedVector does not contain the specified TypeId.");
+        }
+
+        return m_Data[GetTypeId<Args...>()];
+    }
+
+    T& operator[](TypeIdType index)
+    {
+        return m_Data[index];
+    }
+
+    template <typename... Args> const T& Get() const
+    {
+        return m_Data[GetTypeId<Args...>()];
+    }
+
+    template <typename... Args> T& Get()
+    {
+        return m_Data[GetTypeId<Args...>()];
+    }
+
+    template <typename... Args> Iterator Find()
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+
+        if (typeId >= m_Data.size())
+        {
+            return end();
+        }
+
+        return {.TypedVector = this, .Index = typeId};
+    }
+
+    template <typename... Args> ConstIterator Find() const
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+
+        if (typeId >= m_Data.size())
+        {
+            return end();
+        }
+
+        return {.TypedVector = this, .Index = typeId};
+    }
+
+    /** @brief Stores a value for the specified type combination if it does not exist. */
+    template <typename... Args> T& Push(const T& value)
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+
+        if (!Contains<Args...>())
+        {
+            U::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
+            m_Data.push_back(value);
+        }
+        return m_Data[typeId];
+    }
+    void Clear()
+    {
+        m_Data.clear();
+        m_TypeIds.clear();
+        m_NextTypeId = 0;
+    }
+    /** @brief Constructs a value for the specified type combination if it does not exist. */
+    template <typename... Args, typename... Params> Iterator Emplace(Params&&... parameters)
+    {
+        const TypeIdType typeId = GetTypeId<Args...>();
+
+        if (!Contains<Args...>())
+        {
+            U::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
+            m_Data.emplace_back(std::forward<Params>(parameters)...);
+        }
+        return {this, typeId};
+    }
+    TypeIdType Size() const
+    {
+        return m_Data.size();
+    }
+
+    bool Empty() const
+    {
+        return m_Data.empty();
+    }
+
+  private:
+    TypeIdType m_NextTypeId{};
+    std::vector<T> m_Data{};
+    std::vector<TypeIdType> m_TypeIds{};
+    static constexpr TypeIdType InvalidTypeId = std::numeric_limits<TypeIdType>::max();
+
+    template <typename... Args> TypeIdType GetTypeId()
+    {
+        const TypeIdType globalId = GetGlobalTypeId<Args...>();
+
+        if (m_TypeIds.size() <= globalId)
+        {
+            m_TypeIds.resize(globalId + 1, InvalidTypeId);
+        }
+
+        TypeIdType& localId = m_TypeIds[globalId];
+
+        if (localId == InvalidTypeId)
+        {
+            localId = m_NextTypeId++;
+        }
+
+        return localId;
+    }
+
+    template <typename... Args> TypeIdType GetTypeId() const
+    {
+        const TypeIdType globalId = GetGlobalTypeId<Args...>();
+        if (m_TypeIds.size() > globalId)
+        {
+            return m_TypeIds[globalId];
+        }
+        return InvalidTypeId;
+    }
+
+    template <typename... Args> static TypeIdType GetGlobalTypeId()
+    {
+        static const TypeIdType Id = GetNextGlobalTypeId();
+        return Id;
+    }
+
+    static TypeIdType GetNextGlobalTypeId()
+    {
+        static TypeIdType Id{};
+        return Id++;
+    }
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 12: Debug/Inspector.hpp
+// ==================================================
+
+#pragma once
+
+#include <iostream>
+#include <source_location>
+#include <string_view>
+#include <type_traits>
+
+namespace Ivy::U
+{
+
+struct Inspector
+{
+  private:
+    template <typename T> struct PInspect
+    {
+        static void Print(const T& Value)
+        {
+            if constexpr (requires { std::cerr << Value; })
+            {
+                std::cerr << Value;
+            }
+            else
+            {
+                std::cerr << "<uninspectable>";
+            }
+        }
+    };
+
+    template <typename T> static constexpr std::string_view TypeName()
+    {
+        std::string_view Function = __PRETTY_FUNCTION__;
+        constexpr std::string_view Prefix = "T = ";
+        const size_t Start = Function.find(Prefix) + Prefix.size();
+        const size_t End = Function.rfind(']');
+
+        return Function.substr(Start, End - Start);
+    }
+
+  public:
+    template <typename T> struct TInspect;
+
+    template <typename T>
+    static void Inspect(
+        const T& Value, const std::source_location& Location = std::source_location::current())
+    {
+        using Type = std::remove_cvref_t<T>;
+
+        std::cerr << "  Type:    " << TypeName<Type>() << '\n'
+                  << "  Address: " << static_cast<const void*>(&Value) << '\n'
+                  << "  Size:    " << sizeof(Type) << " bytes\n"
+                  << "  Align:   " << alignof(Type) << " bytes\n"
+                  << "  Trivial: " << std::boolalpha << std::is_trivially_copyable_v<Type> << '\n'
+                  << "  At:      " << Location.file_name() << ':' << Location.line() << '\n'
+                  << "  Value:   ";
+
+        PInspect<Type>::Print(Value);
+        std::cerr << "\n\n";
+    }
+
+    Inspector() = delete;
+    ~Inspector() = delete;
+    Inspector& operator=(Inspector&) = delete;
+};
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 13: Debug/Log.hpp
+// ==================================================
+
+#pragma once
+#include <cstddef>
+#include <exception>
+#include <iostream>
+#include <vector>
+
+namespace Ivy::U
+{
+template <typename T> std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+{
+    os << "[";
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        os << vec[i];
+        if (i != vec.size() - 1)
+        {
+            os << ", ";
+        }
+    }
+    os << "]";
+    return os;
+}
+
+/** @brief Provides formatted console logging and pointer validation. */
+namespace Log
+{
+
+/** @brief Resets the console text color. */
+constexpr const char* Reset = "\033[0m";
+/** @brief Sets the console text color to red. */
+constexpr const char* Red = "\033[31m";
+/** @brief Sets the console text color to green. */
+constexpr const char* Green = "\033[32m";
+/** @brief Sets the console text color to yellow. */
+constexpr const char* Yellow = "\033[33m";
+/** @brief Sets the console text color to blue. */
+constexpr const char* Blue = "\033[34m";
+
+#define LOG()                                                                                                \
+    std::cout << source.file_name() << " " << source.function_name() << " " << source.line() << " "          \
+              << source.column() << "\n";
+
+/** @brief Prints a message to the console. */
+template <typename... Args> void Print(const Args&... args)
+{
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs an informational message. */
+template <typename... Args> void Info(const Args&... args)
+{
+    std::cout << Green << "ℹ️ [INFO] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs a warning message. */
+template <typename... Args> void Warning(const Args&... args)
+{
+    std::cout << Yellow << "⚠️ [WARNING] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs an error message. */
+template <typename... Args> void Error(const Args&... args)
+{
+    std::cout << Red << "❌ [ERROR] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+}
+
+/** @brief Logs a fatal error and throws an exception. */
+template <typename... Args> [[noreturn]] static void Fatal(const Args&... args)
+{
+    std::cout << Red << "💀 [FATAL] " << Reset;
+    (..., (std::cout << args));
+    std::cout << '\n';
+    throw std::exception();
+}
+
+/** @brief Validates a raw pointer and returns the dereferenced object. */
+template <typename T, typename... Args> static T& Require(T* rawPtr, const Args&... args)
+{
+    if (!rawPtr)
+    {
+        Fatal(args...);
+    }
+    return *rawPtr;
+}
+
+/** @brief its assert but cleaner. */
+template <typename... Args> static constexpr void Assert(const bool condition, const Args&... args)
+{
+    if (!condition)
+    {
+        Fatal(args...);
+    }
+}
+}; // namespace Log
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 14: FileSystem.hpp
+// ==================================================
+
+#pragma once
+
+#include <fstream>
+#include <sstream>
+#include <string>
+
+#include "Debug/Log.hpp"
+
+namespace Ivy::U::FileSystem
+{
+/** @brief Reads and returns the contents of a file. */
+inline std::string ReadFile(const std::string& path)
+{
+    std::ifstream file(path);
+
+    if (!file)
+    {
+        Log::Error("Failed to read file: ", path);
+        return {};
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    return buffer.str();
+}
+
+/** @brief Writes content to a file. */
+inline void WriteFile(const std::string& path, const std::string& content)
+{
+    std::ofstream file(path);
+
+    if (!file)
+    {
+        Log::Error("Failed to write file: ", path);
+        return;
+    }
+
+    file << content;
+}
+} // namespace Ivy::U::FileSystem
+
+
+// ==================================================
+// FILE 15: FixedString.hpp
+// ==================================================
+
+#pragma once
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <string_view>
+namespace Ivy::U
+{
+
+/**
+ * @brief A compile-time string usable as a non-type template parameter.
+ * @tparam N Number of characters including the null terminator.
+ */
+template <std::size_t N> struct FixedString
+{
+    char Data[N];
+
+    /** @brief Constructs a FixedString from a string literal. */
+    constexpr FixedString(const char (&string)[N])
+    {
+        std::copy_n(string, N, Data);
+    }
+
+    /** @brief Converts the string to a std::string_view.*/
+    constexpr operator std::string_view() const
+    {
+        return {Data, N - 1};
+    }
+
+    /** @brief Checks whether the string is empty. */
+    constexpr bool Empty() const
+    {
+        return Data[0] == '\0';
+    }
+
+    constexpr std::uint64_t HashString(const std::string_view value)
+    {
+        std::uint64_t hash = 14695981039346656037ULL;
+
+        for (const char character : value)
+        {
+            hash ^= static_cast<unsigned char>(character);
+            hash *= 1099511628211ULL;
+        }
+
+        return hash;
+    }
+
+    template <std::size_t M> constexpr FixedString<N + M - 1> operator+(const FixedString<M>& other) const
+    {
+        FixedString<N + M - 1> result{""};
+
+        for (std::size_t i = 0; i < N - 1; ++i)
+        {
+            result.Data[i] = Data[i];
+        }
+
+        for (std::size_t i = 0; i < M; ++i)
+        {
+            result.Data[N - 1 + i] = other.Data[i];
+        }
+
+        return result;
+    }
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 16: Image.hpp
+// ==================================================
+
+#pragma once
+#include <cstddef>
+#include <stb_image.h>
+#include <stb_image_write.h>
+
+#include <algorithm>
+#include <string>
+#include <vector>
+
+#include "Debug/Log.hpp"
+
+namespace Ivy::U
+{
+/**
+ * @brief Represents a raster image.
+ *
+ * Stores raw pixel data along with the image dimensions
+ * and number of color channels.
+ */
+struct Image
+{
+    /** @brief Specifies the number of color channels in each pixel. */
+    enum class ColorChannels
+    {
+        /** Single red channel. */
+        R = 1,
+
+        /** Red and green channels. */
+        RG = 2,
+
+        /** Red, green, and blue channels. */
+        RGB = 3,
+
+        /** Red, green, blue, and alpha channels. */
+        RGBA = 4
+    };
+
+    Image() = default;
+
+    /**
+     * @brief Loads an image from disk.
+     *
+     * @param filePath Path to the image file.
+     * @param flip Whether to vertically flip the image when loading.
+     */
+    Image(const std::string& filePath, const bool flip = false)
+    {
+        stbi_set_flip_vertically_on_load(flip);
+
+        int nrChannels = 1;
+        unsigned char* pixels = stbi_load(filePath.c_str(), &Width, &Height, &nrChannels, 0);
+
+        Channels = static_cast<ColorChannels>(nrChannels);
+
+        if (!pixels)
+        {
+            Log::Error("Failed To Load Image: " + filePath);
+            return;
+        }
+
+        const size_t size =
+            static_cast<size_t>(Width) * static_cast<size_t>(Height) * static_cast<size_t>(Channels);
+
+        Pixels.assign(pixels, pixels + size);
+
+        stbi_image_free(pixels);
+    }
+
+    /**
+     * @brief Creates an image from raw pixel data.
+     *
+     * @param width Image width in pixels.
+     * @param height Image height in pixels.
+     * @param channels Number of color channels per pixel.
+     * @param pixels Raw pixel data.
+     */
+    Image(const int width, const int height, const ColorChannels channels,
+        const std::vector<unsigned char>& pixels)
+        : Pixels(pixels), Width(width), Height(height), Channels(channels)
+    {
+    }
+
+    /**
+     * @brief Saves the image to disk as a PNG file.
+     *
+     * @param filepath Destination path for the PNG file.
+     * @param flip Whether to vertically flip the image when writing.
+     */
+    void SaveToDiskPNG(const std::string& filepath, const bool flip = false)
+    {
+        stbi_flip_vertically_on_write(flip);
+
+        stbi_write_png(filepath.c_str(), Width, Height, static_cast<int>(Channels), Pixels.data(),
+            Width * static_cast<int>(Channels));
+    }
+
+    /**
+     * @brief Vertically flips the image in place.
+     *
+     * Swaps the top and bottom rows of pixels. This is useful when
+     * converting between coordinate systems with different vertical
+     * origins, such as OpenGL's bottom-left origin and conventional
+     * image formats' top-left origin.
+     */
+    void FlipVertically()
+    {
+        const size_t rowSize = static_cast<size_t>(Width) * static_cast<size_t>(Channels);
+
+        for (int y = 0; y < Height / 2; ++y)
+        {
+            auto top = Pixels.begin() + static_cast<size_t>(y) * rowSize;
+            auto bottom = Pixels.begin() + static_cast<size_t>(Height - 1 - y) * rowSize;
+
+            std::swap_ranges(top, top + rowSize, bottom);
+        }
+    }
+
+    /** Raw pixel data stored in CPU memory. */
+    std::vector<unsigned char> Pixels{};
+
+    /** Image width in pixels. */
+    int Width = 0;
+
+    /** Image height in pixels. */
+    int Height = 0;
+
+    /** Number and configuration of color channels per pixel. */
+    ColorChannels Channels = ColorChannels::RGB;
+};
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 17: Include.hpp
+// ==================================================
+
+#pragma once
+
+#include "CheckedPtr.hpp"
+#include "Concepts.hpp"
+#include "DataStructures/GIndexPool.hpp"
+#include "DataStructures/HierarchyTree.hpp"
+#include "DataStructures/IndexPool.hpp"
+#include "DataStructures/Indirect2DVector.hpp"
+#include "DataStructures/SparseSetAoS.hpp"
+#include "DataStructures/SparseSetSoA.hpp"
+#include "DataStructures/StringMap.hpp"
+#include "DataStructures/TypedVector.hpp"
+#include "DataStructures/TypeTree.hpp"
+#include "Debug/Inspector.hpp"
+#include "Debug/Log.hpp"
+#include "FileSystem.hpp"
+#include "FixedString.hpp"
+#include "Image.hpp"
+#include "IsSpecialization.hpp"
+#include "Sort.hpp"
+#include "StringUtils.hpp"
+#include "Track.hpp"
+#include "TupleUtils.hpp"
+#include "Utilities.hpp"
+
+
+// ==================================================
+// FILE 18: IsSpecialization.hpp
+// ==================================================
+
+#pragma once
+
+#include <concepts>
+#include <type_traits>
+
+namespace Ivy::U
+{
+
+template <typename T, template <template <auto...> typename, auto...> typename Template>
+struct IsDerivedTvVSpecialization
+{
+  private:
+    template <template <auto...> typename O, auto... Args>
+    static std::true_type Check(const Template<O, Args...>*);
+
+    static std::false_type Check(...);
+
+  public:
+    static constexpr bool value = decltype(Check(std::declval<T*>()))::value;
+};
+
+template <typename T, template <template <auto...> typename, auto...> typename Template>
+concept IsDerivedTvVSpec = IsDerivedTvVSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, template <typename...> typename Template> struct IsTSpecialization : std::false_type
+{
+};
+
+template <template <typename...> typename Template, typename... Args>
+struct IsTSpecialization<Template<Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a type-only template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <typename...> typename Template>
+concept IsTSpec = IsTSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, template <auto...> typename Template> struct IsVSpecialization : std::false_type
+{
+};
+
+template <template <auto...> typename Template, auto... Args>
+struct IsVSpecialization<Template<Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a non-type-only template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <auto...> typename Template>
+concept IsVSpec = IsVSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, template <auto, typename...> typename Template>
+struct IsVTSpecialization : std::false_type
+{
+};
+
+template <template <auto, typename...> typename Template, auto A, typename... Args>
+struct IsVTSpecialization<Template<A, Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a non-type-then-type template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <auto, typename...> typename Template>
+concept IsVTSpec = IsVTSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, template <typename, auto...> typename Template>
+struct IsTVSpecialization : std::false_type
+{
+};
+
+template <template <typename, auto...> typename Template, typename A, auto... Args>
+struct IsTVSpecialization<Template<A, Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a type-then-non-type template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <typename, auto...> typename Template>
+concept IsTVSpec = IsTVSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, template <typename, auto, typename...> typename Template>
+struct IsTVTSpecialization : std::false_type
+{
+};
+
+template <template <typename, auto, typename...> typename Template, typename A, auto B, typename... Args>
+struct IsTVTSpecialization<Template<A, B, Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a type-then-non-type-then-type template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <typename, auto, typename...> typename Template>
+concept IsTVTSpec = IsTVTSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, template <typename, typename, auto...> typename Template>
+struct IsTTVSpecialization : std::false_type
+{
+};
+
+template <template <typename, typename, auto...> typename Template, typename A, typename B, auto... Args>
+struct IsTTVSpecialization<Template<A, B, Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a type-then-type-then-non-type template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <typename, typename, auto...> typename Template>
+concept IsTTVSpec = IsTTVSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, template <template <auto...> typename, auto...> typename Template>
+struct IsTvVSpecialization : std::false_type
+{
+};
+
+template <template <template <auto...> typename, auto...> typename Template, template <auto...> typename A,
+    auto... Args>
+struct IsTvVSpecialization<Template<A, Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a template<non-type>-then-non-type template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <template <auto...> typename, auto...> typename Template>
+concept IsTvVSpec = IsTvVSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+template <typename T, typename Template>
+concept IsSpec = std::derived_from<std::remove_cvref_t<T>, Template>;
+
+template <typename T> struct IsTvType : std::false_type
+{
+};
+template <template <auto...> typename Template, auto... Args>
+struct IsTvType<Template<Args...>> : std::true_type
+{
+};
+
+template <typename T>
+concept IsTv = IsTvType<std::remove_cvref_t<T>>::value;
+
+template <typename T, template <auto, auto, typename...> typename Template>
+struct IsVVTSpecialization : std::false_type
+{
+};
+
+template <template <auto, auto, typename...> typename Template, auto A, auto B, typename... Args>
+struct IsVVTSpecialization<Template<A, B, Args...>, Template> : std::true_type
+{
+};
+
+/// @brief Checks whether a type is a specialization of a non-type-then-non-type-then-type template.
+/// @details Removes const, volatile, and reference qualifiers before checking.
+/// @tparam T The type to inspect.
+/// @tparam Template The template to compare against.
+template <typename T, template <auto, auto, typename...> typename Template>
+concept IsVVTSpec = IsVVTSpecialization<std::remove_cvref_t<T>, Template>::value;
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 19: STB.cpp
+// ==================================================
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+#include <stb_image.h>
+#include <stb_image_write.h>
+
+// ==================================================
+// FILE 20: Sort.hpp
+// ==================================================
+
+#pragma once
+namespace Ivy::U
+{
+template <typename T, int N>
+constexpr void Swap(std::array<T, N>& arr, size_t a, size_t b) requires std::totally_ordered<T>
+{
+    T value = arr[a];
+    arr[a] = arr[b];
+    arr[b] = value;
+}
+
+template <typename T, size_t N>
+constexpr std::array<T, N> BubbleSort(const std::array<T, N>& arr) requires std::totally_ordered<T>
+{
+    std::array<T, N> result = arr;
+
+    for (size_t i = 0; i < N; ++i)
+    {
+        bool swapped = false;
+
+        for (size_t j = 0; j + 1 < N - i; ++j)
+        {
+            if (result[j] > result[j + 1])
+            {
+                Swap(result, j, j + 1);
+                swapped = true;
+            }
+        }
+
+        if (!swapped)
+        {
+            break;
+        }
+    }
+
+    return result;
+}
+
+template <typename T, size_t N>
+constexpr std::array<T, N> InsertionSort(const std::array<T, N>& arr) requires std::totally_ordered<T>
+{
+    std::array<T, N> result = arr;
+
+    for (size_t i = 1; i < N; ++i)
+    {
+        T value = result[i];
+        size_t j = i;
+
+        while (j > 0 && result[j - 1] > value)
+        {
+            result[j] = result[j - 1];
+            --j;
+        }
+
+        result[j] = value;
+    }
+
+    return result;
+}
+
+template <typename T, size_t N>
+constexpr std::array<T, N> SelectionSort(const std::array<T, N>& arr) requires std::totally_ordered<T>
+{
+    std::array<T, N> result = arr;
+
+    for (size_t i = 0; i < N; ++i)
+    {
+        size_t minIndex = i;
+
+        for (size_t j = i + 1; j < N; ++j)
+        {
+            if (result[j] < result[minIndex])
+            {
+                minIndex = j;
+            }
+        }
+
+        if (minIndex != i)
+        {
+            Swap(result, i, minIndex);
+        }
+    }
+
+    return result;
+}
+template <typename T, size_t N, size_t M>
+constexpr std::array<T, N + M> MergeSort(const std::array<T, N>& left, const std::array<T, M>& right)
+    requires std::totally_ordered<T>
+{
+    std::array<T, N + M> result{};
+    size_t i = 0;
+    size_t j = 0;
+    size_t k = 0;
+
+    while (i < N && j < M)
+    {
+        if (left[i] < right[j])
+        {
+            result[k++] = left[i++];
+        }
+        else
+        {
+            result[k++] = right[j++];
+        }
+    }
+
+    while (i < N)
+    {
+        result[k++] = left[i++];
+    }
+
+    while (j < M)
+    {
+        result[k++] = right[j++];
+    }
+
+    return result;
+}
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 21: StringUtils.hpp
+// ==================================================
+
+#pragma once
+
+namespace Ivy::U
+{
+/** @brief Converts an integer exponent to its Unicode superscript representation. */
+inline std::string Superscript(int exponent)
+{
+    static constexpr std::string_view Digits[] = {"⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
+
+    if (exponent == 1)
+    {
+        return "";
+    }
+
+    std::string result;
+
+    if (exponent < 0)
+    {
+        result += "⁻";
+        exponent = -exponent;
+    }
+
+    std::string digits = std::to_string(exponent);
+
+    for (char digit : digits)
+    {
+        result += Digits[digit - '0'];
+    }
+
+    return result;
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 22: Track.hpp
+// ==================================================
+
+#pragma once
+#include "Math/Concepts.hpp"
+
+namespace Ivy::U
+{
+
+template <typename T> struct Track
+{
+    Track() = default;
+    Track(const T& value) : m_Value(value) {}
+
+    const T& Get() const
+    {
+        return m_Value;
+    }
+
+    T& operator()()
+    {
+        MarkChanged();
+        return m_Value;
+    }
+
+    const T& operator()() const
+    {
+        return m_Value;
+    }
+
+    void Set(const T& value)
+    {
+        if (m_Value == value)
+        {
+            return;
+        }
+
+        m_Value = value;
+        MarkChanged();
+    }
+
+    operator const T&() const
+    {
+        return m_Value;
+    }
+
+    template <typename V> Track& operator+=(const V& value) requires(M::Additive<T, V>)
+    {
+        operator()() += value;
+        return *this;
+    }
+
+    template <typename V> Track& operator-=(const V& value) requires(M::Subtractive<T, V>)
+    {
+        operator()() -= value;
+        return *this;
+    }
+
+    template <typename V> Track& operator*=(const V& value) requires(M::Multiplicative<T, V>)
+    {
+        operator()() *= value;
+        return *this;
+    }
+
+    template <typename V> Track& operator/=(const V& value) requires(M::Divisible<T, V>)
+    {
+        operator()() /= value;
+        return *this;
+    }
+
+    template <typename V> M::AdditionResult<V, T> operator+(const V& value) const requires(M::Additive<T, V>)
+    {
+        return m_Value + value;
+    }
+
+    template <typename V>
+    M::SubtractionResult<V, T> operator-(const V& value) const requires(M::Subtractive<T, V>)
+    {
+        return m_Value - value;
+    }
+
+    template <typename V>
+    M::MultiplicationResult<V, T> operator*(const V& value) const requires(M::Multiplicative<T, V>)
+    {
+        return m_Value * value;
+    }
+
+    template <typename V> M::DivisionResult<V, T> operator/(const V& value) const requires(M::Divisible<T, V>)
+    {
+        return m_Value / value;
+    }
+
+    template <typename V>
+    friend M::AdditionResult<V, T> operator+(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Additive<V, T>)
+    {
+        return other + value.m_Value;
+    }
+
+    template <typename V>
+    friend M::SubtractionResult<V, T> operator-(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Subtractive<V, T>)
+    {
+        return other - value.m_Value;
+    }
+
+    template <typename V>
+    friend M::MultiplicationResult<V, T> operator*(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Multiplicative<V, T>)
+    {
+        return other * value.m_Value;
+    }
+
+    template <typename V>
+    friend M::DivisionResult<V, T> operator/(const V& other, const Track& value)
+        requires(!std::same_as<V, Track> && M::Divisible<V, T>)
+    {
+        return other / value.m_Value;
+    }
+
+    Track& operator=(const T& value)
+    {
+        Set(value);
+        return *this;
+    }
+
+    bool IsChanged() const
+    {
+        return m_Changed;
+    }
+
+    void ClearChanged()
+    {
+        m_Changed = false;
+    }
+
+    void MarkChanged()
+    {
+        if (!m_Changed)
+        {
+            m_Changed = true;
+        }
+    }
+
+  private:
+    T m_Value{};
+    bool m_Changed = false;
+};
+
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 23: TupleUtils.hpp
+// ==================================================
+
+#pragma once
+#include <array>
+#include <concepts>
+#include <cstddef>
+#include <tuple>
+#include <type_traits>
+#include <typeindex>
+#include <utility>
+namespace Ivy::U
+{
+template <typename... Args> struct ConnectIntoTuple;
+
+template <> struct ConnectIntoTuple<>
+{
+    using Type = std::tuple<>;
+};
+
+template <typename T> struct ConnectOne
+{
+    using Type = std::tuple<std::remove_cvref_t<T>>;
+};
+
+template <typename... Args> struct ConnectOne<std::tuple<Args...>>
+{
+    using Type = typename ConnectIntoTuple<Args...>::Type;
+};
+
+template <typename T, typename... Rest> struct ConnectIntoTuple<T, Rest...>
+{
+    using Type = decltype(std::tuple_cat(std::declval<typename ConnectOne<std::remove_cvref_t<T>>::Type>(),
+        std::declval<typename ConnectIntoTuple<Rest...>::Type>()));
+};
+
+template <typename... Args> using ConnectArgsIntoTuple = ConnectIntoTuple<Args...>::Type;
+
+template <typename Tuple, typename F, std::size_t... I, typename... Args>
+decltype(auto) UnpackAndRun(std::index_sequence<I...>, F&& action, Args&&... otherParams)
+{
+    return std::forward<F>(action).template operator()<std::tuple_element_t<I, Tuple>...>(
+        std::forward<Args>(otherParams)...);
+}
+
+template <typename... Args> struct AreUniqueTrait : std::true_type
+{
+};
+
+template <typename T, typename... Args>
+struct AreUniqueTrait<T, Args...>
+    : std::bool_constant<((!std::same_as<T, Args>) && ...) && AreUniqueTrait<Args...>::value>
+{
+};
+
+template <typename... Args>
+concept AreUnique = AreUniqueTrait<Args...>::value;
+} // namespace Ivy::U
+
+
+// ==================================================
+// FILE 24: Utilities.hpp
+// ==================================================
+
+#pragma once
+#include "Include.hpp"
+
+/**
+ * @namespace Ivy::U
+ * @brief Contains utility functions, helpers, and data structures for Ivy game engine.
+ */
+namespace Ivy::U
+{
+
+}
+
+

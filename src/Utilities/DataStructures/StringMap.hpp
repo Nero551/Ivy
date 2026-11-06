@@ -260,8 +260,31 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
 
     void Erase(const std::string_view key)
     {
-        m_Data[m_IndicesMap.at(key)];
-        m_IndicesMap.erase(key);
+        auto it = m_IndicesMap.find(key);
+        if (it == m_IndicesMap.end())
+        {
+            return;
+        }
+
+        const IndexType index = it->second;
+        const IndexType lastIndex = Size() - 1;
+
+        if (index != lastIndex)
+        {
+            m_Data[index] = std::move(m_Data.back());
+
+            for (auto& [k, v] : m_IndicesMap)
+            {
+                if (v == lastIndex)
+                {
+                    v = index;
+                    break;
+                }
+            }
+        }
+
+        m_Data.pop_back();
+        m_IndicesMap.erase(it);
     }
 
     void Clear()

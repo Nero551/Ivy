@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <string_view>
 namespace Ivy::U
 {
 /** @brief Converts an integer exponent to its Unicode superscript representation. */
