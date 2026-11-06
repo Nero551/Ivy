@@ -26,7 +26,6 @@ struct Module : SystemOwner
 
     Module& operator=(Module&&) = delete;
 
-  protected:
     /**
      * @brief Called once when the module is started.
      * Override this method to perform initialization.
@@ -84,7 +83,5 @@ struct Module : SystemOwner
      * @note Called by Engine. Do not call this method directly.
      */
     virtual void Stop() {}
-
-    friend struct Engine;
 };
 } // namespace Ivy::C

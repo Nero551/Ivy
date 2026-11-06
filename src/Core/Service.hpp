@@ -11,8 +11,6 @@ struct Service
 {
     virtual ~Service() = default;
 
-  protected:
-    friend struct Engine;
     virtual void Start() {}
     virtual void BeginFrame(double dt) {}
     virtual void FixedUpdate(double fdt) {}

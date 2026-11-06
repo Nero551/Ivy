@@ -293,8 +293,5 @@ struct Shader
 //
 //TODO: new performance bottleneck: renderer.
 
-//TODO: make tests math & physics. make benchmarks for math, physics, ecs \
-// gtests & google benchmark.
-
 inline void Test() {}
 } // namespace Sketch

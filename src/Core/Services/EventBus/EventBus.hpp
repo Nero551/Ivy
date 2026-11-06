@@ -83,6 +83,8 @@ struct EventBus : Service
         }
     }
 
+    void EndFrame(double dt) override;
+
   private:
     /** @brief Stores a global event callback and its subscription ID. */
     struct Entry
@@ -99,8 +101,5 @@ struct EventBus : Service
 
     /** @brief Generates unique subscription IDs. */
     size_t m_NextSubscription = 0;
-
-  protected:
-    void EndFrame(double dt) override;
 };
 } // namespace Ivy::C

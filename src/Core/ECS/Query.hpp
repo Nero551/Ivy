@@ -5,6 +5,7 @@
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/IsSpecialization.hpp"
 #include "Utilities/TupleUtils.hpp"
 #include <array>
 #include <concepts>
@@ -85,7 +86,9 @@ struct Query
         }
     }
 
-    template <typename... Args> decltype(auto) SetArchetype(Entity& entity) requires(U::AreUnique<Args...>)
+    template <typename... Args>
+    decltype(auto) SetArchetype(Entity& entity) requires(
+        U::AreUnique<Args...> && (sizeof...(Args) != 1 || !(std::derived_from<Args, Component> && ...)))
     {
         using Components = U::ConnectArgsIntoTuple<Args...>;
 
@@ -95,9 +98,10 @@ struct Query
             std::make_index_sequence<std::tuple_size_v<Components>>{}, action, entity);
     }
 
-    template <typename T> T& SetArchetype(Entity& entity) requires(std::derived_from<T, Component>)
+    template <typename T>
+    T& SetArchetype(Entity& entity) requires(std::derived_from<T, Component> && !U::IsTSpec<T, std::tuple>)
     {
-        return std::get<T>(SetArchetypeTypes<T>(entity));
+        return std::get<0>(SetArchetypeTypes<T>(entity));
     }
 
     template <typename... Args, typename F>
@@ -194,4 +198,5 @@ struct Query
     }
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
 };
+
 } // namespace Ivy::C

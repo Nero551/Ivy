@@ -57,8 +57,8 @@ template <typename T> struct Event : IEvent
     /** @brief Stores a listener callback and its subscription ID. */
     struct Entry
     {
-        const std::size_t Subscription;
-        const stl::function<void(const T&) const> Callback;
+        std::size_t Subscription;
+        stl::function<void(const T&) const> Callback;
     };
 
     std::vector<Entry> m_Listeners;
