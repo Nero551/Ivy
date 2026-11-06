@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <memory>
 #include <tuple>
-#include <typeindex>
 #include <utility>
 #include <vector>
 namespace Ivy::C
@@ -73,7 +72,8 @@ struct Query
             return false;
         }
 
-        return (entity.m_Archetype->Supported & MakeSignature<Args...>()).count() == sizeof...(Args);
+        const Signature sig = MakeSignature<Args...>();
+        return (entity.m_Archetype->Supported & sig) == sig;
     }
 
     void RemoveAllComponents(Entity& entity)
@@ -118,13 +118,14 @@ struct Query
 
             const std::array<size_t, sizeof...(Args)> offsets{archetype.Offsets[ComponentId<Args>()]...};
 
-            std::byte* base = archetype.Base;
+            const unsigned n = archetype.Size;
+            const size_t stride = archetype.Stride;
+            const size_t entityOffset = archetype.EntityOffset;
+            std::byte* row = archetype.Base;
 
-            for (unsigned int i = 0; i < archetype.Size; ++i)
+            for (unsigned int i = 0; i < n; ++i, row += stride)
             {
-                std::byte* row = base + i * archetype.Stride;
-
-                unsigned int entityIndex = *reinterpret_cast<unsigned int*>(row + archetype.EntityOffset);
+                const unsigned int entityIndex = *reinterpret_cast<const unsigned int*>(row + entityOffset);
 
                 Invoke<Args...>(action, entityIndex, row, offsets, std::index_sequence_for<Args...>{});
             }

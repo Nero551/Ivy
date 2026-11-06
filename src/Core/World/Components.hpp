@@ -5,7 +5,6 @@
 #include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"
 #include "Math/Vector/Vector3.hpp"
-#include "Utilities/Debug/Log.hpp"
 #include "Utilities/Track.hpp"
 #include <cmath>
 
@@ -16,8 +15,7 @@ struct Renderer2DSystem;
 } // namespace Ivy::R
 namespace Ivy::C
 {
-struct Transform3DSystem;
-struct Transform2DSystem;
+struct TransformSystem;
 } // namespace Ivy::C
 
 namespace Ivy::CMP
@@ -58,7 +56,7 @@ struct Transform2D : C::Component
     U::Track<M::Vector<2>> m_GlobalPosition = M::Vector<2>::Zero();
     U::Track<float> m_GlobalRotation = 0;
     U::Track<M::Vector<2>> m_GlobalScale = M::Vector<2>::One();
-    friend struct C::Transform2DSystem;
+    friend struct C::TransformSystem;
     friend struct R::Renderer2DSystem;
 };
 
@@ -105,7 +103,7 @@ struct Transform3D : C::Component
     U::Track<M::Vector<3>> m_GlobalPosition = M::Vector<3>::Zero();
     U::Track<M::Quaternion<>> m_GlobalRotation = M::Quaternion<>::Identity();
     U::Track<M::Vector<3>> m_GlobalScale = M::Vector<3>::One();
-    friend struct C::Transform3DSystem;
+    friend struct C::TransformSystem;
     friend struct R::Renderer3DSystem;
 };
 } // namespace Ivy::CMP

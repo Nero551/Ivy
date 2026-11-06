@@ -15,7 +15,7 @@ EntityID Entity::GetId() const
     return m_Id;
 }
 
-Entity& Entity::GetRoot()
+Entity& Entity::GetRoot() const
 {
     return m_ECS->GetActiveEntity(m_ECS->EntityHierarchy.GetRoot(GetId().Index));
 }

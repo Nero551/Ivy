@@ -2,21 +2,13 @@
 #include "Component.hpp"
 #include "Entity.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
-#include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/TupleUtils.hpp"
-#include <algorithm>
 #include <array>
 #include <bitset>
 #include <concepts>
 #include <cstddef>
-#include <span>
 #include <tuple>
-#include <typeindex>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
-#include <vector>
 namespace Ivy::C
 {
 

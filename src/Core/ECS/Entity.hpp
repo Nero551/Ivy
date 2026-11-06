@@ -20,7 +20,7 @@ struct Entity
     Entity& operator=(Entity&& other) noexcept = default;
 
     EntityID GetId() const;
-    Entity& GetRoot();
+    Entity& GetRoot() const;
     void Destroy();
 
     void AttachChild(Entity& child);

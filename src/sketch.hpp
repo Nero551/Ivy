@@ -295,6 +295,8 @@ struct Shader
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //
+// TODO: combine Transform2DSystem and Transform3DSystem into 1 with 2 methods.
+//
 struct A : C::Component
 {
     int Number = 10;
