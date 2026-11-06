@@ -168,3 +168,6 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 ![Dampened Spring Vector Field ](Screenshots/DampenedSpringField.png)
 
 ### Week 19 · November 4–11
+
+- switched to an archetype-style ECS
+- optimizations: engine can handle 1 million entities at 40 FPS on release build.
