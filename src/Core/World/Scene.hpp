@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/ECS/Entity.hpp"
-#include "Core/ECS/EntityID.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/EntityID.hpp"
 namespace Ivy::C
 {
 
@@ -18,13 +18,13 @@ struct Scene
 
     Scene(Scene&&) = default;
 
-    Entity& GetRoot() const;
-    void SetRoot(const Entity& entity);
+    ECS::Entity& GetRoot() const;
+    void SetRoot(const ECS::Entity& entity);
 
     virtual void Initialize() {}
 
   protected:
-    EntityID m_Root;
+    ECS::EntityID m_Root;
     Engine& m_Engine;
 };
 } // namespace Ivy::C

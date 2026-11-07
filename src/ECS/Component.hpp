@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/Debug/Log.hpp"
 #include <bitset>
-namespace Ivy::C
+namespace Ivy::ECS
 {
 
 inline unsigned int NextComponentId()
@@ -35,4 +35,4 @@ template <typename... Args> Signature MakeSignature()
 struct Component
 {
 };
-} // namespace Ivy::C
+} // namespace Ivy::ECS

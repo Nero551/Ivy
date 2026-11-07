@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/ECS/System.hpp"
+#include "Core/System.hpp"
 #include "Core/World/Components.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/RenderBatch.hpp"

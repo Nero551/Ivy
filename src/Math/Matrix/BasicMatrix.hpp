@@ -1,6 +1,7 @@
 #pragma once
+// IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
 #include "Math/Set.hpp"
-#include "Math/Vector/Vector.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M

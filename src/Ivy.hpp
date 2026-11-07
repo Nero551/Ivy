@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Core.hpp"
+#include "ECS/ECS.hpp"
 #include "Graphics/Graphics.hpp"
 #include "Math/Math.hpp"
 #include "Physics/Physics.hpp"

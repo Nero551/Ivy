@@ -70,7 +70,7 @@ struct Grid2D : C::Scene
         {
             if (x != 0)
             {
-                CreateGridLine(M::Rad(90), {static_cast<float>(x), 0});
+                CreateGridLine(M::Rad(90.0f), {static_cast<float>(x), 0});
             }
         }
 

@@ -13,7 +13,7 @@
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
-#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 
@@ -84,7 +84,7 @@ struct Grid3D : C::Scene
             if (x != 0)
             {
                 CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)}), {static_cast<float>(x), 0, 0});
+                    M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)}), {static_cast<float>(x), 0, 0});
             }
         }
 
@@ -104,7 +104,7 @@ struct Grid3D : C::Scene
             if (x != 0)
             {
                 CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0}), {static_cast<float>(x), 0, 0});
+                    M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0}), {static_cast<float>(x), 0, 0});
             }
         }
 
@@ -124,7 +124,7 @@ struct Grid3D : C::Scene
             if (y != 0)
             {
                 CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0}), {0, static_cast<float>(y), 0});
+                    M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0}), {0, static_cast<float>(y), 0});
             }
         }
 
@@ -133,7 +133,7 @@ struct Grid3D : C::Scene
             if (z != 0)
             {
                 CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)}), {0, 0, static_cast<float>(z)});
+                    M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)}), {0, 0, static_cast<float>(z)});
             }
         }
     }

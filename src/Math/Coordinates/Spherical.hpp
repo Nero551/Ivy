@@ -15,7 +15,7 @@ namespace Ivy::M
  *
  * The angles are expressed in radians.
  */
-template <Scalar T> struct Spherical
+template <Scalar T = float> struct Spherical
 {
     T Elevation;
     T Azimuth;

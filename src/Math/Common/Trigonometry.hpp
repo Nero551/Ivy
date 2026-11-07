@@ -1,64 +1,65 @@
 #pragma once
 #include "Constants.hpp"
+#include "Math/Scalar.hpp"
 #include <cmath>
 
 namespace Ivy::M
 {
-constexpr float Rad(const float deg)
+template <Scalar T> constexpr T Rad(const T deg)
 {
     return deg * PI / 180.0f;
 }
 
-constexpr float Deg(const float rad)
+template <Scalar T> constexpr T Deg(const T rad)
 {
     return rad * 180.0f / PI;
 }
 
-constexpr float DSin(const float deg)
+template <Scalar T> constexpr T DSin(const T deg)
 {
     return std::sin(Rad(deg));
 }
 
-constexpr float DCos(const float deg)
+template <Scalar T> constexpr T DCos(const T deg)
 {
     return std::cos(Rad(deg));
 }
 
-constexpr float DTan(const float deg)
+template <Scalar T> constexpr T DTan(const T deg)
 {
     return std::tan(Rad(deg));
 }
 
-constexpr float DSec(const float deg)
+template <Scalar T> constexpr T DSec(const T deg)
 {
     return 1.0f / DCos(deg);
 }
-constexpr float DCsc(const float deg)
+template <Scalar T> constexpr T DCsc(const T deg)
 {
     return 1.0f / DSin(deg);
 }
 
-constexpr float DCot(const float deg)
+template <Scalar T> constexpr T DCot(const T deg)
 {
     return 1.0f / DTan(deg);
 }
 
-constexpr float AsinD(const float ratio)
+template <Scalar T> constexpr T AsinD(const T ratio)
 {
     return Deg(std::asin(ratio));
 }
 
-constexpr float AcosD(const float ratio)
+template <Scalar T> constexpr T AcosD(const T ratio)
 {
     return Deg(std::acos(ratio));
 }
 
-constexpr float AtanD(const float ratio)
+template <Scalar T> constexpr T AtanD(const T ratio)
 {
     return Deg(std::atan(ratio));
 }
 
-constexpr float Atan2D(const float y, const float x)
+template <Scalar T> constexpr T Atan2D(const T y, const T x)
 {
     return Deg(std::atan2(y, x));
 }

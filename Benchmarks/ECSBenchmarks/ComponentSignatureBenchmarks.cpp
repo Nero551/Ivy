@@ -1,9 +1,9 @@
-#include "Core/ECS/Component.hpp"
+#include "ECS/Component.hpp"
 #include <benchmark/benchmark.h>
 
 namespace Ivy::Benchmarks
 {
-using namespace Ivy::C;
+using namespace Ivy::ECS;
 
 namespace
 {

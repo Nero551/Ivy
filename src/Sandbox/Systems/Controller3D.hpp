@@ -1,10 +1,12 @@
 #pragma once
-#include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
+#include "Core/System.hpp"
 #include "Core/World/Components.hpp"
+#include "Math/Common/Constraints.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
+#include <algorithm>
 namespace Ivy::Sandbox
 {
 
@@ -48,7 +50,7 @@ struct Controller3D : C::System
             const float xOffset = M::Rad(-input.GetMouseDelta().x * cameraComponent.Sensitivity);
             const float yOffset = M::Rad(-input.GetMouseDelta().y * cameraComponent.Sensitivity);
 
-            constexpr float maxPitch = M::Rad(89.9);
+            constexpr float maxPitch = M::Rad(89.9f);
 
             m_Yaw += xOffset;
             m_Pitch += yOffset;
@@ -57,7 +59,10 @@ struct Controller3D : C::System
             transform.Rotation = M::Quaternion<>::FromEulerXYZ({m_Pitch, m_Yaw, 0});
         }
 
-        const float speed = 5 * static_cast<float>(dt);
+        m_Speed += input.GetScrollDelta().y;
+        m_Speed = std::max(m_Speed, 2.5f);
+
+        const float speed = m_Speed * static_cast<float>(dt);
 
         if (input.IsKeyHeld(G::Key::W))
         {
@@ -93,5 +98,6 @@ struct Controller3D : C::System
   private:
     float m_Yaw = 0;
     float m_Pitch = 0;
+    float m_Speed = 5;
 };
 } // namespace Ivy::Sandbox

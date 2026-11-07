@@ -1,25 +1,25 @@
 #include "World.hpp"
-#include "Core/ECS/Entity.hpp"
-#include "Core/ECS/EntityID.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Nodes.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/EntityID.hpp"
 #include "Systems/TransformSystem.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::C
 {
-void World::SetRoot(const Entity& entity)
+void World::SetRoot(const ECS::Entity& entity)
 {
     m_Root = entity.GetId();
 }
 
-void World::SetCamera(const Entity& entity)
+void World::SetCamera(const ECS::Entity& entity)
 {
     m_ActiveCamera = entity.GetId();
 }
 
-Entity& World::GetRoot()
+ECS::Entity& World::GetRoot()
 {
     auto root = m_Engine.ECS.TryFindEntity(m_Root);
     if (!root)
@@ -29,7 +29,7 @@ Entity& World::GetRoot()
     return *root;
 }
 
-Entity& World::GetCamera()
+ECS::Entity& World::GetCamera()
 {
     auto camera = m_Engine.ECS.TryFindEntity(m_ActiveCamera);
     if (!camera)
@@ -41,9 +41,6 @@ Entity& World::GetCamera()
 
 void World::Start()
 {
-    SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
-    AddSystem<TransformSystem>();
-
     for (auto& system : m_Systems)
     {
         system->Start();

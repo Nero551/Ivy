@@ -37,8 +37,13 @@ xmake run Ivy
 ### Run Tests
 
 ```bash
-xmake build IvyTests
 xmake run IvyTests
+```
+
+### Run Benchmarks
+
+```bash
+./scripts/bench.sh
 ```
 
 ### Generate Documentation

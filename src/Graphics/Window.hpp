@@ -261,7 +261,6 @@ struct Window
     stl::function<void(Window&, int, int)> m_FramebufferSizeCallback;
     stl::function<void(Window&, Key, int, Action, int)> m_KeyCallback;
     stl::function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
-
     stl::function<void(Window&, bool)> m_CursorEnteredCallback;
 
     void SetConfiguration();

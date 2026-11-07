@@ -1,6 +1,7 @@
 #include "Sandbox/Sandbox2D.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
+#include "ECS/EntityID.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
@@ -8,14 +9,9 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Common/Random.hpp"
-#include "Math/Common/Trigonometry.hpp"
-#include "Math/Equations/ODE.hpp"
-#include "Math/Vector/Vector.hpp"
-#include "Math/Vector/Vector2.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
-#include "Physics/DimensionalAnalysis/Dimensionals.hpp"
 #include "Sandbox/Scenes/CoordinateAxes2D.hpp"
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
@@ -26,7 +22,7 @@
 namespace Ivy::Sandbox
 {
 
-C::EntityID Sandbox2D::CreateCircle()
+ECS::EntityID Sandbox2D::CreateCircle()
 {
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
@@ -51,7 +47,7 @@ C::EntityID Sandbox2D::CreateCircle()
     return circle.GetId();
 }
 
-C::EntityID Sandbox2D::CreateSquare()
+ECS::EntityID Sandbox2D::CreateSquare()
 {
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
@@ -76,7 +72,7 @@ C::EntityID Sandbox2D::CreateSquare()
     return square.GetId();
 }
 
-static C::EntityID particleId;
+static ECS::EntityID particleId;
 
 void Sandbox2D::Start()
 {

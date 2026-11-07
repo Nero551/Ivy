@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/ECS/Entity.hpp"
-#include "Core/ECS/System.hpp"
+#include "Core/System.hpp"
 #include "Core/World/Components.hpp"
+#include "ECS/Entity.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include <vector>
 namespace Ivy::C
@@ -16,7 +16,7 @@ struct TransformSystem : System
     void Do2D(U::CheckedPtr<CMP::Transform2D> transform2D, U::CheckedPtr<CMP::Transform2D> parentTransform2D);
     void Do3D(U::CheckedPtr<CMP::Transform3D> transform3D, U::CheckedPtr<CMP::Transform3D> parentTransform3D);
 
-    std::vector<U::CheckedPtr<Entity>> descendants;
+    std::vector<U::CheckedPtr<ECS::Entity>> descendants;
     size_t hierarchyVersion = 0;
     size_t ecsVersion = 0;
 };

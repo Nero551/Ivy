@@ -1,17 +1,11 @@
 #include "Renderer.hpp"
 
-#include "Components.hpp"
-#include "Core/ECS/Entity.hpp"
-#include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Engine.hpp"
-#include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Framebuffer/FramebufferAttachment.hpp"
-#include "Graphics/Buffers/Framebuffer/FramebufferTarget.hpp"
-#include "Graphics/Buffers/Renderbuffer/Renderbuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Graphics/Capability.hpp"
 #include "Graphics/Context.hpp"
@@ -20,7 +14,6 @@
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
-#include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
@@ -103,7 +96,7 @@ void Renderer::PresentFramebuffer()
     G::Context::Clear(G::BufferBit::Color);
 
     int i = 0;
-    for (auto& texture : Framebuffer.TextureAttachments | std::views::values)
+    for (auto& [attachment, texture] : Framebuffer.TextureAttachments)
     {
         ScreenMaterial.AssignTexture(*texture, i);
         ++i;

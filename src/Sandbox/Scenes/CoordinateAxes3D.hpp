@@ -16,7 +16,7 @@
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
-#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 #include <utility>
@@ -44,12 +44,12 @@ struct CoordinateAxes3D : C::Scene
 
         auto& light = m_Engine.ECS.CreateEntity<R::Light3D>();
         query.GetComponent<CMP::Transform3D>(light).Rotation =
-            M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5)});
+            M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5f)});
         light.SetParent(GetRoot());
 
         auto& light2 = m_Engine.ECS.CreateEntity<R::Light3D>();
         query.GetComponent<CMP::Transform3D>(light2).Rotation =
-            M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5)});
+            M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5f)});
         light2.SetParent(GetRoot());
 
         auto& shader = resourceManager.Load<G::Shader>("AxisShader");
@@ -77,7 +77,7 @@ struct CoordinateAxes3D : C::Scene
         query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
 
         auto& yTransform = query.GetComponent<CMP::Transform3D>(yAxis);
-        yTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90)});
+        yTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)});
         yTransform.Scale = {200, 1, 1};
 
         auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
@@ -92,7 +92,7 @@ struct CoordinateAxes3D : C::Scene
         query.GetComponent<CMP::Mesh>(zAxis).Mesh = &line;
 
         auto& zTransform = query.GetComponent<CMP::Transform3D>(zAxis);
-        zTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, M::Rad(90), 0});
+        zTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0});
         zTransform.Scale = {200, 1, 1};
 
         auto& zMaterial = query.GetComponent<CMP::Material>(zAxis);

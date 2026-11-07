@@ -7,8 +7,8 @@
 #include "FramebufferAttachment.hpp"
 #include "FramebufferTarget.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include "Utilities/DataStructures/SparseSetAoS.hpp"
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 namespace Ivy::G
@@ -27,8 +27,8 @@ namespace Ivy::G
 struct Framebuffer
 {
     FrameBufferTarget Target = FrameBufferTarget::ReadDraw;
-    std::unordered_map<FramebufferAttachment, U::CheckedPtr<Texture>> TextureAttachments;
-    std::unordered_map<FramebufferAttachment, U::CheckedPtr<Renderbuffer>> RenderBuffers;
+    U::SparseSetAoS<U::CheckedPtr<Texture>> TextureAttachments;
+    U::SparseSetAoS<U::CheckedPtr<Renderbuffer>> RenderBuffers;
 
     Framebuffer(std::string name) : m_Name(std::move(name)) {}
     ~Framebuffer()

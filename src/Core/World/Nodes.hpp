@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Components.hpp"
-#include "Core/ECS/ECS.hpp"
-#include "Core/ECS/Entity.hpp"
-#include "Math/Vector/Vector.hpp"
+#include "ECS/ECS.hpp"
+#include "ECS/Entity.hpp"
 #include <tuple>
 #include <utility>
 namespace Ivy::C
@@ -12,7 +11,7 @@ template <typename Base, typename... Components>
 using ExtendComponents =
     decltype(std::tuple_cat(std::declval<Base>(), std::declval<std::tuple<Components...>>()));
 
-struct Node : Entity
+struct Node : ECS::Entity
 {
     using ComponentCombo = std::tuple<>;
     using Entity::Entity;

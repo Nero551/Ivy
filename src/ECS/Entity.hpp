@@ -4,7 +4,7 @@
 #include <functional>
 #include <utility>
 #include <vector>
-namespace Ivy::C
+namespace Ivy::ECS
 {
 
 struct EntityComponentSystem;
@@ -60,4 +60,4 @@ struct Entity
     friend struct Query;
     friend struct EntityComponentSystem;
 };
-} // namespace Ivy::C
+} // namespace Ivy::ECS

@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/ECS/System.hpp"
+#include "Core/System.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Utilities/CheckedPtr.hpp"
 

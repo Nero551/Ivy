@@ -1,9 +1,10 @@
 #pragma once
-#include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
+#include "Core/System.hpp"
 #include "Core/World/Components.hpp"
+#include "Graphics/InputEnums/Key.hpp"
 #include "Math/Common/Constants.hpp"
-#include "Math/Common/Constraints.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
@@ -27,13 +28,16 @@ struct Controller2D : C::System
         auto& input = m_Engine.GetModule<I::Input>();
         auto& camera = m_Engine.World.GetCamera();
 
-        if (input.IsKeyHeld(G::Key::LeftControl))
+        if (!input.IsKeyHeld(G::Key::LeftShift))
         {
-            m_Zoom += input.GetScrollDelta().y * M::PI * M::PHI;
-        }
-        else
-        {
-            m_Zoom += input.GetScrollDelta().y;
+            if (input.IsKeyHeld(G::Key::LeftControl))
+            {
+                m_Zoom += input.GetScrollDelta().y * M::PI * M::PHI;
+            }
+            else
+            {
+                m_Zoom += input.GetScrollDelta().y;
+            }
         }
 
         m_Zoom = std::max(m_Zoom, 2.0f);
@@ -47,8 +51,14 @@ struct Controller2D : C::System
         cameraComponent.Right = m_Engine.Window.GetWidth() / m_Zoom;
         cameraComponent.Top = m_Engine.Window.GetHeight() / m_Zoom;
 
-        const float speed = 20 * static_cast<float>(dt);
+        if (input.IsKeyHeld(G::Key::LeftShift))
+        {
+            m_Speed += input.GetScrollDelta().y;
+        }
 
+        m_Speed = std::max(m_Speed, 2.5f);
+
+        const float speed = m_Speed * static_cast<float>(dt);
         if (input.IsKeyHeld(G::Key::A))
         {
             transform.Position -= speed * M::Vector<2>(1, 0);
@@ -74,5 +84,6 @@ struct Controller2D : C::System
     float m_Yaw;
     float m_Pitch;
     float m_Zoom = 65;
+    float m_Speed = 20;
 };
 } // namespace Ivy::Sandbox

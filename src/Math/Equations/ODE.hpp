@@ -4,7 +4,6 @@
 #include "Math/Functions/Function.hpp"
 #include "Math/MathTuple.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include <concepts>
 #include <functional>
 #include <ostream>
 namespace Ivy::M

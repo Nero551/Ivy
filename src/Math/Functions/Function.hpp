@@ -1,6 +1,4 @@
 #pragma once
-#include "Math/Scalar.hpp"
-
 #include "Math/MathTuple.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "stl.hpp"

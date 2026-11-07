@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/ECS/Entity.hpp"
-#include "Core/ECS/EntityID.hpp"
 #include "Core/SystemOwner.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/EntityID.hpp"
 #include "Scene.hpp"
 
 namespace Ivy::C
@@ -18,10 +18,10 @@ struct World : SystemOwner
 {
     using SystemOwner::SystemOwner;
     int MaxLights = 24;
-    void SetRoot(const Entity& entity);
-    Entity& GetRoot();
-    void SetCamera(const Entity& entity);
-    Entity& GetCamera();
+    void SetRoot(const ECS::Entity& entity);
+    ECS::Entity& GetRoot();
+    void SetCamera(const ECS::Entity& entity);
+    ECS::Entity& GetCamera();
 
     template <typename T, typename... Args> T CreateScene(Args&&... args)
     {
@@ -42,7 +42,7 @@ struct World : SystemOwner
     friend struct Engine;
 
   private:
-    EntityID m_Root{};
-    EntityID m_ActiveCamera{};
+    ECS::EntityID m_Root{};
+    ECS::EntityID m_ActiveCamera{};
 };
 } // namespace Ivy::C

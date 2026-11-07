@@ -63,11 +63,19 @@ bool Window::ShouldClose() const
 
 void Window::SwapBuffers()
 {
+    if (!IsGenerated())
+    {
+        return;
+    }
     glfwSwapBuffers(m_GlfwWindow);
 }
 
 void Window::PollEvents()
 {
+    if (!IsGenerated())
+    {
+        return;
+    }
     glfwPollEvents();
 }
 

@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Core/ECS/Entity.hpp"
-#include "Core/ECS/EntityID.hpp"
-#include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/System.hpp"
 #include "Core/World/Components.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/EntityID.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/Material/Material.hpp"
-#include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
@@ -17,15 +16,11 @@
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Coordinates/HyperSpherical.hpp"
-#include "Math/Vector/Vector.hpp"
-#include "Math/Vector/Vector2.hpp"
-#include "Math/Vector/Vector3.hpp"
-#include "Math/Vector/Vector4.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include <format>
 #include <vector>
 
 namespace Ivy::Sandbox
@@ -96,11 +91,11 @@ struct StressTester2D : C::System
         U::Log::Info(M::Pow(360.0f / increase, 3.0f));
         m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3.0f));
 
-        for (int theta = -180; theta < 180; theta += increase)
+        for (float theta = -180; theta < 180; theta += increase)
         {
-            for (int phi = -180; phi < 180; phi += increase)
+            for (float phi = -180; phi < 180; phi += increase)
             {
-                for (int h = -180; h < 180; h += increase)
+                for (float h = -180; h < 180; h += increase)
                 {
                     M::Vector<4> v4 = M::Vector<4>::FromHyperSpherical(
                         M::HyperSpherical(M::Rad(theta), M::Rad(phi), M::Rad(h)));
@@ -112,7 +107,7 @@ struct StressTester2D : C::System
         }
     }
 
-    C::Entity& CreatePoint()
+    ECS::Entity& CreatePoint()
     {
         auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
         auto& query = m_Engine.ECS.Query;
@@ -154,7 +149,7 @@ struct StressTester2D : C::System
         return point;
     }
 
-    C::Entity& Plot(const M::Vector<2> vec2)
+    ECS::Entity& Plot(const M::Vector<2> vec2)
     {
         auto& query = m_Engine.ECS.Query;
 
@@ -169,6 +164,6 @@ struct StressTester2D : C::System
 
   private:
     float multiplier = 1;
-    std::vector<C::EntityID> points;
+    std::vector<ECS::EntityID> points;
 };
 } // namespace Ivy::Sandbox

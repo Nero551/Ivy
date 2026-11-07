@@ -1,12 +1,14 @@
 #pragma once
+// IWYU pragma: private, include "Math/Vector/Vectors.hpp"
 
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/HyperSpherical.hpp"
+#include "Math/Scalar.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include "Vector.hpp"
-#include "Vector3.hpp"
+#include "Vectors.hpp"
+#include <ostream>
 
 namespace Ivy::M
 {
@@ -76,7 +78,7 @@ template <Scalar T> struct Vector<4, T>
     constexpr Vector(const T x, const T y, const T z, const T w) : x(x), y(y), z(z), w(w) {}
 
     /** @brief Constructs a vector from hyperspherical coordinates. */
-    static constexpr Vector FromHyperSpherical(const HyperSpherical<T>& hyperSpherical)
+    static constexpr Vector<4> FromHyperSpherical(const HyperSpherical<T>& hyperSpherical)
     {
         const T m = hyperSpherical.Magnitude;
 

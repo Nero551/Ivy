@@ -4,7 +4,7 @@
 #include "../../Graphics/InputEnums/Key.hpp"
 #include "../../Graphics/InputEnums/MouseButton.hpp"
 #include "Core/Module.hpp"
-#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include <array>
 
 namespace Ivy::I

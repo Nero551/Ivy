@@ -1,17 +1,11 @@
 #pragma once
 
-#include "Components.hpp"
-#include "Core/ECS/Events/EntityDestroyed.hpp"
 #include "Core/Module.hpp"
-#include "Core/World/Components.hpp"
 #include "Graphics/AntiAliasing/MSAA.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
-#include "RenderBatch.hpp"
-#include "Systems/Renderer3DSystem.hpp"
-#include "Utilities/DataStructures/Indirect2DVector.hpp"
 
 namespace Ivy::R
 {

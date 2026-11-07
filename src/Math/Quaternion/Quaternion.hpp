@@ -6,8 +6,8 @@
 #include "../Coordinates/QPolar.hpp"
 #include "Math/Scalar.hpp"
 
-#include "Math/Matrix/Matrix.hpp"
-#include "Math/Vector/Vector.hpp"
+#include "Math/Matrix/Matrices.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <ostream>
 

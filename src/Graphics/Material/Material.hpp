@@ -4,8 +4,8 @@
 #include "Blend/Blend.hpp"
 #include "Depth/Depth.hpp"
 #include "Graphics/Texture/Texture.hpp"
-#include "Math/Vector/Vector3.hpp"
-#include "Math/Vector/Vector4.hpp"
+#include "Math/Vector/Vectors.hpp"
+
 #include "Stencil/Stencil.hpp"
 #include "Utilities/CheckedPtr.hpp"
 

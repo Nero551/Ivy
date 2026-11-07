@@ -1,22 +1,22 @@
 #pragma once
 #include "Entity.hpp"
 #include "EntityID.hpp"
-#include "Events/EntityCreated.hpp"
-#include "Events/EntityDestroyed.hpp"
 #include "Query.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/HierarchyTree.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/Event.hpp"
 #include <concepts>
 #include <cstddef>
-namespace Ivy::C
+#include <vector>
+namespace Ivy::ECS
 {
 struct EntityComponentSystem
 {
-    EntityDestroyed EntityDestroyed{};
-    EntityCreated EntityCreated{};
+    U::Event<const Entity&> EntityDestroyed{};
+    U::Event<const Entity&> EntityCreated{};
 
     U::HierarchyTree<unsigned int> EntityHierarchy;
     Query Query{};
@@ -33,8 +33,7 @@ struct EntityComponentSystem
 
         for (unsigned int i : doomed)
         {
-            EntityDestroyed.Entity = &m_Entities[i];
-            EntityDestroyed.Fire();
+            EntityDestroyed.Fire(m_Entities[i]);
             Query.RemoveAllComponents(m_Entities[i]);
             EntityHierarchy.Detach(i);
             m_Ids.Release(i);
@@ -68,8 +67,7 @@ struct EntityComponentSystem
 
         EntityHierarchy.Ensure(id.Index);
         auto it = m_Entities.Emplace(id.Index, std::move(entity));
-        EntityCreated.Entity = &*it;
-        EntityCreated.Fire();
+        EntityCreated.Fire(*it);
 
         ++Version;
         return *it;
@@ -121,4 +119,4 @@ struct EntityComponentSystem
     U::GIndexPool<> m_Ids{};
 };
 
-} // namespace Ivy::C
+} // namespace Ivy::ECS

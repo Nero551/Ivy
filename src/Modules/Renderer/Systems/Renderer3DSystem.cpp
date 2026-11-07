@@ -1,5 +1,9 @@
+#include "Renderer3DSystem.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
+#include "ECS/Entity.hpp"
+#include "Math/Matrix/Matrices.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/RenderBatch.hpp"
 #include "Modules/Renderer/Renderer.hpp"
@@ -8,14 +12,14 @@ namespace Ivy::R
 
 void Renderer3DSystem::Start()
 {
-    m_Engine.ECS.EntityDestroyed.Sub(
-        [this](const C::EntityDestroyed& event)
+    m_Engine.ECS.EntityDestroyed.Subscribe(
+        [this](const ECS::Entity& entity)
         {
             for (auto& batch : Batches)
             {
-                if (batch.Instances.Contains(event.Entity->GetId().Index))
+                if (batch.Instances.Contains(entity.GetId().Index))
                 {
-                    batch.Instances.Erase(event.Entity->GetId().Index);
+                    batch.Instances.Erase(entity.GetId().Index);
                 }
             }
         });

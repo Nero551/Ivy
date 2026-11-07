@@ -29,6 +29,7 @@
 #include "Math.hpp"
 #include "MathTuple.hpp"
 #include "Matrix/BasicMatrix.hpp"
+#include "Matrix/Matrices.hpp"
 #include "Matrix/Matrix2.hpp"
 #include "Matrix/Matrix3.hpp"
 #include "Matrix/Matrix4.hpp"
@@ -40,3 +41,4 @@
 #include "Vector/Vector3.hpp"
 #include "Vector/Vector4.hpp"
 #include "Vector/Vector.hpp"
+#include "Vector/Vectors.hpp"

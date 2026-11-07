@@ -1,12 +1,9 @@
 #pragma once
 
-#include "Core/ECS/Component.hpp"
-#include "Math/Matrix/Matrix3.hpp"
-#include "Math/Matrix/Matrix4.hpp"
+#include "ECS/Component.hpp"
+#include "Math/Matrix/Matrices.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
-#include "Math/Vector/Vector.hpp"
-#include "Math/Vector/Vector2.hpp"
-#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Utilities/Track.hpp"
 #include <cmath>
 
@@ -23,7 +20,7 @@ struct TransformSystem;
 namespace Ivy::CMP
 {
 
-struct Transform2D : C::Component
+struct Transform2D : ECS::Component
 {
     U::Track<M::Vector<2>> Position = M::Vector<2>::Zero();
     U::Track<M::Vector<2>> Scale = M::Vector<2>::One();
@@ -62,7 +59,7 @@ struct Transform2D : C::Component
     friend struct R::Renderer2DSystem;
 };
 
-struct Transform3D : C::Component
+struct Transform3D : ECS::Component
 {
     U::Track<M::Vector<3>> Position = M::Vector<3>::Zero();
     U::Track<M::Quaternion<>> Rotation = M::Quaternion<>::Identity();

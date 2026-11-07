@@ -1,7 +1,7 @@
 #include "Core/World/Systems/TransformSystem.hpp"
-#include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
+#include "ECS/Entity.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::C
@@ -21,10 +21,10 @@ void TransformSystem::Update(double dt)
 
     U::CheckedPtr<CMP::Transform2D> parentTransform2D = nullptr;
     U::CheckedPtr<CMP::Transform3D> parentTransform3D = nullptr;
-    for (U::CheckedPtr<Entity> descendant : descendants)
+    for (U::CheckedPtr<ECS::Entity> descendant : descendants)
     {
         auto& entity = *descendant;
-        U::CheckedPtr<Entity> parent = entity.TryFindParent();
+        U::CheckedPtr<ECS::Entity> parent = entity.TryFindParent();
         U::CheckedPtr<CMP::Transform2D> transform2D = query.TryGetComponent<CMP::Transform2D>(entity);
         if (transform2D)
         {

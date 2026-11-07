@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Math/Matrix/Matrix3.hpp"
-#include "Math/Matrix/Matrix4.hpp"
-#include "Math/Vector/Vector2.hpp"
-#include "Math/Vector/Vector3.hpp"
-#include "Math/Vector/Vector4.hpp"
+#include "Math/Matrix/Matrices.hpp"
+#include "Math/Vector/Vectors.hpp"
+
 #include "ShaderSource.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/StringMap.hpp"

@@ -1,25 +1,25 @@
-#include "Core/ECS/Component.hpp"
-#include "Core/ECS/ECS.hpp"
-#include "Core/ECS/Entity.hpp"
+#include "ECS/.hpp"
+#include "ECS/Component.hpp"
+#include "ECS/ECS.hpp"
 #include "tracy/Tracy.hpp"
 
 namespace Bencher
 {
 using namespace Ivy;
-struct A : C::Component
+struct A : ECS::Component
 {
     int Number = 10;
 };
-struct B : C::Component
+struct B : ECS::Component
 {
     int Number = 10;
 };
-struct D : C::Component
+struct D : ECS::Component
 {
     int Number = 10;
 };
 
-struct G : C::Component
+struct G : ECS::Component
 {
     int Number = 10;
 };
@@ -28,7 +28,7 @@ void BenchECS()
     C::EntityComponentSystem ecs;
     for (int i = 0; i < 10000000; ++i)
     {
-        auto& e = ecs.CreateEntity<C::Entity>();
+        auto& e = ecs.CreateEntity<C::>();
         if (i % 2 == 0)
         {
             ecs.Query.SetArchetype<A, B, D>(e);

@@ -285,9 +285,6 @@ struct Shader
 // define them using the IsSpec family in Utilities/IsSpecialization.hpp
 //
 // TODO: prevent math tuples from being `input-able to Function.
-////
-// TODO: wrap all used std stuff in stl wrapper. basically to avoid backward compatibility bs in std. \
-// and also as a declaration and limitation that these are all the std stuff used in the codebase.
 //
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //TODO: new performance bottleneck: renderer.

@@ -1,6 +1,6 @@
 #pragma once
 #include "../Utilities/Debug/Log.hpp"
-#include "Core/ECS/System.hpp"
+#include "Core/System.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include <concepts>
 #include <memory>
@@ -10,7 +10,7 @@ namespace Ivy::C
 struct Engine;
 
 template <typename T>
-concept IsSystem = std::derived_from<T, System>;
+concept IsSystem = std::derived_from<T, C::System>;
 
 /**
  * @brief Owns and manages a collection of ECS systems.
@@ -30,17 +30,10 @@ struct SystemOwner
         auto system = m_Systems.Find<T>();
         if (system == m_Systems.end())
         {
-            U::Log::Error(std::format("System Not Found: {}", typeid(T).name()));
+            U::Log::Error("System Not Found:", typeid(T).name());
         }
         return static_cast<T&>(**system);
     }
-
-  protected:
-    Engine& m_Engine;
-    /** @brief Stores systems indexed by their runtime type. */
-    U::TypedVector<std::unique_ptr<System>> m_Systems;
-
-    /** @brief Adds the systems owned by the derived class. */
 
     /** @brief Creates and registers a system of the specified type. */
     template <IsSystem T> T& AddSystem()
@@ -53,5 +46,12 @@ struct SystemOwner
         m_Systems.Emplace<T>(std::make_unique<T>(m_Engine));
         return static_cast<T&>(*m_Systems.Get<T>());
     }
+
+  protected:
+    Engine& m_Engine;
+    /** @brief Stores systems indexed by their runtime type. */
+    U::TypedVector<std::unique_ptr<C::System>> m_Systems;
+
+    /** @brief Adds the systems owned by the derived class. */
 };
 } // namespace Ivy::C

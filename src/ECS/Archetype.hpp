@@ -9,7 +9,7 @@
 #include <concepts>
 #include <cstddef>
 #include <tuple>
-namespace Ivy::C
+namespace Ivy::ECS
 {
 
 struct IArchetype
@@ -108,4 +108,4 @@ struct Archetype : IArchetype
         return std::get<T>(m_Data[entity.GetId().Index]);
     }
 };
-} // namespace Ivy::C
+} // namespace Ivy::ECS

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/ECS/System.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/System.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/DataType.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -11,10 +11,8 @@
 #include "Graphics/Texture/Texture.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
-#include "Math/Common/Trigonometry.hpp"
 #include "Math/Equations/ODE.hpp"
-#include "Math/Vector/Vector.hpp"
-#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 #include "Utilities/CheckedPtr.hpp"
@@ -379,7 +377,7 @@ struct VectorFields2D : C::System
         m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
-    C::Entity& Arrow()
+    ECS::Entity& Arrow()
     {
         auto& query = m_Engine.ECS.Query;
 

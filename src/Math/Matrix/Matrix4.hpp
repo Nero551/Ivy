@@ -1,9 +1,12 @@
 #pragma once
+// IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
 
 #include "../../Utilities/Debug/Log.hpp"
-#include "Math/Matrix/Matrix.hpp"
-#include "Math/Matrix/Matrix3.hpp"
-#include "Math/Vector/Vector4.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Matrix/BasicMatrix.hpp"
+#include "Math/Matrix/Matrices.hpp"
+#include "Math/Scalar.hpp"
+#include "Math/Vector/Vectors.hpp"
 
 namespace Ivy::M
 {
@@ -262,10 +265,9 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix, T>
         const T determinant =
             m0 * adjugate(0, 0) + m1 * adjugate(1, 0) + m2 * adjugate(2, 0) + m3 * adjugate(3, 0);
 
-        if (M::NearlyEquals(std::abs(determinant), 0.0f))
+        if (std::abs(determinant) < EPSILON)
         {
             U::Log::Error("Matrix is not invertible");
-            return Matrix::Identity();
         }
 
         return adjugate / determinant;

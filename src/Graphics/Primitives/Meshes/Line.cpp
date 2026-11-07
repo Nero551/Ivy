@@ -4,8 +4,6 @@
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Topology.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
-#include "Math/Vector/Vector2.hpp"
-#include "Math/Vector/Vector4.hpp"
 #include <string>
 #include <utility>
 #include <vector>

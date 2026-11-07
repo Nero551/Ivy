@@ -2,7 +2,7 @@
 
 #include "BlendEquation.hpp"
 #include "BlendFactor.hpp"
-#include "Math/Vector/Vector4.hpp"
+#include "Math/Vector/Vectors.hpp"
 
 namespace Ivy::G
 {

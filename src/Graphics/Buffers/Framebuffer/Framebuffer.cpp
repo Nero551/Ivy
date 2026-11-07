@@ -62,13 +62,13 @@ void Framebuffer::AttachTexture(FramebufferAttachment textureAttachment, Texture
 {
     Generate();
     texture.Generate();
-    TextureAttachments.emplace(textureAttachment, &texture);
+    TextureAttachments.Emplace(static_cast<unsigned int>(textureAttachment), &texture);
     glNamedFramebufferTexture(m_Id, static_cast<GLenum>(textureAttachment), texture.GetId(), 0);
 }
 
 Texture& Framebuffer::GetTexture(FramebufferAttachment textureAttachment)
 {
-    return *TextureAttachments.at(textureAttachment);
+    return *TextureAttachments.At(static_cast<unsigned int>(textureAttachment));
 }
 
 void Framebuffer::Blit(Framebuffer& dst, const int srcW, const int srcH, const int dstW, const int dstH,
@@ -91,7 +91,7 @@ void Framebuffer::AttachRenderBuffer(FramebufferAttachment attachment, Renderbuf
 {
     Generate();
     renderbuffer.Generate();
-    RenderBuffers.emplace(attachment, &renderbuffer);
+    RenderBuffers.Emplace(static_cast<unsigned int>(attachment), &renderbuffer);
     glNamedFramebufferRenderbuffer(
         m_Id, static_cast<GLenum>(attachment), GL_RENDERBUFFER, renderbuffer.GetId());
 }

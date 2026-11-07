@@ -2,9 +2,12 @@
 
 #include "Core/Service.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
+#include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <concepts>
+#include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 namespace Ivy::C
@@ -74,8 +77,7 @@ struct ResourceManager : Service
     }
 
     template <typename T>
-    Resource<T>& Load(T&& object)
-        requires(std::move_constructible<T> && requires(T& value) { value.GetName(); })
+    Resource<T>& Load(T&& object) requires(std::move_constructible<T> && NamedResource<T>)
     {
         std::string key = typeid(T).name() + object.GetName();
 

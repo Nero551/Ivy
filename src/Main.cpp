@@ -1,6 +1,7 @@
 #include "Core/Engine.hpp"
-#include "Core/Services/EventBus/EventBus.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/World/Nodes.hpp"
+#include "Core/World/Systems/TransformSystem.hpp"
 #include "Graphics/Context.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Profiling/Profiling.hpp"
@@ -25,7 +26,7 @@ int main(const int argc, char* argv[])
     }
 
     Sketch::Test();
-    return 0;
+    // return 0;
 
     Ivy::G::Context::Initialize();
     Ivy::C::Engine engine{[](Ivy::C::Engine& engine)
@@ -35,18 +36,22 @@ int main(const int argc, char* argv[])
             engine.Window.Config.WaylandAppId = "ivy_engine";
             engine.Window.SetIcon({"Assets/icon.png"});
             engine.Window.SetCursor({"Assets/cursor.png"});
-            // Window.SetSize(1920, 1200);
-            // G::Context::SwapInterval(0);
+            // engine.Window.SetSize(1920, 1200);
+            // Ivy::G::Context::SwapInterval(0);
 
-            engine.AddService<Ivy::C::EventBus>();
             engine.AddService<Ivy::C::ResourceManager>();
 
             engine.AddModule<Ivy::I::Input>();
             engine.AddModule<Ivy::R::Renderer>();
             engine.AddModule<Ivy::Profiling>();
             engine.AddModule<Ivy::Sandbox::Sandbox2D>();
+
+            engine.World.SetRoot(engine.ECS.CreateEntity<Ivy::C::Node>());
+            engine.World.AddSystem<Ivy::C::TransformSystem>();
         }};
+
     engine.Run();
+    ;
     Ivy::G::Context::Terminate();
     return 0;
 }

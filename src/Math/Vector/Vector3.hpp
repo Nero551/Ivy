@@ -1,12 +1,13 @@
 #pragma once
+// IWYU pragma: private, include "Math/Vector/Vectors.hpp"
 
 #include "../../Utilities/Debug/Log.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/Spherical.hpp"
-#include "Vector.hpp"
-#include "Vector2.hpp"
+#include "Math/Scalar.hpp"
+#include "Vectors.hpp"
 
 namespace Ivy::M
 {
@@ -98,7 +99,7 @@ template <Scalar T> struct Vector<3, T>
     constexpr Vector(const T x, const T y, const T z) : x(x), y(y), z(z) {}
 
     /** @brief Constructs a vector from spherical coordinates. */
-    static constexpr Vector FromSpherical(const Spherical<T>& spherical)
+    static constexpr Vector<3> FromSpherical(const Spherical<T>& spherical)
     {
         const T m = spherical.Magnitude;
 

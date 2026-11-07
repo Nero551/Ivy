@@ -1,4 +1,5 @@
 #pragma once
+// IWYU pragma: private, include "Math/Vector/Vectors.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
@@ -6,7 +7,6 @@
 #include <array>
 #include <concepts>
 #include <ostream>
-
 namespace Ivy::M
 {
 /**

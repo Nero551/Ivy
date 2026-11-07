@@ -71,7 +71,7 @@ owns core systems (ex: transform system).
 
 ---
 
-## ECS (Entity Component System)
+## ECS ( Component System)
 
 Owns the entities and the query (which owns archetypes and those own components).
 It is responsible for creating, storing & removing entities.

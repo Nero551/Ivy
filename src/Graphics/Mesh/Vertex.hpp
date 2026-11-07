@@ -1,7 +1,5 @@
 #pragma once
-#include "Math/Vector/Vector2.hpp"
-#include "Math/Vector/Vector3.hpp"
-#include "Math/Vector/Vector4.hpp"
+#include "Math/Vector/Vectors.hpp"
 
 namespace Ivy::G
 {

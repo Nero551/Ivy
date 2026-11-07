@@ -5,8 +5,7 @@
 #include "Graphics/Buffers/VertexArray/VertexArray.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
-#include "Math/Matrix/Matrix3.hpp"
-#include "Math/Matrix/Matrix4.hpp"
+#include "Math/Matrix/Matrices.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <cstddef>

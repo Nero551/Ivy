@@ -3,7 +3,7 @@
 #include "../../Graphics/InputEnums/CursorMode.hpp"
 #include "Core/Engine.hpp"
 #include "Graphics/Window.hpp"
-#include "Math/Vector/Vector2.hpp"
+#include "Math/Vector/Vectors.hpp"
 
 namespace Ivy::I
 {

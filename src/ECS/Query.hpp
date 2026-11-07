@@ -14,7 +14,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-namespace Ivy::C
+namespace Ivy::ECS
 {
 struct Query
 {
@@ -199,4 +199,4 @@ struct Query
     U::TypedVector<std::unique_ptr<IArchetype>> m_Archetypes;
 };
 
-} // namespace Ivy::C
+} // namespace Ivy::ECS

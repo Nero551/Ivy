@@ -1,8 +1,9 @@
 #pragma once
+// IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
 
 #include "Math/Common/Constants.hpp"
-#include "Math/Matrix/Matrix.hpp"
-#include "Math/Vector/Vector2.hpp"
+#include "Math/Matrix/Matrices.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M
@@ -56,10 +57,9 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix, T>
     /** @brief Returns the inverse of the matrix. */
     constexpr Matrix Inverse() const
     {
-        // Determinant: ad - bc
         double det = (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
 
-        if (det == 0.0)
+        if (std::abs(det) < EPSILON)
         {
             U::Log::Error("Matrix is singular and cannot be inverted.");
         }
@@ -67,7 +67,6 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix, T>
         double invDet = 1.0 / det;
         Matrix inv;
 
-        // Adjugate for 2x2: swap diagonals, negate off-diagonals
         inv(0, 0) = (*this)(1, 1) * invDet;
         inv(0, 1) = -(*this)(0, 1) * invDet;
         inv(1, 0) = -(*this)(1, 0) * invDet;

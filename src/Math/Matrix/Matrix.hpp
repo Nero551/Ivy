@@ -1,4 +1,5 @@
 #pragma once
+// IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
 
 #include "BasicMatrix.hpp"
 #include "Math/Scalar.hpp"

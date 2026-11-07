@@ -1,14 +1,14 @@
 #include "Core/World/Scene.hpp"
-#include "Core/ECS/Entity.hpp"
 #include "Core/Engine.hpp"
+#include "ECS/Entity.hpp"
 namespace Ivy::C
 {
-Entity& Scene::GetRoot() const
+ECS::Entity& Scene::GetRoot() const
 {
     return m_Engine.ECS.GetEntity(m_Root);
 }
 
-void Scene::SetRoot(const Entity& entity)
+void Scene::SetRoot(const ECS::Entity& entity)
 {
     m_Root = entity.GetId();
 }

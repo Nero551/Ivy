@@ -33,16 +33,6 @@ struct Texture
     int Height = 0;
 
     /**
-     * @brief Creates a texture resource.
-     *
-     * The texture target is specified by the derived texture type and cannot
-     * be changed after construction.
-     *
-     * @param name Resource name.
-     * @param target OpenGL texture target represented by this texture.
-     */
-
-    /**
      * @brief Gets the texture's OpenGL target.
      *
      * @return Texture target used when binding and configuring the texture.

@@ -6,7 +6,7 @@ struct Engine;
 
 struct System
 {
-    virtual ~System() {}
+    virtual ~System() = default;
 
     System(Engine& engine) : m_Engine(engine) {}
 

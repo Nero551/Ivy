@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eu
+set -e
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 REPORT_DIR="$ROOT_DIR/Benchmarks/Reports"
@@ -11,8 +11,8 @@ mkdir -p "$REPORT_DIR"
 
 cd "$ROOT_DIR"
 
-echo "Running benchmarks..."
 xmake f -m release
+echo "Running benchmarks..."
 xmake run IvyBenchmarks --benchmark_out="$REPORT_FILE"
 
 echo "Report saved to: $REPORT_FILE"

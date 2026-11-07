@@ -1,19 +1,19 @@
 #pragma once
 
-#include "Core/ECS/Component.hpp"
 #include "Core/Services/ResourceManager/Resource.hpp"
+#include "ECS/Component.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Math/Common/Trigonometry.hpp"
-#include "Math/Matrix/Matrix4.hpp"
-#include "Math/Vector/Vector3.hpp"
+#include "Math/Matrix/Matrices.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Renderer/LightType.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::CMP
 {
-struct Camera : C::Component
+struct Camera : ECS::Component
 {
     float FOV = 45.0f;
     float Near = -1;
@@ -35,7 +35,7 @@ struct Camera : C::Component
     }
 };
 
-struct Light : C::Component
+struct Light : ECS::Component
 {
     R::LightType Type = R::LightType::Directional;
     M::Vector<3> Color = M::Vector<3>{1};
@@ -47,16 +47,16 @@ struct Light : C::Component
     float Constant = 1.0f;
     float Linear = 0.009f;
     float Quadratic = 0.032f;
-    float InnerCutOff = M::Rad(7.5);
-    float OuterCutOff = M::Rad(17.5);
+    float InnerCutOff = M::Rad(7.5f);
+    float OuterCutOff = M::Rad(17.5f);
 };
 
-struct Material : C::Component
+struct Material : ECS::Component
 {
     U::CheckedPtr<C::Resource<G::Material>> Material{"Material Component Has No Material Assigned"};
 };
 
-struct Mesh : C::Component
+struct Mesh : ECS::Component
 {
     U::CheckedPtr<C::Resource<G::Mesh>> Mesh{"Mesh Component Has No Mesh Assigned"};
 };

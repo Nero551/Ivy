@@ -11,17 +11,17 @@ namespace Ivy::C
 
 void Engine::Run()
 {
-    m_TimeHandler.Initialize(G::Context::GetTime());
+    TimeHandler.Initialize(G::Context::GetTime());
     m_Running = true;
 
     Start();
     while (m_Running)
     {
         BeginFrame();
-        while (m_TimeHandler.ShouldFixedUpdate())
+        while (TimeHandler.ShouldFixedUpdate())
         {
             FixedUpdate();
-            m_TimeHandler.ConsumeFixedUpdate();
+            TimeHandler.ConsumeFixedUpdate();
         }
 
         Update();
@@ -38,7 +38,7 @@ void Engine::Shutdown()
 
 double Engine::GetTime() const
 {
-    return m_TimeHandler.GetTime();
+    return TimeHandler.GetTime();
 }
 
 void Engine::Start()
@@ -67,18 +67,18 @@ void Engine::BeginFrame()
     ZoneScopedN("Begin Frame");
     TracyGpuZone("Begin Frame");
 
-    m_TimeHandler.CalculateTime(G::Context::GetTime());
+    TimeHandler.CalculateTime(G::Context::GetTime());
     Window.PollEvents();
 
-    World.BeginFrame(m_TimeHandler.GetDelta());
+    World.BeginFrame(TimeHandler.GetDelta());
     for (auto& module : m_Modules)
     {
-        module->BeginFrame(m_TimeHandler.GetDelta());
+        module->BeginFrame(TimeHandler.GetDelta());
     }
 
     for (auto& service : m_Services)
     {
-        service->BeginFrame(m_TimeHandler.GetDelta());
+        service->BeginFrame(TimeHandler.GetDelta());
     }
 }
 
@@ -87,15 +87,15 @@ void Engine::FixedUpdate()
     ZoneScopedN("Fixed Update");
     TracyGpuZone("Fixed Update");
 
-    World.FixedUpdate(m_TimeHandler.GetFixedDelta());
+    World.FixedUpdate(TimeHandler.GetFixedDelta());
     for (auto& module : m_Modules)
     {
-        module->FixedUpdate(m_TimeHandler.GetFixedDelta());
+        module->FixedUpdate(TimeHandler.GetFixedDelta());
     }
 
     for (auto& service : m_Services)
     {
-        service->FixedUpdate(m_TimeHandler.GetFixedDelta());
+        service->FixedUpdate(TimeHandler.GetFixedDelta());
     }
 }
 
@@ -104,16 +104,16 @@ void Engine::Update()
     ZoneScopedN("Update");
     TracyGpuZone("Update");
 
-    World.Update(m_TimeHandler.GetDelta());
+    World.Update(TimeHandler.GetDelta());
 
     for (auto& module : m_Modules)
     {
-        module->Update(m_TimeHandler.GetDelta());
+        module->Update(TimeHandler.GetDelta());
     }
 
     for (auto& service : m_Services)
     {
-        service->Update(m_TimeHandler.GetDelta());
+        service->Update(TimeHandler.GetDelta());
     }
 }
 
@@ -140,16 +140,16 @@ void Engine::EndFrame()
     TracyGpuZone("End Frame");
 
     Window.SwapBuffers();
-    World.EndFrame(m_TimeHandler.GetDelta());
+    World.EndFrame(TimeHandler.GetDelta());
 
     for (auto& module : m_Modules)
     {
-        module->EndFrame(m_TimeHandler.GetDelta());
+        module->EndFrame(TimeHandler.GetDelta());
     }
 
     for (auto& service : m_Services)
     {
-        service->EndFrame(m_TimeHandler.GetDelta());
+        service->EndFrame(TimeHandler.GetDelta());
     }
 
     FrameMark;

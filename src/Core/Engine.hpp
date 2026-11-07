@@ -25,7 +25,8 @@ struct Engine
 {
     G::Window Window{};
     World World{*this};
-    EntityComponentSystem ECS{};
+    ECS::EntityComponentSystem ECS{};
+    TimeHandler TimeHandler{};
 
     template <typename F>
     Engine(F&& configure) requires(std::invocable<F, Engine&>)
@@ -36,6 +37,14 @@ struct Engine
     Engine& operator=(const Engine&) = delete;
     Engine(Engine&&) = delete;
     Engine& operator=(Engine&&) = delete;
+
+    void Start();
+    void BeginFrame();
+    void FixedUpdate();
+    void Update();
+    void Render();
+    void EndFrame();
+    void Stop();
 
     /**
      * @brief Runs the engine's main loop.
@@ -104,16 +113,7 @@ struct Engine
     /** @brief Registered engine modules. */
     U::TypedVector<std::unique_ptr<Module>> m_Modules;
     U::TypedVector<std::unique_ptr<Service>> m_Services;
-    TimeHandler m_TimeHandler;
     const std::function<void(Engine&)> m_Configuration;
     bool m_Running = false;
-
-    void Start();
-    void BeginFrame();
-    void FixedUpdate();
-    void Update();
-    void Render();
-    void EndFrame();
-    void Stop();
 };
 } // namespace Ivy::C

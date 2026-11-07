@@ -26,7 +26,7 @@ struct CoordinateAxes2D : C::Scene
         auto& query = m_Engine.ECS.Query;
         auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
 
-        SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
+        SetRoot(m_Engine.ECS.CreateEntity<C::Node2D>());
 
         auto& shader = resourceManager.Load<G::Shader>("AxisShader");
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
@@ -54,7 +54,7 @@ struct CoordinateAxes2D : C::Scene
         yMaterial.Material = &resourceManager.Load<G::Material>("Y-Axis Material");
         yMaterial.Material->Get().Shader = &shader();
 
-        query.GetComponent<CMP::Transform2D>(yAxis).Rotation = M::Rad(90);
+        query.GetComponent<CMP::Transform2D>(yAxis).Rotation = M::Rad(90.0f);
         query.GetComponent<CMP::Transform2D>(yAxis).Scale = {200, 1};
         yMaterial.Material->Get().Color = M::Color::Green;
 

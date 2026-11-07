@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/Vector/Vector3.hpp"
+#include "Math/Vector/Vectors.hpp"
 
 namespace Ivy::M
 {
@@ -8,7 +8,7 @@ namespace Ivy::M
  * A quaternion can be represented as `q = m(cos(θ) + u sin(θ))`,
  * where `m` is the magnitude, `θ` is the angle, and `u` is the normalized imaginary-axis direction.
  */
-template <Scalar T> struct QPolar
+template <Scalar T = float> struct QPolar
 {
     Vector<3, T> Axis;
     T Angle;

@@ -1,9 +1,10 @@
 #pragma once
 #include "LinearEquation.hpp"
 #include "Math/Common/Comparison.hpp"
-#include "Math/Matrix/Matrix.hpp"
+#include "Math/Matrix/Matrices.hpp"
 #include "Math/Set.hpp"
-#include "Math/Vector/Vector.hpp"
+#include "Math/Vector/Vectors.hpp"
+
 #include <optional>
 
 namespace Ivy::M

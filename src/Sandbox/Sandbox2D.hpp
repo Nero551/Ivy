@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/ECS/EntityID.hpp"
 #include "Core/Module.hpp"
+#include "ECS/EntityID.hpp"
 namespace Ivy::Sandbox
 {
 struct Sandbox2D : C::Module
@@ -10,8 +10,8 @@ struct Sandbox2D : C::Module
     void FixedUpdate(double fdt) override;
 
   private:
-    C::EntityID CreateCircle();
-    C::EntityID CreateSquare();
+    ECS::EntityID CreateCircle();
+    ECS::EntityID CreateSquare();
     void PlayWithBall(double fdt);
 };
 

@@ -2,13 +2,9 @@
 #include "ECS.hpp"
 #include "EntityID.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include "Utilities/Debug/Log.hpp"
-#include <format>
 #include <functional>
-#include <string>
-#include <utility>
 #include <vector>
-namespace Ivy::C
+namespace Ivy::ECS
 {
 EntityID Entity::GetId() const
 {
@@ -145,4 +141,4 @@ bool Entity::operator==(const Entity& other) const
 {
     return m_ECS == other.m_ECS && m_Id == other.m_Id;
 }
-} // namespace Ivy::C
+} // namespace Ivy::ECS
