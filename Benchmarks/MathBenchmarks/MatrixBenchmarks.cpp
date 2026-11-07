@@ -256,10 +256,12 @@ BENCHMARK(BM_Matrix4_Perspective);
 
 static void BM_Matrix4_LookAt(benchmark::State& state)
 {
-    Vector<3> eye(0, 0, 5), target(0, 0, 0), up(0, 1, 0);
     for (auto _ : state)
     {
-        auto r = Mat44::LookAt(eye, target, up);
+        // Rotate eye around origin each iteration — defeats folding.
+        float a = static_cast<float>(state.iterations()) * 0.01f;
+        Vector<3> eye(std::cos(a) * 5.0f, 0.0f, std::sin(a) * 5.0f);
+        auto r = Mat44::LookAt(eye, Vector<3>(0, 0, 0), Vector<3>(0, 1, 0));
         benchmark::DoNotOptimize(r);
     }
 }

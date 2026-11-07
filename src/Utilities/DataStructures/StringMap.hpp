@@ -186,7 +186,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
         {
             return m_Data[it->second];
         }
-        Log::Fatal("[StringMap] Key: ", key, " Doesn't Exist");
+        Log::Error("[StringMap] Key: ", key, " Doesn't Exist");
     }
 
     const T& At(const std::string_view key) const
@@ -195,7 +195,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
         {
             return m_Data[it->second];
         }
-        Log::Fatal("[StringMap] Key: ", key, " Doesn't Exist");
+        Log::Error("[StringMap] Key: ", key, " Doesn't Exist");
     }
 
     Iterator Find(const std::string_view key)

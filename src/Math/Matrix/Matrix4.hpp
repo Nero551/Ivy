@@ -178,9 +178,6 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix, T>
     static constexpr Matrix LookAt(
         const Vector<3, T>& position, const Vector<3, T>& target, const Vector<3, T>& up)
     {
-        Matrix translation = Matrix::Identity();
-        translation = translation.Translate(-position);
-
         const Vector<3, T> forward = (target - position).Normalized();
         const Vector<3, T> right = forward.Cross(up).Normalized();
         const Vector<3, T> correctedUp = right.Cross(forward);
@@ -199,7 +196,11 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix, T>
         basisMatrix(1, 2) = -forward.y;
         basisMatrix(2, 2) = -forward.z;
 
-        return basisMatrix.Inverse() * translation;
+        Matrix result = basisMatrix.Transpose();
+        result(0, 3) = -position.Dot(right);
+        result(1, 3) = -position.Dot(correctedUp);
+        result(2, 3) = position.Dot(forward);
+        return result;
     }
 
     /** @brief Returns the determinant of the matrix. */
@@ -212,24 +213,54 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix, T>
     /** @brief Returns the inverse of the matrix. */
     constexpr Matrix Inverse() const
     {
-        Matrix cofactorMatrix = Matrix::Zero();
+        const T m0 = (*this)(0, 0);
+        const T m1 = (*this)(0, 1);
+        const T m2 = (*this)(0, 2);
+        const T m3 = (*this)(0, 3);
+        const T m4 = (*this)(1, 0);
+        const T m5 = (*this)(1, 1);
+        const T m6 = (*this)(1, 2);
+        const T m7 = (*this)(1, 3);
+        const T m8 = (*this)(2, 0);
+        const T m9 = (*this)(2, 1);
+        const T m10 = (*this)(2, 2);
+        const T m11 = (*this)(2, 3);
+        const T m12 = (*this)(3, 0);
+        const T m13 = (*this)(3, 1);
+        const T m14 = (*this)(3, 2);
+        const T m15 = (*this)(3, 3);
 
-        for (unsigned int row = 0; row < 4; ++row)
-        {
-            for (unsigned int column = 0; column < 4; ++column)
-            {
-                T determinant = Minor(row, column).Determinant();
+        const T s0 = m10 * m15 - m11 * m14;
+        const T s1 = m9 * m15 - m11 * m13;
+        const T s2 = m9 * m14 - m10 * m13;
+        const T s3 = m8 * m15 - m11 * m12;
+        const T s4 = m8 * m14 - m10 * m12;
+        const T s5 = m8 * m13 - m9 * m12;
 
-                if ((row + column) % 2 == 1)
-                {
-                    determinant = -determinant;
-                }
+        Matrix adjugate;
 
-                cofactorMatrix(row, column) = determinant;
-            }
-        }
+        adjugate(0, 0) = m5 * s0 - m6 * s1 + m7 * s2;
+        adjugate(0, 1) = -(m1 * s0 - m2 * s1 + m3 * s2);
+        adjugate(0, 2) = m13 * (m2 * m7 - m3 * m6) - m14 * (m1 * m7 - m3 * m5) + m15 * (m1 * m6 - m2 * m5);
+        adjugate(0, 3) = -(m9 * (m2 * m7 - m3 * m6) - m10 * (m1 * m7 - m3 * m5) + m11 * (m1 * m6 - m2 * m5));
 
-        const T determinant = Determinant();
+        adjugate(1, 0) = -(m4 * s0 - m6 * s3 + m7 * s4);
+        adjugate(1, 1) = m0 * s0 - m2 * s3 + m3 * s4;
+        adjugate(1, 2) = -(m12 * (m2 * m7 - m3 * m6) - m14 * (m0 * m7 - m3 * m4) + m15 * (m0 * m6 - m2 * m4));
+        adjugate(1, 3) = m8 * (m2 * m7 - m3 * m6) - m10 * (m0 * m7 - m3 * m4) + m11 * (m0 * m6 - m2 * m4);
+
+        adjugate(2, 0) = m4 * s1 - m5 * s3 + m7 * s5;
+        adjugate(2, 1) = -(m0 * s1 - m1 * s3 + m3 * s5);
+        adjugate(2, 2) = m12 * (m1 * m7 - m3 * m5) - m13 * (m0 * m7 - m3 * m4) + m15 * (m0 * m5 - m1 * m4);
+        adjugate(2, 3) = -(m8 * (m1 * m7 - m3 * m5) - m9 * (m0 * m7 - m3 * m4) + m11 * (m0 * m5 - m1 * m4));
+
+        adjugate(3, 0) = -(m4 * s2 - m5 * s4 + m6 * s5);
+        adjugate(3, 1) = m0 * s2 - m1 * s4 + m2 * s5;
+        adjugate(3, 2) = -(m12 * (m1 * m6 - m2 * m5) - m13 * (m0 * m6 - m2 * m4) + m14 * (m0 * m5 - m1 * m4));
+        adjugate(3, 3) = m8 * (m1 * m6 - m2 * m5) - m9 * (m0 * m6 - m2 * m4) + m10 * (m0 * m5 - m1 * m4);
+
+        const T determinant =
+            m0 * adjugate(0, 0) + m1 * adjugate(1, 0) + m2 * adjugate(2, 0) + m3 * adjugate(3, 0);
 
         if (M::NearlyEquals(std::abs(determinant), 0.0f))
         {
@@ -237,7 +268,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix, T>
             return Matrix::Identity();
         }
 
-        return cofactorMatrix.Transpose() / determinant;
+        return adjugate / determinant;
     }
 
     /** @brief Returns the minor produced by removing a row and column. */

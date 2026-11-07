@@ -79,7 +79,7 @@ struct EntityComponentSystem
     {
         if (!m_Ids.IsAcquired(id))
         {
-            U::Log::Fatal("Entity Not Found: ", id);
+            U::Log::Error("Entity Not Found: ", id);
         }
         return m_Entities[id.Index];
     }
@@ -88,7 +88,7 @@ struct EntityComponentSystem
     {
         if (!m_Entities.Contains(id))
         {
-            U::Log::Fatal("Entity Not Found: ", id);
+            U::Log::Error("Entity Not Found: ", id);
         }
         return m_Entities[id];
     }

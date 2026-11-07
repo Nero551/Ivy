@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BasicMatrix.hpp"
-#include "Math/Concepts.hpp"
+#include "Math/Scalar.hpp"
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M

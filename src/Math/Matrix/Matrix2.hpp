@@ -3,6 +3,7 @@
 #include "Math/Common/Constants.hpp"
 #include "Math/Matrix/Matrix.hpp"
 #include "Math/Vector/Vector2.hpp"
+#include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M
 {
@@ -55,15 +56,24 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix, T>
     /** @brief Returns the inverse of the matrix. */
     constexpr Matrix Inverse() const
     {
-        const T determinant = Determinant();
+        // Determinant: ad - bc
+        double det = (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
 
-        if (std::abs(determinant) < EPSILON)
+        if (det == 0.0)
         {
-            U::Log::Error("Matrix is not invertible");
-            return Matrix::Identity();
+            U::Log::Error("Matrix is singular and cannot be inverted.");
         }
 
-        return Matrix((*this)(1, 1), -(*this)(0, 1), -(*this)(1, 0), (*this)(0, 0)) / determinant;
+        double invDet = 1.0 / det;
+        Matrix inv;
+
+        // Adjugate for 2x2: swap diagonals, negate off-diagonals
+        inv(0, 0) = (*this)(1, 1) * invDet;
+        inv(0, 1) = -(*this)(0, 1) * invDet;
+        inv(1, 0) = -(*this)(1, 0) * invDet;
+        inv(1, 1) = (*this)(0, 0) * invDet;
+
+        return inv;
     }
 
     /** @brief Multiplies this matrix by another matrix. */

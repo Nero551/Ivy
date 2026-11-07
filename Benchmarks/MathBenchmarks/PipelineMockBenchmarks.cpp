@@ -60,7 +60,14 @@ static void BM_Pipeline_MVP_Cube(benchmark::State& state)
 
     for (auto _ : state)
     {
-        Matrix<4, 4> mvp = proj * view * model;
+        // Vary rotation + translation so nothing in `model` is compile-time.
+        float t = static_cast<float>(state.iterations() & 0xFF) * 0.01f;
+        Matrix<4, 4> m = Matrix<4, 4>::Identity()
+                             .RotateY(0.5f + t)
+                             .RotateX(0.3f - t * 0.5f)
+                             .Scale(Vector<3>(2, 2, 2))
+                             .Translate(Vector<3>(1, 2, 3));
+        Matrix<4, 4> mvp = proj * view * m;
         for (auto& v : cube)
         {
             auto p = mvp * v;
@@ -97,9 +104,10 @@ BENCHMARK(BM_Pipeline_SceneGraph_Chain)->Arg(4)->Arg(16)->Arg(64)->Arg(256);
 // by many animation / networking systems.
 static void BM_Pipeline_PoseSerialization(benchmark::State& state)
 {
-    Vector<3> eulerIn(0.4f, 0.3f, 0.2f);
     for (auto _ : state)
     {
+        float t = static_cast<float>(state.iterations() & 0xFFFF) * 1e-4f;
+        Vector<3> eulerIn(t, t * 0.5f, t * 0.25f);
         Quaternion<> q = Quaternion<>::FromEulerXYZ(eulerIn);
         Matrix<4, 4> m = q.ToMatrix4();
         Quaternion<> q2 = Quaternion<>::FromMatrix3(m.ToMatrix3());

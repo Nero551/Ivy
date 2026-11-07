@@ -67,8 +67,8 @@ struct StressTester3D : C::System
 
     void TwoDimensionalProjection(int increase)
     {
-        points.reserve(M::Pow(360.0f / increase, 1));
-        U::Log::Info(M::Pow(360.0f / increase, 1));
+        points.reserve(M::Pow(360.0f / increase, 1.0f));
+        U::Log::Info(M::Pow(360.0f / increase, 1.0f));
         for (int theta = -180; theta < 180; theta += increase)
         {
             M::Vector<2> v2 = M::Vector<2>::FromPolar(M::Polar(M::Rad(theta)));
@@ -80,8 +80,8 @@ struct StressTester3D : C::System
 
     void ThreeDimensionalProjection(int increase)
     {
-        U::Log::Info(M::Pow(360.0f / increase, 2));
-        points.reserve(M::Pow(360.0f / increase, 2));
+        U::Log::Info(M::Pow(360.0f / increase, 2.0f));
+        points.reserve(M::Pow(360.0f / increase, 2.0f));
 
         for (int theta = -180; theta < 180; theta += increase)
         {
@@ -97,9 +97,9 @@ struct StressTester3D : C::System
 
     void FourDimensionalProjection(int increase)
     {
-        points.reserve(M::Pow(360.0f / increase, 3));
-        U::Log::Info(M::Pow(360.0f / increase, 3));
-        m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3));
+        points.reserve(M::Pow(360.0f / increase, 3.0f));
+        U::Log::Info(M::Pow(360.0f / increase, 3.0f));
+        m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3.0f));
 
         for (int theta = -180; theta < 180; theta += increase)
         {

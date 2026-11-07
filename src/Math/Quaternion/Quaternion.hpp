@@ -4,8 +4,12 @@
 #include "../Common/Constants.hpp"
 #include "../Common/Exponentials.hpp"
 #include "../Coordinates/QPolar.hpp"
-#include "../Matrix/Matrix4.hpp"
-#include "../Vector/Vector3.hpp"
+#include "Math/Scalar.hpp"
+
+#include "Math/Matrix/Matrix.hpp"
+#include "Math/Vector/Vector.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <ostream>
 
 namespace Ivy::M
 {
@@ -159,13 +163,19 @@ template <Scalar T = float> struct Quaternion
      */
     static constexpr Quaternion FromEulerXYZ(const Vector<3, T>& euler)
     {
-        Matrix<3, 3, T> rotation = Matrix<3, 3, T>::Identity();
-        rotation = rotation.Rotate(euler);
-        return FromMatrix3(rotation);
-    }
+        const T hx = euler.x * T{0.5};
+        const T hy = euler.y * T{0.5};
+        const T hz = euler.z * T{0.5};
 
+        Quaternion qx{std::cos(hx), std::sin(hx), T{0}, T{0}};
+        Quaternion qy{std::cos(hy), T{0}, std::sin(hy), T{0}};
+        Quaternion qz{std::cos(hz), T{0}, T{0}, std::sin(hz)};
+
+        Quaternion q_half = qz * qy * qx;
+        return q_half * q_half; // ← half → full; this line is what was missing
+    }
     /** @brief Constructs the zero quaternion. */
-    constexpr Quaternion() {}
+    constexpr Quaternion() = default;
 
     /** @brief Constructs a quaternion with all components equal to `all`. */
     constexpr explicit Quaternion(const T all) : w(all), x(all), y(all), z(all) {}
@@ -285,14 +295,34 @@ template <Scalar T = float> struct Quaternion
      */
     constexpr Matrix<4, 4, T> ToMatrix4() const
     {
-        Matrix<4, 4, T> result = Matrix<4, 4, T>::Identity();
+        const auto q = Normalized();
+        const T wHalf = Sqrt((T{1} + q.w) * T{0.5});
 
-        if (iszero(Angle()))
+        if (wHalf < EPSILON)
         {
-            return Matrix<4, 4, T>::Identity();
+            return Matrix<4, 4, T>::Identity().RotateAroundAxis(Axis(), Angle());
         }
 
-        return result.RotateAroundAxis(Axis(), Angle());
+        const T invTwoW = T{1} / (T{2} * wHalf);
+        const T hx = q.x * invTwoW;
+        const T hy = q.y * invTwoW;
+        const T hz = q.z * invTwoW;
+
+        const T xx = hx * hx, yy = hy * hy, zz = hz * hz;
+        const T xy = hx * hy, xz = hx * hz, yz = hy * hz;
+        const T wx = wHalf * hx, wy = wHalf * hy, wz = wHalf * hz;
+
+        Matrix<4, 4, T> m = Matrix<4, 4, T>::Identity();
+        m(0, 0) = T{1} - T{2} * (yy + zz);
+        m(0, 1) = T{2} * (xy - wz);
+        m(0, 2) = T{2} * (xz + wy);
+        m(1, 0) = T{2} * (xy + wz);
+        m(1, 1) = T{1} - T{2} * (xx + zz);
+        m(1, 2) = T{2} * (yz - wx);
+        m(2, 0) = T{2} * (xz - wy);
+        m(2, 1) = T{2} * (yz + wx);
+        m(2, 2) = T{1} - T{2} * (xx + yy);
+        return m;
     }
 
     /**
@@ -353,7 +383,7 @@ template <Scalar T = float> struct Quaternion
         case 3:
             return w;
         default:
-            U::Log::Fatal("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
+            U::Log::Error("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
         }
     }
 
@@ -370,7 +400,7 @@ template <Scalar T = float> struct Quaternion
         case 3:
             return w;
         default:
-            U::Log::Fatal("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
+            U::Log::Error("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
         }
     }
 

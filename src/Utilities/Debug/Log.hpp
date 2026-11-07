@@ -63,18 +63,10 @@ template <typename... Args> void Warning(const Args&... args)
     std::cout << '\n';
 }
 
-/** @brief Logs an error message. */
-template <typename... Args> void Error(const Args&... args)
-{
-    std::cout << Red << "❌ [ERROR] " << Reset;
-    (..., (std::cout << args));
-    std::cout << '\n';
-}
-
 /** @brief Logs a fatal error and throws an exception. */
-template <typename... Args> [[noreturn]] static void Fatal(const Args&... args)
+template <typename... Args> [[noreturn]] static void Error(const Args&... args)
 {
-    std::cout << Red << "💀 [FATAL] " << Reset;
+    std::cout << Red << "💀 [Error] " << Reset;
     (..., (std::cout << args));
     std::cout << '\n';
     throw std::exception();
@@ -85,7 +77,7 @@ template <typename T, typename... Args> static T& Require(T* rawPtr, const Args&
 {
     if (!rawPtr)
     {
-        Fatal(args...);
+        Error(args...);
     }
     return *rawPtr;
 }
@@ -95,7 +87,7 @@ template <typename... Args> static constexpr void Assert(const bool condition, c
 {
     if (!condition)
     {
-        Fatal(args...);
+        Error(args...);
     }
 }
 }; // namespace Log

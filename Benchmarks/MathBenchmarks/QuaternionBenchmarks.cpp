@@ -102,9 +102,11 @@ BENCHMARK(BM_Quaternion_AngleAndAxis);
 
 static void BM_Quaternion_FromEulerXYZ(benchmark::State& state)
 {
-    Vector<3> euler(0.4f, 0.3f, 0.2f);
     for (auto _ : state)
     {
+        // Vary input per iteration — defeats constant folding.
+        float t = static_cast<float>(state.iterations() & 0xFFFF) * 1e-4f;
+        Vector<3> euler(t, t * 0.5f, t * 0.25f);
         auto r = Quaternion<>::FromEulerXYZ(euler);
         benchmark::DoNotOptimize(r);
     }

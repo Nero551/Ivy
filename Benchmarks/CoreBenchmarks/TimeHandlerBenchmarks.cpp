@@ -56,6 +56,7 @@ static void BM_TimeHandler_FixedStepDrain(benchmark::State& state)
         {
             th.ConsumeFixedUpdate();
         }
+        benchmark::DoNotOptimize(th);
     }
     state.counters["steps"] = 60;
 }

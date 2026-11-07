@@ -1,14 +1,10 @@
 #pragma once
-
 #include "Math/Common/Exponentials.hpp"
 #include <concepts>
 #include <iostream>
-#include <utility>
+
 namespace Ivy::M
 {
-
-template <typename T>
-concept Scalar = std::same_as<T, float> || std::same_as<T, double>;
 
 template <typename T, typename O>
 concept Additive = requires(T a, O b) { a + b; };

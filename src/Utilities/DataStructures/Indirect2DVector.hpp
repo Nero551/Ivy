@@ -102,7 +102,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
     {
         if (!Contains(a, b))
         {
-            Log::Fatal("Indirect2DVector: Index does not exist.");
+            Log::Error("Indirect2DVector: Index does not exist.");
         }
 
         return m_Data[m_Lookup[a][b]];
@@ -112,7 +112,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
     {
         if (!Contains(a, b))
         {
-            Log::Fatal("Indirect2DVector: Index does not exist.");
+            Log::Error("Indirect2DVector: Index does not exist.");
         }
 
         return m_Data[m_Lookup[a][b]];

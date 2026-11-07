@@ -1,23 +1,24 @@
 #pragma once
 #include "Exponentials.hpp"
+#include "Math/Scalar.hpp"
 namespace Ivy::M
 {
-constexpr float Lerp(const float a, const float b, const float t)
+template <Scalar T> constexpr T Lerp(const T a, const T b, const T t)
 {
     return a + (b - a) * t;
 }
 
-constexpr float EaseInQuad(const float t)
+template <Scalar T> constexpr T EaseInQuad(const T t)
 {
     return t * t;
 }
 
-constexpr float EaseOutQuad(const float t)
+template <Scalar T> constexpr T EaseOutQuad(const T t)
 {
-    return 1 - Pow(1 - t, 2);
+    return 1 - Pow(1 - t, static_cast<T>(2));
 }
 
-constexpr float EaseInOutQuad(const float t)
+template <Scalar T> constexpr T EaseInOutQuad(const T t)
 {
     if (t < 0.5f)
     {
@@ -27,17 +28,17 @@ constexpr float EaseInOutQuad(const float t)
     return 0.5f + 0.5f * EaseOutQuad((t - 0.5f) * 2.0f);
 }
 
-constexpr float EaseInCubic(const float t)
+template <Scalar T> constexpr T EaseInCubic(const T t)
 {
     return t * t * t;
 }
 
-constexpr float EaseOutCubic(const float t)
+template <Scalar T> constexpr T EaseOutCubic(const T t)
 {
-    return 1 - Pow(1 - t, 3);
+    return 1 - Pow(1 - t, static_cast<T>(3));
 }
 
-constexpr float EaseInOutCubic(const float t)
+template <Scalar T> constexpr T EaseInOutCubic(const T t)
 {
     if (t < 0.5f)
     {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BasicOperations.hpp"
 #include "Color/Color.hpp"
 #include "Common/Comparison.hpp"
 #include "Common/Constants.hpp"
@@ -10,7 +11,6 @@
 #include "Common/Random.hpp"
 #include "Common/Trigonometry.hpp"
 #include "Complex/Complex.hpp"
-#include "Concepts.hpp"
 #include "Coordinates/HyperSpherical.hpp"
 #include "Coordinates/Polar.hpp"
 #include "Coordinates/QPolar.hpp"
@@ -34,6 +34,7 @@
 #include "Matrix/Matrix4.hpp"
 #include "Matrix/Matrix.hpp"
 #include "Quaternion/Quaternion.hpp"
+#include "Scalar.hpp"
 #include "Set.hpp"
 #include "Vector/Vector2.hpp"
 #include "Vector/Vector3.hpp"

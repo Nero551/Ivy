@@ -1,19 +1,25 @@
 #pragma once
+#include "Math/Scalar.hpp"
 #include <cmath>
 
 namespace Ivy::M
 {
-constexpr float Pow(const float x, const float power)
+template <Scalar T> constexpr T Pow(const T x, const T power)
 {
     return std::pow(x, power);
 }
 
-constexpr float Sqrt(const float x)
+template <Scalar T> constexpr T Pow(const T x, const int power)
+{
+    return std::pow(x, power);
+}
+
+template <Scalar T> constexpr T Sqrt(const T x)
 {
     return std::sqrt(x);
 }
 
-constexpr float Exp(const float x)
+template <Scalar T> constexpr T Exp(const T x)
 {
     return std::exp(x);
 }

@@ -1,5 +1,6 @@
 #pragma once
-#include "Math/Concepts.hpp"
+#include "Math/Scalar.hpp"
+
 #include "Utilities/Concepts.hpp"
 #include <cstddef>
 #include <functional>

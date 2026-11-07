@@ -1,6 +1,8 @@
 #pragma once
 #include "Math/Common/Constants.hpp"
-#include "Math/Concepts.hpp"
+#include "Math/Common/Exponentials.hpp"
+#include "Math/Scalar.hpp"
+
 #include "Math/Functions/Function.hpp"
 namespace Ivy::M
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Common/Constants.hpp"
-#include "Math/Concepts.hpp"
+#include "Math/Scalar.hpp"
+
 #include "Math/Functions/Function.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstdlib>

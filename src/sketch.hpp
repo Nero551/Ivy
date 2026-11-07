@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Math/Concepts.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Scalar.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cmath>
@@ -39,7 +39,7 @@ template <typename T, Index Size> struct Array
     {
         if (!Contains(index))
         {
-            U::Log::Fatal("Array: Out of bounds.");
+            U::Log::Error("Array: Out of bounds.");
         }
         return m_Data[index];
     }
@@ -290,7 +290,6 @@ struct Shader
 // and also as a declaration and limitation that these are all the std stuff used in the codebase.
 //
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
-//
 //TODO: new performance bottleneck: renderer.
 
 inline void Test() {}

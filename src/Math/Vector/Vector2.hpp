@@ -4,10 +4,9 @@
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
-#include "Math/Concepts.hpp"
 #include "Math/Coordinates/Polar.hpp"
+#include "Math/Scalar.hpp"
 #include "Vector.hpp"
-#include "stl.hpp"
 #include <ostream>
 
 namespace Ivy::M
@@ -43,7 +42,7 @@ template <Scalar T> struct Vector<2, T>
         case 1:
             return y;
         default:
-            U::Log::Fatal("Index : ", component, " doesn't exist in vector(x, y)");
+            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y)");
         }
     }
 
@@ -57,7 +56,7 @@ template <Scalar T> struct Vector<2, T>
         case 1:
             return y;
         default:
-            U::Log::Fatal("Index : ", component, " doesn't exist in vector(x, y)");
+            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y)");
         }
     }
 

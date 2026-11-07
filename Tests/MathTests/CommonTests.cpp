@@ -115,15 +115,22 @@ TEST(Interpolation, Lerp)
 
 TEST(Interpolation, EaseInOutBoundaries)
 {
-    // All easing curves must map 0 → 0 and 1 → 1
-    for (float (*ease)(float) :
-        {EaseInQuad, EaseOutQuad, EaseInOutQuad, EaseInCubic, EaseOutCubic, EaseInOutCubic})
+    // All easing curves must map 0 -> 0 and 1 -> 1
+    using EasingFn = float (*)(float);
+    constexpr EasingFn easings[] = {
+        EaseInQuad,
+        EaseOutQuad,
+        EaseInOutQuad,
+        EaseInCubic,
+        EaseOutCubic,
+        EaseInOutCubic,
+    };
+    for (EasingFn ease : easings)
     {
         EXPECT_FLOAT_EQ(ease(0.0f), 0.0f);
         EXPECT_FLOAT_EQ(ease(1.0f), 1.0f);
     }
 }
-
 TEST(Interpolation, EaseMidpoints)
 {
     EXPECT_FLOAT_EQ(EaseInQuad(0.5f), 0.25f);

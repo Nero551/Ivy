@@ -84,7 +84,7 @@ struct GIndexPool
     {
         if (index >= m_Generations.size())
         {
-            Log::Fatal("GIndexPool: Index Out of bounds");
+            Log::Error("GIndexPool: Index Out of bounds");
         }
         return m_Generations[index];
     }

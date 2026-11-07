@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Math/Concepts.hpp"
+#include "Math/Scalar.hpp"
+
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M
@@ -170,7 +171,7 @@ template <Scalar T> struct LinearEquation<1, T>
             return Coefficient;
         }
 
-        U::Log::Fatal("LinearEquation: Index out of bounds.");
+        U::Log::Error("LinearEquation: Index out of bounds.");
     }
 
     /** @brief Returns the coefficient at the specified index. */
@@ -181,7 +182,7 @@ template <Scalar T> struct LinearEquation<1, T>
             return Coefficient;
         }
 
-        U::Log::Fatal("LinearEquation: Index out of bounds.");
+        U::Log::Error("LinearEquation: Index out of bounds.");
     }
 
     /** @brief Returns the equation multiplied by a scalar. */

@@ -15,7 +15,7 @@ inline std::string ReadFile(const std::string& path)
 
     if (!file)
     {
-        Log::Error("Failed to read file: ", path);
+        Log::Warning("Failed to read file: ", path);
         return {};
     }
 
@@ -32,7 +32,7 @@ inline void WriteFile(const std::string& path, const std::string& content)
 
     if (!file)
     {
-        Log::Error("Failed to write file: ", path);
+        Log::Warning("Failed to write file: ", path);
         return;
     }
 

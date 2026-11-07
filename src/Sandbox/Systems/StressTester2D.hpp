@@ -92,9 +92,9 @@ struct StressTester2D : C::System
 
     void FourDimensionalProjection(int increase)
     {
-        points.reserve(M::Pow(360.0f / increase, 3));
-        U::Log::Info(M::Pow(360.0f / increase, 3));
-        m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3));
+        points.reserve(M::Pow(360.0f / increase, 3.0f));
+        U::Log::Info(M::Pow(360.0f / increase, 3.0f));
+        m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3.0f));
 
         for (int theta = -180; theta < 180; theta += increase)
         {

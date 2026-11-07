@@ -114,7 +114,7 @@ void ShaderSource::PreprocessIncludes(
                 // Check Circular Include
                 if (!includesProcessing.insert(includePath).second)
                 {
-                    U::Log::Fatal("Circular Include: " + includePath.string() + " | In Shader: " + path);
+                    U::Log::Error("Circular Include: " + includePath.string() + " | In Shader: " + path);
                 }
 
                 // Recursively Include

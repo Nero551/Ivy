@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core/ECS/Component.hpp"
+#include "Math/Matrix/Matrix3.hpp"
+#include "Math/Matrix/Matrix4.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vector.hpp"
 #include "Math/Vector/Vector2.hpp"

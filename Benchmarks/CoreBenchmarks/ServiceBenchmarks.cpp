@@ -68,6 +68,7 @@ static void BM_Service_NoOpDirect(benchmark::State& state)
     for (auto _ : state)
     {
         svc.Update(0.016);
+        benchmark::DoNotOptimize(svc);
     }
 }
 BENCHMARK(BM_Service_NoOpDirect);
@@ -79,6 +80,7 @@ static void BM_Service_NoOpVirtual(benchmark::State& state)
     for (auto _ : state)
     {
         base->Update(0.016);
+        benchmark::DoNotOptimize(svc);
     }
 }
 BENCHMARK(BM_Service_NoOpVirtual);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../Utilities/Debug/Log.hpp"
+#include "Math/Common/Constants.hpp"
 #include "Math/Matrix/Matrix.hpp"
 
 namespace Ivy::M
@@ -148,21 +149,22 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix, T>
     /** @brief Returns the inverse of the matrix. */
     constexpr Matrix Inverse() const
     {
-        const T a = (*this)(0, 0);
-        const T b = (*this)(0, 1);
-        const T c = (*this)(0, 2);
-        const T d = (*this)(1, 0);
-        const T e = (*this)(1, 1);
-        const T f = (*this)(1, 2);
-        const T g = (*this)(2, 0);
-        const T h = (*this)(2, 1);
-        const T i = (*this)(2, 2);
+        Matrix adjugate;
 
-        const T A = e * i - f * h;
-        const T B = f * g - d * i;
-        const T C = d * h - e * g;
+        adjugate(0, 0) = (*this)(1, 1) * (*this)(2, 2) - (*this)(1, 2) * (*this)(2, 1);
+        adjugate(0, 1) = (*this)(0, 2) * (*this)(2, 1) - (*this)(0, 1) * (*this)(2, 2);
+        adjugate(0, 2) = (*this)(0, 1) * (*this)(1, 2) - (*this)(0, 2) * (*this)(1, 1);
 
-        const T determinant = a * A + b * B + c * C;
+        adjugate(1, 0) = (*this)(1, 2) * (*this)(2, 0) - (*this)(1, 0) * (*this)(2, 2);
+        adjugate(1, 1) = (*this)(0, 0) * (*this)(2, 2) - (*this)(0, 2) * (*this)(2, 0);
+        adjugate(1, 2) = (*this)(0, 2) * (*this)(1, 0) - (*this)(0, 0) * (*this)(1, 2);
+
+        adjugate(2, 0) = (*this)(1, 0) * (*this)(2, 1) - (*this)(1, 1) * (*this)(2, 0);
+        adjugate(2, 1) = (*this)(0, 1) * (*this)(2, 0) - (*this)(0, 0) * (*this)(2, 1);
+        adjugate(2, 2) = (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
+
+        const T determinant =
+            (*this)(0, 0) * adjugate(0, 0) + (*this)(0, 1) * adjugate(1, 0) + (*this)(0, 2) * adjugate(2, 0);
 
         if (std::abs(determinant) < EPSILON)
         {
@@ -170,23 +172,7 @@ template <Scalar T> struct Matrix<3, 3, T> : BasicMatrix<3, 3, Matrix, T>
             return Matrix::Identity();
         }
 
-        const T inverseDeterminant = 1.0f / determinant;
-
-        Matrix result;
-
-        result(0, 0) = A * inverseDeterminant;
-        result(0, 1) = (c * h - b * i) * inverseDeterminant;
-        result(0, 2) = (b * f - c * e) * inverseDeterminant;
-
-        result(1, 0) = B * inverseDeterminant;
-        result(1, 1) = (a * i - c * g) * inverseDeterminant;
-        result(1, 2) = (c * d - a * f) * inverseDeterminant;
-
-        result(2, 0) = C * inverseDeterminant;
-        result(2, 1) = (b * g - a * h) * inverseDeterminant;
-        result(2, 2) = (a * e - b * d) * inverseDeterminant;
-
-        return result;
+        return adjugate * (1.0f / determinant);
     }
 
     /** @brief Returns the minor produced by removing a row and column. */

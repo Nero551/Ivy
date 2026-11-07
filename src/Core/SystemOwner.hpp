@@ -30,7 +30,7 @@ struct SystemOwner
         auto system = m_Systems.Find<T>();
         if (system == m_Systems.end())
         {
-            U::Log::Fatal(std::format("System Not Found: {}", typeid(T).name()));
+            U::Log::Error(std::format("System Not Found: {}", typeid(T).name()));
         }
         return static_cast<T&>(**system);
     }
@@ -47,7 +47,7 @@ struct SystemOwner
     {
         if (m_Systems.Contains<T>())
         {
-            U::Log::Fatal("System Already Exists");
+            U::Log::Error("System Already Exists");
         }
 
         m_Systems.Emplace<T>(std::make_unique<T>(m_Engine));

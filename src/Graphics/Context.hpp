@@ -56,7 +56,7 @@ inline void Initialize()
 
     if (!glfwInit())
     {
-        U::Log::Fatal("Failed to initialize GLFW");
+        U::Log::Error("Failed to initialize GLFW");
     }
 }
 

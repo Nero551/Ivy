@@ -55,7 +55,7 @@ struct Engine
         auto module = m_Modules.Find<T>();
         if (module == m_Modules.end())
         {
-            U::Log::Fatal(std::format("Module {} not found", typeid(T).name()));
+            U::Log::Error(std::format("Module {} not found", typeid(T).name()));
         }
         return static_cast<T&>(**module);
     }
@@ -65,7 +65,7 @@ struct Engine
         auto service = m_Services.Find<T>();
         if (service == m_Services.end())
         {
-            U::Log::Fatal(std::format("Service Not Found: {}", typeid(T).name()));
+            U::Log::Error(std::format("Service Not Found: {}", typeid(T).name()));
         }
         return static_cast<T&>(**service);
     }

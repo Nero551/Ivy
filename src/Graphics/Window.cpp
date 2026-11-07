@@ -19,14 +19,14 @@ void Window::Generate(const int width, const int height, std::string_view title)
     m_GlfwWindow = glfwWindow;
     if (!glfwWindow)
     {
-        U::Log::Fatal("Failed To Create Window");
+        U::Log::Error("Failed To Create Window");
     }
 
     MakeCurrentContext();
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
     {
-        U::Log::Fatal("Failed To Initialize GLAD");
+        U::Log::Error("Failed To Initialize GLAD");
     }
 
     U::Log::Info(glGetString(GL_VERSION));

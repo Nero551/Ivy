@@ -25,6 +25,7 @@ static void BM_Track_SetDifferentValue(benchmark::State& state)
         t.Set(value);
         t.ClearChanged();
         ++value;
+        benchmark::DoNotOptimize(t);
     }
 }
 BENCHMARK(BM_Track_SetDifferentValue);

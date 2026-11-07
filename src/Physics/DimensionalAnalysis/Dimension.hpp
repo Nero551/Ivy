@@ -1,13 +1,12 @@
 #pragma once
+#include "Math/BasicOperations.hpp"
 #include "Math/Common/Exponentials.hpp"
-#include "Math/Complex/Complex.hpp"
-#include "Math/Concepts.hpp"
-#include "Math/Quaternion/Quaternion.hpp"
+#include "Math/Scalar.hpp"
+
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include <concepts>
 #include <ostream>
-#include <type_traits>
 #include <utility>
 
 namespace Ivy::P
@@ -196,7 +195,7 @@ struct Dimension
 
 template <int N, typename T, typename D>
 P::Dimension<M::MultiplicationResult<T, T>, Exponentiate<D, D::Exponent * N>> Pow(
-    const P::Dimension<T, D>& dim) requires(M::Power<T, float>)
+    const P::Dimension<T, D>& dim) requires(M::Power<T, int>)
 {
     return M::Pow(dim.Value, N);
 }

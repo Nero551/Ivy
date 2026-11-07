@@ -1,13 +1,15 @@
 #pragma once
 
+#include "Math/Scalar.hpp"
+
 namespace Ivy::M
 {
-constexpr float Ln(const float x)
+template <Scalar T> constexpr T Ln(const T x)
 {
     return std::log(x);
 }
 
-constexpr float Log(const float base, const float x)
+template <Scalar T> constexpr T Log(const T base, const T x)
 {
     return Ln(x) / Ln(base);
 }

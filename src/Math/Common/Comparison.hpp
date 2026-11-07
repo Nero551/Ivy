@@ -1,7 +1,6 @@
 #pragma once
 #include "Constants.hpp"
-#include "Math/Concepts.hpp"
-#include "stl.hpp"
+#include "Math/Scalar.hpp"
 
 namespace Ivy::M
 {

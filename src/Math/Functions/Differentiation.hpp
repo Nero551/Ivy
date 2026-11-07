@@ -1,7 +1,7 @@
 #pragma once
 #include "Function.hpp"
 #include "Math/Common/Constants.hpp"
-#include "Math/Concepts.hpp"
+#include "Math/Scalar.hpp"
 
 namespace Ivy::M
 {
@@ -44,7 +44,7 @@ Function<Output, Input> Differentiate(const Function<Output, Input>& f, Input dx
         case DifferentiationMethod::Backward:
             return (f(x) - f(x - h)) / h;
         default:
-            U::Log::Fatal("Invalid Differentiation Method");
+            U::Log::Error("Invalid Differentiation Method");
             return Output{};
         }
     };

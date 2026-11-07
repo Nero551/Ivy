@@ -32,7 +32,7 @@ template <Scalar T> struct Vector<4, T>
         case 3:
             return w;
         default:
-            U::Log::Fatal("Index : ", component, " doesn't exist in vector(x, y, z, w)");
+            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z, w)");
         }
     }
 
@@ -50,7 +50,7 @@ template <Scalar T> struct Vector<4, T>
         case 3:
             return w;
         default:
-            U::Log::Fatal("Index : ", component, " doesn't exist in vector(x, y, z, w)");
+            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z, w)");
         }
     }
 

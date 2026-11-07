@@ -4,6 +4,8 @@
 
 namespace Ivy::Benchmarks
 {
+using benchmark::DoNotOptimize;
+
 using namespace Ivy::U;
 
 template <std::size_t N> constexpr std::array<int, N> Reverse()
@@ -94,7 +96,7 @@ BENCHMARK(BM_Sort_Insertion_N64);
 
 static void BM_Sort_Merge(benchmark::State& state)
 {
-    constexpr auto a = []()
+    auto a = []()
     {
         std::array<int, 32> r{};
         for (int i = 0; i < 32; ++i)
@@ -103,7 +105,7 @@ static void BM_Sort_Merge(benchmark::State& state)
         }
         return r;
     }();
-    constexpr auto b = []()
+    auto b = []()
     {
         std::array<int, 32> r{};
         for (int i = 0; i < 32; ++i)
@@ -114,6 +116,7 @@ static void BM_Sort_Merge(benchmark::State& state)
     }();
     for (auto _ : state)
     {
+        a[0] = static_cast<int>(state.iterations() & 31);
         auto m = U::MergeSort(a, b);
         benchmark::DoNotOptimize(m);
     }

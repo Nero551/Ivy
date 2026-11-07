@@ -1,7 +1,8 @@
 #pragma once
 #include "Function.hpp"
 #include "Math/Common/Constants.hpp"
-#include "Math/Concepts.hpp"
+#include "Math/Scalar.hpp"
+
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M
@@ -76,7 +77,7 @@ Function<Output, Input> Integrate(const Function<Output, Input>& f, Input lowerB
                 break;
 
             default:
-                U::Log::Fatal("Invalid Integration Method");
+                U::Log::Error("Invalid Integration Method");
             }
         }
 

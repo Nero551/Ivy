@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Math/Scalar.hpp"
+
 namespace Ivy::M
 {
-constexpr float Clamp(const float value, const float min, const float max)
+template <Scalar T> constexpr T Clamp(const T value, const T min, const T max)
 {
     return std::clamp(value, min, max);
 }
 /** @brief Smooth maximum */
-float SMax(float a, float b, float bias);
+template <Scalar T> T SMax(T a, T b, T bias);
 } // namespace Ivy::M

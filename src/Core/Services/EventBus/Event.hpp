@@ -2,7 +2,6 @@
 #include "stl.hpp"
 #include <concepts>
 #include <cstddef>
-#include <functional>
 #include <vector>
 
 namespace Ivy::C
@@ -32,7 +31,7 @@ template <typename T> struct Event : IEvent
     template <typename F> requires std::invocable<F, const T&>
     std::size_t Sub(F&& callback)
     {
-        const auto subscription = ++m_NextSubscription;
+        const auto subscription = m_NextSubscription++;
 
         m_Listeners.push_back({.Subscription = subscription, .Callback = std::forward<F>(callback)});
 

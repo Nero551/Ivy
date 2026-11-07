@@ -135,7 +135,7 @@ struct LinearSystem
             return LinearSolution<Variables, T>{SolutionType::Infinite, CreateSolutionSet()};
 
         default:
-            U::Log::Fatal("LinearSystem: Unknown solution type.");
+            U::Log::Error("LinearSystem: Unknown solution type.");
         }
     }
 

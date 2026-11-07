@@ -153,7 +153,8 @@ static void BM_ECS_ForEach_AcrossManyArchetypes(benchmark::State& state)
     for (auto _ : state)
     {
         int count = 0;
-        ecs.Query.ForEach<Position, Velocity>([&](unsigned int, Position&, Velocity&) { ++count; });
+        ecs.Query.ForEach<Position, Velocity>(
+            [&](unsigned int, Position& p, Velocity& v) { count += p.x * v.x + p.y * v.y; });
         benchmark::DoNotOptimize(count);
     }
     state.counters["per_archetype"] = state.range(0);

@@ -155,7 +155,7 @@ template <Scalar T = float> struct Complex
         case 1:
             return Imaginary;
         default:
-            U::Log::Fatal("Complex Number doesn't have index ", index, " (a + bi)");
+            U::Log::Error("Complex Number doesn't have index ", index, " (a + bi)");
         }
     }
 
@@ -168,7 +168,7 @@ template <Scalar T = float> struct Complex
         case 1:
             return Imaginary;
         default:
-            U::Log::Fatal("Complex Number doesn't have index ", index, " (a + bi)");
+            U::Log::Error("Complex Number doesn't have index ", index, " (a + bi)");
         }
     }
 

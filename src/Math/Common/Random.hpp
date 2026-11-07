@@ -1,4 +1,6 @@
 #pragma once
+#include "Math/Scalar.hpp"
+
 #include <random>
 namespace Ivy::M
 {
@@ -10,7 +12,7 @@ inline float Random()
     return distribution(rng);
 }
 
-inline float Random(const float min, const float max)
+template <Scalar T> inline T Random(const T min, const T max)
 {
     std::uniform_real_distribution distribution(min, max);
     return distribution(rng);
@@ -22,7 +24,7 @@ inline int Random(const int min, const int max)
     return distribution(rng);
 }
 
-inline float RandomGaussian(const float mean, const float standardDeviation)
+template <Scalar T> inline T RandomGaussian(const T mean, const T standardDeviation)
 {
     std::normal_distribution distribution(mean, standardDeviation);
     return distribution(rng);

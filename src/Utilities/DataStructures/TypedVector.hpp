@@ -82,7 +82,7 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
     {
         if (!Contains<Args...>())
         {
-            Log::Fatal("TypedVector does not contain the specified TypeId.");
+            Log::Error("TypedVector does not contain the specified TypeId.");
         }
 
         return m_Data[GetTypeId<Args...>()];

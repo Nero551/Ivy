@@ -61,7 +61,7 @@ struct Query
             std::byte* row = base + archetype.GetDenseIndex(entity.GetId().Index) * archetype.Stride;
             return *reinterpret_cast<T*>(row + offset);
         }
-        U::Log::Fatal("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
+        U::Log::Error("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
     }
 
     template <typename... Args>

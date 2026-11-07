@@ -24,7 +24,7 @@ Entity& World::GetRoot()
     auto root = m_Engine.ECS.TryFindEntity(m_Root);
     if (!root)
     {
-        U::Log::Fatal("No Root Is Set Or Root Is Not An Entity");
+        U::Log::Error("No Root Is Set Or Root Is Not An Entity");
     }
     return *root;
 }
@@ -34,7 +34,7 @@ Entity& World::GetCamera()
     auto camera = m_Engine.ECS.TryFindEntity(m_ActiveCamera);
     if (!camera)
     {
-        U::Log::Fatal("No Active Camera Is Set Or Active Camera Is Not An Entity");
+        U::Log::Error("No Active Camera Is Set Or Active Camera Is Not An Entity");
     }
     return *camera;
 }

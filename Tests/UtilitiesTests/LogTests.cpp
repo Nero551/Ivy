@@ -14,7 +14,7 @@ TEST(Log, PrintDoesNotCrash)
 
 TEST(Log, FatalThrows)
 {
-    EXPECT_THROW(Log::Fatal("boom"), std::exception);
+    EXPECT_THROW(Log::Error("boom"), std::exception);
 }
 
 TEST(Log, AssertPassesThrough)

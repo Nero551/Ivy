@@ -2,7 +2,7 @@
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
-#include "Math/Concepts.hpp"
+#include "Math/Scalar.hpp"
 #include <array>
 #include <concepts>
 #include <ostream>

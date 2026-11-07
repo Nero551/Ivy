@@ -1,7 +1,7 @@
+#include "Core/Services/EventBus/Event.hpp"
 #include <benchmark/benchmark.h>
 #include <cstddef>
 #include <vector>
-#include "Core/Services/EventBus/Event.hpp"
 
 namespace Ivy::Benchmarks
 {
@@ -30,6 +30,7 @@ static void BM_Event_Fire_NoListeners(benchmark::State& state)
     for (auto _ : state)
     {
         event.Fire();
+        benchmark::DoNotOptimize(event);
     }
 }
 BENCHMARK(BM_Event_Fire_NoListeners);
