@@ -21,7 +21,7 @@ static void BM_ECS_CreateDestroyEntity(benchmark::State& state)
     EntityComponentSystem ecs;
     for (auto _ : state)
     {
-        auto id = ecs.CreateEntity<BenchmarkEntity>().GetId();
+        auto id = ecs.CreateEntity().GetId();
         ecs.RemoveEntity(ecs.GetActiveEntity(id.Index));
     }
 }
@@ -35,7 +35,7 @@ static void BM_ECS_CreateN(benchmark::State& state)
         ecs.ReserveEntities(static_cast<size_t>(state.range(0)));
         for (int i = 0; i < state.range(0); ++i)
         {
-            ecs.CreateEntity<BenchmarkEntity>();
+            ecs.CreateEntity();
         }
         benchmark::DoNotOptimize(ecs.EntityAmount());
     }
@@ -46,7 +46,7 @@ BENCHMARK(BM_ECS_CreateN)->Arg(100)->Arg(1000)->Arg(10000)->Arg(100000)->Arg(100
 static void BM_ECS_FindEntity(benchmark::State& state)
 {
     EntityComponentSystem ecs;
-    auto id = ecs.CreateEntity<BenchmarkEntity>().GetId();
+    auto id = ecs.CreateEntity().GetId();
     for (auto _ : state)
     {
         auto& e = ecs.FindEntity(id);
@@ -58,7 +58,7 @@ BENCHMARK(BM_ECS_FindEntity);
 static void BM_ECS_TryFindEntity(benchmark::State& state)
 {
     EntityComponentSystem ecs;
-    auto id = ecs.CreateEntity<BenchmarkEntity>().GetId();
+    auto id = ecs.CreateEntity().GetId();
     for (auto _ : state)
     {
         auto p = ecs.TryFindEntity(id);
@@ -73,7 +73,7 @@ static void BM_ECS_EntityAmount(benchmark::State& state)
     ecs.ReserveEntities(100);
     for (int i = 0; i < 100; ++i)
     {
-        ecs.CreateEntity<BenchmarkEntity>();
+        ecs.CreateEntity();
     }
     for (auto _ : state)
     {

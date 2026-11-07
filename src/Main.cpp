@@ -46,7 +46,7 @@ int main(const int argc, char* argv[])
             engine.AddModule<Ivy::Profiling>();
             engine.AddModule<Ivy::Sandbox::Sandbox2D>();
 
-            engine.World.SetRoot(engine.ECS.CreateEntity<Ivy::C::Node>());
+            engine.World.SetRoot(Ivy::C::Node::Create(engine.ECS));
             engine.World.AddSystem<Ivy::C::TransformSystem>();
         }};
 

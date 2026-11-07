@@ -137,7 +137,7 @@ struct StressTester3D : C::System
         G::Mesh m = G::Primitives::CreateQuad("point");
         auto& mesh = resourceManager.Load<G::Mesh>(m);
 
-        auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        auto& point = R::MeshInstance3D::Create(m_Engine.ECS);
 
         query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
         query.GetComponent<CMP::Transform3D>(point).Scale = M::Vector<3>{0.2};

@@ -23,7 +23,7 @@ struct Grid2D : C::Scene
 
     void Initialize() override
     {
-        SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
+        SetRoot(C::Node::Create(m_Engine.ECS));
         CreateXY();
     }
 
@@ -44,7 +44,7 @@ struct Grid2D : C::Scene
         G::Mesh m = G::Primitives::CreateLine("Line");
         auto& line = resourceManager.Load<G::Mesh>(m);
 
-        auto& l = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+        auto& l = R::MeshInstance2D::Create(m_Engine.ECS);
 
         auto& materialComponent = query.GetComponent<CMP::Material>(l);
         auto& meshComponent = query.GetComponent<CMP::Mesh>(l);

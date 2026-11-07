@@ -26,7 +26,7 @@ ECS::EntityID Sandbox2D::CreateCircle()
 {
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
-    auto& circle = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+    auto& circle = R::MeshInstance2D::Create(m_Engine.ECS);
     query.GetComponent<CMP::Mesh>(circle).Mesh = &resources.Load(G::Primitives::CreateCircle("ball"));
 
     auto& vertSource = resources.Load<G::ShaderSource>(
@@ -51,7 +51,7 @@ ECS::EntityID Sandbox2D::CreateSquare()
 {
     auto& query = m_Engine.ECS.Query;
     auto& resources = m_Engine.GetService<C::ResourceManager>();
-    auto& square = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+    auto& square = R::MeshInstance2D::Create(m_Engine.ECS);
     query.GetComponent<CMP::Mesh>(square).Mesh = &resources.Load(G::Primitives::CreateQuad("cube"));
 
     auto& vertSource = resources.Load<G::ShaderSource>(
@@ -76,7 +76,7 @@ static ECS::EntityID particleId;
 
 void Sandbox2D::Start()
 {
-    auto& camera = m_Engine.ECS.CreateEntity<R::Camera2D>();
+    auto& camera = R::Camera2D::Create(m_Engine.ECS);
     m_Engine.World.GetRoot().AttachChild(camera);
     m_Engine.World.SetCamera(camera);
 

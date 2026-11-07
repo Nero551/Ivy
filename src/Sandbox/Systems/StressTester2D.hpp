@@ -118,7 +118,7 @@ struct StressTester2D : C::System
             resourceManager.Load<G::Mesh>(m);
         }
         auto& mesh = resourceManager.Load<G::Mesh>("stressPoint");
-        auto& point = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+        auto& point = R::MeshInstance2D::Create(m_Engine.ECS);
 
         query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
         query.GetComponent<CMP::Transform2D>(point).Scale = M::Vector<2>{0.2};

@@ -31,7 +31,7 @@ struct CoordinateAxes3D : C::Scene
         auto& query = m_Engine.ECS.Query;
         auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
 
-        SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
+        SetRoot(C::Node::Create(m_Engine.ECS));
 
         auto& lightShader = resourceManager.Load<G::Shader>("lightShader");
         lightShader().AssignSource(resourceManager.Load<G::ShaderSource>(
@@ -42,12 +42,12 @@ struct CoordinateAxes3D : C::Scene
         auto& lightMaterial = resourceManager.Load<G::Material>("lightMaterial");
         lightMaterial().Shader = &lightShader();
 
-        auto& light = m_Engine.ECS.CreateEntity<R::Light3D>();
+        auto& light = R::Light3D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Transform3D>(light).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5f)});
         light.SetParent(GetRoot());
 
-        auto& light2 = m_Engine.ECS.CreateEntity<R::Light3D>();
+        auto& light2 = R::Light3D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Transform3D>(light2).Rotation =
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5f)});
         light2.SetParent(GetRoot());
@@ -61,7 +61,7 @@ struct CoordinateAxes3D : C::Scene
         G::Mesh m = G::Primitives::CreateLine("Line");
         auto& line = resourceManager.Load<G::Mesh>(m);
 
-        auto& xAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        auto& xAxis = R::MeshInstance3D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
         auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
         xMaterial.Material = &resourceManager.Load<G::Material>("X-Axis Material");
@@ -72,7 +72,7 @@ struct CoordinateAxes3D : C::Scene
 
         GetRoot().AttachChild(xAxis);
 
-        auto& yAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        auto& yAxis = R::MeshInstance3D::Create(m_Engine.ECS);
 
         query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
 
@@ -87,7 +87,7 @@ struct CoordinateAxes3D : C::Scene
 
         yAxis.SetParent(GetRoot());
 
-        auto& zAxis = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        auto& zAxis = R::MeshInstance3D::Create(m_Engine.ECS);
 
         query.GetComponent<CMP::Mesh>(zAxis).Mesh = &line;
 

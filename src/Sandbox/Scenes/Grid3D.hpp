@@ -26,7 +26,7 @@ struct Grid3D : C::Scene
 
     void Initialize() override
     {
-        SetRoot(m_Engine.ECS.CreateEntity<C::Node>());
+        SetRoot(C::Node::Create(m_Engine.ECS));
 
         CreateXY();
         CreateXZ();
@@ -57,7 +57,7 @@ struct Grid3D : C::Scene
         G::Mesh m = G::Primitives::CreateLine("Line");
         auto& line = resourceManager.Load<G::Mesh>(m);
 
-        auto& l = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        auto& l = R::MeshInstance3D::Create(m_Engine.ECS);
 
         auto& materialComponent = query.GetComponent<CMP::Material>(l);
         auto& meshComponent = query.GetComponent<CMP::Mesh>(l);

@@ -2,7 +2,6 @@
 #include "EntityID.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include <functional>
-#include <utility>
 #include <vector>
 namespace Ivy::ECS
 {
@@ -49,11 +48,8 @@ struct Entity
 
     bool operator==(const Entity& other) const;
 
-  protected:
-    U::CheckedPtr<EntityComponentSystem> m_ECS;
-    virtual void Initialize() {}
-
   private:
+    U::CheckedPtr<EntityComponentSystem> m_ECS;
     EntityID m_Id;
     U::CheckedPtr<IArchetype> m_Archetype;
 

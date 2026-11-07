@@ -26,7 +26,7 @@ struct CoordinateAxes2D : C::Scene
         auto& query = m_Engine.ECS.Query;
         auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
 
-        SetRoot(m_Engine.ECS.CreateEntity<C::Node2D>());
+        SetRoot(C::Node2D::Create(m_Engine.ECS));
 
         auto& shader = resourceManager.Load<G::Shader>("AxisShader");
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
@@ -37,7 +37,7 @@ struct CoordinateAxes2D : C::Scene
         G::Mesh m = G::Primitives::CreateLine("Line");
         auto& line = resourceManager.Load<G::Mesh>(m);
 
-        auto& xAxis = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+        auto& xAxis = R::MeshInstance2D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
         auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
         xMaterial.Material = &resourceManager.Load<G::Material>("X-Axis Material");
@@ -48,7 +48,7 @@ struct CoordinateAxes2D : C::Scene
 
         xAxis.SetParent(GetRoot());
 
-        auto& yAxis = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+        auto& yAxis = R::MeshInstance2D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
         auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
         yMaterial.Material = &resourceManager.Load<G::Material>("Y-Axis Material");

@@ -11,30 +11,36 @@ template <typename Base, typename... Components>
 using ExtendComponents =
     decltype(std::tuple_cat(std::declval<Base>(), std::declval<std::tuple<Components...>>()));
 
-struct Node : ECS::Entity
+struct Node
 {
     using ComponentCombo = std::tuple<>;
-    using Entity::Entity;
-    void Initialize() override {}
-};
-
-struct Node2D : Node
-{
-    using ComponentCombo = ExtendComponents<Node::ComponentCombo, CMP::Transform2D>;
-    using Node::Node;
-    void Initialize() override
+    static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
-        m_ECS->Query.SetArchetype<ComponentCombo>(*this);
+        ECS::Entity& entity = ecs.CreateEntity();
+        ecs.Query.SetArchetype<ComponentCombo>(entity);
+        return entity;
     }
 };
 
-struct Node3D : Node
+struct Node2D
+{
+    using ComponentCombo = ExtendComponents<Node::ComponentCombo, CMP::Transform2D>;
+    static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
+    {
+        ECS::Entity& entity = ecs.CreateEntity();
+        ecs.Query.SetArchetype<ComponentCombo>(entity);
+        return entity;
+    }
+};
+
+struct Node3D
 {
     using ComponentCombo = ExtendComponents<Node::ComponentCombo, CMP::Transform3D>;
-    using Node::Node;
-    void Initialize() override
+    static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
-        m_ECS->Query.SetArchetype<ComponentCombo>(*this);
+        ECS::Entity& entity = ecs.CreateEntity();
+        ecs.Query.SetArchetype<ComponentCombo>(entity);
+        return entity;
     }
 };
 } // namespace Ivy::C

@@ -96,7 +96,7 @@ struct VectorFields3D : C::System
     {
         auto& query = m_Engine.ECS.Query;
 
-        auto& arrow = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+        auto& arrow = R::MeshInstance3D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(arrow).Mesh = m_Mesh;
         query.GetComponent<CMP::Material>(arrow).Material = m_Material;
 

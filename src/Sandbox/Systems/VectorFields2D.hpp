@@ -381,7 +381,7 @@ struct VectorFields2D : C::System
     {
         auto& query = m_Engine.ECS.Query;
 
-        auto& arrow = m_Engine.ECS.CreateEntity<R::MeshInstance2D>();
+        auto& arrow = R::MeshInstance2D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(arrow).Mesh = m_Mesh;
         query.GetComponent<CMP::Material>(arrow).Material = m_Material;
 

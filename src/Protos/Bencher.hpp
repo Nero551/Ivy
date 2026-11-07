@@ -28,7 +28,7 @@ void BenchECS()
     C::EntityComponentSystem ecs;
     for (int i = 0; i < 10000000; ++i)
     {
-        auto& e = ecs.CreateEntity<C::>();
+        auto& e = ecs.CreateEntity();
         if (i % 2 == 0)
         {
             ecs.Query.SetArchetype<A, B, D>(e);

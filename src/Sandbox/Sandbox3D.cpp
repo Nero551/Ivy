@@ -18,7 +18,7 @@ void Sandbox3D::Start()
     m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
 
     auto& query = m_Engine.ECS.Query;
-    auto& camera = m_Engine.ECS.CreateEntity<R::Camera3D>();
+    auto& camera = R::Camera3D::Create(m_Engine.ECS);
     query.GetComponent<CMP::Transform3D>(camera).Position = {0, 0, 10};
     m_Engine.World.GetRoot().AttachChild(camera);
     m_Engine.World.SetCamera(camera);
@@ -35,7 +35,7 @@ void Sandbox3D::Start()
     GetSystem<VectorFields3D>().LorenzSystem();
 
     // auto& resources = m_Engine.GetService<C::ResourceManager>();
-    // auto& square = m_Engine.ECS.CreateEntity<R::MeshInstance3D>();
+    // auto& square = R::MeshInstance3D::Create(m_Engine.ECS);
     // query.GetComponent<CMP::Mesh>(square).Mesh =
     //     &resources.Load(G::Primitives::CreateQuad("TerrainQuad", 20, 20));
 

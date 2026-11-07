@@ -35,7 +35,7 @@ static void BM_ECS_SetArchetype_FirstTime(benchmark::State& state)
     for (auto _ : state)
     {
         EntityComponentSystem ecs;
-        auto& e = ecs.CreateEntity<BenchmarkEntity>();
+        auto& e = ecs.CreateEntity();
         ecs.Query.SetArchetype<Position, Velocity>(e);
         benchmark::DoNotOptimize(e);
     }
@@ -45,7 +45,7 @@ BENCHMARK(BM_ECS_SetArchetype_FirstTime);
 static void BM_ECS_SetArchetype_SameArchetype(benchmark::State& state)
 {
     EntityComponentSystem ecs;
-    auto& e = ecs.CreateEntity<BenchmarkEntity>();
+    auto& e = ecs.CreateEntity();
     ecs.Query.SetArchetype<Position, Velocity>(e);
     for (auto _ : state)
     {
@@ -59,7 +59,7 @@ static void BM_ECS_ArchetypeMigration(benchmark::State& state)
     // Alternates the entity between {Position} and {Position, Velocity} —
     // exercises the component-copy migration path in SetArchetypeTypes.
     EntityComponentSystem ecs;
-    auto& e = ecs.CreateEntity<BenchmarkEntity>();
+    auto& e = ecs.CreateEntity();
     bool toggle = false;
     for (auto _ : state)
     {
@@ -79,7 +79,7 @@ BENCHMARK(BM_ECS_ArchetypeMigration);
 static void BM_ECS_HasComponent(benchmark::State& state)
 {
     EntityComponentSystem ecs;
-    auto& e = ecs.CreateEntity<BenchmarkEntity>();
+    auto& e = ecs.CreateEntity();
     ecs.Query.SetArchetype<Position, Velocity>(e);
     for (auto _ : state)
     {
@@ -92,7 +92,7 @@ BENCHMARK(BM_ECS_HasComponent);
 static void BM_ECS_GetComponent(benchmark::State& state)
 {
     EntityComponentSystem ecs;
-    auto& e = ecs.CreateEntity<BenchmarkEntity>();
+    auto& e = ecs.CreateEntity();
     ecs.Query.SetArchetype<Position, Velocity>(e);
     for (auto _ : state)
     {
@@ -105,7 +105,7 @@ BENCHMARK(BM_ECS_GetComponent);
 static void BM_ECS_TryGetComponent(benchmark::State& state)
 {
     EntityComponentSystem ecs;
-    auto& e = ecs.CreateEntity<BenchmarkEntity>();
+    auto& e = ecs.CreateEntity();
     ecs.Query.SetArchetype<Position, Velocity>(e);
     for (auto _ : state)
     {
@@ -121,7 +121,7 @@ static void BM_ECS_ForEach(benchmark::State& state)
     ecs.ReserveEntities(static_cast<size_t>(state.range(0)));
     for (int i = 0; i < state.range(0); ++i)
     {
-        auto& e = ecs.CreateEntity<BenchmarkEntity>();
+        auto& e = ecs.CreateEntity();
         ecs.Query.SetArchetype<Position, Velocity>(e);
     }
     for (auto _ : state)
@@ -146,11 +146,11 @@ static void BM_ECS_ForEach_AcrossManyArchetypes(benchmark::State& state)
     ecs.ReserveEntities(static_cast<size_t>(state.range(0)) * 3);
     for (int i = 0; i < state.range(0); ++i)
     {
-        auto& e1 = ecs.CreateEntity<BenchmarkEntity>();
+        auto& e1 = ecs.CreateEntity();
         ecs.Query.SetArchetype<Position, Velocity>(e1);
-        auto& e2 = ecs.CreateEntity<BenchmarkEntity>();
+        auto& e2 = ecs.CreateEntity();
         ecs.Query.SetArchetype<Position, Health>(e2);
-        auto& e3 = ecs.CreateEntity<BenchmarkEntity>();
+        auto& e3 = ecs.CreateEntity();
         ecs.Query.SetArchetype<Position, Velocity, Health>(e3);
     }
     for (auto _ : state)
@@ -171,7 +171,7 @@ static void BM_ECS_SimulatedGameFrame(benchmark::State& state)
     ecs.ReserveEntities(static_cast<size_t>(state.range(0)));
     for (int i = 0; i < state.range(0); ++i)
     {
-        auto& e = ecs.CreateEntity<BenchmarkEntity>();
+        auto& e = ecs.CreateEntity();
         ecs.Query.SetArchetype<Position, Velocity, Health>(e);
     }
     for (auto _ : state)

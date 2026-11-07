@@ -20,8 +20,8 @@ static void BM_ECS_AttachDetach(benchmark::State& state)
 {
     EntityComponentSystem ecs;
     ecs.ReserveEntities(2);
-    auto parentId = ecs.CreateEntity<BenchmarkEntity>().GetId();
-    auto childId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+    auto parentId = ecs.CreateEntity().GetId();
+    auto childId = ecs.CreateEntity().GetId();
 
     for (auto _ : state)
     {
@@ -36,10 +36,10 @@ static void BM_ECS_GetChildren(benchmark::State& state)
     // Star tree: root with N children.
     EntityComponentSystem ecs;
     ecs.ReserveEntities(static_cast<size_t>(state.range(0)) + 1);
-    auto parentId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+    auto parentId = ecs.CreateEntity().GetId();
     for (int i = 0; i < state.range(0); ++i)
     {
-        auto childId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+        auto childId = ecs.CreateEntity().GetId();
         ecs.GetActiveEntity(parentId.Index).AttachChild(ecs.GetActiveEntity(childId.Index));
     }
     for (auto _ : state)
@@ -55,10 +55,10 @@ static void BM_ECS_GetDescendants(benchmark::State& state)
 {
     EntityComponentSystem ecs;
     ecs.ReserveEntities(static_cast<size_t>(state.range(0)) + 1);
-    auto rootId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+    auto rootId = ecs.CreateEntity().GetId();
     for (int i = 0; i < state.range(0); ++i)
     {
-        auto childId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+        auto childId = ecs.CreateEntity().GetId();
         ecs.GetActiveEntity(rootId.Index).AttachChild(ecs.GetActiveEntity(childId.Index));
     }
     for (auto _ : state)
@@ -77,10 +77,10 @@ static void BM_ECS_DestroyTree(benchmark::State& state)
     {
         EntityComponentSystem ecs;
         ecs.ReserveEntities(static_cast<size_t>(state.range(0)) + 1);
-        auto rootId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+        auto rootId = ecs.CreateEntity().GetId();
         for (int i = 0; i < state.range(0); ++i)
         {
-            auto childId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+            auto childId = ecs.CreateEntity().GetId();
             ecs.GetActiveEntity(rootId.Index).AttachChild(ecs.GetActiveEntity(childId.Index));
         }
         ecs.RemoveEntity(ecs.GetActiveEntity(rootId.Index));
@@ -94,11 +94,11 @@ static void BM_ECS_IsDescendantOf_Star(benchmark::State& state)
     // Root with N direct children — O(1) check.
     EntityComponentSystem ecs;
     ecs.ReserveEntities(static_cast<size_t>(state.range(0)) + 1);
-    auto rootId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+    auto rootId = ecs.CreateEntity().GetId();
     unsigned int lastIdx = rootId.Index;
     for (int i = 0; i < state.range(0); ++i)
     {
-        auto childId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+        auto childId = ecs.CreateEntity().GetId();
         lastIdx = childId.Index;
         ecs.GetActiveEntity(rootId.Index).AttachChild(ecs.GetActiveEntity(childId.Index));
     }
@@ -116,12 +116,12 @@ static void BM_ECS_IsDescendantOf_Chain(benchmark::State& state)
     // Linear chain root → c1 → c2 → ... → cN — O(N) check.
     EntityComponentSystem ecs;
     ecs.ReserveEntities(static_cast<size_t>(state.range(0)) + 1);
-    auto rootId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+    auto rootId = ecs.CreateEntity().GetId();
     unsigned int prevIdx = rootId.Index;
     unsigned int lastIdx = rootId.Index;
     for (int i = 0; i < state.range(0); ++i)
     {
-        auto childId = ecs.CreateEntity<BenchmarkEntity>().GetId();
+        auto childId = ecs.CreateEntity().GetId();
         ecs.GetActiveEntity(prevIdx).AttachChild(ecs.GetActiveEntity(childId.Index));
         prevIdx = childId.Index;
         lastIdx = childId.Index;

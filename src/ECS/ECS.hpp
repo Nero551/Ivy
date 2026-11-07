@@ -8,8 +8,8 @@
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/Event.hpp"
-#include <concepts>
 #include <cstddef>
+#include <utility>
 #include <vector>
 namespace Ivy::ECS
 {
@@ -58,12 +58,11 @@ struct EntityComponentSystem
         return m_Entities[id];
     }
 
-    template <typename T> Entity& CreateEntity() requires std::derived_from<T, Entity>
+    Entity& CreateEntity()
     {
         const EntityID id = m_Ids.Acquire();
-        T entity{*this};
+        Entity entity{*this};
         entity.m_Id = id;
-        entity.Initialize();
 
         EntityHierarchy.Ensure(id.Index);
         auto it = m_Entities.Emplace(id.Index, std::move(entity));

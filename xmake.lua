@@ -118,9 +118,6 @@ target("Ivy")
     end)
 
 target("IvyTests")
-    -- if not get_config("mode") then
-    --     set_config("mode", "release")
-    -- end
     set_kind("binary")
     set_rundir(os.projectdir())
 
@@ -129,9 +126,6 @@ target("IvyTests")
     add_packages("gtest")
 
 target("IvyBenchmarks")
-    -- if not get_config("mode") then
-    --     set_config("mode", "release")
-    -- end
     set_kind("binary")
     set_rundir(os.projectdir())
 
