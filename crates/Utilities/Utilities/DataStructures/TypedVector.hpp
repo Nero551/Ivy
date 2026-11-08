@@ -1,6 +1,10 @@
 #pragma once
 
 #include "../Debug/Log.hpp"
+#include <concepts>
+#include <limits>
+#include <type_traits>
+#include <vector>
 
 namespace Ivy::U
 {
@@ -74,8 +78,7 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
 
     template <typename... Args> bool Contains() const
     {
-        const TypeIdType typeId = GetTypeId<Args...>();
-        return typeId < m_Data.size();
+        return GetTypeId<Args...>() != InvalidTypeId && GetTypeId<Args...>() < m_Data.size();
     }
 
     template <typename... Args> T& At()

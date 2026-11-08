@@ -1,6 +1,7 @@
 set_languages("c++26")
 set_toolchains("clang")
 
+---@diagnostic disable-next-line: param-type-not-match
 add_rules("plugin.compile_commands.autoupdate", { lsp = "clang" })
 add_rules("mode.debug", "mode.release")
 
@@ -23,15 +24,18 @@ target("Ivy")
     add_deps("IvyUtilities", "IvyMath", "IvyPhysics", "IvyGraphics", "IvyECS", "IvyCore")
 
     if is_plat("linux") then
+        ---@diagnostic disable-next-line: param-type-not-match
         add_ldflags("-static-libstdc++", "-static-libgcc", { force = true })
     elseif is_plat("windows") then
         set_runtimes("MT")
     end
 
     if is_mode("release") then
+        add_defines("RELEASE")
         remove_files("src/TracyMemory.cpp")
         set_policy("build.optimization.lto", true)
     else
+        add_defines("DEBUG")
         add_links("TracyClient")
         add_defines("TRACY_ENABLE")
         add_defines("TRACY_PROFILE_MEMORY")

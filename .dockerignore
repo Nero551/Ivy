@@ -1,0 +1,12 @@
+.git/
+build/
+.cache/
+compile_commands.json
+.idea/
+.zed/
+Traces/
+benchmarks/
+tests/
+docs/
+templates/
+.xmake/

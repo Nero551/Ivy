@@ -5,12 +5,18 @@
 #include "ECS/EntityComponentSystem.hpp"
 #include "Graphics/Window.hpp"
 #include "Module.hpp"
+#include "Utilities/DataStructures/NonTypedVector.hpp"
+#include "Utilities/DataStructures/StringMap.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/FixedString.hpp"
 #include <concepts>
 #include <format>
 #include <functional>
 #include <memory>
+#include <string>
+#include <string_view>
+#include <unordered_map>
 
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C

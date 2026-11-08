@@ -2,9 +2,7 @@
 
 #include "Core/Service.hpp"
 #include "Graphics/Context.hpp"
-#include "tracy/Tracy.hpp"
-#define TRACY_OPENGL_AUTO_CALIBRATION
-#include "tracy/TracyOpenGL.hpp"
+#include "Utilities/Debug/Profiling.hpp"
 
 namespace Ivy::C
 {
@@ -45,9 +43,9 @@ void Engine::Start()
 {
     m_Configuration(*this);
 
-    TracyGpuContext;
-    ZoneScopedN("Start");
-    TracyGpuZone("Start");
+    IVY_PROFILE_GPU_CONTEXT;
+    IVY_PROFILE_ZONE("Start");
+    IVY_PROFILE_GPU_ZONE("Start");
 
     for (auto& service : m_Services)
     {
@@ -64,8 +62,8 @@ void Engine::Start()
 
 void Engine::BeginFrame()
 {
-    ZoneScopedN("Begin Frame");
-    TracyGpuZone("Begin Frame");
+    IVY_PROFILE_ZONE("Begin Frame");
+    IVY_PROFILE_GPU_ZONE("Begin Frame");
 
     TimeHandler.CalculateTime(G::Context::GetTime());
     Window.PollEvents();
@@ -84,8 +82,8 @@ void Engine::BeginFrame()
 
 void Engine::FixedUpdate()
 {
-    ZoneScopedN("Fixed Update");
-    TracyGpuZone("Fixed Update");
+    IVY_PROFILE_ZONE("Fixed Update");
+    IVY_PROFILE_GPU_ZONE("Fixed Update");
 
     World.FixedUpdate(TimeHandler.GetFixedDelta());
     for (auto& module : m_Modules)
@@ -101,8 +99,8 @@ void Engine::FixedUpdate()
 
 void Engine::Update()
 {
-    ZoneScopedN("Update");
-    TracyGpuZone("Update");
+    IVY_PROFILE_ZONE("Update");
+    IVY_PROFILE_GPU_ZONE("Update");
 
     World.Update(TimeHandler.GetDelta());
 
@@ -119,8 +117,8 @@ void Engine::Update()
 
 void Engine::Render()
 {
-    ZoneScopedN("Render");
-    TracyGpuZone("Render");
+    IVY_PROFILE_ZONE("Render");
+    IVY_PROFILE_GPU_ZONE("Render");
 
     World.Render();
     for (auto& module : m_Modules)
@@ -136,8 +134,8 @@ void Engine::Render()
 
 void Engine::EndFrame()
 {
-    ZoneScopedN("End Frame");
-    TracyGpuZone("End Frame");
+    IVY_PROFILE_ZONE("End Frame");
+    IVY_PROFILE_GPU_ZONE("End Frame");
 
     Window.SwapBuffers();
     World.EndFrame(TimeHandler.GetDelta());
@@ -152,14 +150,14 @@ void Engine::EndFrame()
         service->EndFrame(TimeHandler.GetDelta());
     }
 
-    FrameMark;
-    TracyGpuCollect;
+    IVY_PROFILE_FRAME_MARK;
+    IVY_PROFILE_GPU_COLLECT;
 }
 
 void Engine::Stop()
 {
-    ZoneScopedN("Stop");
-    TracyGpuZone("Stop");
+    IVY_PROFILE_ZONE("Stop");
+    IVY_PROFILE_GPU_ZONE("Stop");
     auto& services = m_Services;
     World.Stop();
 

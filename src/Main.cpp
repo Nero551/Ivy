@@ -3,13 +3,10 @@
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Systems/TransformSystem.hpp"
 #include "Graphics/Context.hpp"
-#include "Graphics/Shader/Shader.hpp"
-#include "Math/Quaternion/Quaternion.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
 #include "Sandbox/Sandbox2D.hpp"
-#include "Sandbox/Sandbox3D.hpp"
 #include "sketch.hpp"
 #include <string_view>
 
@@ -28,7 +25,7 @@ int main(const int argc, char* argv[])
     }
 
     Sketch::Test();
-    // return 0;
+    return 0;
 
     Ivy::G::Context::Initialize();
     Ivy::C::Engine engine{[](Ivy::C::Engine& engine)

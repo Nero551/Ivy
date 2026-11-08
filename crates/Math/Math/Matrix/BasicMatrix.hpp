@@ -1,8 +1,14 @@
 #pragma once
 // IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include <algorithm>
+#include <array>
+#include <concepts>
+#include <ostream>
 
 namespace Ivy::M
 {

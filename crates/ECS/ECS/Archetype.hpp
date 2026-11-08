@@ -15,7 +15,6 @@ namespace Ivy::ECS
 
 struct IArchetype
 {
-    using ComponentCombo = std::tuple<>;
     virtual ~IArchetype() = default;
 
     Signature Supported;

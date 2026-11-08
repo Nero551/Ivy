@@ -1,14 +1,13 @@
 #pragma once
+#include "Math/BasicOperations.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Scalar.hpp"
 
 #include "Math/Functions/Function.hpp"
-#include "Utilities/Debug/Log.hpp"
-#include <cstdlib>
+#include "Optimizations.hpp"
 
 namespace Ivy::M
 {
-
 /**
 * @brief Numerically evaluates the inverse of a function using Newton's method.
 * @param f Function to invert.
@@ -22,23 +21,8 @@ template <Scalar Input, Scalar Output>
 Input EvaluateInverse(const Function<Output, Input>& f, Output y, Input initialGuess, Input epsilon = EPSILON,
     unsigned int iterations = 100) requires(Additive<Input, Input>)
 {
-    Input x = initialGuess;
-
-    for (unsigned int i = 0; i < iterations; ++i)
-    {
-        Output fx = f(x) - y;
-
-        if (std::abs(fx) <= epsilon)
-        {
-            break;
-        }
-        Input dfx = Derivative(f, x);
-        U::Log::Assert(std::abs(dfx) > epsilon, "InverseEvaluate: Derivative is too close to zero: ", dfx);
-
-        x -= fx / dfx;
-    }
-
-    return x;
+    return NewtonMethod(Function<Output, Input>{[f, y](const Input x) { return f(x) - y; }}, initialGuess,
+        epsilon, iterations);
 }
 
 /**

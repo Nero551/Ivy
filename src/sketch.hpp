@@ -1,17 +1,28 @@
 #pragma once
 
-#include "Core/System.hpp"
+#include "Math/Common/Exponentials.hpp"
+#include "Math/Common/Random.hpp"
+#include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Functions/Inverse.hpp"
+#include "Math/Functions/Optimizations.hpp"
+#include "Math/MathTuple.hpp"
+#include "Math/Matrix/Matrices.hpp"
 #include "Math/Scalar.hpp"
+#include "Math/Vector/Vectors.hpp"
+#include "Utilities/DataStructures/NonTypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/FixedString.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
 #include <cstdlib>
 #include <dlfcn.h>
+#include <limits>
 #include <ostream>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace Sketch
 {
@@ -23,7 +34,7 @@ namespace Sketch
 // TODO: need particle system (cpu particle & gpu particle(compute shaders))
 // TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
 
-//TODO: all this time i been thinking how to make cpu side easier to use and more optimized & automatic, even for graphics. \
+//TODO: all this time i been thinking how to make cpu side more automatic for graphics. \
 //i should be thinking about how to make cpu -> gpu pipeline easier to MODIFY and use. not make gpu/shaders as automatic as possible.
 
 using namespace Ivy;
@@ -290,5 +301,24 @@ struct Shader
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //TODO: new performance bottleneck: renderer.
 
-inline void Test() {}
+//TODO: Utilities crate needs a nice cleaning. specially data structures. they are packed with all kinds of unnecessary edge case handling.
+//TODO: i need to formally define convergence and divergence & limits (numerically ofc).
+//
+// TODO: automatic differentiation via dual numbers.
+
+inline void Test()
+{
+    using F = M::Function<float, float>;
+
+    F b = [](float w) { return 2 * w; };
+    F h = [](float w) { return 5 / (w * w); };
+
+    F c1 = [b](float w) { return w * b(w) * 10; };
+    F c2 = [h](float w) { return h(w) * w * 12; };
+    F c3 = [h, b](float w) { return b(w) * h(w) * 12; };
+
+    F C = c1 + c2 + c3;
+
+    U::Log::Info(M::Minimize(C, 0.0f, 1000.0f, M::Interval::Open, 1000));
+}
 } // namespace Sketch
