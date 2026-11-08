@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../Core/World/Scene.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Core/World/Nodes.hpp"
+#include "Core/World/Scene.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
@@ -30,9 +30,9 @@ struct CoordinateAxes2D : C::Scene
 
         auto& shader = resourceManager.Load<G::Shader>("AxisShader");
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "axisFrag", "Assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+            "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "axisVert", "Assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+            "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
         G::Mesh m = G::Primitives::CreateLine("Line");
         auto& line = resourceManager.Load<G::Mesh>(m);

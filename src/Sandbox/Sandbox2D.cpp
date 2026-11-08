@@ -30,9 +30,9 @@ ECS::EntityID Sandbox2D::CreateCircle()
     query.GetComponent<CMP::Mesh>(circle).Mesh = &resources.Load(G::Primitives::CreateCircle("ball"));
 
     auto& vertSource = resources.Load<G::ShaderSource>(
-        "circleShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+        "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
     auto& fragSource = resources.Load<G::ShaderSource>(
-        "circleShaderFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+        "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
 
     auto& shader = resources.Load<G::Shader>("circleShader", vertSource, fragSource);
     auto& mat = resources.Load<G::Material>("circleMat");
@@ -55,9 +55,9 @@ ECS::EntityID Sandbox2D::CreateSquare()
     query.GetComponent<CMP::Mesh>(square).Mesh = &resources.Load(G::Primitives::CreateQuad("cube"));
 
     auto& vertSource = resources.Load<G::ShaderSource>(
-        "squareShaderVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+        "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
     auto& fragSource = resources.Load<G::ShaderSource>(
-        "squareShaderFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+        "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
 
     auto& shader = resources.Load<G::Shader>("squareShader", vertSource, fragSource);
     auto& mat = resources.Load<G::Material>("squareMat");

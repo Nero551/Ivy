@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../Graphics/InputEnums/CursorMode.hpp"
-#include "../../Graphics/InputEnums/Key.hpp"
-#include "../../Graphics/InputEnums/MouseButton.hpp"
 #include "Core/Module.hpp"
+#include "Graphics/InputEnums/CursorMode.hpp"
+#include "Graphics/InputEnums/Key.hpp"
+#include "Graphics/InputEnums/MouseButton.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include <array>
 

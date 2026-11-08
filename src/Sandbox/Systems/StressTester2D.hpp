@@ -135,9 +135,9 @@ struct StressTester2D : C::System
             auto& shader = resourceManager.Load<G::Shader>("pointShader");
 
             shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-                "pointVert", "Assets/Shaders/shader.vert", G::ShaderStage::Vertex));
+                "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
             shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-                "pointFrag", "Assets/Shaders/shader.frag", G::ShaderStage::Fragment));
+                "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
             material().Shader = &shader();
             material().Color = {1, 1, 1, 1};

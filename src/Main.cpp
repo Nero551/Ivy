@@ -3,6 +3,8 @@
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Systems/TransformSystem.hpp"
 #include "Graphics/Context.hpp"
+#include "Graphics/Shader/Shader.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
@@ -31,11 +33,12 @@ int main(const int argc, char* argv[])
     Ivy::G::Context::Initialize();
     Ivy::C::Engine engine{[](Ivy::C::Engine& engine)
         {
-            engine.Window.Generate(800, 600, "Ivy");
             engine.Window.Config.X11ClassName = "ivy_engine";
             engine.Window.Config.WaylandAppId = "ivy_engine";
-            engine.Window.SetIcon({"Assets/icon.png"});
-            engine.Window.SetCursor({"Assets/cursor.png"});
+
+            engine.Window.Generate(800, 600, "Ivy");
+            engine.Window.SetIcon({"assets/icon.png"});
+            engine.Window.SetCursor({"assets/cursor.png"});
             // engine.Window.SetSize(1920, 1200);
             // Ivy::G::Context::SwapInterval(0);
 
@@ -51,7 +54,6 @@ int main(const int argc, char* argv[])
         }};
 
     engine.Run();
-    ;
     Ivy::G::Context::Terminate();
     return 0;
 }

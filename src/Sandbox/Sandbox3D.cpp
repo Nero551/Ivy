@@ -40,9 +40,9 @@ void Sandbox3D::Start()
     //     &resources.Load(G::Primitives::CreateQuad("TerrainQuad", 20, 20));
 
     // auto& vertSource = resources.Load<G::ShaderSource>(
-    //     "TerrainShaderVert", "Assets/Shaders/TerrainShader.vert", G::ShaderStage::Vertex);
+    //     "TerrainShaderVert", "assets/Shaders/TerrainShader.vert", G::ShaderStage::Vertex);
     // auto& fragSource = resources.Load<G::ShaderSource>(
-    //     "TerrainShaderFrag", "Assets/Shaders/TerrainShader.frag", G::ShaderStage::Fragment);
+    //     "TerrainShaderFrag", "assets/Shaders/TerrainShader.frag", G::ShaderStage::Fragment);
 
     // auto& shader = resources.Load<G::Shader>("TerrainShader", vertSource, fragSource);
     // auto& mat = resources.Load<G::Material>("TerrainMat");

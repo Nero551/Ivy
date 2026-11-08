@@ -1,7 +1,7 @@
 #include "Input.hpp"
-#include "../../Graphics/InputEnums/Action.hpp"
-#include "../../Graphics/InputEnums/CursorMode.hpp"
 #include "Core/Engine.hpp"
+#include "Graphics/InputEnums/Action.hpp"
+#include "Graphics/InputEnums/CursorMode.hpp"
 #include "Graphics/Window.hpp"
 #include "Math/Vector/Vectors.hpp"
 

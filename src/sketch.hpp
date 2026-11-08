@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/System.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Utilities/Debug/Log.hpp"

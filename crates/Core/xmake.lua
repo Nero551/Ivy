@@ -1,0 +1,12 @@
+
+target("IvyCore")
+    set_kind("static")
+    set_rundir(os.projectdir())
+    add_includedirs(".", { public = true })
+    add_files("Core/**.cpp")
+    add_deps("IvyUtilities", "IvyGraphics", "IvyECS")
+    add_packages("tracy", { public = true })
+    on_load( function (_target)
+        local umbrella = import("generate-umbrellas")
+        umbrella.GenerateUmbrellaHeader("crates/Core/Core", "Include")
+    end)

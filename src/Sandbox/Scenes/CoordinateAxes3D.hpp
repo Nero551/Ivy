@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../Core/World/Scene.hpp"
 #include "Core/Engine.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Core/World/Nodes.hpp"
+#include "Core/World/Scene.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Topology.hpp"
@@ -19,7 +19,6 @@
 #include "Math/Vector/Vectors.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
-#include <utility>
 
 namespace Ivy::Sandbox
 {
@@ -35,9 +34,9 @@ struct CoordinateAxes3D : C::Scene
 
         auto& lightShader = resourceManager.Load<G::Shader>("lightShader");
         lightShader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "lightFrag", "Assets/Shaders/lightShader.frag", G::ShaderStage::Fragment)());
+            "lightFrag", "assets/Shaders/lightShader.frag", G::ShaderStage::Fragment)());
         lightShader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "lightVert", "Assets/Shaders/lightShader.vert", G::ShaderStage::Vertex)());
+            "lightVert", "assets/Shaders/lightShader.vert", G::ShaderStage::Vertex)());
 
         auto& lightMaterial = resourceManager.Load<G::Material>("lightMaterial");
         lightMaterial().Shader = &lightShader();
@@ -54,9 +53,9 @@ struct CoordinateAxes3D : C::Scene
 
         auto& shader = resourceManager.Load<G::Shader>("AxisShader");
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "axisFrag", "Assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+            "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
         shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "axisVert", "Assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+            "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
         G::Mesh m = G::Primitives::CreateLine("Line");
         auto& line = resourceManager.Load<G::Mesh>(m);

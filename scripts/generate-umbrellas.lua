@@ -1,4 +1,4 @@
-local RootDir = path.join(os.projectdir(), "src")
+local RootDir = path.join(os.projectdir(), "")
 
 function GenerateUmbrellaHeader(dir, subsystem)
     local subsystemDir = path.join(RootDir, dir)
@@ -23,38 +23,6 @@ function GenerateUmbrellaHeader(dir, subsystem)
         local relative = path.relative(header, subsystemDir)
 
         content = content .. '#include "' .. relative .. '"\n'
-    end
-
-    io.writefile(output, content)
-end
-
-function GenerateEngineUmbrella(name)
-    local output = path.join(RootDir, name .. ".hpp")
-
-    local subsystemDirs = os.dirs(path.join(RootDir, "*"))
-    local moduleHeaders = os.files(path.join(RootDir, "Modules/*/Include.hpp"))
-
-    table.sort(subsystemDirs)
-    table.sort(moduleHeaders)
-
-    local content = "#pragma once\n\n"
-
-    for _, dir in ipairs(subsystemDirs) do
-        local subsystem = path.filename(dir)
-        local umbrella = path.join(dir, subsystem .. ".hpp")
-
-        if os.isfile(umbrella) then
-            content = content ..
-                '#include "' .. subsystem .. '/' .. subsystem .. '.hpp"\n'
-        end
-    end
-
-    for _, header in ipairs(moduleHeaders) do
-        local moduleDir = path.directory(header)
-        local module = path.filename(moduleDir)
-
-        content = content ..
-            '#include "Modules/' .. module .. '/Include.hpp"\n'
     end
 
     io.writefile(output, content)

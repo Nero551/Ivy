@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/World/Nodes.hpp"
-#include "ECS/ECS.hpp"
 #include "ECS/Entity.hpp"
+#include "ECS/EntityComponentSystem.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
 namespace Ivy::R

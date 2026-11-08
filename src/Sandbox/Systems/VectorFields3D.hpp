@@ -36,9 +36,9 @@ struct VectorFields3D : C::System
         m_Mesh = &resources.Load(G::Primitives::CreateArrow3D("vectorArrow3D"));
 
         auto& vertSource = resources.Load<G::ShaderSource>(
-            "arrowShaderVert", "Assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
+            "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
         auto& fragSource = resources.Load<G::ShaderSource>(
-            "arrowShaderFrag", "Assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
+            "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
 
         auto& shader = resources.Load<G::Shader>("arrowShader", vertSource, fragSource);
 

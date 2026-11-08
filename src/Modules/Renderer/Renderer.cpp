@@ -44,9 +44,9 @@ void Renderer::SetupFramebuffer()
 
     auto& screenShader = resources.Load<G::Shader>("[Graphics] Screen Shader");
     auto& screenVert = resources.Load<G::ShaderSource>(
-        "[Graphics] Screen Vertex", "Assets/Shaders/screen.vert", G::ShaderStage::Vertex);
+        "[Graphics] Screen Vertex", "assets/Shaders/screen.vert", G::ShaderStage::Vertex);
     auto& screenFrag = resources.Load<G::ShaderSource>(
-        "[Graphics] Screen Fragment", "Assets/Shaders/screen.frag", G::ShaderStage::Fragment);
+        "[Graphics] Screen Fragment", "assets/Shaders/screen.frag", G::ShaderStage::Fragment);
 
     screenShader().AssignSource(screenVert);
     screenShader().AssignSource(screenFrag);
@@ -151,6 +151,6 @@ void Renderer::Stop()
         static_cast<G::Texture2D&>(Framebuffer.GetTexture(G::FramebufferAttachment::Color0));
 
     U::Image image = {texture.Width, texture.Height, U::Image::ColorChannels::RGB, texture.ReadPixels()};
-    image.SaveToDiskPNG("Assets/LastFrame.png", true);
+    image.SaveToDiskPNG("assets/LastFrame.png", true);
 }
 } // namespace Ivy::R

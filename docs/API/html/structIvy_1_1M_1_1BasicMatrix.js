@@ -1,0 +1,25 @@
+var structIvy_1_1M_1_1BasicMatrix =
+[
+    [ "BasicMatrix", "structIvy_1_1M_1_1BasicMatrix.html#a572c4a4bed150e9bf9d0b240e03c64f8", null ],
+    [ "BasicMatrix", "structIvy_1_1M_1_1BasicMatrix.html#a29e20e72286101376088d3cf15b01214", null ],
+    [ "BasicMatrix", "structIvy_1_1M_1_1BasicMatrix.html#af936be2a16148df69758f64962898c33", null ],
+    [ "Data", "structIvy_1_1M_1_1BasicMatrix.html#ab7ff70fcc96458f7ad7abce30b426644", null ],
+    [ "NearlyEquals", "structIvy_1_1M_1_1BasicMatrix.html#a03fe233eb3ba032023b0b6f95ae6ef74", null ],
+    [ "operator!=", "structIvy_1_1M_1_1BasicMatrix.html#a94e1093d2ffc0ad878a5031d138c3637", null ],
+    [ "operator()", "structIvy_1_1M_1_1BasicMatrix.html#acf14794625669477999b776093d5e89c", null ],
+    [ "operator()", "structIvy_1_1M_1_1BasicMatrix.html#a2ea1cbbb99d768f09e0ec48d4e1f85e7", null ],
+    [ "operator*", "structIvy_1_1M_1_1BasicMatrix.html#ab351b0c9d9d8a69bbd1857c7f0a64ae8", null ],
+    [ "operator*", "structIvy_1_1M_1_1BasicMatrix.html#a6c882b38e021580270305230d71d3c13", null ],
+    [ "operator*=", "structIvy_1_1M_1_1BasicMatrix.html#aac6cae6f7edc0247be429b7390cc10c6", null ],
+    [ "operator+", "structIvy_1_1M_1_1BasicMatrix.html#acdd8e08b2c03de5206d6f2f83ffdfc98", null ],
+    [ "operator+=", "structIvy_1_1M_1_1BasicMatrix.html#adbae00a07fcb36cdbf3f789f68e14446", null ],
+    [ "operator-", "structIvy_1_1M_1_1BasicMatrix.html#a80b45cebaf47e3c9e0b4d62574a3624b", null ],
+    [ "operator-", "structIvy_1_1M_1_1BasicMatrix.html#a818fc166960dc58e6e10c52469faf289", null ],
+    [ "operator-=", "structIvy_1_1M_1_1BasicMatrix.html#a6ddde0f77647055614dbf6c8c1bd7179", null ],
+    [ "operator/", "structIvy_1_1M_1_1BasicMatrix.html#aaedebaa145a6961aaf07645c1a014847", null ],
+    [ "operator/=", "structIvy_1_1M_1_1BasicMatrix.html#a77f6be7803f10e73bf8ac3f6e898041f", null ],
+    [ "operator==", "structIvy_1_1M_1_1BasicMatrix.html#adc8f4aad4651565e59861b23becabd10", null ],
+    [ "Transpose", "structIvy_1_1M_1_1BasicMatrix.html#a83072149d14869aec7796a7895955727", null ],
+    [ "operator*", "structIvy_1_1M_1_1BasicMatrix.html#a3805116e6dfe26916f4f6590a6dd835c", null ],
+    [ "operator<<", "structIvy_1_1M_1_1BasicMatrix.html#a42cbd5b8801b78b2c93e5f3277035eda", null ]
+];
