@@ -1,4 +1,6 @@
-#include "Physics/Include.hpp"
+#include "Physics/DimensionalAnalysis/Dimensionals.hpp"
+#include "Physics/DimensionalAnalysis/Dimension.hpp"
+#include "Physics/Units.hpp"
 #include <gtest/gtest.h>
 #include <sstream>
 #include <string>

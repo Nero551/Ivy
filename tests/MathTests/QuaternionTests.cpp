@@ -1,4 +1,5 @@
-#include "Math/Include.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 
@@ -230,7 +231,7 @@ TEST(Quaternion, ExpLnPureReal)
     EXPECT_NEAR(negOne.w, -1.0f, 1e-5f);
 
     // Ln of e
-    Quaternion<> lg = Ln(Quaternion<>(E, 0.0f, 0.0f, 0.0f));
+    Quaternion<> lg = Ln(Quaternion<>{E, 0.0f, 0.0f, 0.0f});
     EXPECT_NEAR(lg.w, 1.0f, 1e-5f);
     EXPECT_NEAR(lg.x, 0.0f, 1e-5f);
 }

@@ -1,5 +1,7 @@
-#include "Math/Include.hpp"
-#include <cmath>
+#include "Math/Coordinates/HyperSpherical.hpp"
+#include "Math/Coordinates/Polar.hpp"
+#include "Math/Coordinates/QPolar.hpp"
+#include "Math/Coordinates/Spherical.hpp"
 #include <gtest/gtest.h>
 
 namespace Ivy::UnitTests

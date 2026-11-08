@@ -1,4 +1,8 @@
-#include "Math/Include.hpp"
+#include "Math/Functions/Differentiation.hpp"
+#include "Math/Functions/Function.hpp"
+#include "Math/Functions/Integration.hpp"
+#include "Math/Functions/Inverse.hpp"
+#include "Math/Functions/Series.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 

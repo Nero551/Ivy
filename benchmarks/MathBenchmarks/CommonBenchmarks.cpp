@@ -1,4 +1,12 @@
-#include "Math/Include.hpp"
+#include "Math/Color/Color.hpp"
+#include "Math/Common/Comparison.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Common/Constraints.hpp"
+#include "Math/Common/Exponentials.hpp"
+#include "Math/Common/Interpolation.hpp"
+#include "Math/Common/Logarithms.hpp"
+#include "Math/Common/Random.hpp"
+#include "Math/Common/Trigonometry.hpp"
 #include <benchmark/benchmark.h>
 #include <cmath>
 

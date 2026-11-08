@@ -1,4 +1,7 @@
-#include "Math/Include.hpp"
+#include "Math/Equations/LinearEquation.hpp"
+#include "Math/Equations/LinearSystem.hpp"
+#include "Math/Equations/ODE.hpp"
+#include "Math/Equations/QuadraticEquationSolver.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 

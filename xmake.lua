@@ -4,10 +4,9 @@ set_toolchains("clang")
 add_rules("plugin.compile_commands.autoupdate", { lsp = "clang" })
 add_rules("mode.debug", "mode.release")
 
-add_requires("tracy v0.13.1", "glfw 3.4", "assimp v6.0.5", "glad 0.1.36", "stb", "gtest", "benchmark 1.9.5")
+add_requires("tracy v0.13.1", "glfw 3.4", "glad 0.1.36", "stb", "gtest", "benchmark 1.9.5")
 add_requireconfs("**", { override = true, configs = { shared = false, system = false } })
 
-add_moduledirs("scripts")
 includes("crates/Utilities")
 includes("crates/Math")
 includes("crates/Physics")

@@ -1,6 +1,10 @@
+#include "Math/Functions/Differentiation.hpp"
+#include "Math/Functions/Function.hpp"
+#include "Math/Functions/Integration.hpp"
+#include "Math/Functions/Inverse.hpp"
+#include "Math/Functions/Series.hpp"
 #include <benchmark/benchmark.h>
 #include <cmath>
-#include "Math/Include.hpp"
 
 namespace Ivy::Benchmarks
 {

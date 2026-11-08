@@ -1,4 +1,6 @@
-#include "Math/Include.hpp"
+#include "Math/MathTuple.hpp"
+#include "Math/Set.hpp"
+#include "Math/FiniteSet.hpp"
 #include <gtest/gtest.h>
 #include <tuple>
 

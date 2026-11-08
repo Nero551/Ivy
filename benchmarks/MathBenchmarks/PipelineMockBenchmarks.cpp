@@ -1,5 +1,12 @@
-#include "Math/Include.hpp"
-#include "Physics/Include.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Coordinates/QPolar.hpp"
+#include "Math/Equations/LinearEquation.hpp"
+#include "Math/Equations/LinearSystem.hpp"
+#include "Math/Equations/ODE.hpp"
+#include "Math/Equations/QuadraticEquationSolver.hpp"
+#include "Math/Matrix/Matrices.hpp"
+#include "Math/Quaternion/Quaternion.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include <benchmark/benchmark.h>
 #include <cmath>
 

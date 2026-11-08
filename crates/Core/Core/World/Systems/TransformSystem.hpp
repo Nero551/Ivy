@@ -4,6 +4,7 @@
 #include "Core/World/Components.hpp"
 #include "ECS/Entity.hpp"
 #include "Utilities/CheckedPtr.hpp"
+#include <cstddef>
 #include <vector>
 namespace Ivy::C
 {

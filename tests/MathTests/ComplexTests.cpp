@@ -1,4 +1,6 @@
-#include "Math/Include.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Complex/Complex.hpp"
+#include "Math/Coordinates/Polar.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 

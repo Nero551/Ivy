@@ -3,8 +3,11 @@
 #include "../Common/Comparison.hpp"
 #include "../Common/Constants.hpp"
 #include "../Common/Exponentials.hpp"
+#include "../Common/Logarithms.hpp"
 #include "../Coordinates/Polar.hpp"
+#include "Math/Scalar.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include <ostream>
 
 namespace Ivy::M
 {

@@ -1,5 +1,4 @@
 #pragma once
-#include "Include.hpp"
 
 /**
  * @namespace Ivy::ECS

@@ -1,4 +1,5 @@
-#include "Math/Include.hpp"
+#include "Math/Vector/Vectors.hpp"
+#include "Math/Common/Constants.hpp"
 #include <benchmark/benchmark.h>
 #include <cmath>
 

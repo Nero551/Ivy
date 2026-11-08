@@ -2,8 +2,9 @@
 
 #include "../Common/Comparison.hpp"
 #include "../Common/Constants.hpp"
-#include "../Common/Exponentials.hpp"
 #include "../Coordinates/QPolar.hpp"
+#include "Math/Common/Exponentials.hpp"
+#include "Math/Common/Logarithms.hpp"
 #include "Math/Scalar.hpp"
 
 #include "Math/Matrix/Matrices.hpp"
@@ -636,12 +637,6 @@ template <Scalar T> constexpr Quaternion<T> Pow(const Quaternion<T>& q, const T 
     return result;
 }
 
-/** @brief Raises a quaternion to a quaternion power using p * Ln(q). */
-template <Scalar T> constexpr Quaternion<T> Pow(const Quaternion<T>& q, const Quaternion<T>& p)
-{
-    return Exp(p * QLn(q));
-}
-
 /** @brief Computes the square root of a quaternion. */
 template <Scalar T> constexpr Quaternion<T> Sqrt(const Quaternion<T>& q)
 {
@@ -666,4 +661,11 @@ template <Scalar T> constexpr Quaternion<T> Ln(const Quaternion<T>& q)
 
     return result;
 }
+
+/** @brief Raises a quaternion to a quaternion power using p * Ln(q). */
+template <Scalar T> constexpr Quaternion<T> Pow(const Quaternion<T>& q, const Quaternion<T>& p)
+{
+    return Exp(p * Ln(q));
+}
+
 } // namespace Ivy::M
