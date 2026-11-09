@@ -24,7 +24,7 @@ inline Bit XOR(const Bit bit, const Bit bit2)
 
 template <int Amount> struct Bits
 {
-    Bits() {}
+    Bits() = default;
     template <typename... Args>
     Bits(Args... args) requires(sizeof...(Args) == Amount && (std::convertible_to<Args, Bit> && ...))
         : m_Bits{static_cast<Bit>(args)...}
@@ -54,7 +54,6 @@ template <int Amount> struct Bits
   private:
     std::array<Bit, Amount> m_Bits{0};
 };
-using Byte = Bits<8>;
 
 inline Bits<2> HalfAdder(const Bit bit, const Bit bit2)
 {
@@ -88,7 +87,7 @@ struct ALU
 
         for (int i = 0; i < Amount; ++i)
         {
-            Bits<2> fullAdded = FULLADDER(bits1(i), bits2(i), carry);
+            Bits<2> fullAdded = FullAdder(bits1(i), bits2(i), carry);
             Bit sum = fullAdded(0);
             result(i) = sum;
             carry = fullAdded(1);

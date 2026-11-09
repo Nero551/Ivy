@@ -1,17 +1,19 @@
 #pragma once
 
+#include "Utilities/DataStructures/StringMap.hpp"
+#include "Utilities/Debug/Log.hpp"
+#include <concepts>
+#include <cstddef>
+#include <memory>
+#include <ostream>
+#include <string_view>
 namespace Ivy::Meta
 {
-
-//TODO: understanding macros is the key to making reflection.
-
-using TypeId = unsigned long;
-
 template <typename T> consteval std::string_view GetTypeName()
 {
-    constexpr std::string_view Function = __PRETTY_FUNCTION__;
-    constexpr std::string_view Prefix = "T = ";
-    constexpr std::size_t Start = Function.find(Prefix) + Prefix.size();
+    static constexpr std::string_view Function = __PRETTY_FUNCTION__;
+    static constexpr std::string_view Prefix = "T = ";
+    static constexpr std::size_t Start = Function.find(Prefix) + Prefix.size();
     constexpr std::size_t End = Function.find(']', Start);
 
     return Function.substr(Start, End - Start);
@@ -29,90 +31,161 @@ consteval unsigned long Hash(const std::string_view typeName)
     return hashValue;
 }
 
+using TypeId = size_t;
+
 template <typename T> consteval TypeId GetTypeId()
 {
     return Hash(GetTypeName<T>());
 }
 
-struct TypeInfo
+struct TypeDescriptor;
+
+struct FieldDescriptor
 {
-    std::string_view Name{};
-    unsigned int Size = 0;
-    unsigned int Align = 0;
-    TypeId Id = 0;
+    std::string_view Name;
+    TypeDescriptor* Type;
+    size_t Offset;
 
-    friend std::ostream& operator<<(std::ostream& os, const TypeInfo& typeInfo)
+    friend std::ostream& operator<<(std::ostream& os, const FieldDescriptor& field);
+};
+
+struct TypeDescriptor
+{
+    std::string_view Name;
+    size_t Size;
+    TypeId TypeId;
+    size_t Alignment;
+    U::StringMap<FieldDescriptor> Fields;
+    friend std::ostream& operator<<(std::ostream& os, const TypeDescriptor& type);
+};
+
+static U::StringMap<std::unique_ptr<TypeDescriptor>> TypeRegistry{};
+
+template <typename T, typename... Args>
+TypeDescriptor& GetDescriptor(Args&&... args) requires(std::same_as<FieldDescriptor, Args> && ...)
+{
+    std::string_view name = GetTypeName<T>();
+    if (TypeRegistry.Contains(name))
     {
-        os << "TypeInfo {\n"
-           << "    Name:  " << typeInfo.Name << '\n'
-           << "    Size:  " << typeInfo.Size << '\n'
-           << "    Align: " << typeInfo.Align << '\n'
-           << "    Id:    " << std::hex << typeInfo.Id << std::dec << '\n'
-           << '}';
+        return *TypeRegistry.At(name);
+    }
 
-        return os;
+    TypeDescriptor& descriptor = **TypeRegistry.Emplace(name, std::make_unique<TypeDescriptor>()).first;
+    descriptor.Name = name;
+    descriptor.Size = sizeof(T);
+    descriptor.Alignment = alignof(T);
+    descriptor.TypeId = GetTypeId<T>();
+    (descriptor.Fields.Emplace(args.Name, std::forward<Args>(args)), ...);
+    return *TypeRegistry.At(name);
+}
+
+FieldDescriptor GetFieldDescriptor(std::string_view name, size_t offset, TypeDescriptor* type)
+{
+    FieldDescriptor descriptor;
+    descriptor.Name = name;
+    descriptor.Type = type;
+    descriptor.Offset = offset;
+    return descriptor;
+}
+
+#define FIELD(Struct, Field)                                                                                 \
+    Ivy::Meta::GetFieldDescriptor(                                                                           \
+        #Field, offsetof(Struct, Field), &Ivy::Meta::GetDescriptor<decltype(Struct::Field)>())
+
+#define REFLECT(Type, ...) Ivy::Meta::GetDescriptor<Type>(__VA_ARGS__)
+
+inline std::ostream& operator<<(std::ostream& os, const TypeDescriptor& type)
+{
+    os << "{ " << type.Name << ", " << type.Size << ", " << type.Alignment << ", Fields: [ ";
+
+    for (const auto& field : type.Fields)
+    {
+        os << field << ", ";
+    }
+
+    os << " ] }";
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const FieldDescriptor& field)
+{
+    os << "{ " << field.Name << ", " << field.Offset << ", ";
+
+    if (field.Type != nullptr)
+    {
+        os << *field.Type;
+    }
+    else
+    {
+        os << "nullptr";
+    }
+
+    os << " }";
+    return os;
+}
+
+struct FieldValue
+{
+    void* Data;
+    TypeDescriptor& Type;
+
+    template <typename T> T& As() const
+    {
+        if (Type.TypeId != GetTypeId<T>())
+        {
+            U::Log::Error("Failed To Get Value: Not Same Type ", Type);
+        }
+
+        return *static_cast<T*>(Data);
     }
 };
 
-template <typename T> consteval TypeInfo GetTypeInfo()
+struct Inspected
 {
-    return {.Name = GetTypeName<T>(), .Size = sizeof(T), .Align = alignof(T), .Id = GetTypeId<T>()};
-}
+    TypeDescriptor& Type;
 
-class TypeRegistry
-{
-  public:
-    static void Register(const TypeInfo& Type)
+    Inspected(void* object, TypeDescriptor& type) : m_Object(object), Type(type) {}
+
+    template <typename T> void SetField(std::string_view name, const T& value)
     {
-        Types.emplace(Type.Id, Type);
+        if (!Type.Fields.Contains(name))
+        {
+            U::Log::Error("Type doesn't contain field: ", name);
+            return;
+        }
+        FieldDescriptor& field = Type.Fields.At(name);
+        if (field.Type->TypeId != GetTypeId<T>())
+        {
+            U::Log::Error("Failed To Set Value: Not Same Type ", Type);
+            return;
+        }
+        void* address = static_cast<std::byte*>(m_Object) + field.Offset;
+        *static_cast<T*>(address) = value;
     }
 
-    static const TypeInfo* Get(const TypeId Id)
+    FieldValue GetField(std::string_view name) const
     {
-        const auto It = Types.find(Id);
-
-        if (It == Types.end())
+        if (!Type.Fields.Contains(name))
         {
-            return nullptr;
+            U::Log::Error("Type doesn't contain field: ", name);
         }
+        FieldDescriptor& field = Type.Fields.At(name);
 
-        return &It->second;
+        void* address = static_cast<std::byte*>(m_Object) + field.Offset;
+
+        return {.Data = static_cast<std::byte*>(m_Object) + field.Offset, .Type = *field.Type};
     }
 
   private:
-    inline static std::unordered_map<TypeId, TypeInfo> Types{};
+    void* m_Object;
 };
 
-struct AttributeInfo
+Inspected InspectObject(void* object, std::string_view type)
 {
-    std::string_view Name{};
-    unsigned int Offset = 0;
-    TypeId TypeID = 0;
-
-    friend std::ostream& operator<<(std::ostream& os, const AttributeInfo& attributeInfo)
+    if (!TypeRegistry.Contains(type))
     {
-        os << "AttributeInfo {\n"
-           << "    Name:   " << attributeInfo.Name << '\n'
-           << "    Offset: " << attributeInfo.Offset << '\n'
-           << "    Type:   " << std::hex << attributeInfo.TypeID << std::dec << '\n'
-           << '}';
-
-        return os;
+        U::Log::Error("Type Registry doesn't contain type");
     }
-
-    const TypeInfo& GetType() const
-    {
-        return *TypeRegistry::Get(TypeID);
-    }
-};
-
-template <typename T> AttributeInfo RegisterAttribute(const std::string_view name, const unsigned int offset)
-{
-    TypeRegistry::Register(GetTypeInfo<T>());
-    return {.Name = name, .Offset = offset, .TypeID = GetTypeId<T>()};
+    return Inspected{object, *TypeRegistry.At(type)};
 }
-
-#define REGISTER_ATTRIBUTE(Struct, Member)                                                                   \
-    Ivy::Reflection::RegisterAttribute<decltype(Struct::Member)>(#Member, offsetof(Struct, Member))
-
 } // namespace Ivy::Meta

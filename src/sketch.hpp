@@ -1,27 +1,26 @@
 #pragma once
 
-#include "Math/Common/Exponentials.hpp"
-#include "Math/Common/Random.hpp"
-#include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Math/Functions/Inverse.hpp"
-#include "Math/Functions/Optimizations.hpp"
-#include "Math/MathTuple.hpp"
-#include "Math/Matrix/Matrices.hpp"
 #include "Math/Scalar.hpp"
-#include "Math/Vector/Vectors.hpp"
-#include "Utilities/DataStructures/NonTypedVector.hpp"
+#include "Protos/Meta.hpp"
+#include "Utilities/DataStructures/StringMap.hpp"
+#include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Utilities/FixedString.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
+#include <cstddef>
 #include <cstdlib>
 #include <dlfcn.h>
-#include <limits>
+#include <memory>
 #include <ostream>
+#include <span>
 #include <string>
+#include <string_view>
 #include <type_traits>
+#include <typeinfo>
+#include <unordered_map>
 #include <vector>
 
 namespace Sketch
@@ -304,21 +303,26 @@ struct Shader
 //TODO: Utilities crate needs a nice cleaning. specially data structures. they are packed with all kinds of unnecessary edge case handling.
 //TODO: i need to formally define convergence and divergence & limits (numerically ofc).
 //
+// TODO: remove window from graphics and make a new crate (Platform Handling / Window Management, whatever). \
+// it will handle input from mouse, keyboard, joystick, window management, basically what glfw does + some custom stuff (action mapper)
+//
 // TODO: automatic differentiation via dual numbers.
+//
+
+struct A
+{
+    int B = 0;
+    int C;
+};
 
 inline void Test()
 {
-    using F = M::Function<float, float>;
+    A object;
+    Meta::TypeDescriptor& a = REFLECT(A, FIELD(A, B), FIELD(A, C));
 
-    F b = [](float w) { return 2 * w; };
-    F h = [](float w) { return 5 / (w * w); };
-
-    F c1 = [b](float w) { return w * b(w) * 10; };
-    F c2 = [h](float w) { return h(w) * w * 12; };
-    F c3 = [h, b](float w) { return b(w) * h(w) * 12; };
-
-    F C = c1 + c2 + c3;
-
-    U::Log::Info(M::Minimize(C, 0.0f, 1000.0f, M::Interval::Open, 1000));
+    Meta::Inspected inspected = Meta::InspectObject(&object, "Sketch::A");
+    inspected.SetField("B", 20);
+    U::Log::Info(inspected.GetField("B").Type);
+    U::Log::Info(inspected.GetField("B").As<int>());
 }
 } // namespace Sketch

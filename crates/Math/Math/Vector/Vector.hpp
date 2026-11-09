@@ -286,24 +286,7 @@ template <unsigned int Components, Scalar T = float> struct Vector
         return -1 * *this;
     }
 
-    /** @brief Compares two vectors for exact equality. */
-    constexpr bool operator==(const Vector& vector) const
-    {
-        for (int i = 0; i < Components; ++i)
-        {
-            if ((*this)(i) != vector(i))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** @brief Compares two vectors for inequality. */
-    constexpr bool operator!=(const Vector& vector) const
-    {
-        return !(*this == vector);
-    }
+    auto constexpr operator<=>(const Vector& v) const = default;
 
     /** @brief Adds a scalar to every component. */
     friend constexpr Vector operator+(const T scalar, const Vector& vector)

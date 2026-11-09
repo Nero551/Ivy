@@ -1,8 +1,8 @@
 #pragma once
 #include "Function.hpp"
+#include "Math/BasicOperations.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Scalar.hpp"
-
 #include "Utilities/Debug/Log.hpp"
 
 namespace Ivy::M

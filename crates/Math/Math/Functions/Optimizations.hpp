@@ -30,7 +30,7 @@ Input NewtonMethod(const Function<Output, Input>& f, Input initialGuess, Input e
             break;
         }
         Input dfx = Derivative(f, x);
-        U::Log::Assert(std::abs(dfx) > epsilon, "InverseEvaluate: Derivative is too close to zero: ", dfx);
+        U::Log::Assert(std::abs(dfx) > epsilon, "Netwon's Method: Derivative is too close to zero: ", dfx);
 
         x -= fx / dfx;
     }
@@ -40,7 +40,7 @@ Input NewtonMethod(const Function<Output, Input>& f, Input initialGuess, Input e
 
 template <M::Scalar Input, M::Scalar Output>
 M::MathTuple<Output, Input> Maximize(
-    M::Function<Output, Input>& f, Input a, Input b, Interval interval, unsigned int iterations = 10)
+    const M::Function<Output, Input>& f, Input a, Input b, Interval interval, unsigned int iterations = 10)
 {
 
     Output best;
@@ -74,7 +74,7 @@ M::MathTuple<Output, Input> Maximize(
 
 template <M::Scalar Input, M::Scalar Output>
 M::MathTuple<Output, Input> Minimize(
-    M::Function<Output, Input>& f, Input a, Input b, Interval interval, unsigned int iterations = 10)
+    const M::Function<Output, Input>& f, Input a, Input b, Interval interval, unsigned int iterations = 10)
 {
 
     Output best;

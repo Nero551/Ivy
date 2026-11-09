@@ -270,17 +270,7 @@ template <Scalar T> struct Vector<4, T>
         return -1 * *this;
     }
 
-    /** @brief Compares two vectors for exact equality. */
-    constexpr bool operator==(const Vector& vector) const
-    {
-        return x == vector.x && y == vector.y && z == vector.z && w == vector.w;
-    }
-
-    /** @brief Compares two vectors for inequality. */
-    constexpr bool operator!=(const Vector& vector) const
-    {
-        return !(*this == vector);
-    }
+    auto constexpr operator<=>(const Vector& v) const = default;
 
     /** @brief Adds a scalar to every component. */
     friend constexpr Vector operator+(const T scalar, const Vector& vector)

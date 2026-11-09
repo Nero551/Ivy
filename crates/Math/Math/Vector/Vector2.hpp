@@ -6,6 +6,7 @@
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/Polar.hpp"
 #include "Math/Scalar.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include "Vectors.hpp"
 #include <ostream>
@@ -253,17 +254,7 @@ template <Scalar T> struct Vector<2, T>
         return -1 * *this;
     }
 
-    /** @brief Compares two vectors for exact equality. */
-    constexpr bool operator==(const Vector& vector) const
-    {
-        return x == vector.x && y == vector.y;
-    }
-
-    /** @brief Compares two vectors for inequality. */
-    constexpr bool operator!=(const Vector& vector) const
-    {
-        return !(*this == vector);
-    }
+    auto constexpr operator<=>(const Vector& v) const = default;
 
     /** @brief Adds a scalar to every component. */
     friend constexpr Vector operator+(const T scalar, const Vector& vector)
