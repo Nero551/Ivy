@@ -2,26 +2,22 @@
 
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
-#include "Protos/Meta.hpp"
-#include "Utilities/DataStructures/StringMap.hpp"
-#include "Utilities/DataStructures/TypedVector.hpp"
+#include "Math/Vector/Vectors.hpp"
+#include "Protos/Meta/Descriptors.hpp"
+#include "Protos/Meta/Meta.hpp"
+
+#include "Protos/Meta/ReflectedInstance.hpp"
+#include "Protos/Meta/ReflectedReference.hpp"
 #include "Utilities/Debug/Log.hpp"
-#include "Utilities/FixedString.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
-#include <cstddef>
 #include <cstdlib>
 #include <dlfcn.h>
-#include <memory>
 #include <ostream>
-#include <span>
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <typeinfo>
-#include <unordered_map>
-#include <vector>
 
 namespace Sketch
 {
@@ -311,18 +307,21 @@ struct Shader
 
 struct A
 {
-    int B = 0;
-    int C;
+    int B = 3;
+    M::Vector<3> C;
 };
-
 inline void Test()
 {
     A object;
-    Meta::TypeDescriptor& a = REFLECT(A, FIELD(A, B), FIELD(A, C));
+    REFLECT(A, FIELD(A, B), FIELD(A, C));
 
-    Meta::Inspected inspected = Meta::InspectObject(&object, "Sketch::A");
+    Meta::ReflectedReference inspected = Meta::Inspect(&object, "Sketch::A");
     inspected.SetField("B", 20);
     U::Log::Info(inspected.GetField("B").Type);
     U::Log::Info(inspected.GetField("B").As<int>());
+
+    Meta::ReflectedInstance a = Meta::Create("Sketch::A");
+    a.SetField("C", M::Vector<3>{3, 6, 8});
+    U::Log::Info(a.GetField("B").As<M::Vector<3>>());
 }
 } // namespace Sketch
