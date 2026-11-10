@@ -8,6 +8,13 @@ add_rules("mode.debug", "mode.release")
 add_requires("tracy v0.13.1", "glfw 3.4", "glad 0.1.36", "stb", "gtest", "benchmark 1.9.5")
 add_requireconfs("**", { override = true, configs = { shared = false, system = false } })
 
+if is_mode("release") then
+    set_policy("build.optimization.lto", true)
+    add_defines("RELEASE")
+else
+    add_defines("DEBUG", "TRACY_ENABLE", "TRACY_PROFILE_MEMORY")
+end
+
 includes("crates/Utilities")
 includes("crates/Math")
 includes("crates/Physics")
@@ -32,14 +39,9 @@ target("Ivy")
     end
 
     if is_mode("release") then
-        add_defines("RELEASE")
         remove_files("src/TracyMemory.cpp")
-        set_policy("build.optimization.lto", true)
     else
-        add_defines("DEBUG")
         add_links("TracyClient")
-        add_defines("TRACY_ENABLE")
-        add_defines("TRACY_PROFILE_MEMORY")
     end
 
 target("Ivy.Tests")

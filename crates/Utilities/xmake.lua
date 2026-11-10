@@ -5,7 +5,7 @@ target("Ivy.Utilities")
     add_files("Utilities/**.cpp")
     ---@diagnostic disable-next-line: param-type-not-match
     add_packages("stb", { public = true })
-    if is_mode("debug") then
+    if not is_mode("release") then
         ---@diagnostic disable-next-line: param-type-not-match
         add_packages("tracy", { public = true })
     end

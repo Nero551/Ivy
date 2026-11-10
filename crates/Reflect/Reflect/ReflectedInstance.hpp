@@ -1,9 +1,8 @@
 #pragma once
-#include "Reflect/Accessor.hpp"
 #include "Reflect/Basic.hpp"
 #include "Reflect/Descriptors.hpp"
+#include "Reflect/Reflected.hpp"
 #include "Reflect/Registry.hpp"
-#include "Reflect/Values.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cstddef>
@@ -13,10 +12,11 @@
 #include <utility>
 namespace Ivy::Reflect
 {
-struct ReflectedInstance
+struct ReflectedInstance : Reflected
 {
-    template <typename... Params> ReflectedInstance(TypeDescriptor& type, Params&&... params) : m_Type(&type)
+    template <typename... Params> ReflectedInstance(TypeDescriptor& type, Params&&... params)
     {
+        m_Type = &type;
         std::tuple<Params...> parameters(std::forward<Params>(params)...);
         std::array<ParameterDescriptor, sizeof...(Params)> descriptors{
             ParameterDescriptor{.Type = &Registry::GetTypeDescriptor<std::remove_cvref_t<Params>>(),
@@ -56,8 +56,9 @@ struct ReflectedInstance
         }
     }
 
-    ReflectedInstance(const ReflectedInstance& other) noexcept : m_Type(other.m_Type)
+    ReflectedInstance(const ReflectedInstance& other) noexcept : Reflected(other)
     {
+        m_Type = other.m_Type;
         if (other.m_Object)
         {
             m_Object = m_Type->CopyConstruct(other.m_Object);
@@ -87,8 +88,9 @@ struct ReflectedInstance
     }
 
     ReflectedInstance(ReflectedInstance&& other) noexcept
-        : m_Type(other.m_Type), m_Object(std::exchange(other.m_Object, nullptr))
     {
+        m_Type = other.m_Type;
+        m_Object = std::exchange(other.m_Object, nullptr);
     }
     ReflectedInstance& operator=(ReflectedInstance&& other) noexcept
     {
@@ -112,29 +114,6 @@ struct ReflectedInstance
             m_Type->Deconstruct(m_Object);
         }
     }
-
-    template <typename T> void SetField(std::string_view name, T&& value)
-    {
-        SetFieldImpl(m_Object, *m_Type, name, std::forward<T>(value));
-    }
-    FieldValue GetField(std::string_view name) const
-    {
-        return GetFieldImpl(m_Object, *m_Type, name);
-    }
-
-    template <typename... Args> ReturnValue InvokeMethod(std::string_view name, Args&&... args)
-    {
-        return InvokeMethodImpl(m_Object, *m_Type, name, std::forward<Args>(args)...);
-    }
-
-    TypeDescriptor& GetType()
-    {
-        return *m_Type;
-    }
-
-  private:
-    TypeDescriptor* m_Type;
-    void* m_Object = nullptr;
 };
 
 template <typename... Params> ReflectedInstance Create(std::string_view type, Params&&... params)

@@ -290,7 +290,7 @@ struct Shader
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
 //TODO: new performance bottleneck: renderer.
 
-//TODO: Utilities crate needs a nice cleaning. specially data structures. they are packed with all kinds of unnecessary edge case handling.
+//TODO: Utilities crate needs a nice cleaning. especially data structures. they are packed with all kinds of unnecessary edge case handling.
 //TODO: i need to formally define convergence and divergence & limits (numerically ofc).
 //
 // TODO: remove window from graphics and make a new crate (Platform Handling / Window Management, whatever). \
@@ -298,6 +298,7 @@ struct Shader
 //
 // TODO: automatic differentiation via dual numbers.
 //
+// TODO: tracy is not working, the macro which defines it when debug mode doesn't work.
 
 inline void Test() {}
 } // namespace Sketch

@@ -172,3 +172,4 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 - switched to an archetype-style ECS
 - optimizations: engine can handle 700k entities at 40 FPS on release build.
 - added google benchmark & gtests.
+- runtime reflection

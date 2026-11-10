@@ -1,2 +1,2 @@
 doxygen Doxyfile
-firefox Docs/API/html/index.html
+firefox docs/API/html/index.html
