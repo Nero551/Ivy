@@ -1,14 +1,14 @@
 #pragma once
-#include "Meta/Basic.hpp"
-#include "Meta/Descriptors.hpp"
-#include "Meta/Values.hpp"
+#include "Reflect/Basic.hpp"
+#include "Reflect/Descriptors.hpp"
+#include "Reflect/Values.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cstddef>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 template <typename T>
 void SetFieldImpl(void* object, const TypeDescriptor& type, std::string_view name, T&& value)
@@ -98,4 +98,4 @@ ReturnValue InvokeMethodImpl(void* object, TypeDescriptor& type, std::string_vie
     return selectedMethod->Invoke(object, &arguments);
 }
 
-} // namespace Ivy::Meta
+} // namespace Ivy::Reflect

@@ -1,8 +1,8 @@
 #pragma once
-#include "Meta/Basic.hpp"
-#include "Meta/Descriptors.hpp"
+#include "Reflect/Basic.hpp"
+#include "Reflect/Descriptors.hpp"
 #include "Utilities/Debug/Log.hpp"
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 struct FieldValue
 {
@@ -60,4 +60,4 @@ struct ReturnValue
         return *static_cast<T*>(Data);
     }
 };
-} // namespace Ivy::Meta
+} // namespace Ivy::Reflect

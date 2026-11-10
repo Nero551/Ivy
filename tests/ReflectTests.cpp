@@ -9,9 +9,12 @@
 #include <string_view>
 #include <utility>
 
-#include "Meta/Meta.hpp"
+#include "Reflect/Basic.hpp"
+#include "Reflect/ReflectedInstance.hpp"
+#include "Reflect/ReflectedReference.hpp"
+#include "Reflect/Registry.hpp"
 
-using namespace Ivy::Meta;
+using namespace Ivy::Reflect;
 
 // ============================================================================
 // Fixture types

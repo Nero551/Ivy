@@ -1,9 +1,9 @@
 #pragma once
-#include "Meta/Accessor.hpp"
-#include "Meta/Basic.hpp"
-#include "Meta/Descriptors.hpp"
-#include "Meta/Registry.hpp"
-#include "Meta/Values.hpp"
+#include "Reflect/Accessor.hpp"
+#include "Reflect/Basic.hpp"
+#include "Reflect/Descriptors.hpp"
+#include "Reflect/Registry.hpp"
+#include "Reflect/Values.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cstddef>
@@ -11,7 +11,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 struct ReflectedInstance
 {
@@ -136,4 +136,10 @@ struct ReflectedInstance
     TypeDescriptor* m_Type;
     void* m_Object = nullptr;
 };
-} // namespace Ivy::Meta
+
+template <typename... Params> ReflectedInstance Create(std::string_view type, Params&&... params)
+{
+    ReflectedInstance reflected = ReflectedInstance{Registry::GetType(type), std::forward<Params>(params)...};
+    return reflected;
+}
+} // namespace Ivy::Reflect

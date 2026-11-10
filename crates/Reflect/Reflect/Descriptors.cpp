@@ -1,7 +1,7 @@
 #include "Descriptors.hpp"
 #include <ostream>
 
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 std::ostream& operator<<(std::ostream& os, const TypeDescriptor& type)
 {
@@ -77,4 +77,4 @@ std::ostream& operator<<(std::ostream& os, const MethodDescriptor& method)
     os << ")";
     return os;
 }
-} // namespace Ivy::Meta
+} // namespace Ivy::Reflect

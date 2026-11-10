@@ -4,7 +4,7 @@
 #include <string_view>
 #include <tuple>
 #include <type_traits>
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 template <typename T> consteval std::string_view GetTypeName()
 {
@@ -72,4 +72,4 @@ template <typename T> void* CopyConstruct(const void* object)
     return new T{*static_cast<const T*>(object)};
 }
 
-} // namespace Ivy::Meta
+} // namespace Ivy::Reflect

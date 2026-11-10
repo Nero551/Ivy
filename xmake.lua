@@ -14,7 +14,7 @@ includes("crates/Physics")
 includes("crates/Graphics")
 includes("crates/ECS")
 includes("crates/Core")
-includes("crates/Meta")
+includes("crates/Reflect")
 
 target("Ivy")
     set_kind("binary")
@@ -47,7 +47,7 @@ target("Ivy.Tests")
     set_rundir(os.projectdir())
 
     add_files("tests/**.cpp")
-    add_deps("Ivy.Math", "Ivy.Physics", "Ivy.Utilities", "Ivy.Meta")
+    add_deps("Ivy.Math", "Ivy.Physics", "Ivy.Utilities", "Ivy.Reflect")
     add_packages("gtest")
 
 target("Ivy.Benchmarks")

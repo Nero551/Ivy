@@ -1,7 +1,7 @@
 #pragma once
-#include "Meta/Basic.hpp"
-#include "Meta/Descriptors.hpp"
-#include "Meta/Values.hpp"
+#include "Reflect/Basic.hpp"
+#include "Reflect/Descriptors.hpp"
+#include "Reflect/Values.hpp"
 #include "Utilities/DataStructures/StringMap.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstddef>
@@ -9,7 +9,7 @@
 #include <string_view>
 #include <tuple>
 #include <type_traits>
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 struct Registry
 {
@@ -146,4 +146,16 @@ struct Registry
   private:
     inline static U::StringMap<std::unique_ptr<TypeDescriptor>> m_TypeRegistry{};
 };
-} // namespace Ivy::Meta
+
+#define FIELD(Struct, Field)                                                                                 \
+    Ivy::Reflect::Registry::AssignField<decltype(Struct::Field)>(                                            \
+        #Field, offsetof(Struct, Field), Ivy::Reflect::Registry::GetTypeDescriptor<Struct>())
+
+#define CONSTRUCTOR(Struct, ...)                                                                             \
+    Ivy::Reflect::Registry::AssignConstructor<Struct __VA_OPT__(, ) __VA_ARGS__>()
+
+#define METHOD(Struct, Method, Return, ...)                                                                  \
+    Ivy::Reflect::Registry::AssignMethod<Struct, &Struct::Method, Return __VA_OPT__(, ) __VA_ARGS__>(#Method)
+
+#define REFLECT(Type) Ivy::Reflect::Registry::GetTypeDescriptor<Type>()
+} // namespace Ivy::Reflect

@@ -1,6 +1,6 @@
-target("Ivy.Meta")
+target("Ivy.Reflect")
     set_kind("static")
     set_rundir(os.projectdir())
     add_includedirs(".", { public = true })
-    add_files("Meta/**.cpp")
+    add_files("Reflect/**.cpp")
     add_deps("Ivy.Utilities")

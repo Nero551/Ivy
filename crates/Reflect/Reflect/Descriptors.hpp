@@ -1,11 +1,11 @@
 #pragma once
-#include "Meta/Basic.hpp"
+#include "Reflect/Basic.hpp"
 #include "Utilities/DataStructures/StringMap.hpp"
 #include <cstddef>
 #include <ostream>
 #include <string_view>
 #include <vector>
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 
 struct TypeDescriptor;
@@ -70,4 +70,4 @@ struct TypeDescriptor
     friend std::ostream& operator<<(std::ostream& os, const TypeDescriptor& type);
 };
 
-} // namespace Ivy::Meta
+} // namespace Ivy::Reflect

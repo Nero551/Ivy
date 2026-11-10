@@ -1,9 +1,10 @@
 #pragma once
-#include "Meta/Accessor.hpp"
-#include "Meta/Descriptors.hpp"
-#include "Meta/Values.hpp"
+#include "Reflect/Accessor.hpp"
+#include "Reflect/Descriptors.hpp"
+#include "Reflect/Registry.hpp"
+#include "Reflect/Values.hpp"
 #include <string_view>
-namespace Ivy::Meta
+namespace Ivy::Reflect
 {
 struct ReflectedReference
 {
@@ -33,4 +34,8 @@ struct ReflectedReference
     TypeDescriptor* m_Type;
     void* m_Object;
 };
-} // namespace Ivy::Meta
+ReflectedReference Inspect(void* object, std::string_view type)
+{
+    return ReflectedReference{object, Registry::GetType(type)};
+}
+} // namespace Ivy::Reflect
