@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cstddef>
 #include <iostream>
 #include <source_location>
 #include <string_view>
 #include <type_traits>
 
-namespace Ivy::U
+namespace Ivy::D
 {
 
 struct Inspector
@@ -61,4 +62,4 @@ struct Inspector
     ~Inspector() = delete;
     Inspector& operator=(Inspector&) = delete;
 };
-} // namespace Ivy::U
+} // namespace Ivy::D

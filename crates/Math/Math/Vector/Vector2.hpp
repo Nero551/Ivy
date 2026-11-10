@@ -7,7 +7,7 @@
 #include "Math/Coordinates/Polar.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Vectors.hpp"
 #include <ostream>
 
@@ -44,7 +44,7 @@ template <Scalar T> struct Vector<2, T>
         case 1:
             return y;
         default:
-            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y)");
+            D::Log::Error("Index : ", component, " doesn't exist in vector(x, y)");
         }
     }
 
@@ -58,7 +58,7 @@ template <Scalar T> struct Vector<2, T>
         case 1:
             return y;
         default:
-            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y)");
+            D::Log::Error("Index : ", component, " doesn't exist in vector(x, y)");
         }
     }
 

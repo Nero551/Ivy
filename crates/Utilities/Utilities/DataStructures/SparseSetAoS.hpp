@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 #include <concepts>
 #include <limits>
@@ -111,14 +111,14 @@ struct SparseSetAoS
     /** @brief Returns the value associated with a sparse index. */
     T& At(const SparseIndexType index)
     {
-        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        D::Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]].Value;
     }
 
     /** @brief Returns the value associated with a sparse index. */
     const T& At(const SparseIndexType index) const
     {
-        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        D::Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]].Value;
     }
 
@@ -137,14 +137,14 @@ struct SparseSetAoS
     /** @brief Returns the entry at a dense index. */
     Entry& AtDense(const DenseIndexType index)
     {
-        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        D::Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 
     /** @brief Returns the entry at a dense index. */
     const Entry& AtDense(const DenseIndexType index) const
     {
-        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        D::Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 

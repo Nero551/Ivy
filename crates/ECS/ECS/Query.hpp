@@ -5,7 +5,7 @@
 #include "Entity.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/TupleUtils.hpp"
 #include <array>
@@ -52,7 +52,7 @@ struct Query
     template <typename T>
     T& GetComponent(const Entity& entity) const requires(std::derived_from<T, Component>)
     {
-        U::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype");
+        D::Log::Assert(entity.m_Archetype != nullptr, "Entity is not Connected To Any Archetype");
         IArchetype& archetype = *entity.m_Archetype;
         const Signature sig = MakeSignature<T>();
         if ((sig & archetype.Supported) == sig)
@@ -62,7 +62,7 @@ struct Query
             std::byte* row = base + archetype.GetDenseIndex(entity.GetId().Index) * archetype.Stride;
             return *reinterpret_cast<T*>(row + offset);
         }
-        U::Log::Error("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
+        D::Log::Error("Component: ", typeid(T).name(), " Doesn't exist for Entity: ", entity.GetId().Index);
     }
 
     template <typename... Args>

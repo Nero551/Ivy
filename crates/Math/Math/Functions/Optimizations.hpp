@@ -30,7 +30,7 @@ Input NewtonMethod(const Function<Output, Input>& f, Input initialGuess, Input e
             break;
         }
         Input dfx = Derivative(f, x);
-        U::Log::Assert(std::abs(dfx) > epsilon, "Netwon's Method: Derivative is too close to zero: ", dfx);
+        D::Log::Assert(std::abs(dfx) > epsilon, "Netwon's Method: Derivative is too close to zero: ", dfx);
 
         x -= fx / dfx;
     }

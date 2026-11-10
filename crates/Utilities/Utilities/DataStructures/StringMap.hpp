@@ -1,5 +1,5 @@
 #pragma once
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <concepts>
 #include <cstddef>
 #include <functional>
@@ -186,7 +186,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
         {
             return m_Data[it->second];
         }
-        Log::Error("[StringMap] Key: ", key, " Doesn't Exist");
+        D::Log::Error("[StringMap] Key: ", key, " Doesn't Exist");
     }
 
     const T& At(const std::string_view key) const
@@ -195,7 +195,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct St
         {
             return m_Data[it->second];
         }
-        Log::Error("[StringMap] Key: ", key, " Doesn't Exist");
+        D::Log::Error("[StringMap] Key: ", key, " Doesn't Exist");
     }
 
     Iterator Find(const std::string_view key)

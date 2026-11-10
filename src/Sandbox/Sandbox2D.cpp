@@ -1,6 +1,7 @@
 #include "Sandbox/Sandbox2D.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
+#include "Diagnostics/Log.hpp"
 #include "ECS/EntityID.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -16,7 +17,6 @@
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields2D.hpp"
-#include "Utilities/Debug/Log.hpp"
 #include <cstdlib>
 
 namespace Ivy::Sandbox
@@ -158,13 +158,13 @@ void Sandbox2D::FixedUpdate(double fdt)
 
     transform.Position = p.Position;
 
-    // U::Log::Info("[[[");
-    // U::Log::Info("Applied Force: ", f);
-    // U::Log::Info("Total Force: ", p.Force);
-    // U::Log::Info("Acceleration: ", p.Acceleration);
-    // U::Log::Info("Velocity: ", p.Velocity);
-    // U::Log::Info("Position: ", p.Position);
-    // U::Log::Info("]]]");
+    // D::Log::Info("[[[");
+    // D::Log::Info("Applied Force: ", f);
+    // D::Log::Info("Total Force: ", p.Force);
+    // D::Log::Info("Acceleration: ", p.Acceleration);
+    // D::Log::Info("Velocity: ", p.Velocity);
+    // D::Log::Info("Position: ", p.Position);
+    // D::Log::Info("]]]");
 
     // PlayWithBall(fdt);
 }
@@ -223,14 +223,14 @@ void Sandbox2D::PlayWithBall(double fdt)
 
     transform.Position = p.Position;
 
-    U::Log::Info("[[[");
-    U::Log::Info("Applied Force: ", f);
-    U::Log::Info("Wind: ", wind);
-    U::Log::Info("Resistive Force: ", R);
-    U::Log::Info("Total Force: ", p.Force);
-    U::Log::Info("Acceleration: ", p.Acceleration);
-    U::Log::Info("Velocity: ", p.Velocity);
-    U::Log::Info("Position: ", p.Position);
-    U::Log::Info("]]]");
+    D::Log::Info("[[[");
+    D::Log::Info("Applied Force: ", f);
+    D::Log::Info("Wind: ", wind);
+    D::Log::Info("Resistive Force: ", R);
+    D::Log::Info("Total Force: ", p.Force);
+    D::Log::Info("Acceleration: ", p.Acceleration);
+    D::Log::Info("Velocity: ", p.Velocity);
+    D::Log::Info("Position: ", p.Position);
+    D::Log::Info("]]]");
 }
 } // namespace Ivy::Sandbox

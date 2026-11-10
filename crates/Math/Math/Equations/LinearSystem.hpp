@@ -65,25 +65,25 @@ struct LinearSolution
 
     constexpr Vector<Variables, T>& GetSolution()
     {
-        U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
+        D::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
         return m_Solution.value();
     }
 
     constexpr const Vector<Variables, T>& GetSolution() const
     {
-        U::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
+        D::Log::Assert(IsUnique(), "LinearSolution: No unique solution exists.");
         return m_Solution.value();
     }
 
     constexpr Set<Vector<Variables, T>>& GetSolutionSet()
     {
-        U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
+        D::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
         return m_SolutionSet.value();
     }
 
     constexpr const Set<Vector<Variables, T>>& GetSolutionSet() const
     {
-        U::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
+        D::Log::Assert(IsInfinite(), "LinearSolution: Solution is finite.");
         return m_SolutionSet.value();
     }
 
@@ -136,7 +136,7 @@ struct LinearSystem
             return LinearSolution<Variables, T>{SolutionType::Infinite, CreateSolutionSet()};
 
         default:
-            U::Log::Error("LinearSystem: Unknown solution type.");
+            D::Log::Error("LinearSystem: Unknown solution type.");
         }
     }
 

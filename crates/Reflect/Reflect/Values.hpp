@@ -1,7 +1,7 @@
 #pragma once
 #include "Reflect/Basic.hpp"
 #include "Reflect/Descriptors.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 namespace Ivy::Reflect
 {
 struct FieldValue
@@ -14,29 +14,29 @@ struct FieldValue
 
         if (Description.Type->TypeId != GetTypeId<T>())
         {
-            U::Log::Error("Failed To Get Value: Not Same Type ", Description);
+            D::Log::Error("Failed To Get Value: Not Same Type ", Description);
         }
 
         using Properties = TypeProperties<T>;
 
         if (Description.IsConst != Properties::IsConst)
         {
-            U::Log::Error("Failed To Get Value: Const Mismatch ", Description);
+            D::Log::Error("Failed To Get Value: Const Mismatch ", Description);
         }
 
         if (Description.IsPointer != Properties::IsPointer)
         {
-            U::Log::Error("Failed To Get Value: Pointer Mismatch", Description);
+            D::Log::Error("Failed To Get Value: Pointer Mismatch", Description);
         }
 
         if (Description.IsReference != Properties::IsReference)
         {
-            U::Log::Error("Failed To Get Value: Reference Mismatch", Description);
+            D::Log::Error("Failed To Get Value: Reference Mismatch", Description);
         }
 
         if (Description.IsRValue != Properties::IsRValue)
         {
-            U::Log::Error("Failed To Get Value: RValue Reference Mismatch", Description);
+            D::Log::Error("Failed To Get Value: RValue Reference Mismatch", Description);
         }
 
         return *static_cast<T*>(Data);
@@ -52,7 +52,7 @@ struct ReturnValue
 
         if (Description.Type->TypeId != GetTypeId<T>())
         {
-            U::Log::Error("Failed To Get Value: Not Same Type ", Description);
+            D::Log::Error("Failed To Get Value: Not Same Type ", Description);
         }
 
         using Properties = TypeProperties<T>;

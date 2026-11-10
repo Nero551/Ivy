@@ -2,12 +2,13 @@
 #include "Reflect/Basic.hpp"
 #include "Reflect/Descriptors.hpp"
 #include "Reflect/Values.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <array>
 #include <cstddef>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
+#include <vector>
 namespace Ivy::Reflect
 {
 struct Reflected
@@ -19,24 +20,24 @@ struct Reflected
 
         if (!m_Type->Fields.Contains(name))
         {
-            U::Log::Error("Type doesn't contain field: ", name);
+            D::Log::Error("Type doesn't contain field: ", name);
         }
 
         const FieldDescriptor& field = m_Type->Fields.At(name);
 
         if (field.Type->TypeId != GetTypeId<BaseType>())
         {
-            U::Log::Error("Failed To Set Value: Not Same Type ", field);
+            D::Log::Error("Failed To Set Value: Not Same Type ", field);
         }
 
         if (field.IsConst)
         {
-            U::Log::Error("Failed To Set Value: Field Is Const ", field);
+            D::Log::Error("Failed To Set Value: Field Is Const ", field);
         }
 
         if (field.IsPointer != Properties::IsPointer)
         {
-            U::Log::Error("Failed To Set Value: Pointer Mismatch ", field);
+            D::Log::Error("Failed To Set Value: Pointer Mismatch ", field);
         }
 
         void* address = static_cast<std::byte*>(m_Object) + field.Offset;
@@ -48,7 +49,7 @@ struct Reflected
     {
         if (!m_Type->Fields.Contains(name))
         {
-            U::Log::Error("Type doesn't contain field: ", name);
+            D::Log::Error("Type doesn't contain field: ", name);
         }
         const FieldDescriptor& field = m_Type->Fields.At(name);
 
@@ -90,7 +91,7 @@ struct Reflected
 
         if (!selectedMethod)
         {
-            U::Log::Error("Can't Invoke Method: No Matching Overload: ", name);
+            D::Log::Error("Can't Invoke Method: No Matching Overload: ", name);
         }
 
         std::tuple<Args...> arguments(std::forward<Args>(args)...);

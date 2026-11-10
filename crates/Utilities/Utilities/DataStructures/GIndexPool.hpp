@@ -1,5 +1,5 @@
 #pragma once
-#include "../Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::U
 {
@@ -84,7 +84,7 @@ struct GIndexPool
     {
         if (index >= m_Generations.size())
         {
-            Log::Error("GIndexPool: Index Out of bounds");
+            D::Log::Error("GIndexPool: Index Out of bounds");
         }
         return m_Generations[index];
     }

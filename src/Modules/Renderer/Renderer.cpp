@@ -10,6 +10,7 @@
 #include "Graphics/Capability.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/DataType.hpp"
+#include "Graphics/Image.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -25,7 +26,6 @@
 #include "Modules/Renderer/Systems/Renderer2DSystem.hpp"
 #include "Modules/Renderer/Systems/Renderer3DSystem.hpp"
 #include "Systems/LightingSystem.hpp"
-#include "Utilities/Image.hpp"
 #include <ranges>
 #include <vector>
 
@@ -150,7 +150,7 @@ void Renderer::Stop()
     const G::Texture2D& texture =
         static_cast<G::Texture2D&>(Framebuffer.GetTexture(G::FramebufferAttachment::Color0));
 
-    U::Image image = {texture.Width, texture.Height, U::Image::ColorChannels::RGB, texture.ReadPixels()};
+    G::Image image = {texture.Width, texture.Height, G::Image::ColorChannels::RGB, texture.ReadPixels()};
     image.SaveToDiskPNG("assets/LastFrame.png", true);
 }
 } // namespace Ivy::R

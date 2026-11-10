@@ -1,5 +1,5 @@
 #pragma once
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <concepts>
 #include <limits>
 #include <type_traits>
@@ -75,7 +75,7 @@ template <typename T, std::unsigned_integral NonTypeIdType = unsigned int> struc
     {
         if (!Contains<Args...>())
         {
-            U::Log::Error("TypedVector does not contain the specified TypeId.");
+            D::Log::Error("TypedVector does not contain the specified TypeId.");
         }
 
         return m_Data[GetTypeId<Args...>()];
@@ -127,7 +127,7 @@ template <typename T, std::unsigned_integral NonTypeIdType = unsigned int> struc
 
         if (!Contains<Args...>())
         {
-            U::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
+            D::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
             m_Data.push_back(value);
         }
         return m_Data[typeId];
@@ -145,7 +145,7 @@ template <typename T, std::unsigned_integral NonTypeIdType = unsigned int> struc
 
         if (!Contains<Args...>())
         {
-            U::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
+            D::Log::Assert(typeId == m_Data.size(), "TypedVector: Invalid local TypeId.");
             m_Data.emplace_back(std::forward<Params>(parameters)...);
         }
         return {this, typeId};

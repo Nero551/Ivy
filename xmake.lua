@@ -22,6 +22,7 @@ includes("crates/Graphics")
 includes("crates/ECS")
 includes("crates/Core")
 includes("crates/Reflect")
+includes("crates/Diagnostics")
 
 target("Ivy")
     set_kind("binary")
@@ -29,7 +30,7 @@ target("Ivy")
     add_includedirs("src")
     set_pcxxheader("src/pch.hpp")
     add_files("src/**.cpp")
-    add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.Graphics", "Ivy.ECS", "Ivy.Core")
+    add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.Graphics", "Ivy.ECS", "Ivy.Core", "Ivy.Reflect", "Ivy.Diagnostics")
 
     if is_plat("linux") then
         ---@diagnostic disable-next-line: param-type-not-match
@@ -49,7 +50,7 @@ target("Ivy.Tests")
     set_rundir(os.projectdir())
 
     add_files("tests/**.cpp")
-    add_deps("Ivy.Math", "Ivy.Physics", "Ivy.Utilities", "Ivy.Reflect")
+    add_deps("Ivy.Math", "Ivy.Physics", "Ivy.Utilities", "Ivy.Reflect", "Ivy.Diagnostics", "Ivy.Graphics")
     add_packages("gtest")
 
 target("Ivy.Benchmarks")

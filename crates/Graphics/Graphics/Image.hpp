@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
-namespace Ivy::U
+namespace Ivy::G
 {
 /**
  * @brief Represents a raster image.
@@ -54,7 +54,7 @@ struct Image
 
         if (!pixels)
         {
-            Log::Error("Failed To Load Image: " + filePath);
+            D::Log::Error("Failed To Load Image: " + filePath);
             return;
         }
 
@@ -127,4 +127,4 @@ struct Image
     /** Number and configuration of color channels per pixel. */
     ColorChannels Channels = ColorChannels::RGB;
 };
-} // namespace Ivy::U
+} // namespace Ivy::G

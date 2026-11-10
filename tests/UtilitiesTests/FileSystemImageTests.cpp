@@ -1,12 +1,11 @@
 #include "Utilities/FileSystem.hpp"
-#include "Utilities/Image.hpp"
+#include "Graphics/Image.hpp"
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <vector>
 
 namespace Ivy::UnitTests
 {
-using namespace Ivy::U;
 
 // ==================== FileSystem ====================
 TEST(FileSystem, WriteThenRead)
@@ -40,7 +39,7 @@ TEST(FileSystem, OverwriteFile)
 // ==================== Image ====================
 TEST(Image, DefaultConstructor)
 {
-    Image img;
+    G::Image img;
     EXPECT_EQ(img.Width, 0);
     EXPECT_EQ(img.Height, 0);
     EXPECT_TRUE(img.Pixels.empty());
@@ -49,10 +48,10 @@ TEST(Image, DefaultConstructor)
 TEST(Image, ConstructFromDimensions)
 {
     std::vector<unsigned char> pixels = {255, 0, 0, 0, 255, 0, 0, 0, 255}; // 3 pixels RGB
-    Image img(3, 1, Image::ColorChannels::RGB, pixels);
+    G::Image img(3, 1, G::Image::ColorChannels::RGB, pixels);
     EXPECT_EQ(img.Width, 3);
     EXPECT_EQ(img.Height, 1);
-    EXPECT_EQ(img.Channels, Image::ColorChannels::RGB);
+    EXPECT_EQ(img.Channels, G::Image::ColorChannels::RGB);
     EXPECT_EQ(img.Pixels.size(), 9u);
     EXPECT_EQ(img.Pixels, pixels);
 }
@@ -64,7 +63,7 @@ TEST(Image, FlipVertically)
         255, 0, 0, 0, 255, 0,  // row 0
         0, 0, 255, 255, 255, 0 // row 1
     };
-    Image img(2, 2, Image::ColorChannels::RGB, pixels);
+    G::Image img(2, 2, G::Image::ColorChannels::RGB, pixels);
     img.FlipVertically();
 
     // row0 should now be [blue, yellow]
@@ -88,7 +87,7 @@ TEST(Image, FlipVerticallyOddHeightMiddleRowUnchanged)
 {
     // 3x1 RGB image: only one row, nothing to flip
     std::vector<unsigned char> pixels = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    Image img(3, 1, Image::ColorChannels::RGB, pixels);
+    G::Image img(3, 1, G::Image::ColorChannels::RGB, pixels);
     img.FlipVertically();
     EXPECT_EQ(img.Pixels, pixels);
 }

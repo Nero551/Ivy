@@ -1,7 +1,6 @@
-
 #pragma once
 
-#ifdef TRACY_ENABLE
+#ifdef DEBUG
 
 #include <tracy/Tracy.hpp>
 

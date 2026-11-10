@@ -1,11 +1,10 @@
 #pragma once
 #include <cstddef>
-#include <exception>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
 
-namespace Ivy::U
+namespace Ivy::D
 {
 template <typename T> std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
 {
@@ -92,4 +91,4 @@ template <typename... Args> static constexpr void Assert(const bool condition, c
     }
 }
 }; // namespace Log
-} // namespace Ivy::U
+} // namespace Ivy::D

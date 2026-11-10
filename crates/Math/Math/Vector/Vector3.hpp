@@ -6,7 +6,7 @@
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/Spherical.hpp"
 #include "Math/Scalar.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Vectors.hpp"
 
 namespace Ivy::M
@@ -39,7 +39,7 @@ template <Scalar T> struct Vector<3, T>
         case 2:
             return z;
         default:
-            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z)");
+            D::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z)");
         }
     }
 
@@ -55,7 +55,7 @@ template <Scalar T> struct Vector<3, T>
         case 2:
             return z;
         default:
-            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z)");
+            D::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z)");
         }
     }
 

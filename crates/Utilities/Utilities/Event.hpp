@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Utilities/ScopeGuard.hpp"
 #include <concepts>
 #include <functional>
@@ -18,7 +18,7 @@ template <typename... Args> struct Event
     {
         if (m_Firing)
         {
-            U::Log::Error("[Event] Attempted to subscribe while firing");
+            D::Log::Error("[Event] Attempted to subscribe while firing");
         }
         Subscription sub = m_Subscriptions.Acquire();
         m_Subscribers.Emplace(sub.Index, std::forward<F>(callback));
@@ -29,7 +29,7 @@ template <typename... Args> struct Event
     {
         if (m_Firing)
         {
-            U::Log::Error("[Event] Attempted to unsubscribe while firing");
+            D::Log::Error("[Event] Attempted to unsubscribe while firing");
         }
 
         if (m_Subscriptions.IsAcquired(subscription))
@@ -43,7 +43,7 @@ template <typename... Args> struct Event
     {
         if (m_Firing)
         {
-            U::Log::Error("[Event] Attempted to fire while firing");
+            D::Log::Error("[Event] Attempted to fire while firing");
         }
 
         m_Firing = true;

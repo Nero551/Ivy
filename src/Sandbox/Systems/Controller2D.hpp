@@ -2,13 +2,13 @@
 #include "Core/Engine.hpp"
 #include "Core/System.hpp"
 #include "Core/World/Components.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/ProjectionMode.hpp"
-#include "Utilities/Debug/Log.hpp"
 #include <algorithm>
 
 namespace Ivy::Sandbox
@@ -21,7 +21,7 @@ struct Controller2D : C::System
     {
         if (m_Engine.GetModule<I::Input>().IsKeyPressed(G::Key::T))
         {
-            U::Log::Info(m_Engine.ECS.EntityAmount());
+            D::Log::Info(m_Engine.ECS.EntityAmount());
         }
 
         auto& query = m_Engine.ECS.Query;

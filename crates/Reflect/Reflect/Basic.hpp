@@ -1,5 +1,5 @@
 #pragma once
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <cstddef>
 #include <string_view>
 #include <tuple>
@@ -49,26 +49,26 @@ template <typename T> consteval TypeId GetTypeId()
 
 template <typename T, typename... Args> void* Construct(void* tuple)
 {
-    U::Log::Info("Constructed");
+    D::Log::Info("Constructed");
     return std::apply([]<typename... Params>(Params&&... params) -> void*
         { return new T{std::forward<Params>(params)...}; }, *static_cast<std::tuple<Args...>*>(tuple));
 }
 
 template <typename T> void Deconstruct(void* object)
 {
-    U::Log::Info("Deconstructed ", object);
+    D::Log::Info("Deconstructed ", object);
     delete static_cast<T*>(object);
 }
 
 template <typename T> void* MoveConstruct(void* object)
 {
-    U::Log::Info("Move Constructed", object);
+    D::Log::Info("Move Constructed", object);
     return new T{std::move(*static_cast<T*>(object))};
 }
 
 template <typename T> void* CopyConstruct(const void* object)
 {
-    U::Log::Info("Copy Constructed", object);
+    D::Log::Info("Copy Constructed", object);
     return new T{*static_cast<const T*>(object)};
 }
 

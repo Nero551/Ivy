@@ -4,6 +4,7 @@
 #include "Core/Services/ResourceManager/Resource.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/System.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/DataType.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -16,7 +17,6 @@
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cmath>
 #include <string>

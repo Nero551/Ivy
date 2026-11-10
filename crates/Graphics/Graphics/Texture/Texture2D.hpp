@@ -6,7 +6,7 @@
 #include "TextureFilter.hpp"
 #include "TextureFormat.hpp"
 #include "TextureWrap.hpp"
-#include "Utilities/Image.hpp"
+#include "Graphics/Image.hpp"
 #include <vector>
 
 namespace Ivy::G
@@ -79,7 +79,7 @@ struct Texture2D : Texture
      * @remark The image should be vertically flipped when loaded to account
      * for the difference between image and OpenGL texture coordinates.
      */
-    void UseImage(const U::Image& image);
+    void UseImage(const G::Image& image);
 
     std::vector<unsigned char> ReadPixels() const;
 

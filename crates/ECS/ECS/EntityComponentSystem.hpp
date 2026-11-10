@@ -6,7 +6,7 @@
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/HierarchyTree.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Utilities/Event.hpp"
 #include <cstddef>
 #include <utility>
@@ -77,7 +77,7 @@ struct EntityComponentSystem
     {
         if (!m_Ids.IsAcquired(id))
         {
-            U::Log::Error("Entity Not Found: ", id);
+            D::Log::Error("Entity Not Found: ", id);
         }
         return m_Entities[id.Index];
     }
@@ -86,7 +86,7 @@ struct EntityComponentSystem
     {
         if (!m_Entities.Contains(id))
         {
-            U::Log::Error("Entity Not Found: ", id);
+            D::Log::Error("Entity Not Found: ", id);
         }
         return m_Entities[id];
     }

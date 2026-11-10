@@ -3,7 +3,7 @@
 
 #include "Math/Functions/Function.hpp"
 #include "Math/MathTuple.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <functional>
 #include <ostream>
 namespace Ivy::M
@@ -90,7 +90,7 @@ template <M::Scalar Independent, typename... States> struct ODE
         const State& initial, const Independent& target, const Independent& dx,
         std::function_ref<void(const State&)> action = [](const State&) {}) const
     {
-        U::Log::Assert(dx > 0, "dx must be positive");
+        D::Log::Assert(dx > 0, "dx must be positive");
 
         State result = initial;
 

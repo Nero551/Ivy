@@ -6,7 +6,7 @@
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/HyperSpherical.hpp"
 #include "Math/Scalar.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Vectors.hpp"
 #include <ostream>
 
@@ -34,7 +34,7 @@ template <Scalar T> struct Vector<4, T>
         case 3:
             return w;
         default:
-            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z, w)");
+            D::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z, w)");
         }
     }
 
@@ -52,7 +52,7 @@ template <Scalar T> struct Vector<4, T>
         case 3:
             return w;
         default:
-            U::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z, w)");
+            D::Log::Error("Index : ", component, " doesn't exist in vector(x, y, z, w)");
         }
     }
 

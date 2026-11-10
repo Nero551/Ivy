@@ -5,8 +5,8 @@
 #include "Graphics/Texture/TextureFormat.hpp"
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 
-#include "Utilities/Debug/Log.hpp"
-#include "Utilities/Image.hpp"
+#include "Diagnostics/Log.hpp"
+#include "Graphics/Image.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
@@ -42,7 +42,7 @@ void Texture2D::Generate()
     }
 }
 
-void Texture2D::UseImage(const U::Image& image)
+void Texture2D::UseImage(const G::Image& image)
 {
     Width = image.Width;
     Height = image.Height;
@@ -52,24 +52,24 @@ void Texture2D::UseImage(const U::Image& image)
 
     switch (image.Channels)
     {
-    case U::Image::ColorChannels::R:
+    case G::Image::ColorChannels::R:
         Format = TextureFormat::Red;
         InternalFormat = TextureInternalFormat::R8;
         break;
-    case U::Image::ColorChannels::RG:
+    case G::Image::ColorChannels::RG:
         Format = TextureFormat::RG;
         InternalFormat = TextureInternalFormat::RG8;
         break;
-    case U::Image::ColorChannels::RGB:
+    case G::Image::ColorChannels::RGB:
         Format = TextureFormat::RGB;
         InternalFormat = TextureInternalFormat::RGB8;
         break;
-    case U::Image::ColorChannels::RGBA:
+    case G::Image::ColorChannels::RGBA:
         Format = TextureFormat::RGBA;
         InternalFormat = TextureInternalFormat::RGBA8;
         break;
     default:
-        U::Log::Error("Unsupported Texture Channel Count");
+        D::Log::Error("Unsupported Texture Channel Count");
     }
 }
 

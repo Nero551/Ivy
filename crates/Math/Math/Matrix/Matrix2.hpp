@@ -4,7 +4,7 @@
 #include "Math/Common/Constants.hpp"
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::M
 {
@@ -61,7 +61,7 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix, T>
 
         if (std::abs(det) < EPSILON)
         {
-            U::Log::Error("Matrix is singular and cannot be inverted.");
+            D::Log::Error("Matrix is singular and cannot be inverted.");
         }
 
         double invDet = 1.0 / det;

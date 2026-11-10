@@ -4,7 +4,7 @@
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <algorithm>
 #include <array>
 #include <concepts>
@@ -183,7 +183,7 @@ struct BasicMatrix
 
     constexpr Derived<Row, Column, T> MultiplyRow(unsigned int r, T scalar)
     {
-        U::Log::Assert(r < Row, "Matrix: Row index out of bounds.");
+        D::Log::Assert(r < Row, "Matrix: Row index out of bounds.");
         Derived<Row, Column, T> result = AsDerived();
 
         for (unsigned int column = 0; column < Column; ++column)
@@ -196,8 +196,8 @@ struct BasicMatrix
 
     constexpr Derived<Row, Column, T> AddRow(unsigned int target, unsigned int source) const
     {
-        U::Log::Assert(target < Row, "Matrix: Row index out of bounds.");
-        U::Log::Assert(source < Row, "Matrix: Row index out of bounds.");
+        D::Log::Assert(target < Row, "Matrix: Row index out of bounds.");
+        D::Log::Assert(source < Row, "Matrix: Row index out of bounds.");
 
         Derived<Row, Column, T> result = AsDerived();
 
@@ -211,7 +211,7 @@ struct BasicMatrix
 
     constexpr Derived<Row, Column, T> SwapRow(unsigned int r1, unsigned int r2)
     {
-        U::Log::Assert(r1 < Row && r2 < Row, "Matrix: Row index out of bounds.");
+        D::Log::Assert(r1 < Row && r2 < Row, "Matrix: Row index out of bounds.");
         Derived<Row, Column, T> result = Zero();
 
         for (unsigned int row = 0; row < Row; ++row)

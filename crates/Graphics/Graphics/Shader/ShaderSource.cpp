@@ -7,7 +7,7 @@
 
 #include "../OpenGL.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Utilities/FileSystem.hpp"
 
 namespace Ivy::G
@@ -49,7 +49,7 @@ void ShaderSource::Compile()
     if (!success)
     {
         glGetShaderInfoLog(m_Id, 512, nullptr, infoLog);
-        U::Log::Error(std::string("Shader Source:" + GetName() + infoLog + " | " + Path));
+        D::Log::Error(std::string("Shader Source:" + GetName() + infoLog + " | " + Path));
 
         if (m_Stage == ShaderStage::Fragment)
         {
@@ -114,7 +114,7 @@ void ShaderSource::PreprocessIncludes(
                 // Check Circular Include
                 if (!includesProcessing.insert(includePath).second)
                 {
-                    U::Log::Error("Circular Include: " + includePath.string() + " | In Shader: " + path);
+                    D::Log::Error("Circular Include: " + includePath.string() + " | In Shader: " + path);
                 }
 
                 // Recursively Include

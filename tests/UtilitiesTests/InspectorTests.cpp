@@ -1,9 +1,9 @@
-#include "Utilities/Debug/Inspector.hpp"
+#include "Diagnostics/Inspector.hpp"
 #include <gtest/gtest.h>
 
 namespace Ivy::UnitTests
 {
-using namespace Ivy::U;
+using namespace Ivy::D;
 
 TEST(Inspector, DoesNotCrashOnPrintables)
 {

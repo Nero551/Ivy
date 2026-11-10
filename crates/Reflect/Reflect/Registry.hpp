@@ -3,7 +3,7 @@
 #include "Reflect/Descriptors.hpp"
 #include "Reflect/Values.hpp"
 #include "Utilities/DataStructures/StringMap.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <cstddef>
 #include <memory>
 #include <string_view>
@@ -18,7 +18,7 @@ struct Registry
     {
         if (!m_TypeRegistry.Contains(type))
         {
-            U::Log::Error("Type Registry doesn't contain type");
+            D::Log::Error("Type Registry doesn't contain type");
         }
         return *m_TypeRegistry.At(type);
     }

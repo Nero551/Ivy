@@ -1,5 +1,5 @@
 #pragma once
-#include "../Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 #include <vector>
 namespace Ivy::U
@@ -113,13 +113,13 @@ struct SparseSetSoA
 
     T& At(const SparseIndexType index)
     {
-        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        D::Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]];
     }
 
     const T& At(const SparseIndexType index) const
     {
-        Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
+        D::Log::Assert(Contains(index), "SparseSet does not contain the specified sparse index.");
         return m_Dense[m_Sparse[index]];
     }
 
@@ -135,13 +135,13 @@ struct SparseSetSoA
 
     T& AtDense(const DenseIndexType index)
     {
-        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        D::Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 
     const T& AtDense(const DenseIndexType index) const
     {
-        Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
+        D::Log::Assert(index < m_Dense.size(), "SparseSet dense index out of bounds.");
         return m_Dense[index];
     }
 

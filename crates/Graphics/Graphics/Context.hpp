@@ -3,7 +3,7 @@
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Capability.hpp"
 #include "OpenGL.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 /** @brief Handles initialization, modification and termination of the graphics state */
 namespace Ivy::G::Context
@@ -51,11 +51,11 @@ inline bool IsEnabled(Capability capability)
 inline void Initialize()
 {
     glfwSetErrorCallback(
-        [](const int error, const char* description) { U::Log::Error("[GLFW] ", error, ": ", description); });
+        [](const int error, const char* description) { D::Log::Error("[GLFW] ", error, ": ", description); });
 
     if (!glfwInit())
     {
-        U::Log::Error("Failed to initialize GLFW");
+        D::Log::Error("Failed to initialize GLFW");
     }
 }
 

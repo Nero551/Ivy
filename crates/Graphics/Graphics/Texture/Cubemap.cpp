@@ -2,7 +2,7 @@
 
 #include "../OpenGL.hpp"
 #include "Graphics/Texture/Texture.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <algorithm>
 #include <cmath>
 
@@ -23,7 +23,7 @@ void Cubemap::Generate()
         Bottom.Width != Width || Bottom.Height != Height || Right.Width != Width || Right.Height != Height ||
         Left.Width != Width || Left.Height != Height)
     {
-        U::Log::Error("Cubemap faces must all have the same dimensions.");
+        D::Log::Error("Cubemap faces must all have the same dimensions.");
         return;
     }
 

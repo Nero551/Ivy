@@ -2,7 +2,7 @@
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 #include <string>
 #include <utility>
@@ -12,8 +12,8 @@ namespace Ivy::G::Primitives
 {
 G::Mesh CreateQuad(const std::string& name, unsigned int widthSegments, unsigned int heightSegments)
 {
-    U::Log::Assert(widthSegments > 0, "Quad width segments must be greater than zero");
-    U::Log::Assert(heightSegments > 0, "Quad height segments must be greater than zero");
+    D::Log::Assert(widthSegments > 0, "Quad width segments must be greater than zero");
+    D::Log::Assert(heightSegments > 0, "Quad height segments must be greater than zero");
 
     std::vector<G::Vertex> vertices;
     std::vector<unsigned int> indices;

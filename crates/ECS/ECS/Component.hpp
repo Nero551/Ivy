@@ -1,5 +1,5 @@
 #pragma once
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <bitset>
 namespace Ivy::ECS
 {
@@ -13,7 +13,7 @@ static constexpr int MaxComponentTypes = 64;
 inline unsigned int NextComponentId()
 {
     static unsigned int counter = 0;
-    U::Log::Assert(counter < MaxComponentTypes, "Too many component types for Signature");
+    D::Log::Assert(counter < MaxComponentTypes, "Too many component types for Signature");
     return counter++;
 }
 

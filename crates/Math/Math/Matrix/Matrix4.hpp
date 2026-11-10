@@ -6,7 +6,7 @@
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::M
 {
@@ -267,7 +267,7 @@ template <Scalar T> struct Matrix<4, 4, T> : BasicMatrix<4, 4, Matrix, T>
 
         if (std::abs(determinant) < EPSILON)
         {
-            U::Log::Error("Matrix is not invertible");
+            D::Log::Error("Matrix is not invertible");
         }
 
         return adjugate / determinant;

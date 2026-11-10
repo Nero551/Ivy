@@ -1,9 +1,9 @@
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <gtest/gtest.h>
 
 namespace Ivy::UnitTests
 {
-using namespace Ivy::U;
+using namespace Ivy::D;
 
 TEST(Log, PrintDoesNotCrash)
 {

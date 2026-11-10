@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <vector>
 
 namespace Ivy::U
@@ -102,7 +102,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
     {
         if (!Contains(a, b))
         {
-            Log::Error("Indirect2DVector: Index does not exist.");
+            D::Log::Error("Indirect2DVector: Index does not exist.");
         }
 
         return m_Data[m_Lookup[a][b]];
@@ -112,7 +112,7 @@ template <typename T, std::unsigned_integral IndexType = unsigned int> struct In
     {
         if (!Contains(a, b))
         {
-            Log::Error("Indirect2DVector: Index does not exist.");
+            D::Log::Error("Indirect2DVector: Index does not exist.");
         }
 
         return m_Data[m_Lookup[a][b]];

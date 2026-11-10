@@ -2,7 +2,7 @@
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Complex/Complex.hpp"
 #include "Math/MathTuple.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <cstdlib>
 #include <optional>
 #include <ostream>
@@ -18,13 +18,13 @@ struct QuadraticResult
 
     MathTuple<float, float> GetRealRoots() const
     {
-        U::Log::Assert(HasRealRoots(), "Quadratic Equation has no real roots");
+        D::Log::Assert(HasRealRoots(), "Quadratic Equation has no real roots");
         return {m_X1, m_X2};
     }
 
     MathTuple<Complex<>, Complex<>> GetComplexRoots() const
     {
-        U::Log::Assert(HasComplexRoots(), "Quadratic Equation has no complex roots");
+        D::Log::Assert(HasComplexRoots(), "Quadratic Equation has no complex roots");
         return {(*m_ComplexRoot), (*m_ComplexRoot).Conjugate()};
     }
 
@@ -67,7 +67,7 @@ struct QuadraticResult
 
 constexpr QuadraticResult SolveQuadratic(const float a, const float b, const float c)
 {
-    U::Log::Assert(a != 0, "[Quadratic Equation] a can't be equal to 0");
+    D::Log::Assert(a != 0, "[Quadratic Equation] a can't be equal to 0");
 
     const float denominator = 2.0f * a;
     const float d = b * b - 4.0f * a * c;

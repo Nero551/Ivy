@@ -3,7 +3,7 @@
 #include "ECS/EntityID.hpp"
 #include "Entity.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Utilities/TupleUtils.hpp"
 #include <array>
 #include <bitset>
@@ -96,14 +96,14 @@ struct Archetype : IArchetype
 
     std::tuple<Args...>& Get(const Entity& entity)
     {
-        U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
+        D::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
             " ] doesn't contain entity: ", entity.GetId());
         return m_Data[entity.GetId().Index];
     }
 
     template <typename T> T& GetOne(const Entity& entity) requires(std::is_same_v<T, Args> || ...)
     {
-        U::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
+        D::Log::Assert(m_Data.Contains(entity.GetId().Index), "Archetype: [ ", typeid(Args).name()...,
             " ] doesn't contain entity: ", entity.GetId());
         return std::get<T>(m_Data[entity.GetId().Index]);
     }

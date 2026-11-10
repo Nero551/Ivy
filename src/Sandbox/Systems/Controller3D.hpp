@@ -29,7 +29,7 @@ struct Controller3D : C::System
 
         if (m_Engine.GetModule<I::Input>().IsKeyPressed(G::Key::T))
         {
-            U::Log::Info(m_Engine.ECS.EntityAmount());
+            D::Log::Info(m_Engine.ECS.EntityAmount());
         }
 
         auto& query = m_Engine.ECS.Query;

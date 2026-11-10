@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::U::FileSystem
 {
@@ -15,7 +15,7 @@ inline std::string ReadFile(const std::string& path)
 
     if (!file)
     {
-        Log::Warning("Failed to read file: ", path);
+        D::Log::Warning("Failed to read file: ", path);
         return {};
     }
 
@@ -32,7 +32,7 @@ inline void WriteFile(const std::string& path, const std::string& content)
 
     if (!file)
     {
-        Log::Warning("Failed to write file: ", path);
+        D::Log::Warning("Failed to write file: ", path);
         return;
     }
 

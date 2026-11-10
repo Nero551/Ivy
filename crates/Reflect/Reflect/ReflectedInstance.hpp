@@ -3,7 +3,7 @@
 #include "Reflect/Descriptors.hpp"
 #include "Reflect/Reflected.hpp"
 #include "Reflect/Registry.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <array>
 #include <cstddef>
 #include <string_view>
@@ -52,7 +52,7 @@ struct ReflectedInstance : Reflected
         }
         if (nonviableConstructor)
         {
-            U::Log::Error("No Viable Constructor For Params: ", params...);
+            D::Log::Error("No Viable Constructor For Params: ", params...);
         }
     }
 

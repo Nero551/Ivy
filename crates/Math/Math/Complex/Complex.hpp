@@ -6,7 +6,7 @@
 #include "../Common/Logarithms.hpp"
 #include "../Coordinates/Polar.hpp"
 #include "Math/Scalar.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <ostream>
 
 namespace Ivy::M
@@ -158,7 +158,7 @@ template <Scalar T = float> struct Complex
         case 1:
             return Imaginary;
         default:
-            U::Log::Error("Complex Number doesn't have index ", index, " (a + bi)");
+            D::Log::Error("Complex Number doesn't have index ", index, " (a + bi)");
         }
     }
 
@@ -171,7 +171,7 @@ template <Scalar T = float> struct Complex
         case 1:
             return Imaginary;
         default:
-            U::Log::Error("Complex Number doesn't have index ", index, " (a + bi)");
+            D::Log::Error("Complex Number doesn't have index ", index, " (a + bi)");
         }
     }
 

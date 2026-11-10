@@ -1,9 +1,8 @@
 #pragma once
 
+#include "Diagnostics/Log.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
-#include "Math/Vector/Vectors.hpp"
-#include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
@@ -40,7 +39,7 @@ template <typename T, Index Size> struct Array
     {
         if (!Contains(index))
         {
-            U::Log::Error("Array: Out of bounds.");
+            D::Log::Error("Array: Out of bounds.");
         }
         return m_Data[index];
     }
@@ -192,7 +191,7 @@ template <M::Scalar T> struct Dual
 
     constexpr Dual Inverse()
     {
-        U::Log::Assert(Real == 0, "[Dual] An Inverse Exists Only If Real Part a != 0");
+        D::Log::Assert(Real == 0, "[Dual] An Inverse Exists Only If Real Part a != 0");
         return Conjugate() / MagnitudeSquared();
     }
 };

@@ -2,7 +2,7 @@
 
 #include "Math/Scalar.hpp"
 
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::M
 {
@@ -171,7 +171,7 @@ template <Scalar T> struct LinearEquation<1, T>
             return Coefficient;
         }
 
-        U::Log::Error("LinearEquation: Index out of bounds.");
+        D::Log::Error("LinearEquation: Index out of bounds.");
     }
 
     /** @brief Returns the coefficient at the specified index. */
@@ -182,7 +182,7 @@ template <Scalar T> struct LinearEquation<1, T>
             return Coefficient;
         }
 
-        U::Log::Error("LinearEquation: Index out of bounds.");
+        D::Log::Error("LinearEquation: Index out of bounds.");
     }
 
     /** @brief Returns the equation multiplied by a scalar. */
@@ -250,7 +250,7 @@ template <Scalar T> struct LinearEquation<1, T>
     /** @brief Solves the equation when a unique solution exists. */
     constexpr T Solve() const
     {
-        U::Log::Assert(Coefficient != 0, "LinearEquation: Infinite or no solutions exist for this equation.");
+        D::Log::Assert(Coefficient != 0, "LinearEquation: Infinite or no solutions exist for this equation.");
         return Result / Coefficient;
     }
 

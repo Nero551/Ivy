@@ -5,7 +5,7 @@
 #include "ECS/EntityID.hpp"
 #include "Systems/TransformSystem.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::C
 {
@@ -24,7 +24,7 @@ ECS::Entity& World::GetRoot()
     auto root = m_Engine.ECS.TryFindEntity(m_Root);
     if (!root)
     {
-        U::Log::Error("No Root Is Set Or Root Is Not An Entity");
+        D::Log::Error("No Root Is Set Or Root Is Not An Entity");
     }
     return *root;
 }
@@ -34,7 +34,7 @@ ECS::Entity& World::GetCamera()
     auto camera = m_Engine.ECS.TryFindEntity(m_ActiveCamera);
     if (!camera)
     {
-        U::Log::Error("No Active Camera Is Set Or Active Camera Is Not An Entity");
+        D::Log::Error("No Active Camera Is Set Or Active Camera Is Not An Entity");
     }
     return *camera;
 }

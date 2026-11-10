@@ -2,21 +2,15 @@
 #include "Core/Service.hpp"
 #include "Core/TimeHandler.hpp"
 #include "Core/World/World.hpp"
+#include "Diagnostics/Log.hpp"
 #include "ECS/EntityComponentSystem.hpp"
 #include "Graphics/Window.hpp"
 #include "Module.hpp"
-#include "Utilities/DataStructures/NonTypedVector.hpp"
-#include "Utilities/DataStructures/StringMap.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
-#include "Utilities/Debug/Log.hpp"
-#include "Utilities/FixedString.hpp"
 #include <concepts>
 #include <format>
 #include <functional>
 #include <memory>
-#include <string>
-#include <string_view>
-#include <unordered_map>
 
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
@@ -70,7 +64,7 @@ struct Engine
         auto module = m_Modules.Find<T>();
         if (module == m_Modules.end())
         {
-            U::Log::Error(std::format("Module {} not found", typeid(T).name()));
+            D::Log::Error(std::format("Module {} not found", typeid(T).name()));
         }
         return static_cast<T&>(**module);
     }
@@ -80,7 +74,7 @@ struct Engine
         auto service = m_Services.Find<T>();
         if (service == m_Services.end())
         {
-            U::Log::Error(std::format("Service Not Found: {}", typeid(T).name()));
+            D::Log::Error(std::format("Service Not Found: {}", typeid(T).name()));
         }
         return static_cast<T&>(**service);
     }
@@ -106,7 +100,7 @@ struct Engine
     {
         if (m_Services.Contains<T>())
         {
-            U::Log::Error(std::format(" Service {} Already Added", typeid(T).name()));
+            D::Log::Error(std::format(" Service {} Already Added", typeid(T).name()));
             return static_cast<T&>(*m_Services.At<T>());
         }
 

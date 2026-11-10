@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/System.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <concepts>
 #include <memory>
 
@@ -30,7 +30,7 @@ struct SystemOwner
         auto system = m_Systems.Find<T>();
         if (system == m_Systems.end())
         {
-            U::Log::Error("System Not Found:", typeid(T).name());
+            D::Log::Error("System Not Found:", typeid(T).name());
         }
         return static_cast<T&>(**system);
     }
@@ -40,7 +40,7 @@ struct SystemOwner
     {
         if (m_Systems.Contains<T>())
         {
-            U::Log::Error("System Already Exists");
+            D::Log::Error("System Already Exists");
         }
 
         m_Systems.Emplace<T>(std::make_unique<T>(m_Engine));

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <string_view>
 namespace Ivy::U
 {
@@ -42,7 +42,7 @@ template <typename T> struct CheckedPtr
     /** @brief Accesses a member through the pointer, checking for null. */
     T* operator->() const
     {
-        Log::Assert(m_Ptr != nullptr, "[NULL PTR]", m_NullMessage);
+        D::Log::Assert(m_Ptr != nullptr, "[NULL PTR]", m_NullMessage);
         return m_Ptr;
     }
 
@@ -61,7 +61,7 @@ template <typename T> struct CheckedPtr
     /** @brief Dereferences the pointer, checking for null. */
     T& operator*() const
     {
-        Log::Assert(m_Ptr != nullptr, "[NULL PTR]", m_NullMessage);
+        D::Log::Assert(m_Ptr != nullptr, "[NULL PTR]", m_NullMessage);
         return *m_Ptr;
     }
 

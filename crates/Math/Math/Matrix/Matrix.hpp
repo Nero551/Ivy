@@ -3,7 +3,7 @@
 
 #include "BasicMatrix.hpp"
 #include "Math/Scalar.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::M
 {
@@ -110,7 +110,7 @@ struct Matrix : BasicMatrix<Row, Column, Matrix, T>
 
         if (M::NearlyEquals(determinant, 0))
         {
-            U::Log::Error("Matrix is not invertible");
+            D::Log::Error("Matrix is not invertible");
             return Matrix::Identity();
         }
 

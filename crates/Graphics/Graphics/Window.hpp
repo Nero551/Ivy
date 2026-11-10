@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "Utilities/Image.hpp"
+#include "Graphics/Image.hpp"
 
 namespace Ivy::G
 {
@@ -123,7 +123,7 @@ struct Window
 
     void SetTitle(const std::string& title);
 
-    void SetIcon(const U::Image& icon);
+    void SetIcon(const G::Image& icon);
 
     /** @param height New height in pixels */
     void SetHeight(int height);
@@ -249,7 +249,7 @@ struct Window
     }
 
     void SetCursorMode(CursorMode mode);
-    void SetCursor(const U::Image& icon);
+    void SetCursor(const G::Image& icon);
     void SetDefaultCursor();
 
   private:

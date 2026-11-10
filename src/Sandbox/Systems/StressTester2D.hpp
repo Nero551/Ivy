@@ -4,6 +4,7 @@
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/System.hpp"
 #include "Core/World/Components.hpp"
+#include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
 #include "Graphics/InputEnums/Key.hpp"
@@ -20,7 +21,6 @@
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
-#include "Utilities/Debug/Log.hpp"
 #include <vector>
 
 namespace Ivy::Sandbox
@@ -58,7 +58,7 @@ struct StressTester2D : C::System
     // void TwoDimensionalProjection(int increase)
     // {
     //     points.reserve(M::Pow(360.0f / increase, 1));
-    //     U::Log::Info(M::Pow(360.0f / increase, 1));
+    //     D::Log::Info(M::Pow(360.0f / increase, 1));
     //     for (int theta = -180; theta < 180; theta += increase)
     //     {
     //         M::Vector<2> v2 = M::Vector<2>::FromPolar(M::Polar(M::Rad(theta)));
@@ -70,7 +70,7 @@ struct StressTester2D : C::System
 
     // void ThreeDimensionalProjection(int increase)
     // {
-    //     U::Log::Info(M::Pow(360.0f / increase, 2));
+    //     D::Log::Info(M::Pow(360.0f / increase, 2));
     //     points.reserve(M::Pow(360.0f / increase, 2));
 
     //     for (int theta = -180; theta < 180; theta += increase)
@@ -88,7 +88,7 @@ struct StressTester2D : C::System
     void FourDimensionalProjection(int increase)
     {
         points.reserve(M::Pow(360.0f / increase, 3.0f));
-        U::Log::Info(M::Pow(360.0f / increase, 3.0f));
+        D::Log::Info(M::Pow(360.0f / increase, 3.0f));
         m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3.0f));
 
         for (float theta = -180; theta < 180; theta += increase)

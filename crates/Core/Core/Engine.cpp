@@ -2,7 +2,7 @@
 
 #include "Core/Service.hpp"
 #include "Graphics/Context.hpp"
-#include "Utilities/Debug/Profiling.hpp"
+#include "Diagnostics/Profiling.hpp"
 
 namespace Ivy::C
 {

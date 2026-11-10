@@ -3,7 +3,7 @@
 #include "Math/BasicOperations.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Scalar.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::M
 {
@@ -77,7 +77,7 @@ Function<Output, Input> Integrate(const Function<Output, Input>& f, Input lowerB
                 break;
 
             default:
-                U::Log::Error("Invalid Integration Method");
+                D::Log::Error("Invalid Integration Method");
             }
         }
 

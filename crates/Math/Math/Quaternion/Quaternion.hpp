@@ -9,7 +9,7 @@
 
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <ostream>
 
 namespace Ivy::M
@@ -384,7 +384,7 @@ template <Scalar T = float> struct Quaternion
         case 3:
             return w;
         default:
-            U::Log::Error("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
+            D::Log::Error("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
         }
     }
 
@@ -401,7 +401,7 @@ template <Scalar T = float> struct Quaternion
         case 3:
             return w;
         default:
-            U::Log::Error("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
+            D::Log::Error("Quaternion doesn't have index ", index, " w + xi + yj + zk ");
         }
     }
 

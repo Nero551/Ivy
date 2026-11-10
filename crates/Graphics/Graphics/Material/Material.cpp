@@ -3,7 +3,7 @@
 #include <string>
 
 #include "Graphics/Texture/Texture.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::G
 {
@@ -17,7 +17,7 @@ void Material::AssignTexture(Texture& texture, const unsigned int slot)
 {
     if (slot >= MaxCustomTextures)
     {
-        U::Log::Error("Material: ", GetName(), " Texture slot: ", slot, " out of bounds: ", texture.GetId());
+        D::Log::Error("Material: ", GetName(), " Texture slot: ", slot, " out of bounds: ", texture.GetId());
         return;
     }
     m_CustomTextures[slot] = &texture;

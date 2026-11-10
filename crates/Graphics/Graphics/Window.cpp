@@ -3,8 +3,8 @@
 #include "Graphics/GLFWPlatform.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "OpenGL.hpp"
-#include "Utilities/Debug/Log.hpp"
-#include "Utilities/Image.hpp"
+#include "Diagnostics/Log.hpp"
+#include "Graphics/Image.hpp"
 #include <string>
 #include <string_view>
 
@@ -19,17 +19,17 @@ void Window::Generate(const int width, const int height, std::string_view title)
     m_GlfwWindow = glfwWindow;
     if (!glfwWindow)
     {
-        U::Log::Error("Failed To Create Window");
+        D::Log::Error("Failed To Create Window");
     }
 
     MakeCurrentContext();
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
     {
-        U::Log::Error("Failed To Initialize GLAD");
+        D::Log::Error("Failed To Initialize GLAD");
     }
 
-    U::Log::Info(glGetString(GL_VERSION));
+    D::Log::Info(glGetString(GL_VERSION));
 
     glViewport(0, 0, width, height);
     glfwSetWindowUserPointer(m_GlfwWindow, this);
@@ -84,7 +84,7 @@ void Window::SetTitle(const std::string& title)
     glfwSetWindowTitle(m_GlfwWindow, title.c_str());
 }
 
-void Window::SetIcon(const U::Image& icon)
+void Window::SetIcon(const G::Image& icon)
 {
     if (GetPlatform() == GLFWPlatform::Wayland)
     {
@@ -144,7 +144,7 @@ void Window::SetCursorMode(CursorMode mode)
     glfwSetInputMode(m_GlfwWindow, GLFW_CURSOR, static_cast<int>(mode));
 }
 
-void Window::SetCursor(const U::Image& icon)
+void Window::SetCursor(const G::Image& icon)
 {
     GLFWimage image;
     image.height = icon.Height;

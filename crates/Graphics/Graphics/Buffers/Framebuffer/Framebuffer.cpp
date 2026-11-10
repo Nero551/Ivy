@@ -6,7 +6,7 @@
 #include "Graphics/Buffers/Renderbuffer/Renderbuffer.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Texture/TextureFilter.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 #include <string>
 
 namespace Ivy::G
@@ -51,7 +51,7 @@ bool Framebuffer::IsComplete() const
 
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        U::Log::Error("Framebuffer: ", GetId(), " is not complete");
+        D::Log::Error("Framebuffer: ", GetId(), " is not complete");
         return false;
     }
 

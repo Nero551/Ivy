@@ -11,7 +11,7 @@
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include "Utilities/Debug/Log.hpp"
+#include "Diagnostics/Log.hpp"
 
 namespace Ivy::G
 {
@@ -48,7 +48,6 @@ void Shader::AssignSource(ShaderSource& source)
     {
         if (existing->GetStage() == source.GetStage())
         {
-            // Ivy::U::Logger::Error("Shader: " + Name + " Duplicate Shader Stage.");
             return;
         }
     }
@@ -95,7 +94,7 @@ void Shader::CreateProgram()
 
     if (m_Sources.empty())
     {
-        U::Log::Warning("Shader Program:", GetId(), " Has No Sources");
+        D::Log::Warning("Shader Program:", GetId(), " Has No Sources");
         return;
     }
 
@@ -117,7 +116,7 @@ void Shader::CreateProgram()
     if (!success)
     {
         glGetProgramInfoLog(m_Id, 512, nullptr, infoLog);
-        U::Log::Error(std::string("Shader Program: " + GetName() + " Linking Failed: " + infoLog));
+        D::Log::Error(std::string("Shader Program: " + GetName() + " Linking Failed: " + infoLog));
         Delete();
     }
 }
@@ -135,7 +134,6 @@ int Shader::GetUniformLocation(std::string_view name)
         location = glGetUniformLocation(m_Id, name.data());
         if (location == -1)
         {
-            // U::Logger::Warning("Shader: " + Name + " Uniform Not Found: " + name);
         }
     }
     return location;
