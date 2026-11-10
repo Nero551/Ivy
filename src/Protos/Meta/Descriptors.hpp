@@ -2,14 +2,22 @@
 #include "Protos/Meta/Basic.hpp"
 #include "Utilities/DataStructures/StringMap.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include "Utilities/TupleUtils.hpp"
 #include <cstddef>
 #include <ostream>
+#include <span>
 #include <string_view>
+#include <tuple>
+#include <utility>
+#include <vector>
 namespace Ivy::Meta
 {
-template <typename T> void* Construct()
+template <typename T, typename... Args> void* Construct(void* tuple)
 {
-    return new T{};
+    return U::UnpackAndRun(std::make_index_sequence<sizeof...(Args)>{},
+        std::move(*static_cast<std::tuple<Args...>*>(tuple)),
+        []<typename... Params>(Params&&... params) -> void*
+        { return new T{std::forward<Params>(params)...}; });
 }
 
 template <typename T> void Deconstruct(void* object)
@@ -28,6 +36,21 @@ struct FieldDescriptor
     friend std::ostream& operator<<(std::ostream& os, const FieldDescriptor& field);
 };
 
+struct ParameterDescriptor
+{
+    TypeDescriptor* Type;
+    bool IsConst = false;
+    bool IsReference = false;
+    bool IsRValue = false;
+    bool IsPointer = false;
+};
+
+struct ConstructorDescriptor
+{
+    std::vector<ParameterDescriptor> Parameters;
+    void* (*Invoke)(void*);
+};
+
 struct TypeDescriptor
 {
     std::string_view FullName;
@@ -35,7 +58,8 @@ struct TypeDescriptor
     TypeId TypeId;
     size_t Alignment;
     U::StringMap<FieldDescriptor> Fields;
-    void* (*Construct)();
+    std::vector<ConstructorDescriptor> Constructors;
+
     void (*Deconstruct)(void*);
 
     friend std::ostream& operator<<(std::ostream& os, const TypeDescriptor& type);

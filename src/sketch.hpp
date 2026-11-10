@@ -309,19 +309,27 @@ struct A
 {
     int B = 3;
     M::Vector<3> C;
+
+    A() = default;
+    A(int b) : B(b) {}
 };
 inline void Test()
 {
-    A object;
-    REFLECT(A, FIELD(A, B), FIELD(A, C));
+    A object{5};
+
+    REFLECT(A);
+    FIELD(A, B);
+    FIELD(A, C);
+    CONSTRUCTOR(A);
+    CONSTRUCTOR(A, int);
 
     Meta::ReflectedReference inspected = Meta::Inspect(&object, "Sketch::A");
     inspected.SetField("B", 20);
     U::Log::Info(inspected.GetField("B").Type);
     U::Log::Info(inspected.GetField("B").As<int>());
 
-    Meta::ReflectedInstance a = Meta::Create("Sketch::A");
+    Meta::ReflectedInstance a = Meta::Create("Sketch::A", 5);
     a.SetField("C", M::Vector<3>{3, 6, 8});
-    U::Log::Info(a.GetField("B").As<M::Vector<3>>());
+    U::Log::Info(a.GetField("B").As<int>());
 }
 } // namespace Sketch

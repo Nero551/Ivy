@@ -40,6 +40,13 @@ decltype(auto) UnpackAndRun(std::index_sequence<I...>, F&& action, Args&&... oth
         std::forward<Args>(otherParams)...);
 }
 
+template <typename Tuple, typename F, std::size_t... I, typename... Args>
+decltype(auto) UnpackAndRun(std::index_sequence<I...>, Tuple&& tuple, F&& action, Args&&... otherParams)
+{
+    return std::forward<F>(action)(
+        std::get<I>(std::forward<Tuple>(tuple))..., std::forward<Args>(otherParams)...);
+}
+
 template <typename... Args> struct AreUniqueTrait : std::true_type
 {
 };
