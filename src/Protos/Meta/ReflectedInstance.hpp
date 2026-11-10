@@ -58,19 +58,28 @@ struct ReflectedInstance
             m_Object = Type->CopyConstruct(other.m_Object);
         }
     };
-    ReflectedInstance& operator=(const ReflectedInstance& other) noexcept
+    ReflectedInstance& operator=(const ReflectedInstance& other)
     {
         if (this != &other)
         {
+            void* newObject = nullptr;
+
+            if (other.m_Object)
+            {
+                newObject = other.Type->CopyConstruct(other.m_Object);
+            }
+
             if (m_Object)
             {
                 Type->Deconstruct(m_Object);
             }
+
             Type = other.Type;
-            m_Object = Type->CopyConstruct(other.m_Object);
+            m_Object = newObject;
         }
+
         return *this;
-    };
+    }
 
     ReflectedInstance(ReflectedInstance&& other) noexcept
         : Type(other.Type), m_Object(std::exchange(other.m_Object, nullptr))
@@ -106,6 +115,47 @@ struct ReflectedInstance
     FieldValue GetField(std::string_view name) const
     {
         return GetFieldImpl(m_Object, *Type, name);
+    }
+
+    template <typename... Args> ReturnValue InvokeMethod(std::string_view name, Args&&... args)
+    {
+        std::array<TypeId, sizeof...(Args)> argumentTypes{GetTypeId<std::remove_cvref_t<Args>>()...};
+
+        MethodDescriptor* selectedMethod = nullptr;
+
+        for (MethodDescriptor& method : Type->Methods)
+        {
+            if (method.Name != name || method.Parameters.size() != argumentTypes.size())
+            {
+                continue;
+            }
+
+            bool matches = true;
+
+            for (size_t i = 0; i < argumentTypes.size(); ++i)
+            {
+                if (method.Parameters[i].Type->TypeId != argumentTypes[i])
+                {
+                    matches = false;
+                    break;
+                }
+            }
+
+            if (matches)
+            {
+                selectedMethod = &method;
+                break;
+            }
+        }
+
+        if (!selectedMethod)
+        {
+            U::Log::Error("Can't Invoke Method: No Matching Overload: ", name);
+        }
+
+        std::tuple<Args...> arguments(std::forward<Args>(args)...);
+
+        return selectedMethod->Invoke(m_Object, &arguments);
     }
 
   private:

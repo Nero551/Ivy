@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <memory>
 #include <string_view>
+#include <tuple>
+#include <type_traits>
 namespace Ivy::Meta
 {
 struct Registry
@@ -30,13 +32,16 @@ struct Registry
 
         TypeDescriptor& descriptor = **m_TypeRegistry.Emplace(name, std::make_unique<TypeDescriptor>()).first;
         descriptor.Name = name;
-        descriptor.Size = sizeof(CleanType<T>);
-        descriptor.Alignment = alignof(CleanType<T>);
         descriptor.TypeId = GetTypeId<T>();
 
-        descriptor.Deconstruct = &Deconstruct<CleanType<T>>;
-        descriptor.MoveConstruct = &MoveConstruct<CleanType<T>>;
-        descriptor.CopyConstruct = &CopyConstruct<CleanType<T>>;
+        if constexpr (!std::is_void_v<CleanType<T>>)
+        {
+            descriptor.Size = sizeof(CleanType<T>);
+            descriptor.Alignment = alignof(CleanType<T>);
+            descriptor.Deconstruct = &Deconstruct<CleanType<T>>;
+            descriptor.MoveConstruct = &MoveConstruct<CleanType<T>>;
+            descriptor.CopyConstruct = &CopyConstruct<CleanType<T>>;
+        }
 
         return *m_TypeRegistry.At(name);
     }
@@ -68,6 +73,72 @@ struct Registry
             ...);
         descriptor.Invoke = &Construct<T, Params...>;
         GetTypeDescriptor<T>().Constructors.push_back(descriptor);
+    }
+
+    template <typename T, auto Method, typename Return, typename... Args>
+    static ReturnValue Invoke(void* instance, void* arguments)
+    {
+        std::tuple<Args...>& params = *static_cast<std::tuple<Args...>*>(arguments);
+
+        auto invoke = [instance](auto&&... values) -> decltype(auto)
+        {
+            return std::invoke(Method, *static_cast<T*>(instance), std::forward<decltype(values)>(values)...);
+        };
+
+        if constexpr (std::is_void_v<Return>)
+        {
+            std::apply(invoke, std::move(params));
+
+            return {.Data = nullptr, .Description = {.Type = &GetTypeDescriptor<void>()}};
+        }
+        else if constexpr (std::is_reference_v<Return>)
+        {
+            decltype(auto) result = std::apply(invoke, std::move(params));
+
+            return {
+                .Data = const_cast<void*>(static_cast<const void*>(std::addressof(result))),
+                .Description = {.Type = &GetTypeDescriptor<std::remove_cvref_t<Return>>(),
+                                .IsConst = std::is_const_v<std::remove_reference_t<Return>>,
+                                .IsReference = true,
+                                .IsRValue = std::is_rvalue_reference_v<Return>}
+            };
+        }
+        else
+        {
+            using ValueType = std::remove_cvref_t<Return>;
+
+            ValueType* result = new ValueType(std::apply(invoke, std::move(params)));
+
+            ParameterDescriptor description{.Type = &GetTypeDescriptor<Return>(),
+                .IsConst = GetTypeName<Return>().contains("const"),
+                .IsReference = GetTypeName<Return>().contains('&'),
+                .IsRValue = GetTypeName<Return>().contains("&&"),
+                .IsPointer = GetTypeName<Return>().contains('*')};
+
+            return {.Data = result, .Description = description};
+        }
+    }
+
+    template <typename T, auto Method, typename Return, typename... Params>
+    static void AssignMethod(std::string_view name)
+    {
+        MethodDescriptor descriptor;
+        descriptor.Invoke = Invoke<CleanType<T>, Method, Return, Params...>;
+        descriptor.Name = name;
+        descriptor.Return = ParameterDescriptor{.Type = &GetTypeDescriptor<Return>(),
+            .IsConst = GetTypeName<Return>().contains("const"),
+            .IsReference = GetTypeName<Return>().contains('&'),
+            .IsRValue = GetTypeName<Return>().contains("&&"),
+            .IsPointer = GetTypeName<Return>().contains('*')};
+
+        (descriptor.Parameters.emplace_back(ParameterDescriptor{.Type = &GetTypeDescriptor<Params>(),
+             .IsConst = GetTypeName<Params>().contains("const"),
+             .IsReference = GetTypeName<Params>().contains('&'),
+             .IsRValue = GetTypeName<Params>().contains("&&"),
+             .IsPointer = GetTypeName<Params>().contains('*')}),
+            ...);
+
+        GetTypeDescriptor<T>().Methods.emplace_back(descriptor);
     }
 
   private:

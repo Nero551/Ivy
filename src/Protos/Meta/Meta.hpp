@@ -7,7 +7,7 @@
 namespace Ivy::Meta
 {
 
-//TODO:move & copy constructors + assignment, private, public, protected, \
+//TODO: private, public, protected, \
 // overloaded methods , method descriptors. operators (via methods + operator overloading in ReflectedReference + ReflectedInstance)
 
 #define FIELD(Struct, Field)                                                                                 \
@@ -15,6 +15,9 @@ namespace Ivy::Meta
         #Field, offsetof(Struct, Field), Ivy::Meta::Registry::GetTypeDescriptor<Struct>())
 
 #define CONSTRUCTOR(Struct, ...) Ivy::Meta::Registry::AssignConstructor<Struct __VA_OPT__(, ) __VA_ARGS__>()
+
+#define METHOD(Struct, Method, Return, ...)                                                                  \
+    Ivy::Meta::Registry::AssignMethod<Struct, &Struct::Method, Return __VA_OPT__(, ) __VA_ARGS__>(#Method)
 
 #define REFLECT(Type) Ivy::Meta::Registry::GetTypeDescriptor<Type>()
 

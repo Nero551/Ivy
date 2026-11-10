@@ -16,6 +16,7 @@
 #include <ostream>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -312,6 +313,11 @@ struct A
 
     A() = default;
     A(int b) : B(b) {}
+
+    int Increment()
+    {
+        return ++B;
+    }
 };
 inline void Test()
 {
@@ -322,17 +328,16 @@ inline void Test()
     FIELD(A, C);
     CONSTRUCTOR(A);
     CONSTRUCTOR(A, int);
+    METHOD(A, Increment, int);
 
     // Meta::ReflectedReference inspected = Meta::Inspect(&object, "Sketch::A");
     // inspected.SetField("B", 20);
     // U::Log::Info(inspected.GetField("B").Description);
     // U::Log::Info(inspected.GetField("B").As<int>());
 
-    Meta::ReflectedInstance a = Meta::Create("Sketch::A", 5);
-    a.SetField("B", 5);
-
-    Meta::ReflectedInstance b{std::move(a)};
-    // b = a;
-    U::Log::Info(b.GetField("B").As<int>());
+    Meta::ReflectedInstance a = Meta::Create("Sketch::A");
+    std::tuple<> t{};
+    // a.InvokeMethod("Increment");
+    U::Log::Info(a.InvokeMethod("Increment").As<int>());
 }
 } // namespace Sketch
