@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <exception>
 #include <iostream>
+#include <stdexcept>
 #include <vector>
 
 namespace Ivy::U
@@ -69,7 +70,7 @@ template <typename... Args> [[noreturn]] static void Error(const Args&... args)
     std::cout << Red << "💀 [Error] " << Reset;
     (..., (std::cout << args));
     std::cout << '\n';
-    throw std::exception{};
+    throw std::runtime_error("");
 }
 
 /** @brief Validates a raw pointer and returns the dereferenced object. */

@@ -307,7 +307,7 @@ struct Shader
 
 struct A
 {
-    int B = 3;
+    int B = 0;
     M::Vector<3> C;
 
     A() = default;
@@ -315,7 +315,7 @@ struct A
 };
 inline void Test()
 {
-    A object{5};
+    A object{};
 
     REFLECT(A);
     FIELD(A, B);
@@ -324,12 +324,13 @@ inline void Test()
     CONSTRUCTOR(A, int);
 
     Meta::ReflectedReference inspected = Meta::Inspect(&object, "Sketch::A");
-    inspected.SetField("B", 20);
-    U::Log::Info(inspected.GetField("B").Type);
+    // inspected.SetField("B", 20);
+    U::Log::Info(inspected.GetField("B").Description);
+    inspected.SetField("B", 5);
     U::Log::Info(inspected.GetField("B").As<int>());
 
-    Meta::ReflectedInstance a = Meta::Create("Sketch::A", 5);
-    a.SetField("C", M::Vector<3>{3, 6, 8});
-    U::Log::Info(a.GetField("B").As<int>());
+    // Meta::ReflectedInstance a = Meta::Create("Sketch::A", 5);
+    // a.SetField("C", M::Vector<3>{3, 6, 8});
+    // U::Log::Info(a.GetField("B").As<const int>());
 }
 } // namespace Sketch

@@ -1,9 +1,10 @@
 #pragma once
 #include <cstddef>
 #include <string_view>
+#include <type_traits>
 namespace Ivy::Meta
 {
-template <typename T> consteval std::string_view GetTypeFullName()
+template <typename T> consteval std::string_view GetTypeName()
 {
     static constexpr std::string_view Function = __PRETTY_FUNCTION__;
     static constexpr std::string_view Prefix = "T = ";
@@ -26,10 +27,22 @@ consteval unsigned long Hash(const std::string_view typeName)
 }
 
 using TypeId = size_t;
+template <typename T> using CleanType = std::remove_cvref_t<std::remove_pointer_t<T>>;
+
+template <typename T> struct TypeProperties
+{
+    using ValueType = std::remove_reference_t<T>;
+    using BaseType = std::remove_cv_t<std::remove_pointer_t<ValueType>>;
+
+    static constexpr bool IsReference = std::is_lvalue_reference_v<T>;
+    static constexpr bool IsRValue = std::is_rvalue_reference_v<T>;
+    static constexpr bool IsPointer = std::is_pointer_v<std::remove_reference_t<T>>;
+    static constexpr bool IsConst = std::is_const_v<std::remove_reference_t<T>>;
+};
 
 template <typename T> consteval TypeId GetTypeId()
 {
-    return Hash(GetTypeFullName<T>());
+    return Hash(GetTypeName<CleanType<T>>());
 }
 
 } // namespace Ivy::Meta

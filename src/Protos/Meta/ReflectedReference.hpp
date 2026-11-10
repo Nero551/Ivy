@@ -1,7 +1,10 @@
 #pragma once
+#include "Protos/Meta/Basic.hpp"
 #include "Protos/Meta/Descriptors.hpp"
+#include "Protos/Meta/FieldAccessor.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstddef>
+#include <iterator>
 #include <string_view>
 namespace Ivy::Meta
 {
@@ -11,34 +14,13 @@ struct ReflectedReference
 
     ReflectedReference(void* object, TypeDescriptor& type) : m_Object(object), Type(type) {}
 
-    template <typename T> void SetField(std::string_view name, const T& value)
+    template <typename T> void SetField(std::string_view name, T&& value)
     {
-        if (!Type.Fields.Contains(name))
-        {
-            U::Log::Error("Type doesn't contain field: ", name);
-            return;
-        }
-        const FieldDescriptor& field = Type.Fields.At(name);
-        if (field.Type->TypeId != GetTypeId<T>())
-        {
-            U::Log::Error("Failed To Set Value: Not Same Type ", Type);
-            return;
-        }
-        void* address = static_cast<std::byte*>(m_Object) + field.Offset;
-        *static_cast<T*>(address) = value;
+        SetFieldImpl(m_Object, Type, name, std::forward<T>(value));
     }
-
     FieldValue GetField(std::string_view name) const
     {
-        if (!Type.Fields.Contains(name))
-        {
-            U::Log::Error("Type doesn't contain field: ", name);
-        }
-        const FieldDescriptor& field = Type.Fields.At(name);
-
-        void* address = static_cast<std::byte*>(m_Object) + field.Offset;
-
-        return {.Data = static_cast<std::byte*>(m_Object) + field.Offset, .Type = *field.Type};
+        return GetFieldImpl(m_Object, Type, name);
     }
 
   private:

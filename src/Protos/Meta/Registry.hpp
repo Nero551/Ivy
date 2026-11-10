@@ -1,10 +1,12 @@
 #pragma once
+#include "Protos/Meta/Basic.hpp"
 #include "Protos/Meta/Descriptors.hpp"
 #include "Utilities/DataStructures/StringMap.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstddef>
 #include <memory>
 #include <string_view>
+#include <type_traits>
 namespace Ivy::Meta
 {
 struct Registry
@@ -21,31 +23,35 @@ struct Registry
 
     template <typename T> static TypeDescriptor& GetTypeDescriptor()
     {
-        std::string_view fullName = GetTypeFullName<T>();
-        if (m_TypeRegistry.Contains(fullName))
+        std::string_view name = GetTypeName<CleanType<T>>();
+        if (m_TypeRegistry.Contains(name))
         {
-            return *m_TypeRegistry.At(fullName);
+            return *m_TypeRegistry.At(name);
         }
 
-        TypeDescriptor& descriptor =
-            **m_TypeRegistry.Emplace(fullName, std::make_unique<TypeDescriptor>()).first;
-        descriptor.FullName = fullName;
-        descriptor.Size = sizeof(T);
-        descriptor.Alignment = alignof(T);
+        TypeDescriptor& descriptor = **m_TypeRegistry.Emplace(name, std::make_unique<TypeDescriptor>()).first;
+        descriptor.FullName = name;
+        descriptor.Size = sizeof(CleanType<T>);
+        descriptor.Alignment = alignof(CleanType<T>);
         descriptor.TypeId = GetTypeId<T>();
 
-        descriptor.Deconstruct = &Deconstruct<T>;
+        descriptor.Deconstruct = &Deconstruct<CleanType<T>>;
 
-        return *m_TypeRegistry.At(fullName);
+        return *m_TypeRegistry.At(name);
     }
 
     template <typename T>
     static FieldDescriptor AssignField(std::string_view name, size_t offset, TypeDescriptor& type)
     {
+        std::string_view fullTypeName = GetTypeName<T>();
         FieldDescriptor descriptor;
         descriptor.Name = name;
         descriptor.Type = &GetTypeDescriptor<T>();
         descriptor.Offset = offset;
+        descriptor.IsConst = fullTypeName.contains("const");
+        descriptor.IsRValue = fullTypeName.contains("&&");
+        descriptor.IsReference = fullTypeName.contains('&');
+        descriptor.IsPointer = fullTypeName.contains('*');
         type.Fields.Emplace(name, descriptor);
         return descriptor;
     }
@@ -53,8 +59,12 @@ struct Registry
     template <typename T, typename... Params> static void AssignConstructor()
     {
         ConstructorDescriptor descriptor;
-
-        (descriptor.Parameters.emplace_back(ParameterDescriptor{.Type = &GetTypeDescriptor<Params>()}), ...);
+        (descriptor.Parameters.emplace_back(ParameterDescriptor{.Type = &GetTypeDescriptor<Params>(),
+             .IsConst = GetTypeName<Params>().contains("const"),
+             .IsReference = GetTypeName<Params>().contains('&'),
+             .IsRValue = GetTypeName<Params>().contains("&&"),
+             .IsPointer = GetTypeName<Params>().contains('*')}),
+            ...);
         descriptor.Invoke = &Construct<T, Params...>;
         GetTypeDescriptor<T>().Constructors.push_back(descriptor);
     }
