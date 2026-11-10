@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <memory>
 #include <string_view>
-#include <type_traits>
 namespace Ivy::Meta
 {
 struct Registry
@@ -30,12 +29,14 @@ struct Registry
         }
 
         TypeDescriptor& descriptor = **m_TypeRegistry.Emplace(name, std::make_unique<TypeDescriptor>()).first;
-        descriptor.FullName = name;
+        descriptor.Name = name;
         descriptor.Size = sizeof(CleanType<T>);
         descriptor.Alignment = alignof(CleanType<T>);
         descriptor.TypeId = GetTypeId<T>();
 
         descriptor.Deconstruct = &Deconstruct<CleanType<T>>;
+        descriptor.MoveConstruct = &MoveConstruct<CleanType<T>>;
+        descriptor.CopyConstruct = &CopyConstruct<CleanType<T>>;
 
         return *m_TypeRegistry.At(name);
     }

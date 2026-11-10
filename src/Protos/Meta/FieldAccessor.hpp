@@ -26,12 +26,12 @@ void SetFieldImpl(void* object, const TypeDescriptor& type, std::string_view nam
 
     if (field.IsConst)
     {
-        U::Log::Error("Failed To Set Value: Field Is Const", field);
+        U::Log::Error("Failed To Set Value: Field Is Const ", field);
     }
 
     if (field.IsPointer != Properties::IsPointer)
     {
-        U::Log::Error("Failed To Set Value: Pointer Mismatch", field);
+        U::Log::Error("Failed To Set Value: Pointer Mismatch ", field);
     }
 
     void* address = static_cast<std::byte*>(object) + field.Offset;

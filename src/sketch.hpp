@@ -7,7 +7,6 @@
 #include "Protos/Meta/Meta.hpp"
 
 #include "Protos/Meta/ReflectedInstance.hpp"
-#include "Protos/Meta/ReflectedReference.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cmath>
@@ -18,6 +17,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 
 namespace Sketch
 {
@@ -323,14 +323,16 @@ inline void Test()
     CONSTRUCTOR(A);
     CONSTRUCTOR(A, int);
 
-    Meta::ReflectedReference inspected = Meta::Inspect(&object, "Sketch::A");
+    // Meta::ReflectedReference inspected = Meta::Inspect(&object, "Sketch::A");
     // inspected.SetField("B", 20);
-    U::Log::Info(inspected.GetField("B").Description);
-    inspected.SetField("B", 5);
-    U::Log::Info(inspected.GetField("B").As<int>());
+    // U::Log::Info(inspected.GetField("B").Description);
+    // U::Log::Info(inspected.GetField("B").As<int>());
 
-    // Meta::ReflectedInstance a = Meta::Create("Sketch::A", 5);
-    // a.SetField("C", M::Vector<3>{3, 6, 8});
-    // U::Log::Info(a.GetField("B").As<const int>());
+    Meta::ReflectedInstance a = Meta::Create("Sketch::A", 5);
+    a.SetField("B", 5);
+
+    Meta::ReflectedInstance b{std::move(a)};
+    // b = a;
+    U::Log::Info(b.GetField("B").As<int>());
 }
 } // namespace Sketch

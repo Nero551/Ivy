@@ -5,16 +5,15 @@
 #include "Utilities/TupleUtils.hpp"
 #include <cstddef>
 #include <ostream>
-#include <span>
 #include <string_view>
 #include <tuple>
-#include <type_traits>
 #include <utility>
 #include <vector>
 namespace Ivy::Meta
 {
 template <typename T, typename... Args> void* Construct(void* tuple)
 {
+    U::Log::Info("Constructed");
     return U::UnpackAndRun(std::make_index_sequence<sizeof...(Args)>{},
         std::move(*static_cast<std::tuple<Args...>*>(tuple)),
         []<typename... Params>(Params&&... params) -> void*
@@ -23,7 +22,20 @@ template <typename T, typename... Args> void* Construct(void* tuple)
 
 template <typename T> void Deconstruct(void* object)
 {
+    U::Log::Info("Deconstructed");
     delete static_cast<T*>(object);
+}
+
+template <typename T> void* MoveConstruct(void* object)
+{
+    U::Log::Info("Move Constructed");
+    return new T{std::move(*static_cast<T*>(object))};
+}
+
+template <typename T> void* CopyConstruct(const void* object)
+{
+    U::Log::Info("Copy Constructed");
+    return new T{*static_cast<const T*>(object)};
 }
 
 struct TypeDescriptor;
@@ -56,17 +68,20 @@ struct ConstructorDescriptor
 {
     std::vector<ParameterDescriptor> Parameters;
     void* (*Invoke)(void*);
+    friend std::ostream& operator<<(std::ostream& os, const ConstructorDescriptor& constructor);
 };
 
 struct TypeDescriptor
 {
-    std::string_view FullName;
+    std::string_view Name;
     size_t Size;
     TypeId TypeId;
     size_t Alignment;
     U::StringMap<FieldDescriptor> Fields;
     std::vector<ConstructorDescriptor> Constructors;
     void (*Deconstruct)(void*);
+    void* (*MoveConstruct)(void*);
+    void* (*CopyConstruct)(const void*);
 
     friend std::ostream& operator<<(std::ostream& os, const TypeDescriptor& type);
 };
@@ -88,7 +103,7 @@ struct FieldValue
 
         if (Description.IsConst != Properties::IsConst)
         {
-            U::Log::Error("Failed To Get Value: Field Is Const", Description);
+            U::Log::Error("Failed To Get Value: Const Mismatch ", Description);
         }
 
         if (Description.IsPointer != Properties::IsPointer)
@@ -112,7 +127,7 @@ struct FieldValue
 
 inline std::ostream& operator<<(std::ostream& os, const TypeDescriptor& type)
 {
-    os << "{ " << type.FullName << ", " << type.Size << ", " << type.Alignment << ", Fields: [ ";
+    os << "{ " << type.Name << ", " << type.Size << ", " << type.Alignment << ", Fields: [ ";
 
     for (const auto& field : type.Fields)
     {
@@ -156,6 +171,19 @@ inline std::ostream& operator<<(std::ostream& os, const ParameterDescriptor& par
     }
 
     os << " }";
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const ConstructorDescriptor& constructor)
+{
+    os << "Constructor(";
+
+    for (auto& parameter : constructor.Parameters)
+    {
+        os << parameter;
+    }
+
+    os << ")";
     return os;
 }
 

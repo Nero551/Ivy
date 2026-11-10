@@ -7,8 +7,8 @@
 namespace Ivy::Meta
 {
 
-//TODO:move & copy semantics, private, public, protected, \
-// overloaded methods , method descriptors.
+//TODO:move & copy constructors + assignment, private, public, protected, \
+// overloaded methods , method descriptors. operators (via methods + operator overloading in ReflectedReference + ReflectedInstance)
 
 #define FIELD(Struct, Field)                                                                                 \
     Ivy::Meta::Registry::AssignField<decltype(Struct::Field)>(                                               \
