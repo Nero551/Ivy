@@ -1,6 +1,7 @@
 #pragma once
-#include "Protos/Meta/Basic.hpp"
-#include "Protos/Meta/Descriptors.hpp"
+#include "Meta/Basic.hpp"
+#include "Meta/Descriptors.hpp"
+#include "Meta/Values.hpp"
 #include "Utilities/DataStructures/StringMap.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <cstddef>
@@ -72,6 +73,7 @@ struct Registry
              .IsPointer = GetTypeName<Params>().contains('*')}),
             ...);
         descriptor.Invoke = &Construct<T, Params...>;
+        descriptor.Type = &GetTypeDescriptor<T>();
         GetTypeDescriptor<T>().Constructors.push_back(descriptor);
     }
 
@@ -96,8 +98,8 @@ struct Registry
             decltype(auto) result = std::apply(invoke, std::move(params));
 
             return {
-                .Data = const_cast<void*>(static_cast<const void*>(std::addressof(result))),
-                .Description = {.Type = &GetTypeDescriptor<std::remove_cvref_t<Return>>(),
+                .Data = const_cast<void*>(static_cast<const void*>(&result)),
+                .Description = {.Type = &GetTypeDescriptor<Return>(),
                                 .IsConst = std::is_const_v<std::remove_reference_t<Return>>,
                                 .IsReference = true,
                                 .IsRValue = std::is_rvalue_reference_v<Return>}
@@ -105,9 +107,7 @@ struct Registry
         }
         else
         {
-            using ValueType = std::remove_cvref_t<Return>;
-
-            ValueType* result = new ValueType(std::apply(invoke, std::move(params)));
+            CleanType<Return>* result = new CleanType<Return>(std::apply(invoke, std::move(params)));
 
             ParameterDescriptor description{.Type = &GetTypeDescriptor<Return>(),
                 .IsConst = GetTypeName<Return>().contains("const"),
@@ -137,6 +137,8 @@ struct Registry
              .IsRValue = GetTypeName<Params>().contains("&&"),
              .IsPointer = GetTypeName<Params>().contains('*')}),
             ...);
+
+        descriptor.Type = &GetTypeDescriptor<T>();
 
         GetTypeDescriptor<T>().Methods.emplace_back(descriptor);
     }

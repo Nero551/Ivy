@@ -1,6 +1,6 @@
-target("IvyPhysics")
+target("Ivy.Physics")
     set_kind("static")
     set_rundir(os.projectdir())
     add_includedirs(".", { public = true })
     add_files("Physics/**.cpp")
-    add_deps("IvyUtilities", "IvyMath")
+    add_deps("Ivy.Utilities", "Ivy.Math")

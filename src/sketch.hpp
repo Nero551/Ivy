@@ -3,10 +3,6 @@
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Protos/Meta/Descriptors.hpp"
-#include "Protos/Meta/Meta.hpp"
-
-#include "Protos/Meta/ReflectedInstance.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cmath>
@@ -15,10 +11,7 @@
 #include <dlfcn.h>
 #include <ostream>
 #include <string>
-#include <string_view>
-#include <tuple>
 #include <type_traits>
-#include <utility>
 
 namespace Sketch
 {
@@ -306,38 +299,5 @@ struct Shader
 // TODO: automatic differentiation via dual numbers.
 //
 
-struct A
-{
-    int B = 0;
-    M::Vector<3> C;
-
-    A() = default;
-    A(int b) : B(b) {}
-
-    int Increment()
-    {
-        return ++B;
-    }
-};
-inline void Test()
-{
-    A object{};
-
-    REFLECT(A);
-    FIELD(A, B);
-    FIELD(A, C);
-    CONSTRUCTOR(A);
-    CONSTRUCTOR(A, int);
-    METHOD(A, Increment, int);
-
-    // Meta::ReflectedReference inspected = Meta::Inspect(&object, "Sketch::A");
-    // inspected.SetField("B", 20);
-    // U::Log::Info(inspected.GetField("B").Description);
-    // U::Log::Info(inspected.GetField("B").As<int>());
-
-    Meta::ReflectedInstance a = Meta::Create("Sketch::A");
-    std::tuple<> t{};
-    // a.InvokeMethod("Increment");
-    U::Log::Info(a.InvokeMethod("Increment").As<int>());
-}
+inline void Test() {}
 } // namespace Sketch

@@ -4,6 +4,6 @@ set -e
 ROOT="$(git rev-parse --show-toplevel)"
 "$ROOT/scripts/format-code.sh"
 xmake build -P "$ROOT" Ivy
-xmake run -P "$ROOT" IvyTests
+xmake run -P "$ROOT" Ivy.Tests
 
 git add .

@@ -14,6 +14,7 @@ includes("crates/Physics")
 includes("crates/Graphics")
 includes("crates/ECS")
 includes("crates/Core")
+includes("crates/Meta")
 
 target("Ivy")
     set_kind("binary")
@@ -21,7 +22,7 @@ target("Ivy")
     add_includedirs("src")
     set_pcxxheader("src/pch.hpp")
     add_files("src/**.cpp")
-    add_deps("IvyUtilities", "IvyMath", "IvyPhysics", "IvyGraphics", "IvyECS", "IvyCore")
+    add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.Graphics", "Ivy.ECS", "Ivy.Core")
 
     if is_plat("linux") then
         ---@diagnostic disable-next-line: param-type-not-match
@@ -41,20 +42,20 @@ target("Ivy")
         add_defines("TRACY_PROFILE_MEMORY")
     end
 
-target("IvyTests")
+target("Ivy.Tests")
     set_kind("binary")
     set_rundir(os.projectdir())
 
     add_files("tests/**.cpp")
-    add_deps("IvyMath", "IvyPhysics", "IvyUtilities")
+    add_deps("Ivy.Math", "Ivy.Physics", "Ivy.Utilities", "Ivy.Meta")
     add_packages("gtest")
 
-target("IvyBenchmarks")
+target("Ivy.Benchmarks")
     set_kind("binary")
     set_rundir(os.projectdir())
 
     add_files("benchmarks/**.cpp")
-    add_deps("IvyUtilities", "IvyMath", "IvyPhysics", "IvyECS", "IvyGraphics", "IvyCore")
+    add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.ECS", "Ivy.Graphics", "Ivy.Core")
     set_pcxxheader("src/pch.hpp")
 
     add_packages("benchmark")

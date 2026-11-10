@@ -1,0 +1,6 @@
+target("Ivy.Meta")
+    set_kind("static")
+    set_rundir(os.projectdir())
+    add_includedirs(".", { public = true })
+    add_files("Meta/**.cpp")
+    add_deps("Ivy.Utilities")

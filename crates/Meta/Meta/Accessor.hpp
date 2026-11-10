@@ -1,9 +1,13 @@
 #pragma once
-#include "Protos/Meta/Basic.hpp"
-#include "Protos/Meta/Descriptors.hpp"
+#include "Meta/Basic.hpp"
+#include "Meta/Descriptors.hpp"
+#include "Meta/Values.hpp"
 #include "Utilities/Debug/Log.hpp"
+#include <array>
 #include <cstddef>
 #include <string_view>
+#include <tuple>
+#include <type_traits>
 namespace Ivy::Meta
 {
 template <typename T>
@@ -50,6 +54,48 @@ FieldValue GetFieldImpl(void* object, const TypeDescriptor& type, std::string_vi
     void* address = static_cast<std::byte*>(object) + field.Offset;
 
     return {.Data = static_cast<std::byte*>(object) + field.Offset, .Description = field};
+}
+
+template <typename... Args>
+ReturnValue InvokeMethodImpl(void* object, TypeDescriptor& type, std::string_view name, Args&&... args)
+{
+    std::array<TypeId, sizeof...(Args)> argumentTypes{GetTypeId<std::remove_cvref_t<Args>>()...};
+
+    MethodDescriptor* selectedMethod = nullptr;
+
+    for (MethodDescriptor& method : type.Methods)
+    {
+        if (method.Name != name || method.Parameters.size() != argumentTypes.size())
+        {
+            continue;
+        }
+
+        bool matches = true;
+
+        for (size_t i = 0; i < argumentTypes.size(); ++i)
+        {
+            if (method.Parameters[i].Type->TypeId != argumentTypes[i])
+            {
+                matches = false;
+                break;
+            }
+        }
+
+        if (matches)
+        {
+            selectedMethod = &method;
+            break;
+        }
+    }
+
+    if (!selectedMethod)
+    {
+        U::Log::Error("Can't Invoke Method: No Matching Overload: ", name);
+    }
+
+    std::tuple<Args...> arguments(std::forward<Args>(args)...);
+
+    return selectedMethod->Invoke(object, &arguments);
 }
 
 } // namespace Ivy::Meta

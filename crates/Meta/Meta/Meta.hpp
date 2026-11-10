@@ -1,14 +1,13 @@
 #pragma once
-#include "Protos/Meta/ReflectedInstance.hpp"
-#include "Protos/Meta/ReflectedReference.hpp"
-#include "Protos/Meta/Registry.hpp"
+#include "Meta/ReflectedInstance.hpp"
+#include "Meta/ReflectedReference.hpp"
+#include "Meta/Registry.hpp"
 #include <cstddef>
 #include <string_view>
 namespace Ivy::Meta
 {
 
-//TODO: private, public, protected, \
-// overloaded methods , method descriptors. operators (via methods + operator overloading in ReflectedReference + ReflectedInstance)
+//TODO: private, public, protected, operators (via methods + operator overloading in ReflectedReference + ReflectedInstance)
 
 #define FIELD(Struct, Field)                                                                                 \
     Ivy::Meta::Registry::AssignField<decltype(Struct::Field)>(                                               \

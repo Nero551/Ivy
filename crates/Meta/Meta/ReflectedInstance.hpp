@@ -1,8 +1,9 @@
 #pragma once
-#include "Protos/Meta/Basic.hpp"
-#include "Protos/Meta/Descriptors.hpp"
-#include "Protos/Meta/FieldAccessor.hpp"
-#include "Protos/Meta/Registry.hpp"
+#include "Meta/Accessor.hpp"
+#include "Meta/Basic.hpp"
+#include "Meta/Descriptors.hpp"
+#include "Meta/Registry.hpp"
+#include "Meta/Values.hpp"
 #include "Utilities/Debug/Log.hpp"
 #include <array>
 #include <cstddef>
@@ -14,16 +15,20 @@ namespace Ivy::Meta
 {
 struct ReflectedInstance
 {
-    TypeDescriptor* Type;
-
-    template <typename... Params> ReflectedInstance(TypeDescriptor& type, Params&&... params) : Type(&type)
+    template <typename... Params> ReflectedInstance(TypeDescriptor& type, Params&&... params) : m_Type(&type)
     {
         std::tuple<Params...> parameters(std::forward<Params>(params)...);
         std::array<ParameterDescriptor, sizeof...(Params)> descriptors{
-            &Registry::GetTypeDescriptor<std::remove_cvref_t<Params>>()...};
+            ParameterDescriptor{.Type = &Registry::GetTypeDescriptor<std::remove_cvref_t<Params>>(),
+                                .IsConst = TypeProperties<Params>::IsConst,
+                                .IsReference = TypeProperties<Params>::IsReference,
+                                .IsRValue = TypeProperties<Params>::IsRValue,
+                                .IsPointer = TypeProperties<Params>::IsPointer}
+            ...
+        };
 
         bool nonviableConstructor = false;
-        for (auto& constructor : Type->Constructors)
+        for (auto& constructor : m_Type->Constructors)
         {
             nonviableConstructor = false;
             if (constructor.Parameters.size() != descriptors.size())
@@ -33,7 +38,7 @@ struct ReflectedInstance
 
             for (size_t i = 0; i < constructor.Parameters.size(); ++i)
             {
-                if (constructor.Parameters[i].Type->TypeId != descriptors[i].Type->TypeId)
+                if (constructor.Parameters[i] != descriptors[i])
                 {
                     nonviableConstructor = true;
                 }
@@ -51,11 +56,11 @@ struct ReflectedInstance
         }
     }
 
-    ReflectedInstance(const ReflectedInstance& other) noexcept : Type(other.Type)
+    ReflectedInstance(const ReflectedInstance& other) noexcept : m_Type(other.m_Type)
     {
         if (other.m_Object)
         {
-            m_Object = Type->CopyConstruct(other.m_Object);
+            m_Object = m_Type->CopyConstruct(other.m_Object);
         }
     };
     ReflectedInstance& operator=(const ReflectedInstance& other)
@@ -66,15 +71,15 @@ struct ReflectedInstance
 
             if (other.m_Object)
             {
-                newObject = other.Type->CopyConstruct(other.m_Object);
+                newObject = other.m_Type->CopyConstruct(other.m_Object);
             }
 
             if (m_Object)
             {
-                Type->Deconstruct(m_Object);
+                m_Type->Deconstruct(m_Object);
             }
 
-            Type = other.Type;
+            m_Type = other.m_Type;
             m_Object = newObject;
         }
 
@@ -82,17 +87,17 @@ struct ReflectedInstance
     }
 
     ReflectedInstance(ReflectedInstance&& other) noexcept
-        : Type(other.Type), m_Object(std::exchange(other.m_Object, nullptr))
+        : m_Type(other.m_Type), m_Object(std::exchange(other.m_Object, nullptr))
     {
     }
     ReflectedInstance& operator=(ReflectedInstance&& other) noexcept
     {
         if (this != &other)
         {
-            Type = other.Type;
+            m_Type = other.m_Type;
             if (m_Object)
             {
-                Type->Deconstruct(m_Object);
+                m_Type->Deconstruct(m_Object);
             }
             m_Object = std::exchange(other.m_Object, nullptr);
         }
@@ -104,61 +109,31 @@ struct ReflectedInstance
     {
         if (m_Object)
         {
-            Type->Deconstruct(m_Object);
+            m_Type->Deconstruct(m_Object);
         }
     }
 
     template <typename T> void SetField(std::string_view name, T&& value)
     {
-        SetFieldImpl(m_Object, *Type, name, std::forward<T>(value));
+        SetFieldImpl(m_Object, *m_Type, name, std::forward<T>(value));
     }
     FieldValue GetField(std::string_view name) const
     {
-        return GetFieldImpl(m_Object, *Type, name);
+        return GetFieldImpl(m_Object, *m_Type, name);
     }
 
     template <typename... Args> ReturnValue InvokeMethod(std::string_view name, Args&&... args)
     {
-        std::array<TypeId, sizeof...(Args)> argumentTypes{GetTypeId<std::remove_cvref_t<Args>>()...};
+        return InvokeMethodImpl(m_Object, *m_Type, name, std::forward<Args>(args)...);
+    }
 
-        MethodDescriptor* selectedMethod = nullptr;
-
-        for (MethodDescriptor& method : Type->Methods)
-        {
-            if (method.Name != name || method.Parameters.size() != argumentTypes.size())
-            {
-                continue;
-            }
-
-            bool matches = true;
-
-            for (size_t i = 0; i < argumentTypes.size(); ++i)
-            {
-                if (method.Parameters[i].Type->TypeId != argumentTypes[i])
-                {
-                    matches = false;
-                    break;
-                }
-            }
-
-            if (matches)
-            {
-                selectedMethod = &method;
-                break;
-            }
-        }
-
-        if (!selectedMethod)
-        {
-            U::Log::Error("Can't Invoke Method: No Matching Overload: ", name);
-        }
-
-        std::tuple<Args...> arguments(std::forward<Args>(args)...);
-
-        return selectedMethod->Invoke(m_Object, &arguments);
+    TypeDescriptor& GetType()
+    {
+        return *m_Type;
     }
 
   private:
+    TypeDescriptor* m_Type;
     void* m_Object = nullptr;
 };
 } // namespace Ivy::Meta

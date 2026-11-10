@@ -1,6 +1,6 @@
-target("IvyECS")
+target("Ivy.ECS")
     set_kind("static")
     set_rundir(os.projectdir())
     add_includedirs(".", { public = true })
     add_files("ECS/**.cpp")
-    add_deps("IvyUtilities")
+    add_deps("Ivy.Utilities")

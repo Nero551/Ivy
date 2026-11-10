@@ -1,4 +1,4 @@
-target("IvyUtilities")
+target("Ivy.Utilities")
     set_kind("static")
     set_rundir(os.projectdir())
     add_includedirs(".", { public = true })
