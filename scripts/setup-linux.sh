@@ -1,41 +1,70 @@
+
 #!/bin/sh
-set -e
 
-echo "📦 Installing Nova system dependencies..."
+set -eu
 
-if command -v pacman >/dev/null 2>&1; then
-     pacman -S --needed \
-        base-devel clang ccache ninja git curl zip unzip tar \
-        pkgconf autoconf autoconf-archive automake libtool doxygen xmake
+echo "Installing Ivy development dependencies..."
 
-elif command -v apt >/dev/null 2>&1; then
-     apt install \
-        build-essential clang ccache ninja-build git curl zip unzip tar \
-        pkg-config autoconf autoconf-archive automake libtool doxygen xmake
-
-elif command -v dnf >/dev/null 2>&1; then
-     dnf install \
-        gcc gcc-c++ clang ccache ninja-build git curl zip unzip tar \
-        pkgconf-pkg-config autoconf autoconf-archive automake libtool doxygen xmake
-
-elif command -v xbps-install >/dev/null 2>&1; then
-     xbps-install -S
-     xbps-install -y \
-        base-devel clang ccache ninja git curl zip unzip tar \
-        pkg-config autoconf autoconf-archive automake libtool doxygen xmake
-
+if [ "$(id -u)" -eq 0 ]; then
+    SUDO=""
+elif command -v sudo >/dev/null 2>&1; then
+    SUDO="sudo"
 else
-    echo "❌ Unsupported package manager."
+    echo "Error: Run as root or install sudo." >&2
     exit 1
 fi
 
-echo "🔍 Verifying tools..."
+if command -v pacman >/dev/null 2>&1; then
+    $SUDO pacman -S --needed \
+        base-devel \
+        clang clang-tools-extra libc++ libc++abi lld \
+        ccache cmake ninja \
+        git curl zip unzip tar \
+        pkgconf python doxygen gdb \
+        xmake
 
-command -v clang
-command -v clang++
-command -v ninja
-command -v git
-command -v xmake
-command -v doxygen
+elif command -v apt-get >/dev/null 2>&1; then
+    $SUDO apt-get update
+    $SUDO apt-get install -y \
+        build-essential \
+        clang clangd clang-format clang-tidy \
+        libc++-dev libc++abi-dev lld \
+        ccache cmake ninja-build \
+        git curl zip unzip tar \
+        pkg-config python3 doxygen gdb \
+        xmake
 
-echo "🥳 Dependencies Installed!"
+elif command -v dnf >/dev/null 2>&1; then
+    $SUDO dnf install -y \
+        gcc gcc-c++ make \
+        clang clang-tools-extra lld \
+        ccache cmake ninja-build \
+        git curl zip unzip tar \
+        pkgconf-pkg-config python3 doxygen gdb \
+        xmake
+
+elif command -v xbps-install >/dev/null 2>&1; then
+    $SUDO xbps-install -S
+    $SUDO xbps-install -y \
+        base-devel \
+        clang clang-tools-extra \
+        ccache cmake ninja \
+        git curl zip unzip tar \
+        pkg-config python3 doxygen gdb \
+        xmake
+
+else
+    echo "Error: Unsupported package manager." >&2
+    exit 1
+fi
+
+echo "Verifying development tools..."
+
+for tool in clang clang++ cmake ninja git python3 doxygen gdb xmake; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        echo "Error: $tool was not installed correctly." >&2
+        exit 1
+    fi
+done
+
+echo "Ivy development environment ready!"

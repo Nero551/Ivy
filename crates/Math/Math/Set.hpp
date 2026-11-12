@@ -2,7 +2,6 @@
 
 #include "Utilities/stl.hpp"
 #include <concepts>
-#include <functional>
 #include <type_traits>
 
 namespace Ivy::M
@@ -12,8 +11,8 @@ namespace Ivy::M
 template <typename T> struct Set
 {
     /** @brief Creates a set from a membership predicate. */
-    template <typename F>
-    requires std::same_as<std::invoke_result_t<F, T>, bool> && (!std::same_as<std::remove_cvref_t<F>, Set>)
+    template <typename F> requires std::invocable<F, T> && std::same_as<std::invoke_result_t<F, T>, bool> &&
+        (!std::same_as<std::remove_cvref_t<F>, Set>)
     Set(F&& predicate) : m_Predicate(std::forward<F>(predicate))
     {
     }
@@ -70,5 +69,4 @@ template <typename T> struct Set
   private:
     stl::function<bool(const T&) const> m_Predicate;
 };
-
 } // namespace Ivy::M

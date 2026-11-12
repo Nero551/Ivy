@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/BasicOperations.hpp"
 #include "Utilities/Concepts.hpp"
+#include "Utilities/TupleUtils.hpp"
 #include <cstddef>
 #include <functional>
 #include <ostream>
@@ -9,7 +10,7 @@
 #include <utility>
 namespace Ivy::M
 {
-template <typename... Args> struct MathTuple
+template <typename... Args> struct Ordered
 {
   private:
     std::tuple<Args...> m_Values;
@@ -19,7 +20,7 @@ template <typename... Args> struct MathTuple
 
     static constexpr size_t Size = std::tuple_size_v<std::tuple<Args...>>;
 
-    constexpr MathTuple(const Args&... args) : m_Values(args...) {}
+    constexpr Ordered(const Args&... args) : m_Values(args...) {}
 
     template <typename Function> constexpr decltype(auto) Apply(Function&& function) const
     {
@@ -27,67 +28,79 @@ template <typename... Args> struct MathTuple
     }
 
     template <typename F, typename... OArgs>
-    constexpr auto Operate(const MathTuple<OArgs...>& other, F&& func) const
+    constexpr auto Operate(const Ordered<OArgs...>& other, F&& func) const
     {
         return [&]<std::size_t... I>(std::index_sequence<I...>)
-        { return MathTuple{std::invoke(std::forward<F>(func), Get<I>(), other.template Get<I>())...}; }(
+        { return Ordered{std::invoke(std::forward<F>(func), Get<I>(), other.template Get<I>())...}; }(
             std::index_sequence_for<Args...>{});
     }
 
+    template <std::size_t N> constexpr auto Split() const
+    {
+        static_assert(N <= Size, "Split index out of bounds");
+
+        return [&]<std::size_t... Left, std::size_t... Right>(
+                   std::index_sequence<Left...>, std::index_sequence<Right...>)
+        {
+            return std::pair{Ordered<std::tuple_element_t<Left, std::tuple<Args...>>...>{Get<Left>()...},
+                Ordered<std::tuple_element_t<N + Right, std::tuple<Args...>>...>{Get<N + Right>()...}};
+        }(std::make_index_sequence<N>{}, std::make_index_sequence<Size - N>{});
+    }
+
     template <typename... OArgs>
-    constexpr auto operator+(const MathTuple<OArgs...>& other) const
+    constexpr auto operator+(const Ordered<OArgs...>& other) const
         requires(sizeof...(OArgs) == sizeof...(Args)) && (Additive<Args, OArgs> && ...)
     {
         return Operate(other, [](const auto& a, const auto& b) { return a + b; });
     }
 
     template <typename... OArgs>
-    constexpr auto operator-(const MathTuple<OArgs...>& other) const
+    constexpr auto operator-(const Ordered<OArgs...>& other) const
         requires(sizeof...(OArgs) == sizeof...(Args)) && (Subtractive<Args, OArgs> && ...)
     {
         return Operate(other, [](const auto& a, const auto& b) { return a - b; });
     }
 
     template <typename... OArgs>
-    constexpr auto operator*(const MathTuple<OArgs...>& other) const
+    constexpr auto operator*(const Ordered<OArgs...>& other) const
         requires(sizeof...(OArgs) == sizeof...(Args)) && (Multiplicative<Args, OArgs> && ...)
     {
         return Operate(other, [](const auto& a, const auto& b) { return a * b; });
     }
 
     template <typename... OArgs>
-    constexpr auto operator/(const MathTuple<OArgs...>& other) const
+    constexpr auto operator/(const Ordered<OArgs...>& other) const
         requires(sizeof...(OArgs) == sizeof...(Args)) && (Divisible<Args, OArgs> && ...)
     {
         return Operate(other, [](const auto& a, const auto& b) { return a / b; });
     }
 
     template <typename T>
-    MathTuple<AdditionResult<T, Args>...> constexpr operator+(const T& value) const
+    Ordered<AdditionResult<T, Args>...> constexpr operator+(const T& value) const
         requires(Additive<T, Args> && ...)
     {
-        return Apply([value](const Args... args) { return MathTuple{(value + args)...}; });
+        return Apply([value](const Args... args) { return Ordered{(value + args)...}; });
     }
 
     template <typename T>
-    MathTuple<SubtractionResult<T, Args>...> constexpr operator-(const T& value) const
+    Ordered<SubtractionResult<T, Args>...> constexpr operator-(const T& value) const
         requires(Subtractive<T, Args> && ...)
     {
-        return Apply([value](const Args... args) { return MathTuple{(args - value)...}; });
+        return Apply([value](const Args... args) { return Ordered{(args - value)...}; });
     }
 
     template <typename T>
-    MathTuple<MultiplicationResult<T, Args>...> constexpr operator*(const T& value) const
+    Ordered<MultiplicationResult<T, Args>...> constexpr operator*(const T& value) const
         requires(Multiplicative<T, Args> && ...)
     {
-        return Apply([value](const Args... args) { return MathTuple{(value * args)...}; });
+        return Apply([value](const Args... args) { return Ordered{(value * args)...}; });
     }
 
     template <typename T>
-    MathTuple<DivisionResult<T, Args>...> constexpr operator/(const T& value) const
+    Ordered<DivisionResult<T, Args>...> constexpr operator/(const T& value) const
         requires(Divisible<T, Args> && ...)
     {
-        return Apply([value](const Args... args) { return MathTuple{(args / value)...}; });
+        return Apply([value](const Args... args) { return Ordered{(args / value)...}; });
     }
 
     template <unsigned int I> constexpr decltype(auto) Get()
@@ -119,7 +132,7 @@ template <typename... Args> struct MathTuple
         return Get<0>();
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const MathTuple<Args...>& tuple)
+    friend std::ostream& operator<<(std::ostream& os, const Ordered<Args...>& tuple)
     {
         os << '(';
 
@@ -133,17 +146,17 @@ template <typename... Args> struct MathTuple
         return os << ')';
     }
 
-    template <std::size_t I> friend constexpr decltype(auto) get(Ivy::M::MathTuple<Args...>& tuple)
+    template <std::size_t I> friend constexpr decltype(auto) get(Ivy::M::Ordered<Args...>& tuple)
     {
         return std::get<I>(tuple.m_Values);
     }
 
-    template <std::size_t I> friend constexpr decltype(auto) get(const Ivy::M::MathTuple<Args...>& tuple)
+    template <std::size_t I> friend constexpr decltype(auto) get(const Ivy::M::Ordered<Args...>& tuple)
     {
         return std::get<I>(tuple.m_Values);
     }
 
-    template <std::size_t I> friend constexpr decltype(auto) get(Ivy::M::MathTuple<Args...>&& tuple)
+    template <std::size_t I> friend constexpr decltype(auto) get(Ivy::M::Ordered<Args...>&& tuple)
     {
         return std::get<I>(std::move(tuple.m_Values));
     }
@@ -153,12 +166,12 @@ template <typename... Args> struct MathTuple
 namespace std
 {
 template <typename... Args>
-struct tuple_size<Ivy::M::MathTuple<Args...>> : std::integral_constant<std::size_t, sizeof...(Args)>
+struct tuple_size<Ivy::M::Ordered<Args...>> : std::integral_constant<std::size_t, sizeof...(Args)>
 {
 };
 
 template <std::size_t I, typename... Args>
-struct tuple_element<I, Ivy::M::MathTuple<Args...>> : tuple_element<I, std::tuple<Args...>>
+struct tuple_element<I, Ivy::M::Ordered<Args...>> : tuple_element<I, std::tuple<Args...>>
 {
 };
 } // namespace std

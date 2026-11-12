@@ -1,6 +1,6 @@
-#include "Math/MathTuple.hpp"
-#include "Math/Set.hpp"
 #include "Math/FiniteSet.hpp"
+#include "Math/Ordered.hpp"
+#include "Math/Set.hpp"
 #include <benchmark/benchmark.h>
 
 namespace Ivy::Benchmarks
@@ -10,8 +10,8 @@ using namespace Ivy::M;
 // ==================== MathTuple ====================
 static void BM_MathTuple2_Add(benchmark::State& state)
 {
-    MathTuple<float, float> a(1.0f, 2.0f);
-    MathTuple<float, float> b(3.0f, 4.0f);
+    Ordered<float, float> a(1.0f, 2.0f);
+    Ordered<float, float> b(3.0f, 4.0f);
     for (auto _ : state)
     {
         auto r = a + b;
@@ -22,8 +22,8 @@ BENCHMARK(BM_MathTuple2_Add);
 
 static void BM_MathTuple3_Add(benchmark::State& state)
 {
-    MathTuple<float, float, float> a(1.0f, 2.0f, 3.0f);
-    MathTuple<float, float, float> b(4.0f, 5.0f, 6.0f);
+    Ordered<float, float, float> a(1.0f, 2.0f, 3.0f);
+    Ordered<float, float, float> b(4.0f, 5.0f, 6.0f);
     for (auto _ : state)
     {
         auto r = a + b;
@@ -34,7 +34,7 @@ BENCHMARK(BM_MathTuple3_Add);
 
 static void BM_MathTuple2_ScalarMul(benchmark::State& state)
 {
-    MathTuple<float, float> t(1.0f, 2.0f);
+    Ordered<float, float> t(1.0f, 2.0f);
     for (auto _ : state)
     {
         auto r = t * 2.0f;
@@ -45,7 +45,7 @@ BENCHMARK(BM_MathTuple2_ScalarMul);
 
 static void BM_MathTuple2_Apply(benchmark::State& state)
 {
-    MathTuple<float, float> t(1.0f, 2.0f);
+    Ordered<float, float> t(1.0f, 2.0f);
     for (auto _ : state)
     {
         auto r = t.Apply([](float a, float b) { return a + b; });

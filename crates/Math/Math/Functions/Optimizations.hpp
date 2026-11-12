@@ -4,7 +4,7 @@
 #include "Math/Common/Random.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Math/MathTuple.hpp"
+#include "Math/Ordered.hpp"
 #include "Math/Scalar.hpp"
 #include <limits>
 namespace Ivy::M
@@ -39,7 +39,7 @@ Input NewtonMethod(const Function<Output, Input>& f, Input initialGuess, Input e
 }
 
 template <M::Scalar Input, M::Scalar Output>
-M::MathTuple<Output, Input> Maximize(
+M::Ordered<Output, Input> Maximize(
     const M::Function<Output, Input>& f, Input a, Input b, Interval interval, unsigned int iterations = 10)
 {
 
@@ -73,7 +73,7 @@ M::MathTuple<Output, Input> Maximize(
 }
 
 template <M::Scalar Input, M::Scalar Output>
-M::MathTuple<Output, Input> Minimize(
+M::Ordered<Output, Input> Minimize(
     const M::Function<Output, Input>& f, Input a, Input b, Interval interval, unsigned int iterations = 10)
 {
 

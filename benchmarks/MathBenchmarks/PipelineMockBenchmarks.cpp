@@ -198,8 +198,8 @@ BENCHMARK(BM_Pipeline_SolveQuadratic);
 // Full exponential-growth ODE with 100 steps.
 static void BM_Pipeline_ODE_Exponential(benchmark::State& state)
 {
-    Ivy::M::ODE<float, float> ode([](float x, float y) { return Ivy::M::ODE<float, float>::State(x, y); });
-    Ivy::M::ODE<float, float>::State init(0.0f, 1.0f);
+    Ivy::M::ODE<float, float> ode([](float x, float y) { return Ivy::M::ODEState<float, float>(x, y); });
+    Ivy::M::ODEState<float, float> init(0.0f, 1.0f);
     for (auto _ : state)
     {
         auto r = ode.Solve(init, 1.0f, 0.01f);

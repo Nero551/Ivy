@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/MathTuple.hpp"
+#include "Math/Ordered.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/stl.hpp"
 #include <concepts>
@@ -44,7 +44,7 @@ template <typename Output, typename... Inputs> struct Function
     }
 
     template <typename... Middles>
-    Function<Output, Middles...> Compose(const Function<MathTuple<Inputs...>, Middles...>& g) const
+    Function<Output, Middles...> Compose(const Function<Ordered<Inputs...>, Middles...>& g) const
         requires(sizeof...(Inputs) > 0)
     {
         return [f = *this, g](const Middles&... middles)
@@ -60,7 +60,7 @@ template <typename Output, typename... Inputs> struct Function
     }
 
     template <typename... Middles>
-    Function<Output, Middles...> operator()(const Function<MathTuple<Inputs...>, Middles...>& g) const
+    Function<Output, Middles...> operator()(const Function<Ordered<Inputs...>, Middles...>& g) const
         requires(sizeof...(Inputs) > 0)
     {
         return Compose(g);

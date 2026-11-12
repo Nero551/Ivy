@@ -127,6 +127,11 @@ template <typename T> struct FiniteSet
         return !(*this == other);
     }
 
+    unsigned int Cardinality()
+    {
+        return m_Elements.size();
+    }
+
   private:
     std::unordered_set<T> m_Elements{};
 };

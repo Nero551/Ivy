@@ -1,9 +1,9 @@
 #pragma once
 #include "Math/Scalar.hpp"
 
-#include "Math/Functions/Function.hpp"
-#include "Math/MathTuple.hpp"
 #include "Diagnostics/Log.hpp"
+#include "Math/Functions/Function.hpp"
+#include "Math/Ordered.hpp"
 #include <functional>
 #include <ostream>
 namespace Ivy::M
@@ -14,6 +14,20 @@ enum class ODEMethod
     ExplicitEuler,
     ImplicitEuler,
     RK4,
+};
+
+template <Scalar Independent, typename... States> struct ODEState
+{
+    Ordered<States...> State;
+    Independent x;
+
+    ODEState(Independent X, const States&... vars) : x(X), State(vars...) {}
+    ODEState(Independent X, const Ordered<States...>& tuple) : x(X), State(tuple) {}
+
+    friend std::ostream& operator<<(std::ostream& os, const ODEState& state)
+    {
+        os << "( " << state.x << ", " << state.State << " )";
+    }
 };
 
 /**
@@ -31,20 +45,7 @@ enum class ODEMethod
  */
 template <M::Scalar Independent, typename... States> struct ODE
 {
-    struct State
-    {
-        MathTuple<States...> Variables;
-        Independent x;
-
-        State(Independent X, const States&... vars) : x(X), Variables(vars...) {}
-        State(Independent X, const MathTuple<States...>& tuple) : x(X), Variables(tuple) {}
-
-        friend std::ostream& operator<<(std::ostream& os, const State& state)
-        {
-            os << "( " << state.x << ", " << state.Variables << " )";
-        }
-    };
-
+    using State = ODEState<Independent, States...>;
     using DerivativeFunction = M::Function<State, Independent, States...>;
 
     /**
@@ -60,7 +61,7 @@ template <M::Scalar Independent, typename... States> struct ODE
      */
     State Derivative(const State& current) const
     {
-        return current.Variables.Apply(
+        return current.State.Apply(
             [this, &current](const States&... values) { return m_Derivative(current.x, values...); });
     }
 
@@ -72,7 +73,7 @@ template <M::Scalar Independent, typename... States> struct ODE
      */
     State Step(const State& current, const Independent& dx) const
     {
-        return {current.x + dx, current.Variables + Derivative(current).Variables * dx};
+        return {current.x + dx, current.State + Derivative(current).State * dx};
     }
 
     /**

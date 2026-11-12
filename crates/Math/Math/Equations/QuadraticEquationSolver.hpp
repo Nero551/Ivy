@@ -1,8 +1,8 @@
 #pragma once
+#include "Diagnostics/Log.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Complex/Complex.hpp"
-#include "Math/MathTuple.hpp"
-#include "Diagnostics/Log.hpp"
+#include "Math/Ordered.hpp"
 #include <cstdlib>
 #include <optional>
 #include <ostream>
@@ -16,13 +16,13 @@ struct QuadraticResult
     QuadraticResult(float x1, float x2) : m_X1(x1), m_X2(x2), HasRealSolution(true) {}
     QuadraticResult(const Complex<>& x) : m_ComplexRoot(x), HasRealSolution(false) {}
 
-    MathTuple<float, float> GetRealRoots() const
+    Ordered<float, float> GetRealRoots() const
     {
         D::Log::Assert(HasRealRoots(), "Quadratic Equation has no real roots");
         return {m_X1, m_X2};
     }
 
-    MathTuple<Complex<>, Complex<>> GetComplexRoots() const
+    Ordered<Complex<>, Complex<>> GetComplexRoots() const
     {
         D::Log::Assert(HasComplexRoots(), "Quadratic Equation has no complex roots");
         return {(*m_ComplexRoot), (*m_ComplexRoot).Conjugate()};

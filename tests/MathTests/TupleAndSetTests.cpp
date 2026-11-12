@@ -1,6 +1,6 @@
-#include "Math/MathTuple.hpp"
-#include "Math/Set.hpp"
 #include "Math/FiniteSet.hpp"
+#include "Math/Ordered.hpp"
+#include "Math/Set.hpp"
 #include <gtest/gtest.h>
 #include <tuple>
 
@@ -9,9 +9,9 @@ namespace Ivy::UnitTests
 using namespace Ivy::M;
 
 // Aliases so gtest macros don't choke on template commas.
-using MT_fi = MathTuple<float, int>;
-using MT_ff = MathTuple<float, float>;
-using MT_fid = MathTuple<float, int, double>;
+using MT_fi = Ordered<float, int>;
+using MT_ff = Ordered<float, float>;
+using MT_fid = Ordered<float, int, double>;
 
 // ==================== MathTuple ====================
 TEST(MathTuple, ConstructionAndGet)

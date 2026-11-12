@@ -163,37 +163,37 @@ TEST(Quadratic, ComplexWithRealPart)
 TEST(ODE, ConstantDerivative)
 {
     // dy/dx = 1, y(0)=0 → y(5)=5 exactly
-    ODE<float, float> ode([](float x, float y) { return ODE<float, float>::State(x, 1.0f); });
-    ODE<float, float>::State init(0.0f, 0.0f);
+    ODE<float, float> ode([](float x, float y) { return ODEState<float, float>(x, 1.0f); });
+    ODEState<float, float> init(0.0f, 0.0f);
 
     auto result = ode.Solve(init, 5.0f, 1.0f);
     EXPECT_NEAR(result.x, 5.0f, 1e-5f);
-    EXPECT_NEAR(result.Variables.Get<0>(), 5.0f, 1e-4f);
+    EXPECT_NEAR(result.State.Get<0>(), 5.0f, 1e-4f);
 }
 
 TEST(ODE, ExponentialGrowth)
 {
     // dy/dx = y, y(0)=1, target=1
-    ODE<float, float> ode([](float x, float y) { return ODE<float, float>::State(x, y); });
-    ODE<float, float>::State init(0.0f, 1.0f);
+    ODE<float, float> ode([](float x, float y) { return ODEState<float, float>(x, y); });
+    ODEState<float, float> init(0.0f, 1.0f);
 
     auto result = ode.Solve(init, 1.0f, 0.01f);
-    EXPECT_NEAR(result.Variables.Get<0>(), std::exp(1.0f), 0.05f);
+    EXPECT_NEAR(result.State.Get<0>(), std::exp(1.0f), 0.05f);
 }
 
 TEST(ODE, TargetEqualsStartNoStep)
 {
-    ODE<float, float> ode([](float x, float y) { return ODE<float, float>::State(x, y); });
-    ODE<float, float>::State init(0.5f, 1.0f);
+    ODE<float, float> ode([](float x, float y) { return ODEState<float, float>(x, y); });
+    ODEState<float, float> init(0.5f, 1.0f);
     auto result = ode.Solve(init, init.x, 0.1f);
     EXPECT_FLOAT_EQ(result.x, init.x);
-    EXPECT_FLOAT_EQ(result.Variables.Get<0>(), 1.0f);
+    EXPECT_FLOAT_EQ(result.State.Get<0>(), 1.0f);
 }
 
 TEST(ODE, TargetBelowStartNoStep)
 {
-    ODE<float, float> ode([](float x, float y) { return ODE<float, float>::State(x, y); });
-    ODE<float, float>::State init(0.5f, 1.0f);
+    ODE<float, float> ode([](float x, float y) { return ODEState<float, float>(x, y); });
+    ODEState<float, float> init(0.5f, 1.0f);
     auto result = ode.Solve(init, -1.0f, 0.1f);
     // Loop condition x < target is never true, so no steps taken
     EXPECT_FLOAT_EQ(result.x, 0.5f);
@@ -201,8 +201,8 @@ TEST(ODE, TargetBelowStartNoStep)
 
 TEST(ODE, ActionCallback)
 {
-    ODE<float, float> ode([](float x, float y) { return ODE<float, float>::State(x, 1.0f); });
-    ODE<float, float>::State init(0.0f, 0.0f);
+    ODE<float, float> ode([](float x, float y) { return ODEState<float, float>(x, 1.0f); });
+    ODEState<float, float> init(0.0f, 0.0f);
 
     int calls = 0;
     ode.Solve(init, 1.0f, 0.1f, [&calls](const auto&) { ++calls; });
@@ -214,11 +214,11 @@ TEST(ODE, ActionCallback)
 TEST(ODE, StepSizeLargerThanRange)
 {
     // dx = 10, but target only 1 away → one step of size 1
-    ODE<float, float> ode([](float x, float y) { return ODE<float, float>::State(x, 2.0f); });
-    ODE<float, float>::State init(0.0f, 0.0f);
+    ODE<float, float> ode([](float x, float y) { return ODEState<float, float>(x, 2.0f); });
+    ODEState<float, float> init(0.0f, 0.0f);
     auto result = ode.Solve(init, 1.0f, 10.0f);
     EXPECT_NEAR(result.x, 1.0f, 1e-5f);
-    EXPECT_NEAR(result.Variables.Get<0>(), 2.0f, 1e-5f);
+    EXPECT_NEAR(result.State.Get<0>(), 2.0f, 1e-5f);
 }
 
 } // namespace Ivy::UnitTests

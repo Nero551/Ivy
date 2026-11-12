@@ -63,7 +63,7 @@ struct VectorFields2D : C::System
                 const float thetaDot = omega;
                 const float omegaDot = -0.2f * omega - (9.8f / 2.0f) * std::sin(theta);
 
-                return Equation::State{t, thetaDot, omegaDot};
+                return M::ODEState<float, float, float>{t, thetaDot, omegaDot};
             }};
 
         std::vector<float> magnitudes{};
@@ -75,7 +75,7 @@ struct VectorFields2D : C::System
             for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
             {
                 // Evaluate the derivative at this point in phase space.
-                auto [thetaDot, omegaDot] = equation.Derivative({0.0f, theta, omega}).Variables;
+                auto [thetaDot, omegaDot] = equation.Derivative({0.0f, theta, omega}).State;
 
                 // Skip the arrow if the vector field is effectively zero.
                 if (M::Vector<2>{thetaDot, omegaDot}.Length() < 0.0001f)
@@ -112,7 +112,7 @@ struct VectorFields2D : C::System
 
         using Equation = M::ODE<float, float>;
 
-        const Equation equation{[k](float t, float p) { return Equation::State{t, k * p}; }};
+        const Equation equation{[k](float t, float p) { return M::ODEState<float, float>{t, k * p}; }};
 
         std::vector<float> magnitudes{};
 
@@ -122,7 +122,7 @@ struct VectorFields2D : C::System
         {
             for (float t = 0; t < 50; t += 0.5f)
             {
-                const auto [dp] = equation.Derivative({t, p}).Variables;
+                const auto [dp] = equation.Derivative({t, p}).State;
 
                 const M::Vector<2> pos = {t, p};
                 const M::Vector<2> target = {1, dp};
@@ -156,7 +156,8 @@ struct VectorFields2D : C::System
 
         using Equation = M::ODE<float, float>;
 
-        const Equation equation{[k, a](float t, float p) { return Equation::State{t, k * p * (a - p)}; }};
+        const Equation equation{
+            [k, a](float t, float p) { return M::ODEState<float, float>{t, k * p * (a - p)}; }};
 
         std::vector<float> magnitudes{};
 
@@ -166,7 +167,7 @@ struct VectorFields2D : C::System
         {
             for (float t = 0; t < 50; t += 0.5f)
             {
-                const auto [dp] = equation.Derivative({t, p}).Variables;
+                const auto [dp] = equation.Derivative({t, p}).State;
 
                 const M::Vector<2> pos = {t, p};
                 const M::Vector<2> target = {1, dp};
@@ -201,7 +202,7 @@ struct VectorFields2D : C::System
         using Equation = M::ODE<float, float, float>;
 
         const Equation equation{
-            [k, m](float t, float x, float v) { return Equation::State{t, v, -k * x / m}; }};
+            [k, m](float t, float x, float v) { return M::ODEState<float, float, float>{t, v, -k * x / m}; }};
 
         std::vector<float> magnitudes{};
 
@@ -211,7 +212,7 @@ struct VectorFields2D : C::System
         {
             for (float x = -25; x < 25; x += 0.5f)
             {
-                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).Variables;
+                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).State;
 
                 const M::Vector<2> pos = {x, v};
                 const M::Vector<2> target = {dx, dv};
@@ -246,8 +247,8 @@ struct VectorFields2D : C::System
 
         using Equation = M::ODE<float, float, float>;
 
-        const Equation equation{
-            [k, m, b](float t, float x, float v) { return Equation::State{t, v, -k * x / m - b * v / m}; }};
+        const Equation equation{[k, m, b](float t, float x, float v)
+            { return M::ODEState<float, float, float>{t, v, -k * x / m - b * v / m}; }};
 
         std::vector<float> magnitudes{};
 
@@ -257,7 +258,7 @@ struct VectorFields2D : C::System
         {
             for (float x = -25; x < 25; x += 0.5f)
             {
-                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).Variables;
+                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).State;
 
                 const M::Vector<2> pos = {x, v};
                 const M::Vector<2> target = {dx, dv};
@@ -292,7 +293,8 @@ struct VectorFields2D : C::System
 
         using Equation = M::ODE<float, float>;
 
-        const Equation equation{[b, m, g](float t, float v) { return Equation::State{t, g - (b / m) * v}; }};
+        const Equation equation{
+            [b, m, g](float t, float v) { return M::ODEState<float, float>{t, g - (b / m) * v}; }};
 
         std::vector<float> magnitudes{};
 
@@ -302,7 +304,7 @@ struct VectorFields2D : C::System
         {
             for (float t = 0; t < 50; t += 0.5f)
             {
-                const auto [dv] = equation.Derivative({t, v}).Variables;
+                const auto [dv] = equation.Derivative({t, v}).State;
 
                 const M::Vector<2> pos = {t, v};
                 const M::Vector<2> target = {1, dv};
@@ -340,7 +342,7 @@ struct VectorFields2D : C::System
         using Equation = M::ODE<float, float>;
 
         const Equation equation{[g, D, p, A, m](float t, float v)
-            { return Equation::State{t, g - (D * p * A / (2.0f * m)) * v * std::abs(v)}; }};
+            { return M::ODEState<float, float>{t, g - (D * p * A / (2.0f * m)) * v * std::abs(v)}; }};
 
         std::vector<float> magnitudes{};
 
@@ -350,7 +352,7 @@ struct VectorFields2D : C::System
         {
             for (float t = 0; t < 50; t += 0.5f)
             {
-                const auto [dv] = equation.Derivative({t, v}).Variables;
+                const auto [dv] = equation.Derivative({t, v}).State;
 
                 const M::Vector<2> pos = {t, v};
                 const M::Vector<2> target = {1, dv};

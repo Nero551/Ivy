@@ -15,14 +15,18 @@ else
     add_defines("DEBUG", "TRACY_ENABLE", "TRACY_PROFILE_MEMORY")
 end
 
-includes("crates/Utilities")
-includes("crates/Math")
-includes("crates/Physics")
-includes("crates/Graphics")
-includes("crates/ECS")
-includes("crates/Core")
-includes("crates/Reflect")
-includes("crates/Diagnostics")
+set_warnings("all", "extra", "pedantic")
+
+includes(
+"crates/Utilities",
+"crates/Math",
+"crates/Graphics",
+"crates/ECS",
+"crates/Reflect",
+"crates/Diagnostics",
+"crates/Physics",
+"crates/Core"
+)
 
 target("Ivy")
     set_kind("binary")

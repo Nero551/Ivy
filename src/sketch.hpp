@@ -1,8 +1,13 @@
 #pragma once
 
 #include "Diagnostics/Log.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Common/Exponentials.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/Functions/Integration.hpp"
+#include "Math/Functions/Inverse.hpp"
 #include "Math/Scalar.hpp"
+#include "Math/Set.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
@@ -298,6 +303,10 @@ struct Shader
 // TODO: automatic differentiation via dual numbers.
 //
 // TODO: tracy is not working, the macro which defines it when debug mode doesn't work.
+
+static M::Set<unsigned int> N = [](unsigned int x) { return true; };
+static M::Set<int> Z = [](int x) { return true; };
+static M::Set<float> R = [](float x) { return true; };
 
 inline void Test() {}
 } // namespace Sketch

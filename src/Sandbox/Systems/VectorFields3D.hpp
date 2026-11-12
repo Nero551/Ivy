@@ -58,7 +58,7 @@ struct VectorFields3D : C::System
                 float dx = sigma * (y - x);
                 float dy = x * (rho - z) - y;
                 float dz = x * y - beta * z;
-                return M::ODE<float, float, float, float>::State{t, dx, dy, dz};
+                return M::ODEState<float, float, float, float>{t, dx, dy, dz};
             }};
 
         std::vector<float> magnitudes{};
@@ -66,10 +66,10 @@ struct VectorFields3D : C::System
         auto& query = m_Engine.ECS.Query;
 
         eq.Solve({0, 0.9, 1, 1.1}, 100, 0.001f,
-            [&](const M::ODE<float, float, float, float>::State& state)
+            [&](const M::ODEState<float, float, float, float>& state)
             {
-                auto [x, y, z] = state.Variables;
-                auto [dx, dy, dz] = eq.Derivative(state).Variables;
+                auto [x, y, z] = state.State;
+                auto [dx, dy, dz] = eq.Derivative(state).State;
 
                 auto& arrow = Arrow();
 
