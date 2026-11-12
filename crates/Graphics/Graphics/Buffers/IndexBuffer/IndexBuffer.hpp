@@ -20,7 +20,7 @@ struct IndexBuffer
     IndexBuffer(const IndexBuffer&) = delete;
     IndexBuffer& operator=(const IndexBuffer&) = delete;
 
-    IndexBuffer(IndexBuffer&& other) noexcept : m_Id(std::exchange(other.m_Id, 0)), Usage(other.Usage) {}
+    IndexBuffer(IndexBuffer&& other) noexcept : Usage(other.Usage), m_Id(std::exchange(other.m_Id, 0)) {}
 
     IndexBuffer& operator=(IndexBuffer&& other) noexcept
     {

@@ -20,7 +20,7 @@ struct ArrayBuffer
 
     ArrayBuffer(const ArrayBuffer&) = delete;
     ArrayBuffer& operator=(const ArrayBuffer&) = delete;
-    ArrayBuffer(ArrayBuffer&& other) noexcept : m_Id(std::exchange(other.m_Id, 0)), Usage(other.Usage) {}
+    ArrayBuffer(ArrayBuffer&& other) noexcept : Usage(other.Usage), m_Id(std::exchange(other.m_Id, 0)) {}
     ArrayBuffer& operator=(ArrayBuffer&& other) noexcept
     {
         if (this != &other)

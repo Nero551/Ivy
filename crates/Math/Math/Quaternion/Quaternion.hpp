@@ -7,9 +7,9 @@
 #include "Math/Common/Logarithms.hpp"
 #include "Math/Scalar.hpp"
 
+#include "Diagnostics/Log.hpp"
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Diagnostics/Log.hpp"
 #include <ostream>
 
 namespace Ivy::M
@@ -125,32 +125,32 @@ template <Scalar T = float> struct Quaternion
 
     static Quaternion FromTo(const Vector<3, T>& from, const Vector<3, T>& to)
     {
-        Vector<3, T> A = from.Normalized();
-        Vector<3, T> B = to.Normalized();
+        Vector<3, T> a = from.Normalized();
+        Vector<3, T> b = to.Normalized();
 
-        T Dot = A.Dot(B);
+        T dot = a.Dot(b);
 
-        if (Dot >= T(1.0) - EPSILON)
+        if (M::NearlyEquals(dot, T{1.0f}))
         {
             return Identity();
         }
 
-        if (Dot <= T(-1.0) + EPSILON)
+        if (M::NearlyEquals(dot, T{-1}))
         {
-            Vector<3, T> Axis = A.Cross(Vector<3, T>::Right()).Normalized();
+            Vector<3, T> axis = a.Cross(Vector<3, T>::Right()).Normalized();
 
-            if (Axis.LengthSquared() <= EPSILON)
+            if (M::NearlyEquals(axis.LengthSquared(), T{0}))
             {
-                Axis = A.Cross(Vector<3, T>::Up()).Normalized();
+                axis = a.Cross(Vector<3, T>::Up()).Normalized();
             }
 
-            return FromQPolar({Axis, M::PI});
+            return FromQPolar({axis, M::PI});
         }
 
-        Vector<3, T> Axis = A.Cross(B).Normalized();
-        T Angle = std::acos(std::clamp(Dot, T(-1.0), T(1.0)));
+        Vector<3, T> axis = a.Cross(b).Normalized();
+        T angle = std::acos(std::clamp(dot, T(-1.0), T(1.0)));
 
-        return FromQPolar({Axis, Angle});
+        return FromQPolar({axis, angle});
     }
 
     /**
@@ -173,7 +173,7 @@ template <Scalar T = float> struct Quaternion
         Quaternion qz{std::cos(hz), T{0}, T{0}, std::sin(hz)};
 
         Quaternion q_half = qz * qy * qx;
-        return q_half * q_half; // ← half → full; this line is what was missing
+        return q_half * q_half;
     }
     /** @brief Constructs the zero quaternion. */
     constexpr Quaternion() = default;
@@ -241,8 +241,8 @@ template <Scalar T = float> struct Quaternion
     constexpr Vector<3, T> Transform(const Vector<3, T>& vec3) const
     {
         Quaternion p = {0, vec3.x, vec3.y, vec3.z};
-        Quaternion q = FromQPolar({Axis(), Angle() / T{2}, Magnitude()});
-        Quaternion result = q * p * q.Inverse();
+        Quaternion q = FromQPolar({Axis(), Angle() / T{2}, T{1}});
+        Quaternion result = q * p * q.Conjugate();
 
         return {result.x, result.y, result.z};
     }

@@ -1,8 +1,8 @@
 #pragma once
+#include "Diagnostics/Log.hpp"
 #include "Reflect/Basic.hpp"
 #include "Reflect/Descriptors.hpp"
 #include "Reflect/Values.hpp"
-#include "Diagnostics/Log.hpp"
 #include <array>
 #include <cstddef>
 #include <string_view>
@@ -27,7 +27,7 @@ struct Reflected
 
         if (field.Type->TypeId != GetTypeId<BaseType>())
         {
-            D::Log::Error("Failed To Set Value: Not Same Type ", field);
+            D::Log::Error("Failed To Set Value: Not Same Type ", GetTypeName<T>(), field);
         }
 
         if (field.IsConst)
@@ -55,7 +55,7 @@ struct Reflected
 
         void* address = static_cast<std::byte*>(m_Object) + field.Offset;
 
-        return {.Data = static_cast<std::byte*>(m_Object) + field.Offset, .Description = field};
+        return {.Data = address, .Description = field};
     }
 
     template <typename... Args> ReturnValue InvokeMethod(std::string_view name, Args&&... args)
@@ -102,6 +102,18 @@ struct Reflected
     TypeDescriptor& GetType()
     {
         return *m_Type;
+    }
+
+    std::vector<FieldValue> GetFields()
+    {
+        std::vector<FieldValue> fields;
+        for (FieldDescriptor& descriptor : m_Type->Fields)
+        {
+            void* address = static_cast<std::byte*>(m_Object) + descriptor.Offset;
+            FieldValue field{.Data = address, .Description = descriptor};
+            fields.push_back(field);
+        }
+        return fields;
     }
 
   protected:

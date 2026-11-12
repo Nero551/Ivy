@@ -14,6 +14,7 @@ struct ReflectedReference : Reflected
         m_Type = &type;
     }
 };
+
 ReflectedReference Inspect(void* object, std::string_view type)
 {
     return ReflectedReference{object, Registry::GetType(type)};

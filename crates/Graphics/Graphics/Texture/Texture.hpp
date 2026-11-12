@@ -93,8 +93,8 @@ struct Texture
         Delete();
     }
     Texture(Texture&& other) noexcept
-        : m_Name(std::move(other.m_Name)), m_Target(std::exchange(other.m_Target, TextureTarget::Texture2D)),
-          m_Id(std::exchange(other.m_Id, 0))
+        : m_Id(std::exchange(other.m_Id, 0)), m_Name(std::move(other.m_Name)),
+          m_Target(std::exchange(other.m_Target, TextureTarget::Texture2D))
     {
     }
 

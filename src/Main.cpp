@@ -7,6 +7,7 @@
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
 #include "Sandbox/Sandbox2D.hpp"
+#include "Sandbox/Sandbox3D.hpp"
 #include "sketch.hpp"
 #include <string_view>
 

@@ -5,7 +5,7 @@ set_toolchains("clang")
 add_rules("plugin.compile_commands.autoupdate", { lsp = "clang" })
 add_rules("mode.debug", "mode.release")
 
-add_requires("tracy v0.13.1", "glfw 3.4", "glad 0.1.36", "stb", "gtest", "benchmark 1.9.5")
+add_requires("tracy v0.13.1", "glfw 3.4", "glad 0.1.36", "stb", "gtest", "benchmark 1.9.5", "nlohmann_json")
 add_requireconfs("**", { override = true, configs = { shared = false, system = false } })
 
 if is_mode("release") then
@@ -35,6 +35,7 @@ target("Ivy")
     set_pcxxheader("src/pch.hpp")
     add_files("src/**.cpp")
     add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.Graphics", "Ivy.ECS", "Ivy.Core", "Ivy.Reflect", "Ivy.Diagnostics")
+    add_packages("nlohmann_json")
 
     if is_plat("linux") then
         ---@diagnostic disable-next-line: param-type-not-match

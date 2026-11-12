@@ -4,17 +4,25 @@
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Math/Functions/Integration.hpp"
-#include "Math/Functions/Inverse.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
+#include "Math/Vector/Vectors.hpp"
+#include "Protos/Data.hpp"
+#include "Reflect/Basic.hpp"
+#include "Reflect/ReflectedReference.hpp"
+#include "Reflect/Registry.hpp"
+#include "Reflect/Values.hpp"
+#include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
 #include <cstdlib>
-#include <dlfcn.h>
+#include <fstream>
+#include <iostream>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 namespace Sketch
@@ -308,5 +316,26 @@ static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
-inline void Test() {}
+struct PlayerData : Datalization::StructuredData<PlayerData>
+{
+    std::string Name = "Unknown";
+    unsigned int Age = 0;
+};
+
+inline void Test()
+{
+    REFLECT(PlayerData);
+    FIELD(PlayerData, Name);
+    FIELD(PlayerData, Age);
+
+    using F = M::Function<float, float>;
+    F f = [](float x) { return M::PI / 4.0f * (M::Pow(x, 3) / 3.0f - 4 * M::Pow(x, 2) + 16 * x); };
+
+    PlayerData p = PlayerData::Load("assets/test.json");
+    D::Log::Info(p.Name);
+    D::Log::Info(p.Age);
+    p.Age = 50;
+    p.Name = "Yuno";
+    p.Save("assets/test2.json");
+}
 } // namespace Sketch

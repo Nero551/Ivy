@@ -43,8 +43,8 @@ struct Renderbuffer
     Renderbuffer(const Renderbuffer&) = delete;
     Renderbuffer& operator=(const Renderbuffer&) = delete;
     Renderbuffer(Renderbuffer&& other) noexcept
-        : m_Id(std::exchange(other.m_Id, 0)), Width(other.Width), Height(other.Height),
-          Samples(other.Samples), InternalFormat(other.InternalFormat), m_Name(std::move(other.m_Name))
+        : InternalFormat(other.InternalFormat), Width(other.Width), Height(other.Height),
+          Samples(other.Samples), m_Name(std::move(other.m_Name)), m_Id(std::exchange(other.m_Id, 0))
     {
     }
     Renderbuffer& operator=(Renderbuffer&& other) noexcept
