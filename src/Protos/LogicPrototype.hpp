@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Ivy::DigitalLogic
+namespace Protos::DigitalLogic
 {
 
 using Bit = bool;
@@ -147,4 +147,4 @@ struct ALU
         return result;
     }
 };
-} // namespace Ivy::DigitalLogic
+} // namespace Protos::DigitalLogic

@@ -11,11 +11,16 @@ add_requireconfs("**", { override = true, configs = { shared = false, system = f
 if is_mode("release") then
     set_policy("build.optimization.lto", true)
     add_defines("RELEASE")
+
 else
+    -- set_policy("build.sanitizer.address", true)
+    -- set_policy("build.sanitizer.undefined", true)
+    -- set_policy("build.sanitizer.thread", true)
+    -- set_policy("build.sanitizer.memory", true)
     add_defines("DEBUG", "TRACY_ENABLE", "TRACY_PROFILE_MEMORY")
 end
 
-set_warnings("all", "extra", "pedantic")
+-- set_warnings("all", "extra", "pedantic")
 
 includes(
 "crates/Utilities",

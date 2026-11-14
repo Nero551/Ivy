@@ -6,8 +6,8 @@
 #include <utility>
 
 #include "../OpenGL.hpp"
-#include "Graphics/Shader/ShaderStage.hpp"
 #include "Diagnostics/Log.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
 #include "Utilities/FileSystem.hpp"
 
 namespace Ivy::G
@@ -92,7 +92,7 @@ void ShaderSource::Preprocess()
 void ShaderSource::PreprocessIncludes(
     const std::string& path, std::string& code, std::unordered_set<std::string>& includesProcessing)
 {
-    const std::string include = "#include \"";
+    const std::string_view include = "#include \"";
     auto pos = code.find(include);
 
     while (pos != std::string::npos)

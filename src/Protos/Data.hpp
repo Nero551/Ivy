@@ -11,8 +11,10 @@
 #include <iostream>
 #include <string>
 #include <string_view>
-namespace Ivy::Datalization
+namespace Protos::Datalization
 {
+
+using namespace Ivy;
 
 template <typename Derived> struct StructuredData
 {
@@ -126,4 +128,4 @@ template <typename Derived> struct StructuredData
     friend Derived;
 };
 
-} // namespace Ivy::Datalization
+} // namespace Protos::Datalization

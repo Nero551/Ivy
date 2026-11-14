@@ -10,6 +10,8 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Common/Random.hpp"
+#include "Math/Common/Trigonometry.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Renderer/Components.hpp"
 #include "Modules/Renderer/Nodes.hpp"
@@ -84,14 +86,21 @@ void Sandbox2D::Start()
     m_Engine.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
 
     AddSystem<Controller2D>();
-    // AddSystem<StressTester2D>();
+    AddSystem<StressTester2D>();
     // GetSystem<StressTester2D>().FourDimensionalProjection(4);
 
-    AddSystem<VectorFields2D>();
-    GetSystem<VectorFields2D>().Start();
+    // AddSystem<VectorFields2D>();
+    // GetSystem<VectorFields2D>().Start();
 
-    GetSystem<VectorFields2D>().PendulumModel();
+    // GetSystem<VectorFields2D>().PendulumModel();
     particleId = CreateSquare();
+    auto& plotter = GetSystem<StressTester2D>();
+
+    for (float theta = 0; theta < 360; theta += 0.5)
+    {
+        auto& point = plotter.Plot({M::Vector<2>::FromPolar({M::Rad(theta), M::DSin(2 * theta)})});
+        m_Engine.ECS.Query.GetComponent<CMP::Transform2D>(point).Scale = {0.01, 0.01};
+    }
 }
 
 struct Particle

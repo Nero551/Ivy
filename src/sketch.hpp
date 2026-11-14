@@ -6,24 +6,25 @@
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
-#include "Math/Vector/Vectors.hpp"
-#include "Protos/Data.hpp"
-#include "Reflect/Basic.hpp"
-#include "Reflect/ReflectedReference.hpp"
-#include "Reflect/Registry.hpp"
-#include "Reflect/Values.hpp"
-#include "nlohmann/json.hpp"
-#include "nlohmann/json_fwd.hpp"
+#include "Protos/MultiThreading.hpp"
+#include "Utilities/stl.hpp"
+#include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <concepts>
+#include <condition_variable>
 #include <cstdlib>
-#include <fstream>
+#include <functional>
 #include <iostream>
+#include <mutex>
 #include <ostream>
+#include <queue>
 #include <string>
-#include <string_view>
+#include <thread>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace Sketch
 {
@@ -306,7 +307,7 @@ struct Shader
 //TODO: i need to formally define convergence and divergence & limits (numerically ofc).
 //
 // TODO: remove window from graphics and make a new crate (Platform Handling / Window Management, whatever). \
-// it will handle input from mouse, keyboard, joystick, window management, basically what glfw does + some custom stuff (action mapper)
+// it will handle input from mouse, keyboard, joystick, wi        ndow management, basically what glfw does + some custom stuff (action mapper)
 //
 // TODO: automatic differentiation via dual numbers.
 //
@@ -316,26 +317,48 @@ static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
-struct PlayerData : Datalization::StructuredData<PlayerData>
-{
-    std::string Name = "Unknown";
-    unsigned int Age = 0;
-};
-
 inline void Test()
 {
-    REFLECT(PlayerData);
-    FIELD(PlayerData, Name);
-    FIELD(PlayerData, Age);
-
     using F = M::Function<float, float>;
     F f = [](float x) { return M::PI / 4.0f * (M::Pow(x, 3) / 3.0f - 4 * M::Pow(x, 2) + 16 * x); };
 
-    PlayerData p = PlayerData::Load("assets/test.json");
-    D::Log::Info(p.Name);
-    D::Log::Info(p.Age);
-    p.Age = 50;
-    p.Name = "Yuno";
-    p.Save("assets/test2.json");
+    auto start = std::chrono::high_resolution_clock::now();
+
+    int s = 0;
+    int e = 2000;
+    int counter = 0;
+    std::condition_variable cv;
+    std::mutex mutex;
+
+    using namespace Protos;
+
+    Parallel::Initialize(8);
+
+    stl::function<void(int, int)> op = [&mutex, &counter](int s, int e)
+    {
+        for (int i = s; i < e; ++i)
+        {
+            std::scoped_lock<std::mutex> lock{mutex};
+            ++counter;
+        }
+    };
+
+    while (true)
+    {
+        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
+        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
+        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
+        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
+
+        Parallel::ParallelFor(s, e, [](int j) { j++; });
+    }
+
+    Parallel::Pool.Wait();
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+    D::Log::Info(duration.count() / 1000000.0f);
+    D::Log::Info(counter);
 }
 } // namespace Sketch

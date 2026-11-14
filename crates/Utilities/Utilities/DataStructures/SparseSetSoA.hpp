@@ -244,11 +244,7 @@ struct SparseSetSoA
     {
         m_Dense.clear();
         m_Indices.clear();
-
-        for (DenseIndexType& index : m_Sparse)
-        {
-            index = InvalidDenseIndex;
-        }
+        m_Sparse.clear();
     }
 
     void ReserveDense(const DenseIndexType size)

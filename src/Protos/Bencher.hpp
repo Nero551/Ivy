@@ -1,9 +1,8 @@
-#include "ECS/.hpp"
 #include "ECS/Component.hpp"
-#include "ECS/ECS.hpp"
+#include "ECS/EntityComponentSystem.hpp"
 #include "tracy/Tracy.hpp"
 
-namespace Bencher
+namespace Protos::Bencher
 {
 using namespace Ivy;
 struct A : ECS::Component
@@ -25,7 +24,7 @@ struct G : ECS::Component
 };
 void BenchECS()
 {
-    C::EntityComponentSystem ecs;
+    ECS::EntityComponentSystem ecs;
     for (int i = 0; i < 10000000; ++i)
     {
         auto& e = ecs.CreateEntity();
@@ -52,4 +51,4 @@ void BenchECS()
         elapsed += 0.016;
     }
 }
-} // namespace Bencher
+} // namespace Protos::Bencher

@@ -101,8 +101,8 @@ struct CoordinateAxes3D : C::Scene
 
         zAxis.SetParent(GetRoot());
 
-        Grid3D grid = m_Engine.World.CreateScene<Grid3D>();
-        GetRoot().AttachChild(grid.GetRoot());
+        // Grid3D grid = m_Engine.World.CreateScene<Grid3D>();
+        // GetRoot().AttachChild(grid.GetRoot());
     }
 };
 } // namespace Ivy::Sandbox
