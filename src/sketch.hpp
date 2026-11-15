@@ -4,14 +4,18 @@
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
+#include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <concepts>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <ostream>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace Sketch
 {
@@ -390,12 +394,101 @@ static M::Set<float> R = [](float x) { return true; };
 //     }
 // };
 
+template <std::unsigned_integral T> struct DAG
+{
+    static constexpr T Invalid = std::numeric_limits<T>::max();
+    struct Node
+    {
+        std::vector<T> Predecessors;
+        std::vector<T> Successors;
+    };
+
+    void Ensure(T index)
+    {
+        if (index == Invalid)
+        {
+            return;
+        }
+
+        std::size_t oldSize = m_Nodes.size();
+        std::size_t newSize = static_cast<std::size_t>(index) + 1;
+
+        if (newSize <= oldSize)
+        {
+            return;
+        }
+
+        m_Nodes.resize(newSize);
+
+        for (std::size_t i = oldSize; i < newSize; ++i)
+        {
+            T node = static_cast<T>(i);
+            m_Sources.Push(node, node);
+        }
+    }
+
+    bool Exists(T node)
+    {
+        return node < m_Nodes.size();
+    }
+
+    void Attach(T pred, T suc)
+    {
+        if (!Exists(pred) || !Exists(suc))
+        {
+            return;
+        }
+        m_Nodes[pred].Successors.push_back(suc);
+        m_Nodes[suc].Predecessors.push_back(pred);
+        m_Sources.Erase(suc);
+    }
+
+    bool Detach(T pred, T suc)
+    {
+        if (!Exists(pred) || !Exists(suc))
+        {
+            return false;
+        }
+
+        Node& predNode = m_Nodes[pred];
+        Node& sucNode = m_Nodes[suc];
+
+        auto edge = std::ranges::find(predNode.Successors, suc);
+
+        if (edge == predNode.Successors.end())
+        {
+            return false;
+        }
+
+        std::erase(predNode.Successors, suc);
+        std::erase(sucNode.Predecessors, pred);
+
+        if (sucNode.Predecessors.empty())
+        {
+            m_Sources.Push(suc, suc);
+        }
+
+        return true;
+    }
+
+    std::vector<Node> m_Nodes;
+    U::SparseSetSoA<T> m_Sources;
+};
+
 inline void Test()
 {
 
-    // TODO: some sort of ordering mechanic for systems(which system runs first on each part of the loop).
+    // TODO: some sort of ordering mechanic for systems(which system runs first on each part of the loop). \
+    // system execution order. after that, figure out how to parallelize them via my new MT prototype. \
+    // if i can do that. i will be able to run each system(or set of systems) on a different thread. more speed.
+    //
+    // TODO: idea, all systems run on different threads, but option to run some systems together sequentially on 1 thread.
+    //
     //
     //TODO: download and setup bevy, i would like to know how they do things.
+    //
+    // TODO: i need a way to describe system dependencies, via graphs or chains or smth. \
+    //  directed acyclic graphs
     //
 
     // Eng eng{};

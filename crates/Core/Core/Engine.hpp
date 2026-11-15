@@ -8,14 +8,12 @@
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/TupleUtils.hpp"
-#include <array>
 #include <concepts>
 #include <format>
 #include <functional>
 #include <memory>
 #include <tuple>
 #include <utility>
-#include <vector>
 
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
@@ -61,7 +59,7 @@ struct Engine
     /** @brief Returns elapsed engine time in seconds. */
     double GetTime() const;
 
-    template <IsSystem T> T& GetSystems()
+    template <IsSystem T> T& GetSystems() const
     {
         auto system = m_Systems.Find<T>();
         if (system == m_Systems.end())
@@ -71,7 +69,7 @@ struct Engine
         return static_cast<T&>(**system);
     }
 
-    template <IsSystem... Args> std::tuple<Args&...> GetSystems() requires(sizeof...(Args) != 1)
+    template <IsSystem... Args> std::tuple<Args&...> GetSystems() const requires(sizeof...(Args) != 1)
     {
         return {GetSystems<Args>()...};
     }
@@ -92,10 +90,17 @@ struct Engine
         return {AddSystems<Args>()...};
     }
 
-    template <typename Tuple> decltype(auto) AddSystems() requires(U::IsTSpec<Tuple, std::tuple>)
+    template <typename Tuple> decltype(auto) AddPlugins() requires(U::IsTSpec<Tuple, std::tuple>)
     {
         return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
             [this]<IsSystem... Args>() { return AddSystems<Args...>(); });
+    }
+
+    template <typename... Tuples>
+    std::tuple<Tuples...> AddPlugins()
+        requires(sizeof...(Tuples) != 1 && (U::IsTSpec<Tuples, std::tuple> && ...))
+    {
+        return {AddPlugins<Tuples>()...};
     }
 
   private:

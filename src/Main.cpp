@@ -36,8 +36,8 @@ int main(const int argc, char* argv[])
         }
     }
 
-    // Sketch::Test();
-    // return 0;
+    Sketch::Test();
+    return 0;
 
     Ivy::G::Context::Initialize();
     Ivy::C::Engine engine{[](Ivy::C::Engine& engine)
@@ -58,7 +58,7 @@ int main(const int argc, char* argv[])
                 Ivy::Sandbox::StressTester3D, Ivy::Sandbox::Controller3D>;
 
             engine.World.SetRoot(Ivy::C::Node::Create(engine.ECS));
-            engine.AddSystems<Sandbox3D>();
+            engine.AddPlugins<Sandbox3D>();
             engine.AddSystems<Ivy::C::ResourceManager, Ivy::C::TransformSystem, Ivy::I::Input,
                 Ivy::R::LightingSystem, Ivy::R::Renderer, Ivy::Profiling>();
         }};
