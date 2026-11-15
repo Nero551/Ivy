@@ -1,27 +1,27 @@
 #pragma once
 
+#include "Core/System.hpp"
+#include "Core/SystemOwner.hpp"
+#include "Core/TimeHandler.hpp"
 #include "Diagnostics/Log.hpp"
-#include "Math/Common/Constants.hpp"
-#include "Math/Common/Exponentials.hpp"
+#include "ECS/EntityComponentSystem.hpp"
+#include "Graphics/Window.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
-#include "Protos/MultiThreading.hpp"
-#include "Utilities/stl.hpp"
-#include <algorithm>
+#include "Utilities/DataStructures/TypedVector.hpp"
+#include "Utilities/IsSpecialization.hpp"
 #include <array>
-#include <chrono>
 #include <cmath>
 #include <concepts>
-#include <condition_variable>
 #include <cstdlib>
+#include <format>
 #include <functional>
 #include <iostream>
-#include <mutex>
+#include <memory>
 #include <ostream>
-#include <queue>
 #include <string>
-#include <thread>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -317,48 +317,111 @@ static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
-inline void Test()
+enum class Execution : unsigned int
 {
-    using F = M::Function<float, float>;
-    F f = [](float x) { return M::PI / 4.0f * (M::Pow(x, 3) / 3.0f - 4 * M::Pow(x, 2) + 16 * x); };
+    Start,
+    BeginFrame,
+    FixedUpdate,
+    Update,
+    Render,
+    EndFrame,
+    Stop,
+    Count,
+};
 
-    auto start = std::chrono::high_resolution_clock::now();
+struct Sys
+{
+    virtual void Upd() {}
+};
 
-    int s = 0;
-    int e = 2000;
-    int counter = 0;
-    std::condition_variable cv;
-    std::mutex mutex;
+struct Eng
+{
 
-    using namespace Protos;
-
-    Parallel::Initialize(8);
-
-    stl::function<void(int, int)> op = [&mutex, &counter](int s, int e)
+    /** @brief Returns a registered module by type. */
+    template <typename T> T& GetSystem()
     {
-        for (int i = s; i < e; ++i)
+        auto system = m_Systems.Find<T>();
+        if (system == m_Systems.end())
         {
-            std::scoped_lock<std::mutex> lock{mutex};
-            ++counter;
+            D::Log::Error(std::format("System {} not found", typeid(T).name()));
         }
-    };
-
-    while (true)
-    {
-        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
-        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
-        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
-        // Parallel::Pool.Assign(Parallel::Task{op, s, e});
-
-        Parallel::ParallelFor(s, e, [](int j) { j++; });
+        return static_cast<T&>(**system);
     }
 
-    Parallel::Pool.Wait();
+    const U::TypedVector<std::unique_ptr<Sys>>& GetAllSystems() const
+    {
+        return m_Systems;
+    }
 
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    /** @brief Creates and registers a module. */
+    template <typename T> T& AddSystems()
+    {
+        m_Systems.Emplace<T>(std::make_unique<T>());
+        // for (int i = 0; i < static_cast<unsigned int>(Execution::Count); ++i)
+        // {
+        //     Add<T>(static_cast<Execution>(i));
+        // }
+        return static_cast<T&>(*m_Systems.Get<T>());
+    }
 
-    D::Log::Info(duration.count() / 1000000.0f);
-    D::Log::Info(counter);
+    template <typename... Args> std::tuple<Args&...> AddSystems() requires(sizeof...(Args) != 1)
+    {
+        return {AddSystems<Args>()...};
+    }
+
+    template <typename Tuple> decltype(auto) AddSystems() requires(U::IsTSpec<Tuple, std::tuple>)
+    {
+        return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
+            [this]<typename... Args>() { return AddSystems<Args...>(); });
+    }
+
+    using ExecutionOrder = std::vector<unsigned int>;
+
+    std::array<ExecutionOrder, static_cast<unsigned int>(Execution::Count)> ExecutionScheduler;
+
+    template <typename... Args> void Add(Execution execution)
+    {
+        (ExecutionScheduler[static_cast<unsigned int>(execution)].push_back(m_Systems.GetIndex<Args>()), ...);
+    }
+
+    /** @brief Registered engine modules. */
+    U::TypedVector<std::unique_ptr<Sys>> m_Systems;
+};
+
+struct SysA : Sys
+{
+    void Upd() override
+    {
+        D::Log::Info("A");
+    }
+};
+struct SysB : Sys
+{
+    void Upd() override
+    {
+        D::Log::Info("B");
+    }
+};
+
+inline void Test()
+{
+
+    //TODO: possibly remove modules entirely and represent them as a tuple of systems.
+    //TODO: i believe i can straight up remove services & modules. just keep systems inside Engine. \
+    // and remove systems from World.
+    // TODO: some sort of ordering mechanic for systems(which system runs first on each part of the loop).
+    //
+    //TODO: download and setup bevy, i would like to know how they do things.
+    //
+
+    Eng eng{};
+    eng.AddSystems<SysA>();
+    eng.AddSystems<SysB>();
+    eng.Add<SysB, SysA>(Execution::Update);
+
+    for (unsigned int index : eng.ExecutionScheduler[static_cast<unsigned int>(Execution::Update)])
+    {
+        eng.m_Systems[index]->Upd();
+    }
 }
 } // namespace Sketch

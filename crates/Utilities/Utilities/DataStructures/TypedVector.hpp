@@ -96,6 +96,15 @@ template <typename T, std::unsigned_integral TypeIdType = unsigned int> struct T
         return m_Data[index];
     }
 
+    template <typename... Args> TypeIdType GetIndex()
+    {
+        if (Contains<Args...>())
+        {
+            return GetTypeId<Args...>();
+        }
+        return InvalidTypeId;
+    }
+
     template <typename... Args> const T& Get() const
     {
         return m_Data[GetTypeId<Args...>()];

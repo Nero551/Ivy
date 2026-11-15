@@ -1,7 +1,7 @@
 #pragma once
+#include "Diagnostics/Log.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
-#include "Diagnostics/Log.hpp"
 #include "Utilities/ScopeGuard.hpp"
 #include <concepts>
 #include <functional>
@@ -9,8 +9,8 @@ namespace Ivy::U
 {
 template <typename... Args> struct Event
 {
+    using Subscription = unsigned long;
     using Callback = std::move_only_function<void(Args...)>;
-    using Subscription = GIndexPool<>::Handle;
 
     template <typename F>
     Subscription Subscribe(F&& callback)
@@ -20,8 +20,8 @@ template <typename... Args> struct Event
         {
             D::Log::Error("[Event] Attempted to subscribe while firing");
         }
-        Subscription sub = m_Subscriptions.Acquire();
-        m_Subscribers.Emplace(sub.Index, std::forward<F>(callback));
+        Subscription sub = m_NextSubscription++;
+        m_Subscribers.Emplace(sub, std::forward<F>(callback));
         return sub;
     }
 
@@ -32,15 +32,13 @@ template <typename... Args> struct Event
             D::Log::Error("[Event] Attempted to unsubscribe while firing");
         }
 
-        if (m_Subscriptions.IsAcquired(subscription))
-        {
-            m_Subscriptions.Release(subscription);
-            m_Subscribers.Erase(subscription.Index);
-        }
+        m_Subscribers.Erase(subscription);
     }
 
     void Fire(Args... args)
     {
+
+        //prevents the callback itself from running Fire().
         if (m_Firing)
         {
             D::Log::Error("[Event] Attempted to fire while firing");
@@ -56,8 +54,8 @@ template <typename... Args> struct Event
     }
 
   private:
-    U::SparseSetSoA<Callback, decltype(Subscription::Index)> m_Subscribers{};
-    U::GIndexPool<decltype(Subscription::Index), decltype(Subscription::Generation)> m_Subscriptions{};
+    U::SparseSetSoA<Callback, unsigned long> m_Subscribers{};
+    Subscription m_NextSubscription = 0;
     bool m_Firing = false;
 };
 } // namespace Ivy::U

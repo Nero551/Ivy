@@ -8,7 +8,7 @@
 #include <thread>
 #include <utility>
 #include <vector>
-namespace Protos::Parallel
+namespace Protos::MT
 {
 using namespace Ivy;
 
@@ -20,7 +20,7 @@ struct Task
     Task() = default;
     template <typename F, typename... Args>
     explicit Task(F&& op, Args&&... args)
-        : m_Op([op, ... args = std::forward<Args>(args)]() mutable { op(args...); })
+        : m_Op([op = std::forward<F>(op), ... args = std::forward<Args>(args)]() mutable { op(args...); })
     {
     }
 
@@ -35,19 +35,7 @@ struct Task
 
 struct ThreadPool
 {
-    unsigned int ThreadCount = 0;
     ThreadPool() = default;
-
-    void Initialize(unsigned int threadCount)
-    {
-        ThreadCount = threadCount;
-        m_Threads.resize(threadCount);
-        for (auto& thread : m_Threads)
-        {
-            thread = std::jthread([this] { Worker(); });
-        }
-    }
-
     ThreadPool(unsigned int threadCount)
     {
         Initialize(threadCount);
@@ -73,6 +61,23 @@ struct ThreadPool
 
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
+    ThreadPool(ThreadPool&&) noexcept = delete;
+    ThreadPool& operator=(ThreadPool&&) noexcept = delete;
+
+    unsigned int GetThreadCount() const
+    {
+        return m_ThreadCount;
+    }
+
+    void Initialize(unsigned int threadCount)
+    {
+        m_ThreadCount = threadCount;
+        m_Threads.resize(threadCount);
+        for (auto& thread : m_Threads)
+        {
+            thread = std::jthread([this] { Worker(); });
+        }
+    }
 
     void Assign(Task&& task)
     {
@@ -96,6 +101,7 @@ struct ThreadPool
     }
 
   private:
+    unsigned int m_ThreadCount = 0;
     std::vector<std::jthread> m_Threads;
     std::queue<Task> m_Tasks;
     std::mutex m_Mutex;
@@ -134,28 +140,37 @@ struct ThreadPool
     }
 };
 
-inline ThreadPool Pool{};
-
-void Initialize(unsigned int threadCount)
+struct TaskManager
 {
-    Pool.Initialize(threadCount);
-}
+    ThreadPool Pool{};
 
-template <typename F> void ParallelFor(int start, int end, F&& op)
-{
-    int chunk = (end - start) / Pool.ThreadCount;
-    for (int i = start; i < end; i += chunk)
+    void Initialize(unsigned int threadCount)
     {
-        unsigned int chunkStart = i;
-        unsigned int chunkEnd = std::min(i + chunk, end);
-
-        Pool.Assign(Task{[chunkStart, chunkEnd, &op]()
-            {
-                for (unsigned int j = chunkStart; j < chunkEnd; ++j)
-                {
-                    op(j);
-                }
-            }});
+        Pool.Initialize(threadCount);
     }
-}
-} // namespace Protos::Parallel
+
+    template <typename F> void For(int start, int end, F&& op, int chunk = 1024)
+    {
+        if (start >= end)
+        {
+            return;
+        }
+
+        for (int i = start; i < end; i += chunk)
+        {
+            const unsigned int chunkStart = i;
+            const unsigned int chunkEnd = std::min(i + chunk, end);
+
+            Pool.Assign(Task{[chunkStart, chunkEnd, op = std::forward<F>(op)]()
+                {
+                    for (unsigned int j = chunkStart; j < chunkEnd; ++j)
+                    {
+                        op(j);
+                    }
+                }});
+        }
+    }
+};
+
+inline TaskManager Parallel{};
+} // namespace Protos::MT

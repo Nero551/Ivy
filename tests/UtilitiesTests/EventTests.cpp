@@ -184,7 +184,7 @@ TEST(Event, UnsubscribeIsIdempotentOnStillValidId)
 TEST(Event, UnsubscribeOfNeverIssuedIdIsNoOp)
 {
     TestEvent ev;
-    EXPECT_NO_THROW(ev.Unsubscribe({999999, 5}));
+    EXPECT_NO_THROW(ev.Unsubscribe(999999));
 }
 
 TEST(Event, SubscribeAfterUnsubscribeWorks)

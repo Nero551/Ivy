@@ -180,7 +180,7 @@ BENCHMARK(BM_Event_Fire_NListeners_WithWork)->Arg(1)->Arg(4)->Arg(16)->Arg(64)->
 static void BM_Event_Unsubscribe_Noop(benchmark::State& state)
 {
     BasicEvent event;
-    BasicEvent::Subscription bogus = {999999, 200};
+    BasicEvent::Subscription bogus = 999999;
     for (auto _ : state)
     {
         event.Unsubscribe(bogus);

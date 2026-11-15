@@ -122,6 +122,11 @@ struct GIndexPool
         m_Generations.reserve(capacity);
     }
 
+    Handle Front() const
+    {
+        return {m_Acquired.front(), m_Generations.front()};
+    }
+
   private:
     std::vector<bool> m_Acquired{};
     std::vector<GenType> m_Generations{};

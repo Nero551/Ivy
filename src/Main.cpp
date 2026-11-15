@@ -1,11 +1,14 @@
 #include "Core/Engine.hpp"
+#include "Core/Services/ResourceManager/Resource.hpp"
 #include "Core/Services/ResourceManager/ResourceManager.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Systems/TransformSystem.hpp"
 #include "Graphics/Context.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
 #include "Modules/Input/Input.hpp"
 #include "Modules/Profiling/Profiling.hpp"
 #include "Modules/Renderer/Renderer.hpp"
+#include "Protos/MultiThreading.hpp"
 #include "Sandbox/Sandbox2D.hpp"
 #include "Sandbox/Sandbox3D.hpp"
 #include "sketch.hpp"
@@ -40,12 +43,8 @@ int main(const int argc, char* argv[])
             // engine.Window.SetSize(1920, 1200);
             // Ivy::G::Context::SwapInterval(0);
 
-            engine.AddService<Ivy::C::ResourceManager>();
-
-            engine.AddModule<Ivy::I::Input>();
-            engine.AddModule<Ivy::R::Renderer>();
-            engine.AddModule<Ivy::Profiling>();
-            engine.AddModule<Ivy::Sandbox::Sandbox2D>();
+            engine.AddServices<Ivy::C::ResourceManager>();
+            engine.AddModules<Ivy::I::Input, Ivy::R::Renderer, Ivy::Profiling, Ivy::Sandbox::Sandbox2D>();
 
             engine.World.SetRoot(Ivy::C::Node::Create(engine.ECS));
             engine.World.AddSystem<Ivy::C::TransformSystem>();

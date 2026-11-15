@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Service.hpp"
+#include "Core/SystemOwner.hpp"
 #include "Core/TimeHandler.hpp"
 #include "Core/World/World.hpp"
 #include "Diagnostics/Log.hpp"
@@ -7,10 +8,16 @@
 #include "Graphics/Window.hpp"
 #include "Module.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
+#include "Utilities/IsSpecialization.hpp"
+#include "Utilities/TupleUtils.hpp"
+#include <array>
 #include <concepts>
 #include <format>
 #include <functional>
 #include <memory>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
@@ -90,13 +97,24 @@ struct Engine
     }
 
     /** @brief Creates and registers a module. */
-    template <IsModule T> T& AddModule()
+    template <IsModule T> T& AddModules()
     {
         m_Modules.Emplace<T>(std::make_unique<T>(*this));
         return static_cast<T&>(*m_Modules.Get<T>());
     }
 
-    template <IsService T> T& AddService()
+    template <IsModule... Args> std::tuple<Args&...> AddModules() requires(sizeof...(Args) != 1)
+    {
+        return {AddModules<Args>()...};
+    }
+
+    template <typename Tuple> decltype(auto) AddModules() requires(U::IsTSpec<Tuple, std::tuple>)
+    {
+        return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
+            [this]<IsModule... Args>() { return AddModules<Args...>(); });
+    }
+
+    template <IsService T> T& AddServices()
     {
         if (m_Services.Contains<T>())
         {
@@ -109,10 +127,16 @@ struct Engine
         return static_cast<T&>(*m_Services.Get<T>());
     }
 
+    template <IsService... Args> std::tuple<Args&...> AddServices() requires(sizeof...(Args) != 1)
+    {
+        return {AddServices<Args>()...};
+    }
+
   private:
     /** @brief Registered engine modules. */
     U::TypedVector<std::unique_ptr<Module>> m_Modules;
     U::TypedVector<std::unique_ptr<Service>> m_Services;
+
     const std::function<void(Engine&)> m_Configuration;
     bool m_Running = false;
 };
