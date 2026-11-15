@@ -5,6 +5,7 @@
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
+#include "Utilities/DataStructures/TypedVector.hpp"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -13,8 +14,10 @@
 #include <iostream>
 #include <limits>
 #include <ostream>
+#include <span>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace Sketch
@@ -308,92 +311,6 @@ static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
-// enum class Execution : unsigned int
-// {
-//     Start,
-//     BeginFrame,
-//     FixedUpdate,
-//     Update,
-//     Render,
-//     EndFrame,
-//     Stop,
-//     Count,
-// };
-
-// struct Sys
-// {
-//     virtual void Upd() {}
-// };
-
-// struct Eng
-// {
-
-//     /** @brief Returns a registered system by type. */
-//     template <typename T> T& GetSystems()
-//     {
-//         auto system = m_Systems.Find<T>();
-//         if (system == m_Systems.end())
-//         {
-//             D::Log::Error(std::format("System {} not found", typeid(T).name()));
-//         }
-//         return static_cast<T&>(**system);
-//     }
-
-//     const U::TypedVector<std::unique_ptr<Sys>>& GetAllSystems() const
-//     {
-//         return m_Systems;
-//     }
-
-//     /** @brief Creates and registers a system. */
-//     template <typename T> T& AddSystems()
-//     {
-//         m_Systems.Emplace<T>(std::make_unique<T>());
-//         // for (int i = 0; i < static_cast<unsigned int>(Execution::Count); ++i)
-//         // {
-//         //     Add<T>(static_cast<Execution>(i));
-//         // }
-//         return static_cast<T&>(*m_Systems.Get<T>());
-//     }
-
-//     template <typename... Args> std::tuple<Args&...> AddSystems() requires(sizeof...(Args) != 1)
-//     {
-//         return {AddSystems<Args>()...};
-//     }
-
-//     template <typename Tuple> decltype(auto) AddSystems() requires(U::IsTSpec<Tuple, std::tuple>)
-//     {
-//         return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
-//             [this]<typename... Args>() { return AddSystems<Args...>(); });
-//     }
-
-//     using ExecutionOrder = std::vector<unsigned int>;
-
-//     std::array<ExecutionOrder, static_cast<unsigned int>(Execution::Count)> ExecutionScheduler;
-
-//     template <typename... Args> void Add(Execution execution)
-//     {
-//         (ExecutionScheduler[static_cast<unsigned int>(execution)].push_back(m_Systems.GetIndex<Args>()), ...);
-//     }
-
-//     /** @brief Registered engine systems. */
-//     U::TypedVector<std::unique_ptr<Sys>> m_Systems;
-// };
-
-// struct SysA : Sys
-// {
-//     void Upd() override
-//     {
-//         D::Log::Info("A");
-//     }
-// };
-// struct SysB : Sys
-// {
-//     void Upd() override
-//     {
-//         D::Log::Info("B");
-//     }
-// };
-
 template <std::unsigned_integral T> struct DAG
 {
     static constexpr T Invalid = std::numeric_limits<T>::max();
@@ -427,7 +344,7 @@ template <std::unsigned_integral T> struct DAG
         }
     }
 
-    bool Exists(T node)
+    bool Exists(T node) const
     {
         return node < m_Nodes.size();
     }
@@ -470,9 +387,131 @@ template <std::unsigned_integral T> struct DAG
 
         return true;
     }
+    template <typename F> void ForEachDescendant(T node, F&& action) const requires std::invocable<F, T>
+    {
+        if (!Exists(node))
+        {
+            return;
+        }
+
+        std::vector<bool> visited(m_Nodes.size(), false);
+
+        auto Traverse = [&](auto&& self, T current) -> void
+        {
+            for (T child : m_Nodes[current].Successors)
+            {
+                if (visited[child])
+                {
+                    continue;
+                }
+
+                visited[child] = true;
+                action(child);
+                self(self, child);
+            }
+        };
+
+        Traverse(Traverse, node);
+    }
+
+    std::span<const T> ViewSources() const
+    {
+        return m_Sources.Data();
+    }
 
     std::vector<Node> m_Nodes;
     U::SparseSetSoA<T> m_Sources;
+};
+
+enum class Execution : unsigned int
+{
+    Start,
+    BeginFrame,
+    FixedUpdate,
+    Update,
+    Render,
+    EndFrame,
+    Stop,
+    Count,
+};
+
+struct Sys
+{
+    virtual void Upd() {}
+};
+
+struct Eng
+{
+
+    /** @brief Returns a registered system by type. */
+    template <typename T> T& GetSystems()
+    {
+        auto system = m_Systems.Find<T>();
+        if (system == m_Systems.end())
+        {
+            D::Log::Error(std::format("System {} not found", typeid(T).name()));
+        }
+        return static_cast<T&>(**system);
+    }
+
+    const U::TypedVector<std::unique_ptr<Sys>>& GetAllSystems() const
+    {
+        return m_Systems;
+    }
+
+    /** @brief Creates and registers a system. */
+    template <typename T> T& AddSystems()
+    {
+        m_Systems.Emplace<T>(std::make_unique<T>());
+        for (DAG<unsigned int>& execution : ExecutionScheduler)
+        {
+            execution.Ensure(m_Systems.GetIndex<T>());
+        }
+        return static_cast<T&>(*m_Systems.Get<T>());
+    }
+
+    template <typename... Args> std::tuple<Args&...> AddSystems() requires(sizeof...(Args) != 1)
+    {
+        return {AddSystems<Args>()...};
+    }
+
+    template <typename Tuple> decltype(auto) AddSystems() requires(U::IsTSpec<Tuple, std::tuple>)
+    {
+        return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
+            [this]<typename... Args>() { return AddSystems<Args...>(); });
+    }
+
+    std::array<DAG<unsigned int>, static_cast<unsigned int>(Execution::Count)> ExecutionScheduler;
+
+    template <typename First, typename Second, typename... Args> void Chain(Execution execution)
+    {
+        auto& graph = ExecutionScheduler[static_cast<unsigned int>(execution)];
+
+        graph.Attach(m_Systems.GetIndex<First>(), m_Systems.GetIndex<Second>());
+
+        if constexpr (sizeof...(Args) > 0)
+        {
+            Chain<Second, Args...>(execution);
+        }
+    }
+
+    /** @brief Registered engine systems. */
+    U::TypedVector<std::unique_ptr<Sys>> m_Systems;
+};
+
+struct SysA : Sys
+{
+    void Upd() override
+    {
+        D::Log::Info("A");
+    }
+};
+struct SysB : Sys
+{
+    void Upd() override
+    {
+        D::Log::Info("B");
+    }
 };
 
 inline void Test()
@@ -489,16 +528,19 @@ inline void Test()
     //
     // TODO: i need a way to describe system dependencies, via graphs or chains or smth. \
     //  directed acyclic graphs
-    //
+    //    //
 
-    // Eng eng{};
-    // eng.AddSystems<SysA>();
-    // eng.AddSystems<SysB>();
-    // eng.Add<SysB, SysA>(Execution::Update);
+    Eng eng{};
+    eng.AddSystems<SysA>();
+    eng.AddSystems<SysB>();
+    eng.Chain<SysA, SysB>(Execution::Update);
 
-    // for (unsigned int index : eng.ExecutionScheduler[static_cast<unsigned int>(Execution::Update)])
-    // {
-    //     eng.m_Systems[index]->Upd();
-    // }
+    auto& graph = eng.ExecutionScheduler[static_cast<unsigned int>(Execution::Update)];
+
+    for (unsigned int sourceIndex : graph.ViewSources())
+    {
+        eng.m_Systems[sourceIndex]->Upd();
+        graph.ForEachDescendant(sourceIndex, [&eng](unsigned int index) { eng.m_Systems[index]->Upd(); });
+    }
 }
 } // namespace Sketch
