@@ -1,5 +1,6 @@
 #include "Engine.hpp"
 
+#include "Core/ExecutionOrder.hpp"
 #include "Core/System.hpp"
 #include "Diagnostics/Profiling.hpp"
 #include "Graphics/Context.hpp"
@@ -48,10 +49,11 @@ void Engine::Start()
     IVY_PROFILE_ZONE("Start");
     IVY_PROFILE_GPU_ZONE("Start");
 
-    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
+    auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(Execution::Start)];
+    for (unsigned int sourceIndex : graph.ViewSources())
     {
-        System* system = m_Systems[static_cast<unsigned int>(i)].get();
-        system->Start();
+        m_Systems[sourceIndex]->Start();
+        graph.ForEachDescendant(sourceIndex, [this](unsigned int index) { m_Systems[index]->Start(); });
     }
 }
 
@@ -63,10 +65,12 @@ void Engine::BeginFrame()
     TimeHandler.CalculateTime(G::Context::GetTime());
     Window.PollEvents();
 
-    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
+    auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(Execution::BeginFrame)];
+    for (unsigned int sourceIndex : graph.ViewSources())
     {
-        System* system = m_Systems[static_cast<unsigned int>(i)].get();
-        system->BeginFrame(TimeHandler.GetDelta());
+        m_Systems[sourceIndex]->BeginFrame(TimeHandler.GetDelta());
+        graph.ForEachDescendant(sourceIndex,
+            [this](unsigned int index) { m_Systems[index]->BeginFrame(TimeHandler.GetDelta()); });
     }
 }
 
@@ -75,10 +79,12 @@ void Engine::FixedUpdate()
     IVY_PROFILE_ZONE("Fixed Update");
     IVY_PROFILE_GPU_ZONE("Fixed Update");
 
-    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
+    auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(Execution::FixedUpdate)];
+    for (unsigned int sourceIndex : graph.ViewSources())
     {
-        System* system = m_Systems[static_cast<unsigned int>(i)].get();
-        system->FixedUpdate(TimeHandler.GetFixedDelta());
+        m_Systems[sourceIndex]->FixedUpdate(TimeHandler.GetFixedDelta());
+        graph.ForEachDescendant(sourceIndex,
+            [this](unsigned int index) { m_Systems[index]->FixedUpdate(TimeHandler.GetFixedDelta()); });
     }
 }
 
@@ -87,10 +93,12 @@ void Engine::Update()
     IVY_PROFILE_ZONE("Update");
     IVY_PROFILE_GPU_ZONE("Update");
 
-    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
+    auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(Execution::Update)];
+    for (unsigned int sourceIndex : graph.ViewSources())
     {
-        System* system = m_Systems[static_cast<unsigned int>(i)].get();
-        system->Update(TimeHandler.GetDelta());
+        m_Systems[sourceIndex]->Update(TimeHandler.GetDelta());
+        graph.ForEachDescendant(
+            sourceIndex, [this](unsigned int index) { m_Systems[index]->Update(TimeHandler.GetDelta()); });
     }
 }
 
@@ -99,10 +107,11 @@ void Engine::Render()
     IVY_PROFILE_ZONE("Render");
     IVY_PROFILE_GPU_ZONE("Render");
 
-    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
+    auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(Execution::Render)];
+    for (unsigned int sourceIndex : graph.ViewSources())
     {
-        System* system = m_Systems[static_cast<unsigned int>(i)].get();
-        system->Render();
+        m_Systems[sourceIndex]->Render();
+        graph.ForEachDescendant(sourceIndex, [this](unsigned int index) { m_Systems[index]->Render(); });
     }
 }
 
@@ -112,10 +121,12 @@ void Engine::EndFrame()
     IVY_PROFILE_GPU_ZONE("End Frame");
 
     Window.SwapBuffers();
-    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
+    auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(Execution::EndFrame)];
+    for (unsigned int sourceIndex : graph.ViewSources())
     {
-        System* system = m_Systems[static_cast<unsigned int>(i)].get();
-        system->EndFrame(TimeHandler.GetDelta());
+        m_Systems[sourceIndex]->EndFrame(TimeHandler.GetDelta());
+        graph.ForEachDescendant(
+            sourceIndex, [this](unsigned int index) { m_Systems[index]->EndFrame(TimeHandler.GetDelta()); });
     }
 
     IVY_PROFILE_FRAME_MARK;
@@ -127,10 +138,11 @@ void Engine::Stop()
     IVY_PROFILE_ZONE("Stop");
     IVY_PROFILE_GPU_ZONE("Stop");
 
-    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
+    auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(Execution::Stop)];
+    for (unsigned int sourceIndex : graph.ViewSources())
     {
-        System* system = m_Systems[static_cast<unsigned int>(i)].get();
-        system->Stop();
+        m_Systems[sourceIndex]->Stop();
+        graph.ForEachDescendant(sourceIndex, [this](unsigned int index) { m_Systems[index]->Stop(); });
     }
 
     Window.Delete();

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/ExecutionOrder.hpp"
 #include "Core/System.hpp"
 #include "Core/TimeHandler.hpp"
 #include "Core/World/World.hpp"
@@ -8,6 +9,7 @@
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/TupleUtils.hpp"
+#include <array>
 #include <concepts>
 #include <format>
 #include <functional>
@@ -82,6 +84,10 @@ struct Engine
     template <IsSystem T> T& AddSystems()
     {
         m_Systems.Emplace<T>(std::make_unique<T>(*this));
+        for (auto& execution : m_ExecutionScheduler)
+        {
+            execution.Ensure(m_Systems.GetIndex<T>());
+        }
         return static_cast<T&>(*m_Systems.Get<T>());
     }
 
@@ -103,7 +109,21 @@ struct Engine
         return {AddPlugins<Tuples>()...};
     }
 
+    template <typename First, typename Second, typename... Args> void Chain(Execution execution)
+    {
+        auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(execution)];
+
+        graph.Attach(m_Systems.GetIndex<First>(), m_Systems.GetIndex<Second>());
+
+        if constexpr (sizeof...(Args) > 0)
+        {
+            Chain<Second, Args...>(execution);
+        }
+    }
+
   private:
+    std::array<ExecutionOrder<unsigned int>, static_cast<unsigned int>(Execution::Count)>
+        m_ExecutionScheduler;
     U::TypedVector<std::unique_ptr<System>> m_Systems;
     const std::function<void(Engine&)> m_Configuration;
     bool m_Running = false;

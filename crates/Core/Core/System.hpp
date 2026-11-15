@@ -6,10 +6,11 @@ struct Engine;
 
 struct System
 {
-    virtual ~System() = default;
 
     System(Engine& engine) : m_Engine(engine) {}
+    virtual ~System() = default;
 
+  protected:
     virtual void Start() {}
 
     virtual void Update(double dt) {}
@@ -24,7 +25,7 @@ struct System
 
     virtual void EndFrame(double dt) {}
 
-  protected:
     Engine& m_Engine;
+    friend struct Engine;
 };
 } // namespace Ivy::C

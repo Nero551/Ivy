@@ -1,4 +1,5 @@
 #include "Core/Engine.hpp"
+#include "Core/ExecutionOrder.hpp"
 #include "Core/Resource.hpp"
 #include "Core/ResourceManager.hpp"
 #include "Core/World/Nodes.hpp"
@@ -36,8 +37,8 @@ int main(const int argc, char* argv[])
         }
     }
 
-    Sketch::Test();
-    return 0;
+    // Sketch::Test();
+    // return 0;
 
     Ivy::G::Context::Initialize();
     Ivy::C::Engine engine{[](Ivy::C::Engine& engine)
@@ -51,10 +52,10 @@ int main(const int argc, char* argv[])
             // engine.Window.SetSize(1920, 1200);
             // Ivy::G::Context::SwapInterval(0);
 
-            using Sandbox2D = std::tuple<Ivy::Sandbox::VectorFields2D, Ivy::Sandbox::Sandbox2D,
+            using Sandbox2D = std::tuple<Ivy::Sandbox::Sandbox2D, Ivy::Sandbox::VectorFields2D,
                 Ivy::Sandbox::StressTester2D, Ivy::Sandbox::Controller2D>;
 
-            using Sandbox3D = std::tuple<Ivy::Sandbox::VectorFields3D, Ivy::Sandbox::Sandbox3D,
+            using Sandbox3D = std::tuple<Ivy::Sandbox::Sandbox3D, Ivy::Sandbox::VectorFields3D,
                 Ivy::Sandbox::StressTester3D, Ivy::Sandbox::Controller3D>;
 
             engine.World.SetRoot(Ivy::C::Node::Create(engine.ECS));
