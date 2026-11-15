@@ -6,9 +6,9 @@
 #include "Graphics/InputEnums/Key.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/ProjectionMode.hpp"
+#include "Systems/Input/Input.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/ProjectionMode.hpp"
 #include <algorithm>
 
 namespace Ivy::Sandbox
@@ -19,13 +19,13 @@ struct Controller2D : C::System
 
     void Update(double dt) override
     {
-        if (m_Engine.GetModule<I::Input>().IsKeyPressed(G::Key::T))
+        if (m_Engine.GetSystems<I::Input>().IsKeyPressed(G::Key::T))
         {
             D::Log::Info(m_Engine.ECS.EntityAmount());
         }
 
         auto& query = m_Engine.ECS.Query;
-        auto& input = m_Engine.GetModule<I::Input>();
+        auto& input = m_Engine.GetSystems<I::Input>();
         auto& camera = m_Engine.World.GetCamera();
 
         if (!input.IsKeyHeld(G::Key::LeftShift))

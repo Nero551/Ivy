@@ -1,21 +1,21 @@
 #pragma once
 
-#include "Core/Service.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
+#include "Core/Resource.hpp"
+#include "Core/System.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <concepts>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 namespace Ivy::C
 {
 
 /** @brief Manages the lifetime, storage, and retrieval of resources. */
-struct ResourceManager : Service
+struct ResourceManager : System
 {
+    using System::System;
     /**
      * @brief Loads a resource or returns an already loaded resource with the same type and name.
      * If the resource already exists but the type doesn't match it will error.

@@ -9,8 +9,7 @@
 
 namespace Ivy::R
 {
-struct Renderer3DSystem;
-struct Renderer2DSystem;
+struct Renderer;
 } // namespace Ivy::R
 namespace Ivy::C
 {
@@ -56,7 +55,7 @@ struct Transform2D : ECS::Component
     U::Track<float> m_GlobalRotation = 0;
     U::Track<M::Vector<2>> m_GlobalScale = M::Vector<2>::One();
     friend struct C::TransformSystem;
-    friend struct R::Renderer2DSystem;
+    friend struct R::Renderer;
 };
 
 struct Transform3D : ECS::Component
@@ -103,6 +102,6 @@ struct Transform3D : ECS::Component
     U::Track<M::Quaternion<>> m_GlobalRotation = M::Quaternion<>::Identity();
     U::Track<M::Vector<3>> m_GlobalScale = M::Vector<3>::One();
     friend struct C::TransformSystem;
-    friend struct R::Renderer3DSystem;
+    friend struct R::Renderer;
 };
 } // namespace Ivy::CMP

@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Services/ResourceManager/Resource.hpp"
+#include "Core/Resource.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/Buffers/BufferUsage.hpp"
 #include "Graphics/Buffers/VertexArray/VertexArray.hpp"

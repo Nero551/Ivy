@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/Services/ResourceManager/Resource.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/Resource.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
@@ -16,8 +16,8 @@
 #include "Math/Equations/ODE.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/Nodes.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/Nodes.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include <array>
 #include <cmath>
@@ -32,7 +32,7 @@ struct VectorFields3D : C::System
 
     void Start() override
     {
-        auto& resources = m_Engine.GetService<C::ResourceManager>();
+        auto& resources = m_Engine.GetSystems<C::ResourceManager>();
         m_Mesh = &resources.Load(G::Primitives::CreateArrow3D("vectorArrow3D"));
 
         auto& vertSource = resources.Load<G::ShaderSource>(

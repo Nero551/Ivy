@@ -1,12 +1,10 @@
 #pragma once
-#include "Core/Service.hpp"
-#include "Core/SystemOwner.hpp"
+#include "Core/System.hpp"
 #include "Core/TimeHandler.hpp"
 #include "Core/World/World.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityComponentSystem.hpp"
 #include "Graphics/Window.hpp"
-#include "Module.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/TupleUtils.hpp"
@@ -23,11 +21,9 @@
 namespace Ivy::C
 {
 template <typename T>
-concept IsModule = std::derived_from<T, Module>;
-template <typename T>
-concept IsService = std::derived_from<T, Service>;
+concept IsSystem = std::derived_from<T, C::System>;
 
-/** @brief Main Ivy engine and game loop. Manages the window, world, modules, ECS, and frame lifecycle. */
+/** @brief Main Ivy engine and game loop. Manages the window, world, systems, ECS, and frame lifecycle. */
 struct Engine
 {
     G::Window Window{};
@@ -65,78 +61,45 @@ struct Engine
     /** @brief Returns elapsed engine time in seconds. */
     double GetTime() const;
 
-    /** @brief Returns a registered module by type. */
-    template <IsModule T> T& GetModule()
+    template <IsSystem T> T& GetSystems()
     {
-        auto module = m_Modules.Find<T>();
-        if (module == m_Modules.end())
+        auto system = m_Systems.Find<T>();
+        if (system == m_Systems.end())
         {
-            D::Log::Error(std::format("Module {} not found", typeid(T).name()));
+            D::Log::Error(std::format("System {} not found", typeid(T).name()));
         }
-        return static_cast<T&>(**module);
+        return static_cast<T&>(**system);
     }
 
-    template <IsService T> T& GetService()
+    template <IsSystem... Args> std::tuple<Args&...> GetSystems() requires(sizeof...(Args) != 1)
     {
-        auto service = m_Services.Find<T>();
-        if (service == m_Services.end())
-        {
-            D::Log::Error(std::format("Service Not Found: {}", typeid(T).name()));
-        }
-        return static_cast<T&>(**service);
+        return {GetSystems<Args>()...};
     }
 
-    const U::TypedVector<std::unique_ptr<Module>>& GetAllModules() const
+    const U::TypedVector<std::unique_ptr<System>>& GetAllSystems() const
     {
-        return m_Modules;
+        return m_Systems;
     }
 
-    const U::TypedVector<std::unique_ptr<Service>>& GetAllServices() const
+    template <IsSystem T> T& AddSystems()
     {
-        return m_Services;
+        m_Systems.Emplace<T>(std::make_unique<T>(*this));
+        return static_cast<T&>(*m_Systems.Get<T>());
     }
 
-    /** @brief Creates and registers a module. */
-    template <IsModule T> T& AddModules()
+    template <IsSystem... Args> std::tuple<Args&...> AddSystems() requires(sizeof...(Args) != 1)
     {
-        m_Modules.Emplace<T>(std::make_unique<T>(*this));
-        return static_cast<T&>(*m_Modules.Get<T>());
+        return {AddSystems<Args>()...};
     }
 
-    template <IsModule... Args> std::tuple<Args&...> AddModules() requires(sizeof...(Args) != 1)
-    {
-        return {AddModules<Args>()...};
-    }
-
-    template <typename Tuple> decltype(auto) AddModules() requires(U::IsTSpec<Tuple, std::tuple>)
+    template <typename Tuple> decltype(auto) AddSystems() requires(U::IsTSpec<Tuple, std::tuple>)
     {
         return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
-            [this]<IsModule... Args>() { return AddModules<Args...>(); });
-    }
-
-    template <IsService T> T& AddServices()
-    {
-        if (m_Services.Contains<T>())
-        {
-            D::Log::Error(std::format(" Service {} Already Added", typeid(T).name()));
-            return static_cast<T&>(*m_Services.At<T>());
-        }
-
-        m_Services.Emplace<T>(std::make_unique<T>());
-
-        return static_cast<T&>(*m_Services.Get<T>());
-    }
-
-    template <IsService... Args> std::tuple<Args&...> AddServices() requires(sizeof...(Args) != 1)
-    {
-        return {AddServices<Args>()...};
+            [this]<IsSystem... Args>() { return AddSystems<Args...>(); });
     }
 
   private:
-    /** @brief Registered engine modules. */
-    U::TypedVector<std::unique_ptr<Module>> m_Modules;
-    U::TypedVector<std::unique_ptr<Service>> m_Services;
-
+    U::TypedVector<std::unique_ptr<System>> m_Systems;
     const std::function<void(Engine&)> m_Configuration;
     bool m_Running = false;
 };

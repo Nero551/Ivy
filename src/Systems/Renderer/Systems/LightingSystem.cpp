@@ -2,8 +2,7 @@
 
 #include "../Components.hpp"
 #include "Core/Engine.hpp"
-#include "Core/Service.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include <cstddef>
@@ -14,7 +13,7 @@ using C::ResourceManager;
 
 void LightingSystem::Start()
 {
-    auto& resources = m_Engine.GetService<ResourceManager>();
+    auto& resources = m_Engine.GetSystems<ResourceManager>();
 
     LightingBuffer = &resources.Load<G::Uniformbuffer>("[Graphics] Lighting Buffer")();
     LightingBuffer->Binding = 1;

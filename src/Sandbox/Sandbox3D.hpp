@@ -1,10 +1,10 @@
 #pragma once
-#include "Core/Module.hpp"
+#include "Core/System.hpp"
 namespace Ivy::Sandbox
 {
-struct Sandbox3D : C::Module
+struct Sandbox3D : C::System
 {
-    using Module::Module;
+    using C::System::System;
     void Start() override;
     void FixedUpdate(double dt) override;
 };

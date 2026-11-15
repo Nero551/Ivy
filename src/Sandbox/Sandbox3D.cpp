@@ -2,12 +2,12 @@
 #include "Core/World/Components.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "Graphics/InputEnums/Key.hpp"
-#include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Nodes.hpp"
 #include "Sandbox/Scenes/CoordinateAxes3D.hpp"
 #include "Sandbox/Systems/Controller3D.hpp"
 #include "Sandbox/Systems/StressTester3D.hpp"
 #include "Sandbox/Systems/VectorFields3D.hpp"
+#include "Systems/Input/Input.hpp"
+#include "Systems/Renderer/Nodes.hpp"
 
 namespace Ivy::Sandbox
 {
@@ -15,7 +15,7 @@ namespace Ivy::Sandbox
 //TODO: quick flicker happens at the start of the run, its input mouse rapidly changing when changing MouseMode.
 void Sandbox3D::Start()
 {
-    m_Engine.GetModule<I::Input>().SetMouseMode(G::CursorMode::Disabled);
+    m_Engine.GetSystems<I::Input>().SetMouseMode(G::CursorMode::Disabled);
 
     auto& query = m_Engine.ECS.Query;
     auto& camera = R::Camera3D::Create(m_Engine.ECS);
@@ -26,15 +26,10 @@ void Sandbox3D::Start()
     CoordinateAxes3D coordinateAxes = m_Engine.World.CreateScene<CoordinateAxes3D>();
     m_Engine.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
 
-    AddSystem<Controller3D>();
-    AddSystem<VectorFields3D>();
-    GetSystem<VectorFields3D>().Start();
-    // AddSystem<StressTester3D>();
+    // m_Engine.GetSystems<StressTester3D>().Spawn(4, 3);
+    m_Engine.GetSystems<VectorFields3D>().LorenzSystem();
 
-    // GetSystem<StressTester3D>().Spawn(4, 3);
-    GetSystem<VectorFields3D>().LorenzSystem();
-
-    // auto& resources = m_Engine.GetService<C::ResourceManager>();
+    // auto& resources = m_Engine.GetSystems<C::ResourceManager>();
     // auto& square = R::MeshInstance3D::Create(m_Engine.ECS);
     // query.GetComponent<CMP::Mesh>(square).Mesh =
     //     &resources.Load(G::Primitives::CreateQuad("TerrainQuad", 20, 20));
@@ -59,12 +54,11 @@ void Sandbox3D::Start()
 
 void Sandbox3D::FixedUpdate(double dt)
 {
-    if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::Escape))
+    if (m_Engine.GetSystems<I::Input>().IsKeyHeld(G::Key::Escape))
     {
         m_Engine.Shutdown();
     }
 
-    GetSystem<Controller3D>().Update(dt);
-    // GetSystem<StressTester3D>().Update(dt);
+    // m_Engine.GetSystems<StressTester3D>().Update(dt);
 }
 } // namespace Ivy::Sandbox

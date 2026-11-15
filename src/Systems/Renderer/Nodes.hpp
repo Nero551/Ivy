@@ -2,8 +2,8 @@
 #include "Core/World/Nodes.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityComponentSystem.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/ProjectionMode.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/ProjectionMode.hpp"
 namespace Ivy::R
 {
 struct Camera2D

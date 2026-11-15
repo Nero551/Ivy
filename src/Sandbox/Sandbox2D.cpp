@@ -1,5 +1,5 @@
 #include "Sandbox/Sandbox2D.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityID.hpp"
@@ -12,13 +12,13 @@
 #include "Math/Common/Random.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/Nodes.hpp"
 #include "Sandbox/Scenes/CoordinateAxes2D.hpp"
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields2D.hpp"
+#include "Systems/Input/Input.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/Nodes.hpp"
 #include <cstdlib>
 
 namespace Ivy::Sandbox
@@ -27,7 +27,7 @@ namespace Ivy::Sandbox
 ECS::EntityID Sandbox2D::CreateCircle()
 {
     auto& query = m_Engine.ECS.Query;
-    auto& resources = m_Engine.GetService<C::ResourceManager>();
+    auto& resources = m_Engine.GetSystems<C::ResourceManager>();
     auto& circle = R::MeshInstance2D::Create(m_Engine.ECS);
     query.GetComponent<CMP::Mesh>(circle).Mesh = &resources.Load(G::Primitives::CreateCircle("ball"));
 
@@ -52,7 +52,7 @@ ECS::EntityID Sandbox2D::CreateCircle()
 ECS::EntityID Sandbox2D::CreateSquare()
 {
     auto& query = m_Engine.ECS.Query;
-    auto& resources = m_Engine.GetService<C::ResourceManager>();
+    auto& resources = m_Engine.GetSystems<C::ResourceManager>();
     auto& square = R::MeshInstance2D::Create(m_Engine.ECS);
     query.GetComponent<CMP::Mesh>(square).Mesh = &resources.Load(G::Primitives::CreateQuad("cube"));
 
@@ -85,16 +85,10 @@ void Sandbox2D::Start()
     CoordinateAxes2D coordinateAxes = m_Engine.World.CreateScene<CoordinateAxes2D>();
     m_Engine.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
 
-    AddSystem<Controller2D>();
-    AddSystem<StressTester2D>();
-    // GetSystem<StressTester2D>().FourDimensionalProjection(4);
-
-    // AddSystem<VectorFields2D>();
-    // GetSystem<VectorFields2D>().Start();
-
-    // GetSystem<VectorFields2D>().PendulumModel();
+    // m_Engine.GetSystems<StressTester2D>().FourDimensionalProjection(4);
+    m_Engine.GetSystems<VectorFields2D>().PendulumModel();
     particleId = CreateSquare();
-    auto& plotter = GetSystem<StressTester2D>();
+    auto& plotter = m_Engine.GetSystems<StressTester2D>();
 
     for (float theta = 0; theta < 360; theta += 0.5)
     {
@@ -118,13 +112,12 @@ static float speed = 15;
 
 void Sandbox2D::FixedUpdate(double fdt)
 {
-    if (m_Engine.GetModule<I::Input>().IsKeyHeld(G::Key::Escape))
+    if (m_Engine.GetSystems<I::Input>().IsKeyHeld(G::Key::Escape))
     {
         m_Engine.Shutdown();
     }
-    GetSystem<Controller2D>().Update(fdt);
 
-    // auto& plotter = GetSystem<StressTester2D>();
+    // auto& plotter = m_Engine.GetSystems<StressTester2D>();
     // plotter.Plot({p.Position.x, p.Force.x}, {0, 0, 1, 1});
     // plotter.Plot({p.Force.x, p.Position.x}, {0, 1, 1, 1});
 
@@ -144,7 +137,7 @@ void Sandbox2D::FixedUpdate(double fdt)
     // plotter.Plot({static_cast<float>(m_Engine.GetTime()), p.Acceleration.x}, {1, 0, 0, 1});
 
     auto& query = m_Engine.ECS.Query;
-    auto& input = m_Engine.GetModule<I::Input>();
+    auto& input = m_Engine.GetSystems<I::Input>();
     auto& transform = query.GetComponent<CMP::Transform2D>(m_Engine.ECS.GetEntity(particleId));
 
     p.Position.y = 0.5;
@@ -183,7 +176,7 @@ void Sandbox2D::PlayWithBall(double fdt)
     constexpr float b = 0.5;
     constexpr float restitution = 0.8;
     auto& query = m_Engine.ECS.Query;
-    auto& input = m_Engine.GetModule<I::Input>();
+    auto& input = m_Engine.GetSystems<I::Input>();
     auto& transform = query.GetComponent<CMP::Transform2D>(m_Engine.ECS.GetEntity(particleId));
 
     M::Vector<2> f{0, 0};

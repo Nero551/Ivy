@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Module.hpp"
+#include "Core/System.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/InputEnums/MouseButton.hpp"
@@ -9,9 +9,9 @@
 
 namespace Ivy::I
 {
-struct Input : C::Module
+struct Input : C::System
 {
-    using C::Module::Module;
+    using C::System::System;
     bool IsKeyHeld(G::Key key);
 
     bool IsKeyPressed(G::Key key);

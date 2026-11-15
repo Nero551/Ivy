@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/System.hpp"
 #include "Core/World/Components.hpp"
 #include "Diagnostics/Log.hpp"
@@ -18,9 +18,9 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Coordinates/HyperSpherical.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Input/Input.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/Nodes.hpp"
+#include "Systems/Input/Input.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/Nodes.hpp"
 #include <vector>
 
 namespace Ivy::Sandbox
@@ -31,7 +31,7 @@ struct StressTester2D : C::System
 
     void Update(double dt) override
     {
-        auto& input = m_Engine.GetModule<I::Input>();
+        auto& input = m_Engine.GetSystems<I::Input>();
         auto& query = m_Engine.ECS.Query;
 
         if (input.IsKeyHeld(G::Key::Left))
@@ -109,7 +109,7 @@ struct StressTester2D : C::System
 
     ECS::Entity& CreatePoint()
     {
-        auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+        auto& resourceManager = m_Engine.GetSystems<C::ResourceManager>();
         auto& query = m_Engine.ECS.Query;
 
         if (!resourceManager.Exists<G::Mesh>("stressPoint"))

@@ -1,30 +1,17 @@
 #pragma once
 
-#include "Core/System.hpp"
-#include "Core/SystemOwner.hpp"
-#include "Core/TimeHandler.hpp"
 #include "Diagnostics/Log.hpp"
-#include "ECS/EntityComponentSystem.hpp"
-#include "Graphics/Window.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
-#include "Utilities/DataStructures/TypedVector.hpp"
-#include "Utilities/IsSpecialization.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
 #include <cstdlib>
-#include <format>
-#include <functional>
 #include <iostream>
-#include <memory>
 #include <ostream>
 #include <string>
-#include <tuple>
 #include <type_traits>
-#include <utility>
-#include <vector>
 
 namespace Sketch
 {
@@ -317,111 +304,108 @@ static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
-enum class Execution : unsigned int
-{
-    Start,
-    BeginFrame,
-    FixedUpdate,
-    Update,
-    Render,
-    EndFrame,
-    Stop,
-    Count,
-};
+// enum class Execution : unsigned int
+// {
+//     Start,
+//     BeginFrame,
+//     FixedUpdate,
+//     Update,
+//     Render,
+//     EndFrame,
+//     Stop,
+//     Count,
+// };
 
-struct Sys
-{
-    virtual void Upd() {}
-};
+// struct Sys
+// {
+//     virtual void Upd() {}
+// };
 
-struct Eng
-{
+// struct Eng
+// {
 
-    /** @brief Returns a registered module by type. */
-    template <typename T> T& GetSystem()
-    {
-        auto system = m_Systems.Find<T>();
-        if (system == m_Systems.end())
-        {
-            D::Log::Error(std::format("System {} not found", typeid(T).name()));
-        }
-        return static_cast<T&>(**system);
-    }
+//     /** @brief Returns a registered system by type. */
+//     template <typename T> T& GetSystems()
+//     {
+//         auto system = m_Systems.Find<T>();
+//         if (system == m_Systems.end())
+//         {
+//             D::Log::Error(std::format("System {} not found", typeid(T).name()));
+//         }
+//         return static_cast<T&>(**system);
+//     }
 
-    const U::TypedVector<std::unique_ptr<Sys>>& GetAllSystems() const
-    {
-        return m_Systems;
-    }
+//     const U::TypedVector<std::unique_ptr<Sys>>& GetAllSystems() const
+//     {
+//         return m_Systems;
+//     }
 
-    /** @brief Creates and registers a module. */
-    template <typename T> T& AddSystems()
-    {
-        m_Systems.Emplace<T>(std::make_unique<T>());
-        // for (int i = 0; i < static_cast<unsigned int>(Execution::Count); ++i)
-        // {
-        //     Add<T>(static_cast<Execution>(i));
-        // }
-        return static_cast<T&>(*m_Systems.Get<T>());
-    }
+//     /** @brief Creates and registers a system. */
+//     template <typename T> T& AddSystems()
+//     {
+//         m_Systems.Emplace<T>(std::make_unique<T>());
+//         // for (int i = 0; i < static_cast<unsigned int>(Execution::Count); ++i)
+//         // {
+//         //     Add<T>(static_cast<Execution>(i));
+//         // }
+//         return static_cast<T&>(*m_Systems.Get<T>());
+//     }
 
-    template <typename... Args> std::tuple<Args&...> AddSystems() requires(sizeof...(Args) != 1)
-    {
-        return {AddSystems<Args>()...};
-    }
+//     template <typename... Args> std::tuple<Args&...> AddSystems() requires(sizeof...(Args) != 1)
+//     {
+//         return {AddSystems<Args>()...};
+//     }
 
-    template <typename Tuple> decltype(auto) AddSystems() requires(U::IsTSpec<Tuple, std::tuple>)
-    {
-        return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
-            [this]<typename... Args>() { return AddSystems<Args...>(); });
-    }
+//     template <typename Tuple> decltype(auto) AddSystems() requires(U::IsTSpec<Tuple, std::tuple>)
+//     {
+//         return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
+//             [this]<typename... Args>() { return AddSystems<Args...>(); });
+//     }
 
-    using ExecutionOrder = std::vector<unsigned int>;
+//     using ExecutionOrder = std::vector<unsigned int>;
 
-    std::array<ExecutionOrder, static_cast<unsigned int>(Execution::Count)> ExecutionScheduler;
+//     std::array<ExecutionOrder, static_cast<unsigned int>(Execution::Count)> ExecutionScheduler;
 
-    template <typename... Args> void Add(Execution execution)
-    {
-        (ExecutionScheduler[static_cast<unsigned int>(execution)].push_back(m_Systems.GetIndex<Args>()), ...);
-    }
+//     template <typename... Args> void Add(Execution execution)
+//     {
+//         (ExecutionScheduler[static_cast<unsigned int>(execution)].push_back(m_Systems.GetIndex<Args>()), ...);
+//     }
 
-    /** @brief Registered engine modules. */
-    U::TypedVector<std::unique_ptr<Sys>> m_Systems;
-};
+//     /** @brief Registered engine systems. */
+//     U::TypedVector<std::unique_ptr<Sys>> m_Systems;
+// };
 
-struct SysA : Sys
-{
-    void Upd() override
-    {
-        D::Log::Info("A");
-    }
-};
-struct SysB : Sys
-{
-    void Upd() override
-    {
-        D::Log::Info("B");
-    }
-};
+// struct SysA : Sys
+// {
+//     void Upd() override
+//     {
+//         D::Log::Info("A");
+//     }
+// };
+// struct SysB : Sys
+// {
+//     void Upd() override
+//     {
+//         D::Log::Info("B");
+//     }
+// };
 
 inline void Test()
 {
 
-    //TODO: possibly remove modules entirely and represent them as a tuple of systems.
-    //TODO: i believe i can straight up remove services & modules. just keep systems inside Engine. \
-    // and remove systems from World.
     // TODO: some sort of ordering mechanic for systems(which system runs first on each part of the loop).
     //
     //TODO: download and setup bevy, i would like to know how they do things.
     //
 
-    Eng eng{};
-    eng.AddSystems<SysA>();
-    eng.AddSystems<SysB>();
-    eng.Add<SysB, SysA>(Execution::Update);
+    // Eng eng{};
+    // eng.AddSystems<SysA>();
+    // eng.AddSystems<SysB>();
+    // eng.Add<SysB, SysA>(Execution::Update);
 
-    for (unsigned int index : eng.ExecutionScheduler[static_cast<unsigned int>(Execution::Update)])
-    {
-        eng.m_Systems[index]->Upd();
-    }
+    // for (unsigned int index : eng.ExecutionScheduler[static_cast<unsigned int>(Execution::Update)])
+    // {
+    //     eng.m_Systems[index]->Upd();
+    // }
 }
 } // namespace Sketch

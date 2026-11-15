@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Scene.hpp"
@@ -17,8 +17,8 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/Nodes.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/Nodes.hpp"
 
 namespace Ivy::Sandbox
 {
@@ -28,7 +28,7 @@ struct CoordinateAxes3D : C::Scene
     void Initialize() override
     {
         auto& query = m_Engine.ECS.Query;
-        auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+        auto& resourceManager = m_Engine.GetSystems<C::ResourceManager>();
 
         SetRoot(C::Node::Create(m_Engine.ECS));
 

@@ -1,7 +1,7 @@
 #include "Renderer.hpp"
 
 #include "Core/Engine.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/World/Components.hpp"
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
@@ -23,9 +23,6 @@
 #include "Graphics/Texture/TextureFormat.hpp"
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 #include "Graphics/Window.hpp"
-#include "Modules/Renderer/Systems/Renderer2DSystem.hpp"
-#include "Modules/Renderer/Systems/Renderer3DSystem.hpp"
-#include "Systems/LightingSystem.hpp"
 #include <ranges>
 #include <vector>
 
@@ -39,7 +36,7 @@ void Renderer::SetupFramebuffer()
         G::Vertex({-1.0f, 1.0f, 0.0f, 1.0f}, {}, {0.0f, 1.0f}, {})};
 
     const std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
-    auto& resources = m_Engine.GetService<C::ResourceManager>();
+    auto& resources = m_Engine.GetSystems<C::ResourceManager>();
     auto& window = m_Engine.Window;
 
     auto& screenShader = resources.Load<G::Shader>("[Graphics] Screen Shader");
@@ -76,7 +73,7 @@ void Renderer::SetupFramebuffer()
         [&](G::Window& win, const int w, const int h)
         {
             G::Context::SetViewport(0, 0, w, h);
-            auto& graphics = m_Engine.GetModule<Renderer>();
+            auto& graphics = m_Engine.GetSystems<Renderer>();
             graphics.MSAntiAliasing.OutputBuffer.Resize(w, h);
             graphics.Framebuffer.Resize(w, h);
         });
@@ -108,10 +105,6 @@ void Renderer::PresentFramebuffer()
 
 void Renderer::Start()
 {
-    AddSystem<LightingSystem>();
-    AddSystem<Renderer3DSystem>();
-    AddSystem<Renderer2DSystem>();
-
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);
 
@@ -120,9 +113,8 @@ void Renderer::Start()
     MSAntiAliasing.Generate(m_Engine.Window.GetWidth(), m_Engine.Window.GetHeight());
     SetupFramebuffer();
 
-    GetSystem<LightingSystem>().Start();
-    GetSystem<Renderer3DSystem>().Start();
-    GetSystem<Renderer2DSystem>().Start();
+    Start3D();
+    Start2D();
 }
 
 void Renderer::BeginFrame(double dt)
@@ -139,9 +131,8 @@ void Renderer::BeginFrame(double dt)
 //  it auto sorts.
 void Renderer::Render()
 {
-    GetSystem<LightingSystem>().Render();
-    GetSystem<Renderer3DSystem>().Render();
-    GetSystem<Renderer2DSystem>().Render();
+    Render3D();
+    Render2D();
     PresentFramebuffer();
 }
 

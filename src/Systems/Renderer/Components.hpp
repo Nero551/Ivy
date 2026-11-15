@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Core/Services/ResourceManager/Resource.hpp"
+#include "Core/Resource.hpp"
 #include "ECS/Component.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Renderer/LightType.hpp"
-#include "Modules/Renderer/ProjectionMode.hpp"
+#include "Systems/Renderer/LightType.hpp"
+#include "Systems/Renderer/ProjectionMode.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::CMP

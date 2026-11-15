@@ -1,11 +1,11 @@
 #pragma once
-#include "Core/Module.hpp"
+#include "Core/System.hpp"
 #include "ECS/EntityID.hpp"
 namespace Ivy::Sandbox
 {
-struct Sandbox2D : C::Module
+struct Sandbox2D : C::System
 {
-    using Module::Module;
+    using C::System::System;
     void Start() override;
     void FixedUpdate(double fdt) override;
 

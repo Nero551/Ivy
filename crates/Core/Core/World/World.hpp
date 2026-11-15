@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/SystemOwner.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
 #include "Scene.hpp"
@@ -14,9 +13,10 @@ struct Engine;
  * The World owns all entities. It is responsible for managing the lifecycle of
  * entities, including entity creation and destruction & system execution.
  */
-struct World : SystemOwner
+struct World
 {
-    using SystemOwner::SystemOwner;
+    World(Engine& engine) : m_Engine(engine) {}
+
     int MaxLights = 24;
     void SetRoot(const ECS::Entity& entity);
     ECS::Entity& GetRoot();
@@ -30,18 +30,8 @@ struct World : SystemOwner
         return scene;
     }
 
-  protected:
-    void Start();
-    void BeginFrame(double dt);
-    void FixedUpdate(double fdt);
-    void Update(double dt);
-    void Render();
-    void EndFrame(double dt);
-    void Stop();
-
-    friend struct Engine;
-
   private:
+    Engine& m_Engine;
     ECS::EntityID m_Root{};
     ECS::EntityID m_ActiveCamera{};
 };

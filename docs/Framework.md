@@ -9,8 +9,7 @@ The engine is organized into a simple hierarchy:
 ```
 Main
 └── Engine
-    ├── Modules
-    │   └── Systems
+    ├── Systems
     ├── ECS
     │   └── Entities
     │   └── Components
@@ -34,23 +33,11 @@ It owns and updates:
 - The **Window**
 - The **World**
 - The **ECS**
-- All **Modules**
+- All **Systems**
 
 The engine is responsible for driving the application's lifecycle (startup, update loop, rendering, shutdown).
 
 ---
-
-## Modules
-
-Modules are large, self-contained parts of the engine that participate in the runtime loop.
-Examples include:
-
-- Renderer
-- Input
-- Physics simulation
-
-Each module owns one or more **Systems**. The module handles the lifecycle of all related **Systems**.
-It can also contain pre-made **Entities** & **Components**.
 
 ---
 
@@ -67,7 +54,7 @@ Examples include:
 
 ## World
 
-owns core systems (ex: transform system).
+stores scene state and entity references. The Engine owns and runs systems such as the transform system.
 
 ---
 

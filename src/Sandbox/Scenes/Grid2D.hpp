@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Scene.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -12,8 +12,8 @@
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/Nodes.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/Nodes.hpp"
 
 namespace Ivy
 {
@@ -30,7 +30,7 @@ struct Grid2D : C::Scene
   private:
     void CreateGridLine(float rotation, M::Vector<2> position)
     {
-        auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+        auto& resourceManager = m_Engine.GetSystems<C::ResourceManager>();
         auto& query = m_Engine.ECS.Query;
 
         auto& shader = resourceManager.Load<G::Shader>("AxisShader");

@@ -2,13 +2,13 @@
 
 #include <deque>
 
-#include "Core/Module.hpp"
+#include "Core/System.hpp"
 
 namespace Ivy
 {
-struct Profiling : C::Module
+struct Profiling : C::System
 {
-    using C::Module::Module;
+    using C::System::System;
     double FrameMs{0};
     int FrameCount{0};
 

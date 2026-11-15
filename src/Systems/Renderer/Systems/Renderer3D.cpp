@@ -1,21 +1,20 @@
-#include "Renderer3DSystem.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Components.hpp"
 #include "ECS/Entity.hpp"
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/RenderBatch.hpp"
-#include "Modules/Renderer/Renderer.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/RenderBatch.hpp"
+#include "Systems/Renderer/Systems/Renderer.hpp"
 namespace Ivy::R
 {
 
-void Renderer3DSystem::Start()
+void Renderer::Start3D()
 {
     m_Engine.ECS.EntityDestroyed.Subscribe(
         [this](const ECS::Entity& entity)
         {
-            for (auto& batch : Batches)
+            for (auto& batch : Batches3D)
             {
                 if (batch.Instances.Contains(entity.GetId().Index))
                 {
@@ -25,11 +24,10 @@ void Renderer3DSystem::Start()
         });
 }
 
-void Renderer3DSystem::Render()
+void Renderer::Render3D()
 {
     const auto& camera = m_Engine.World.GetCamera();
     auto& query = m_Engine.ECS.Query;
-    auto& rendererModule = m_Engine.GetModule<Renderer>();
 
     if (!query.HasComponent<CMP::Transform3D>(camera))
     {
@@ -45,11 +43,11 @@ void Renderer3DSystem::Render()
     const M::Vector<3> up = transform.GetUp();
     M::Matrix<4, 4> view = M::Matrix<4, 4>::LookAt(pos, pos + forward, up);
 
-    rendererModule.GUniformbuffer.Set(view, 0);
-    rendererModule.GUniformbuffer.Set(projection, 64);
-    rendererModule.GUniformbuffer.Set(m_Engine.GetTime(), 128);
-    rendererModule.GUniformbuffer.Set(query.GetComponent<CMP::Transform3D>(camera).m_GlobalPosition, 144);
-    rendererModule.GUniformbuffer.Bind();
+    GUniformbuffer.Set(view, 0);
+    GUniformbuffer.Set(projection, 64);
+    GUniformbuffer.Set(m_Engine.GetTime(), 128);
+    GUniformbuffer.Set(query.GetComponent<CMP::Transform3D>(camera).m_GlobalPosition, 144);
+    GUniformbuffer.Bind();
 
     query.ForEach<CMP::Material, CMP::Transform3D, CMP::Mesh>(
         [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform3D& transform,
@@ -60,22 +58,22 @@ void Renderer3DSystem::Render()
                 materialComponent.Material->Get().Shader->Delete();
             }
 
-            FillBatches(entityId, transform, materialComponent, meshComponent);
+            FillBatches3D(entityId, transform, materialComponent, meshComponent);
         });
-    for (auto& batch : Batches)
+    for (auto& batch : Batches3D)
     {
         batch.Render();
     }
 }
 
-void Renderer3DSystem::FillBatches(unsigned int entityId, CMP::Transform3D& transformComponent,
+void Renderer::FillBatches3D(unsigned int entityId, CMP::Transform3D& transformComponent,
     CMP::Material& materialComponent, CMP::Mesh& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
 
     RenderBatch& batch =
-        Batches.GetOrEmplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
+        Batches3D.GetOrEmplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
 
     if (!batch.Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
         transformComponent.m_GlobalRotation.IsChanged() || transformComponent.m_GlobalScale.IsChanged())

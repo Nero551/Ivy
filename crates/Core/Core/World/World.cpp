@@ -1,11 +1,11 @@
 #include "World.hpp"
 #include "Core/Engine.hpp"
 #include "Core/World/Nodes.hpp"
+#include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
-#include "Systems/TransformSystem.hpp"
+#include "Core/World/Systems/TransformSystem.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include "Diagnostics/Log.hpp"
 
 namespace Ivy::C
 {
@@ -37,61 +37,5 @@ ECS::Entity& World::GetCamera()
         D::Log::Error("No Active Camera Is Set Or Active Camera Is Not An Entity");
     }
     return *camera;
-}
-
-void World::Start()
-{
-    for (auto& system : m_Systems)
-    {
-        system->Start();
-    }
-}
-
-void World::Update(const double dt)
-{
-    for (auto& system : m_Systems)
-    {
-        system->Update(dt);
-    }
-}
-
-void World::FixedUpdate(const double fdt)
-{
-    for (auto& system : m_Systems)
-    {
-        system->FixedUpdate(fdt);
-    }
-}
-
-void World::Stop()
-{
-    for (auto& system : m_Systems)
-    {
-        system->Stop();
-    }
-}
-
-void World::BeginFrame(const double dt)
-{
-    for (auto& system : m_Systems)
-    {
-        system->BeginFrame(dt);
-    }
-}
-
-void World::EndFrame(const double dt)
-{
-    for (auto& system : m_Systems)
-    {
-        system->EndFrame(dt);
-    }
-}
-
-void World::Render()
-{
-    for (auto& system : m_Systems)
-    {
-        system->Render();
-    }
 }
 } // namespace Ivy::C

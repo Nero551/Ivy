@@ -1,8 +1,7 @@
 #include "Engine.hpp"
 
-#include "Core/Service.hpp"
-#include "Graphics/Context.hpp"
 #include "Diagnostics/Profiling.hpp"
+#include "Graphics/Context.hpp"
 
 namespace Ivy::C
 {
@@ -47,16 +46,10 @@ void Engine::Start()
     IVY_PROFILE_ZONE("Start");
     IVY_PROFILE_GPU_ZONE("Start");
 
-    for (auto& service : m_Services)
+    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
     {
-        service->Start();
-    }
-
-    World.Start();
-
-    for (auto& module : m_Modules)
-    {
-        module->Start();
+        System* system = m_Systems[static_cast<unsigned int>(i)].get();
+        system->Start();
     }
 }
 
@@ -68,15 +61,10 @@ void Engine::BeginFrame()
     TimeHandler.CalculateTime(G::Context::GetTime());
     Window.PollEvents();
 
-    World.BeginFrame(TimeHandler.GetDelta());
-    for (auto& module : m_Modules)
+    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
     {
-        module->BeginFrame(TimeHandler.GetDelta());
-    }
-
-    for (auto& service : m_Services)
-    {
-        service->BeginFrame(TimeHandler.GetDelta());
+        System* system = m_Systems[static_cast<unsigned int>(i)].get();
+        system->BeginFrame(TimeHandler.GetDelta());
     }
 }
 
@@ -85,15 +73,10 @@ void Engine::FixedUpdate()
     IVY_PROFILE_ZONE("Fixed Update");
     IVY_PROFILE_GPU_ZONE("Fixed Update");
 
-    World.FixedUpdate(TimeHandler.GetFixedDelta());
-    for (auto& module : m_Modules)
+    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
     {
-        module->FixedUpdate(TimeHandler.GetFixedDelta());
-    }
-
-    for (auto& service : m_Services)
-    {
-        service->FixedUpdate(TimeHandler.GetFixedDelta());
+        System* system = m_Systems[static_cast<unsigned int>(i)].get();
+        system->FixedUpdate(TimeHandler.GetFixedDelta());
     }
 }
 
@@ -102,16 +85,10 @@ void Engine::Update()
     IVY_PROFILE_ZONE("Update");
     IVY_PROFILE_GPU_ZONE("Update");
 
-    World.Update(TimeHandler.GetDelta());
-
-    for (auto& module : m_Modules)
+    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
     {
-        module->Update(TimeHandler.GetDelta());
-    }
-
-    for (auto& service : m_Services)
-    {
-        service->Update(TimeHandler.GetDelta());
+        System* system = m_Systems[static_cast<unsigned int>(i)].get();
+        system->Update(TimeHandler.GetDelta());
     }
 }
 
@@ -120,15 +97,10 @@ void Engine::Render()
     IVY_PROFILE_ZONE("Render");
     IVY_PROFILE_GPU_ZONE("Render");
 
-    World.Render();
-    for (auto& module : m_Modules)
+    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
     {
-        module->Render();
-    }
-
-    for (auto& service : m_Services)
-    {
-        service->Render();
+        System* system = m_Systems[static_cast<unsigned int>(i)].get();
+        system->Render();
     }
 }
 
@@ -138,16 +110,10 @@ void Engine::EndFrame()
     IVY_PROFILE_GPU_ZONE("End Frame");
 
     Window.SwapBuffers();
-    World.EndFrame(TimeHandler.GetDelta());
-
-    for (auto& module : m_Modules)
+    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
     {
-        module->EndFrame(TimeHandler.GetDelta());
-    }
-
-    for (auto& service : m_Services)
-    {
-        service->EndFrame(TimeHandler.GetDelta());
+        System* system = m_Systems[static_cast<unsigned int>(i)].get();
+        system->EndFrame(TimeHandler.GetDelta());
     }
 
     IVY_PROFILE_FRAME_MARK;
@@ -158,18 +124,13 @@ void Engine::Stop()
 {
     IVY_PROFILE_ZONE("Stop");
     IVY_PROFILE_GPU_ZONE("Stop");
-    auto& services = m_Services;
-    World.Stop();
 
-    for (auto& module : m_Modules)
+    for (std::size_t i = 0; i < m_Systems.Size(); ++i)
     {
-        module->Stop();
+        System* system = m_Systems[static_cast<unsigned int>(i)].get();
+        system->Stop();
     }
 
-    for (auto& service : m_Services)
-    {
-        service->Stop();
-    }
     Window.Delete();
 }
 } // namespace Ivy::C

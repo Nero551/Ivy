@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/Services/ResourceManager/ResourceManager.hpp"
+#include "Core/ResourceManager.hpp"
 #include "Core/World/Nodes.hpp"
 #include "Core/World/Scene.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -14,8 +14,8 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Modules/Renderer/Components.hpp"
-#include "Modules/Renderer/Nodes.hpp"
+#include "Systems/Renderer/Components.hpp"
+#include "Systems/Renderer/Nodes.hpp"
 
 namespace Ivy
 {
@@ -44,7 +44,7 @@ struct Grid3D : C::Scene
   private:
     void CreateGridLine(const M::Quaternion<> rotation, M::Vector<3> position)
     {
-        auto& resourceManager = m_Engine.GetService<C::ResourceManager>();
+        auto& resourceManager = m_Engine.GetSystems<C::ResourceManager>();
         auto& query = m_Engine.ECS.Query;
         auto& shader = resourceManager.Load<G::Shader>("AxisShader");
 
