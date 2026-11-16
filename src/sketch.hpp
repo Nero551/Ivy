@@ -321,9 +321,10 @@ inline void Test()
     //
     // TODO: [DONE] step 1: integrate the Execution Order thing. \
     // [DONE] step 2: create State(singleton-like indexed by type), engine owns all states. systems request state, they do not own it. \
-    // step 3: systems become free functions. no longer objects. \
-    // step 4: enforce strict parameters on systems via compile-time dependency chain stuff. \
-    // step 5: MULTI-THREADING
+    // [DONE] step 3: systems become free functions. no longer objects. \
+    // step 4: plugins, presets of systems + state + dependency chain \
+    // step 5: enforce strict parameters on systems via compile-time dependency chain stuff. \
+    // step 6: MULTI-THREADING
     //
     //
     //? system will just be free functions that take engine state,ecs,world,etc  as parameters.

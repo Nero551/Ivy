@@ -104,7 +104,6 @@ inline void Start_Sandbox2D(C::Engine& eng)
     eng.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
 
     // StressTester2D::FourDimensionalProjection(eng, 4);
-    VectorFields2D::Start_VectorFields2D(eng);
     VectorFields2D::PendulumModel(eng);
 
     particleId = CreateSquare(eng);

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Plugin.hpp"
 #include "Core/State.hpp"
 
 #include "Core/SystemManager.hpp"
@@ -19,9 +20,6 @@
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
 {
-
-template <typename T>
-concept IsState = std::derived_from<T, C::State>;
 
 /** @brief Main Ivy engine and game loop. Manages the window, world, systems, ECS, and frame lifecycle. */
 struct Engine
@@ -92,6 +90,16 @@ struct Engine
     template <IsState... Args> std::tuple<Args&...> AddStates() requires(sizeof...(Args) != 1)
     {
         return {AddStates<Args>()...};
+    }
+
+    template <IsPlugin P> void AddPlugins()
+    {
+        P::Setup(*this);
+    }
+
+    template <IsPlugin... Ps> void AddPlugins() requires(sizeof...(Ps) != 1)
+    {
+        (AddPlugins<Ps>(), ...);
     }
 
   private:

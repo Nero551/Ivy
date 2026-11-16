@@ -29,7 +29,6 @@ inline void Start_Sandbox3D(C::Engine& eng)
     eng.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
 
     // StressTester3D::Spawn(eng, 4, 3);
-    VectorFields3D::Start_VectorFields3D(eng);
     VectorFields3D::LorenzSystem(eng);
 
     // auto& square = R::MeshInstance3D::Create(eng.ECS);
