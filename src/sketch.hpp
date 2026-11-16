@@ -331,5 +331,7 @@ inline void Test()
     //? the dependency is not between systems, its on the state itself. system execution ordering is still needed though.
     //
     //? as for thread safety. i think that should be integrated into the engine/ecs itself.
+//? World doesn't need engine, only ecs. fix that.
+//? configuration in engine is const, doesn't need private. fix that.
 }
 } // namespace Sketch
