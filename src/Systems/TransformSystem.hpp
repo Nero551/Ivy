@@ -2,7 +2,7 @@
 
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
-#include "Core/System.hpp"
+
 #include "ECS/Entity.hpp"
 #include "Systems/Components.hpp"
 #include "Utilities/CheckedPtr.hpp"
@@ -21,7 +21,8 @@ struct TransformSystemState : C::State
 namespace Transform
 {
 
-void Do2D(U::CheckedPtr<CMP::Transform2D> transform2D, U::CheckedPtr<CMP::Transform2D> parentTransform2D)
+inline void Do2D(
+    U::CheckedPtr<CMP::Transform2D> transform2D, U::CheckedPtr<CMP::Transform2D> parentTransform2D)
 {
     if (!transform2D)
     {
@@ -43,7 +44,8 @@ void Do2D(U::CheckedPtr<CMP::Transform2D> transform2D, U::CheckedPtr<CMP::Transf
 
     parentTransform2D = transform2D;
 }
-void Do3D(U::CheckedPtr<CMP::Transform3D> transform3D, U::CheckedPtr<CMP::Transform3D> parentTransform3D)
+inline void Do3D(
+    U::CheckedPtr<CMP::Transform3D> transform3D, U::CheckedPtr<CMP::Transform3D> parentTransform3D)
 {
     if (!transform3D)
     {
@@ -66,7 +68,7 @@ void Do3D(U::CheckedPtr<CMP::Transform3D> transform3D, U::CheckedPtr<CMP::Transf
     parentTransform3D = transform3D;
 }
 
-void Update_Transform(C::Engine& eng, double dt)
+inline void Update_Transform(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<TransformSystemState>();
     auto& query = eng.ECS.Query;

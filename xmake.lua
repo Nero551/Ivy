@@ -38,7 +38,7 @@ target("Ivy")
     set_rundir(os.projectdir())
     add_includedirs("src")
     set_pcxxheader("src/pch.hpp")
-    add_files("src/Main.cpp")
+    add_files("src/**.cpp")
     add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.Graphics", "Ivy.ECS", "Ivy.Core", "Ivy.Reflect", "Ivy.Diagnostics")
     add_packages("nlohmann_json")
 

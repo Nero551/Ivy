@@ -22,7 +22,7 @@ struct Controller2DState : C::State
 
 namespace Controller2D
 {
-void Update_Controller2D(C::Engine& eng, double dt)
+inline void Update_Controller2D(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<Controller2DState>();
     auto& input = eng.Input;

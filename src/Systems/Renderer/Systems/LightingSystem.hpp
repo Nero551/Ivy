@@ -16,11 +16,12 @@ struct LightingSystemState : C::State
 
 namespace Lighting
 {
-void Start_Lighting(C::Engine& eng)
+inline void Start_Lighting(C::Engine& eng)
 {
     auto& state = eng.GetStates<LightingSystemState>();
 
-    state.LightingBuffer = &LoadResource<G::Uniformbuffer>(eng, "[Graphics] Lighting Buffer")();
+    state.LightingBuffer =
+        &ResourceManager::LoadResource<G::Uniformbuffer>(eng, "[Graphics] Lighting Buffer")();
     state.LightingBuffer->Binding = 1;
 
     constexpr size_t LightStride = 144;
@@ -29,7 +30,7 @@ void Start_Lighting(C::Engine& eng)
     state.LightingBuffer->Size = HeaderSize + eng.World.MaxLights * LightStride;
 }
 
-void Render_Lighting(C::Engine& eng)
+inline void Render_Lighting(C::Engine& eng)
 {
     auto& state = eng.GetStates<LightingSystemState>();
 

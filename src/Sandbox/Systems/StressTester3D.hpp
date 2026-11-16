@@ -19,7 +19,6 @@
 #include "Math/Coordinates/Spherical.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Systems/Components.hpp"
-#include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
 #include "Systems/ResourceManager.hpp"
@@ -42,7 +41,7 @@ inline ECS::Entity& CreatePoint(C::Engine& eng, M::Vector<4> col)
     auto& query = eng.ECS.Query;
 
     G::Mesh m = G::Primitives::CreateQuad("point");
-    auto& mesh = LoadResource<G::Mesh>(eng, m);
+    auto& mesh = ResourceManager::LoadResource<G::Mesh>(eng, m);
 
     auto& point = R::MeshInstance3D::Create(eng.ECS);
 
@@ -51,20 +50,20 @@ inline ECS::Entity& CreatePoint(C::Engine& eng, M::Vector<4> col)
 
     const std::string name = std::format("m{}{}{}", col.z, col.x, col.y);
 
-    if (ResourceExists<G::Material>(eng, name))
+    if (ResourceManager::ResourceExists<G::Material>(eng, name))
     {
-        auto& material = LoadResource<G::Material>(eng, name);
+        auto& material = ResourceManager::LoadResource<G::Material>(eng, name);
         query.GetComponent<CMP::Material>(point).Material = &material;
     }
     else
     {
-        auto& material = LoadResource<G::Material>(eng, name);
+        auto& material = ResourceManager::LoadResource<G::Material>(eng, name);
         material().Color = col;
 
-        auto& shader = LoadResource<G::Shader>(eng, "pointShader");
-        shader().AssignSource(LoadResource<G::ShaderSource>(
+        auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "pointShader");
+        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
             eng, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
-        shader().AssignSource(LoadResource<G::ShaderSource>(
+        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
             eng, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
         material().Shader = &shader();

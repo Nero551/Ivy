@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/State.hpp"
-#include "Core/System.hpp"
+
 #include "Core/SystemManager.hpp"
 #include "Core/TimeHandler.hpp"
 #include "Core/World/World.hpp"

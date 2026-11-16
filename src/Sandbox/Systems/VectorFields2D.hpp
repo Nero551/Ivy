@@ -320,7 +320,7 @@ inline void Start_VectorFields2D(C::Engine& eng)
         eng, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
     auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
         eng, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(eng, "arrowShader", vertSource, fragSource);
+    auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "arrowShader", vertSource, fragSource);
 
     state.Material = &ResourceManager::LoadResource<G::Material>(eng, "arrowMat");
     state.Material->Get().Shader = &shader();

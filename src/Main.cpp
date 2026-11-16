@@ -3,6 +3,10 @@
 #include "Core/Engine.hpp"
 #include "Core/SystemManager.hpp"
 #include "Graphics/Context.hpp"
+#include "Sandbox/Sandbox3D.hpp"
+#include "Sandbox/Systems/Controller2D.hpp"
+#include "Sandbox/Systems/Controller3D.hpp"
+#include "Sandbox/Systems/VectorFields3D.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Profiling/ProfilingSystem.hpp"
 #include "Systems/Renderer/Systems/LightingSystem.hpp"
@@ -37,17 +41,26 @@ int main(const int argc, char* argv[])
             engine.Window.SetCursor({"assets/cursor.png"});
             engine.Input.Initialize(engine.Window);
 
-            engine.AddStates<ProfilingState, ResourceManagerState, TransformSystemState, R::RendererState>();
+            engine.AddStates<ProfilingState, ResourceManagerState, TransformSystemState, R::RendererState,
+                R::LightingSystemState, Sandbox::VectorFields3DState, Sandbox::Controller3DState>();
             // engine.SM.AddSystems<C::Execution::FixedUpdate>();
 
-            engine.SM.AddSystems<Ivy::C::Execution::Start, R::Renderer::Start_Renderer,
+            engine.SM.AddSystems<Ivy::C::Execution::Start, Sandbox::Sandbox3D::Start_Sandbox3D,
+                Sandbox::VectorFields3D::Start_VectorFields3D, R::Renderer::Start_Renderer,
                 R::Lighting::Start_Lighting>();
+
             engine.SM.AddSystems<C::Execution::BeginFrame, R::Renderer::BeginFrame_Renderer>();
-            engine.SM
-                .AddSystems<C::Execution::Update, Profiling::Update_Profiling, Transform::Update_Transform>();
+
+            engine.SM.AddSystems<Ivy::C::Execution::FixedUpdate, Sandbox::Sandbox3D::FixedUpdate_Sandbox3D>();
+
+            engine.SM.AddSystems<C::Execution::Update, Sandbox::Controller3D::Update_Controller3D,
+                Profiling::Update_Profiling, Transform::Update_Transform>();
+
             engine.SM.AddSystems<C::Execution::Render, R::Lighting::Render_Lighting,
                 R::Renderer::Render_Renderer>();
+
             // engine.SM.AddSystems<C::Execution::EndFrame>();
+            //
             engine.SM.AddSystems<C::Execution::Stop, ResourceManager::Stop_ResourceManager,
                 R::Renderer::Stop_Renderer>();
 

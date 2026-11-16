@@ -1,6 +1,5 @@
 #include "Engine.hpp"
 
-#include "Core/System.hpp"
 #include "Core/SystemManager.hpp"
 #include "Diagnostics/Profiling.hpp"
 #include "Graphics/Context.hpp"

@@ -130,7 +130,7 @@ template <typename T> void UnloadResource(C::Engine& eng, const std::string& nam
 }
 
 /** @brief Unloads all resources and resets the resource manager. */
-void UnloadAllResources(C::Engine& eng)
+inline void UnloadAllResources(C::Engine& eng)
 {
     auto& state = eng.GetStates<ResourceManagerState>();
     state.Handles.Clear();
@@ -191,13 +191,13 @@ template <typename T> bool ResourceExists(C::Engine& eng, const std::string& nam
      * @param handle Handle to check.
      * @return True if the handle refers to an acquired resource, otherwise false.
      */
-bool ResourceExists(C::Engine& eng, const IResource::HandleType handle)
+inline bool ResourceExists(C::Engine& eng, const IResource::HandleType handle)
 {
     const auto& state = eng.GetStates<ResourceManagerState>();
     return state.Resources.Contains(handle.Index) && state.Handles.IsAcquired(handle);
 }
 
-void Stop_ResourceManager(C::Engine& eng)
+inline void Stop_ResourceManager(C::Engine& eng)
 {
     UnloadAllResources(eng);
 }

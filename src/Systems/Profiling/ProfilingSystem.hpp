@@ -19,7 +19,7 @@ struct ProfilingState : C::State
 
 namespace Profiling
 {
-void Update_Profiling(C::Engine& eng, double dt)
+inline void Update_Profiling(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<ProfilingState>();
 

@@ -18,7 +18,6 @@
 #include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields2D.hpp"
 #include "Systems/Components.hpp"
-#include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
 #include "Systems/ResourceManager.hpp"
@@ -50,15 +49,15 @@ inline ECS::EntityID CreateCircle(C::Engine& eng)
     auto& circle = R::MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(circle).Mesh =
-        &LoadResource<G::Mesh>(eng, G::Primitives::CreateCircle("ball"));
+        &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateCircle("ball"));
 
-    auto& vertSource = LoadResource<G::ShaderSource>(
+    auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
         eng, "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadResource<G::ShaderSource>(
+    auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
         eng, "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(eng, "circleShader", vertSource, fragSource);
+    auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "circleShader", vertSource, fragSource);
 
-    auto& mat = LoadResource<G::Material>(eng, "circleMat");
+    auto& mat = ResourceManager::LoadResource<G::Material>(eng, "circleMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 
@@ -75,15 +74,15 @@ inline ECS::EntityID CreateSquare(C::Engine& eng)
     auto& square = R::MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(square).Mesh =
-        &LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("cube"));
+        &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("cube"));
 
-    auto& vertSource = LoadResource<G::ShaderSource>(
+    auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
         eng, "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadResource<G::ShaderSource>(
+    auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
         eng, "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(eng, "squareShader", vertSource, fragSource);
+    auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "squareShader", vertSource, fragSource);
 
-    auto& mat = LoadResource<G::Material>(eng, "squareMat");
+    auto& mat = ResourceManager::LoadResource<G::Material>(eng, "squareMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 

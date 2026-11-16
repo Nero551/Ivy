@@ -2,7 +2,7 @@
 
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
-#include "Core/System.hpp"
+
 #include "ECS/Entity.hpp"
 #include "Graphics/AntiAliasing/MSAA.hpp"
 #include "Graphics/Buffers/BufferBit.hpp"
@@ -50,7 +50,7 @@ struct RendererState : C::State
 };
 namespace Renderer
 {
-void SetupFramebuffer(C::Engine& eng)
+inline void SetupFramebuffer(C::Engine& eng)
 {
     const std::vector<G::Vertex> vertices = {G::Vertex({-1.0f, -1.0f, 0.0f, 1.0f}, {}, {0.0f, 0.0f}, {}),
         G::Vertex({1.0f, -1.0f, 0.0f, 1.0f}, {}, {1.0f, 0.0f}, {}),
@@ -60,10 +60,10 @@ void SetupFramebuffer(C::Engine& eng)
     const std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
     auto& window = eng.Window;
 
-    auto& screenShader = LoadResource<G::Shader>(eng, "[Graphics] Screen Shader");
-    auto& screenVert = LoadResource<G::ShaderSource>(
+    auto& screenShader = ResourceManager::LoadResource<G::Shader>(eng, "[Graphics] Screen Shader");
+    auto& screenVert = ResourceManager::LoadResource<G::ShaderSource>(
         eng, "[Graphics] Screen Vertex", "assets/Shaders/screen.vert", G::ShaderStage::Vertex);
-    auto& screenFrag = LoadResource<G::ShaderSource>(
+    auto& screenFrag = ResourceManager::LoadResource<G::ShaderSource>(
         eng, "[Graphics] Screen Fragment", "assets/Shaders/screen.frag", G::ShaderStage::Fragment);
 
     screenShader().AssignSource(screenVert);
@@ -80,7 +80,7 @@ void SetupFramebuffer(C::Engine& eng)
     rState.ScreenMesh.Indices = indices;
     rState.ScreenMesh.CullMode = G::CullMode::None;
 
-    auto& screenTexture = LoadResource<G::Texture2D>(eng, "COLOR_BUFFER");
+    auto& screenTexture = ResourceManager::LoadResource<G::Texture2D>(eng, "COLOR_BUFFER");
     screenTexture.Get().Width = window.GetWidth();
     screenTexture.Get().Height = window.GetHeight();
     screenTexture.Get().InternalFormat = G::TextureInternalFormat::RGB8;
@@ -100,7 +100,7 @@ void SetupFramebuffer(C::Engine& eng)
             eng.GetStates<RendererState>().Framebuffer.Resize(w, h);
         });
 }
-void PresentFramebuffer(C::Engine& eng)
+inline void PresentFramebuffer(C::Engine& eng)
 {
     auto& window = eng.Window;
     int width = window.GetWidth();
@@ -126,7 +126,7 @@ void PresentFramebuffer(C::Engine& eng)
     rState.ScreenMesh.Draw();
 }
 
-void Start2D(C::Engine& eng)
+inline void Start2D(C::Engine& eng)
 {
     eng.ECS.EntityDestroyed.Subscribe(
         [&eng](const ECS::Entity& entity)
@@ -140,7 +140,7 @@ void Start2D(C::Engine& eng)
             }
         });
 }
-void FillBatches2D(C::Engine& eng, unsigned int entityId, CMP::Transform2D& transformComponent,
+inline void FillBatches2D(C::Engine& eng, unsigned int entityId, CMP::Transform2D& transformComponent,
     CMP::Material& materialComponent, CMP::Mesh& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
@@ -163,7 +163,7 @@ void FillBatches2D(C::Engine& eng, unsigned int entityId, CMP::Transform2D& tran
         batch.DataChanged = true;
     }
 }
-void Render2D(C::Engine& eng)
+inline void Render2D(C::Engine& eng)
 {
     const auto& camera = eng.World.GetCamera();
     auto& query = eng.ECS.Query;
@@ -204,7 +204,7 @@ void Render2D(C::Engine& eng)
     }
 }
 
-void Start3D(C::Engine& eng)
+inline void Start3D(C::Engine& eng)
 {
     eng.ECS.EntityDestroyed.Subscribe(
         [&eng](const ECS::Entity& entity)
@@ -218,7 +218,7 @@ void Start3D(C::Engine& eng)
             }
         });
 }
-void FillBatches3D(C::Engine& eng, unsigned int entityId, CMP::Transform3D& transformComponent,
+inline void FillBatches3D(C::Engine& eng, unsigned int entityId, CMP::Transform3D& transformComponent,
     CMP::Material& materialComponent, CMP::Mesh& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
@@ -241,7 +241,7 @@ void FillBatches3D(C::Engine& eng, unsigned int entityId, CMP::Transform3D& tran
         batch.DataChanged = true;
     }
 }
-void Render3D(C::Engine& eng)
+inline void Render3D(C::Engine& eng)
 {
     const auto& camera = eng.World.GetCamera();
     auto& query = eng.ECS.Query;
@@ -284,7 +284,7 @@ void Render3D(C::Engine& eng)
     }
 }
 
-void Start_Renderer(C::Engine& eng)
+inline void Start_Renderer(C::Engine& eng)
 {
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);
@@ -298,7 +298,7 @@ void Start_Renderer(C::Engine& eng)
     Start3D(eng);
     Start2D(eng);
 }
-void BeginFrame_Renderer(C::Engine& eng, double dt)
+inline void BeginFrame_Renderer(C::Engine& eng, double dt)
 {
     auto& rState = eng.GetStates<RendererState>();
     rState.MSAntiAliasing.OutputBuffer.Bind();
@@ -306,14 +306,14 @@ void BeginFrame_Renderer(C::Engine& eng, double dt)
     G::Context::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
 }
 
-void Render_Renderer(C::Engine& eng)
+inline void Render_Renderer(C::Engine& eng)
 {
     Render2D(eng);
     Render3D(eng);
     PresentFramebuffer(eng);
 }
 
-void Stop_Renderer(C::Engine& eng)
+inline void Stop_Renderer(C::Engine& eng)
 {
     auto& rState = eng.GetStates<RendererState>();
     const G::Texture2D& texture =

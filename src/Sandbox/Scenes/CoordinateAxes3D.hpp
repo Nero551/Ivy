@@ -28,17 +28,15 @@ struct CoordinateAxes3D : C::Scene
     void Initialize() override
     {
         auto& query = m_Engine.ECS.Query;
-        auto& resourceManager = m_Engine.GetSystems<C::ResourceManager>();
+        SetRoot(Node::Create(m_Engine.ECS));
 
-        SetRoot(C::Node::Create(m_Engine.ECS));
+        auto& lightShader = ResourceManager::LoadResource<G::Shader>(m_Engine, "lightShader");
+        lightShader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+            m_Engine, "lightFrag", "assets/Shaders/lightShader.frag", G::ShaderStage::Fragment)());
+        lightShader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+            m_Engine, "lightVert", "assets/Shaders/lightShader.vert", G::ShaderStage::Vertex)());
 
-        auto& lightShader = resourceManager.Load<G::Shader>("lightShader");
-        lightShader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "lightFrag", "assets/Shaders/lightShader.frag", G::ShaderStage::Fragment)());
-        lightShader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "lightVert", "assets/Shaders/lightShader.vert", G::ShaderStage::Vertex)());
-
-        auto& lightMaterial = resourceManager.Load<G::Material>("lightMaterial");
+        auto& lightMaterial = ResourceManager::LoadResource<G::Material>(m_Engine, "lightMaterial");
         lightMaterial().Shader = &lightShader();
 
         auto& light = R::Light3D::Create(m_Engine.ECS);
@@ -51,19 +49,19 @@ struct CoordinateAxes3D : C::Scene
             M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5f)});
         light2.SetParent(GetRoot());
 
-        auto& shader = resourceManager.Load<G::Shader>("AxisShader");
-        shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
-        shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-            "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+        auto& shader = ResourceManager::LoadResource<G::Shader>(m_Engine, "AxisShader");
+        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+            m_Engine, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+            m_Engine, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
         G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = resourceManager.Load<G::Mesh>(m);
+        auto& line = ResourceManager::LoadResource<G::Mesh>(m_Engine, m);
 
         auto& xAxis = R::MeshInstance3D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
         auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
-        xMaterial.Material = &resourceManager.Load<G::Material>("X-Axis Material");
+        xMaterial.Material = &ResourceManager::LoadResource<G::Material>(m_Engine, "X-Axis Material");
         xMaterial.Material->Get().Shader = &shader();
 
         query.GetComponent<CMP::Transform3D>(xAxis).Scale = {200, 1, 1};
@@ -80,7 +78,7 @@ struct CoordinateAxes3D : C::Scene
         yTransform.Scale = {200, 1, 1};
 
         auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
-        yMaterial.Material = &resourceManager.Load<G::Material>("Y-Axis Material");
+        yMaterial.Material = &ResourceManager::LoadResource<G::Material>(m_Engine, "Y-Axis Material");
         yMaterial.Material->Get().Shader = &shader();
         yMaterial.Material->Get().Color = M::Color::Green;
 
@@ -95,7 +93,7 @@ struct CoordinateAxes3D : C::Scene
         zTransform.Scale = {200, 1, 1};
 
         auto& zMaterial = query.GetComponent<CMP::Material>(zAxis);
-        zMaterial.Material = &resourceManager.Load<G::Material>("Z-Axis Material");
+        zMaterial.Material = &ResourceManager::LoadResource<G::Material>(m_Engine, "Z-Axis Material");
         zMaterial.Material->Get().Shader = &shader();
         zMaterial.Material->Get().Color = M::Color::Blue;
 

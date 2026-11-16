@@ -9,14 +9,13 @@
 #include "Sandbox/Systems/StressTester3D.hpp"
 #include "Sandbox/Systems/VectorFields3D.hpp"
 #include "Systems/Components.hpp"
-#include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Nodes.hpp"
 
 namespace Ivy::Sandbox
 {
 namespace Sandbox3D
 {
-void Start_Sandbox3D(C::Engine& eng)
+inline void Start_Sandbox3D(C::Engine& eng)
 {
     eng.Input.SetMouseMode(G::CursorMode::Disabled);
 
@@ -35,14 +34,14 @@ void Start_Sandbox3D(C::Engine& eng)
 
     // auto& square = R::MeshInstance3D::Create(eng.ECS);
     // query.GetComponent<CMP::Mesh>(square).Mesh =
-    //     &LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("TerrainQuad", 20, 20));
+    //     &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("TerrainQuad", 20, 20));
     //
-    // auto& vertSource = LoadResource<G::ShaderSource>(
+    // auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
     //     eng, "TerrainShaderVert", "assets/Shaders/TerrainShader.vert", G::ShaderStage::Vertex);
-    // auto& fragSource = LoadResource<G::ShaderSource>(
+    // auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
     //     eng, "TerrainShaderFrag", "assets/Shaders/TerrainShader.frag", G::ShaderStage::Fragment);
-    // auto& shader = LoadResource<G::Shader>(eng, "TerrainShader", vertSource, fragSource);
-    // auto& mat    = LoadResource<G::Material>(eng, "TerrainMat");
+    // auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "TerrainShader", vertSource, fragSource);
+    // auto& mat    = ResourceManager::LoadResource<G::Material>(eng, "TerrainMat");
     // mat().Shader = &shader();
     // mat().Color  = {1, 1, 1, 1};
     // shader().HotReload = true;
@@ -54,7 +53,7 @@ void Start_Sandbox3D(C::Engine& eng)
     // eng.World.GetRoot().AttachChild(square);
 }
 
-void FixedUpdate_Sandbox3D(C::Engine& eng, double dt)
+inline void FixedUpdate_Sandbox3D(C::Engine& eng, double dt)
 {
     if (eng.Input.IsKeyHeld(G::Key::Escape))
     {

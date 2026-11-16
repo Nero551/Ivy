@@ -23,7 +23,7 @@ struct Controller3DState : C::State
 
 namespace Controller3D
 {
-void Update_Controller3D(C::Engine& eng, double dt)
+inline void Update_Controller3D(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<Controller3DState>();
     auto& input = eng.Input;
