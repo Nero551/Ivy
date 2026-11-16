@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
@@ -24,14 +25,21 @@
 
 namespace Ivy::Sandbox
 {
+struct VectorFields2DState : C::State
+{
+    U::CheckedPtr<C::Resource<G::Mesh>> Mesh;
+    U::CheckedPtr<C::Resource<G::Material>> Material;
+};
+
 struct VectorFields2D : C::System
 {
     using C::System::System;
 
     void Start() override
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
         auto& resources = m_Engine.GetSystems<C::ResourceManager>();
-        m_Mesh = &resources.Load(G::Primitives::CreateArrow2D("vectorArrow"));
+        state.Mesh = &resources.Load(G::Primitives::CreateArrow2D("vectorArrow"));
 
         auto& vertSource = resources.Load<G::ShaderSource>(
             "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
@@ -40,13 +48,15 @@ struct VectorFields2D : C::System
 
         auto& shader = resources.Load<G::Shader>("arrowShader", vertSource, fragSource);
 
-        m_Material = &resources.Load<G::Material>("arrowMat");
-        m_Material->Get().Shader = &shader();
-        m_Material->Get().Color = {1, 1, 1, 1};
+        state.Material = &resources.Load<G::Material>("arrowMat");
+        state.Material->Get().Shader = &shader();
+        state.Material->Get().Color = {1, 1, 1, 1};
     }
 
     void PendulumModel()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
+
         constexpr float thetaMin = -25.0f;
         constexpr float thetaMax = 25;
         constexpr float omegaMin = -25.0f;
@@ -101,13 +111,15 @@ struct VectorFields2D : C::System
         G::ArrayBuffer buffer{};
 
         buffer.SetData(magnitudes);
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     void ExponentialModel()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
+
         const float k = 0.2f;
 
         using Equation = M::ODE<float, float>;
@@ -144,13 +156,15 @@ struct VectorFields2D : C::System
         G::ArrayBuffer buffer{};
         buffer.SetData(magnitudes);
 
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     void LogisticModel()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
+
         const float k = 0.05f;
         const float a = 15.0f;
 
@@ -189,13 +203,15 @@ struct VectorFields2D : C::System
         G::ArrayBuffer buffer{};
         buffer.SetData(magnitudes);
 
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     void SpringModel()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
+
         const float k = 0.8f;
         const float m = 1.0f;
 
@@ -234,13 +250,15 @@ struct VectorFields2D : C::System
         G::ArrayBuffer buffer{};
         buffer.SetData(magnitudes);
 
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     void DampenedSpringModel()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
+
         const float k = 0.8f;
         const float m = 1.0f;
         const float b = 0.5f;
@@ -280,13 +298,15 @@ struct VectorFields2D : C::System
         G::ArrayBuffer buffer{};
         buffer.SetData(magnitudes);
 
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     void LinearResistiveForceModel()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
+
         const float b = 0.8f;
         const float m = 1.0f;
         const float g = 9.8f;
@@ -326,13 +346,15 @@ struct VectorFields2D : C::System
         G::ArrayBuffer buffer{};
         buffer.SetData(magnitudes);
 
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     void QuadraticResistiveForceModel()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
+
         const float g = 9.8f;
         const float m = 0.046f;
         const float D = 1.0f;
@@ -374,23 +396,21 @@ struct VectorFields2D : C::System
         G::ArrayBuffer buffer{};
         buffer.SetData(magnitudes);
 
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     ECS::Entity& Arrow()
     {
+        auto& state = m_Engine.GetStates<VectorFields2DState>();
         auto& query = m_Engine.ECS.Query;
 
         auto& arrow = R::MeshInstance2D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Mesh>(arrow).Mesh = m_Mesh;
-        query.GetComponent<CMP::Material>(arrow).Material = m_Material;
+        query.GetComponent<CMP::Mesh>(arrow).Mesh = state.Mesh;
+        query.GetComponent<CMP::Material>(arrow).Material = state.Material;
 
         return arrow;
     }
-
-    U::CheckedPtr<C::Resource<G::Mesh>> m_Mesh;
-    U::CheckedPtr<C::Resource<G::Material>> m_Material;
 };
 } // namespace Ivy::Sandbox

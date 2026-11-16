@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Graphics/AntiAliasing/MSAA.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
@@ -14,9 +15,8 @@
 namespace Ivy::R
 {
 
-struct Renderer : C::System
+struct RendererState : C::State
 {
-    using C::System::System;
 
     G::Framebuffer Framebuffer{"Graphics system has no Framebuffer to use"};
     G::Material ScreenMaterial{"Graphics system has no Screen Material to render on"};
@@ -25,6 +25,12 @@ struct Renderer : C::System
     G::MSAA MSAntiAliasing{8};
 
     U::Indirect2DVector<RenderBatch> Batches2D, Batches3D;
+};
+
+struct Renderer : C::System
+{
+    using C::System::System;
+
     void Start2D();
     void Start3D();
     void Render2D();

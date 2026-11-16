@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Engine.hpp"
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Math/Common/Constraints.hpp"
 #include "Systems/Components.hpp"
@@ -10,11 +11,20 @@
 namespace Ivy::Sandbox
 {
 
+struct Controller3DState : C::State
+{
+    float Yaw = 0;
+    float Pitch = 0;
+    float Speed = 5;
+};
+
 struct Controller3D : C::System
 {
     using C::System::System;
-    void Update(double dt)
+    void Update(double dt) override
     {
+        auto& state = m_Engine.GetStates<Controller3DState>();
+
         if (m_Engine.GetSystems<I::Input>().IsKeyReleased(G::Key::Q))
         {
             if (m_Engine.GetSystems<I::Input>().GetMouseMode() == G::CursorMode::Disabled)
@@ -52,17 +62,17 @@ struct Controller3D : C::System
 
             constexpr float maxPitch = M::Rad(89.9f);
 
-            m_Yaw += xOffset;
-            m_Pitch += yOffset;
-            m_Pitch = std::clamp(m_Pitch, -maxPitch, maxPitch);
+            state.Yaw += xOffset;
+            state.Pitch += yOffset;
+            state.Pitch = std::clamp(state.Pitch, -maxPitch, maxPitch);
 
-            transform.Rotation = M::Quaternion<>::FromEulerXYZ({m_Pitch, m_Yaw, 0});
+            transform.Rotation = M::Quaternion<>::FromEulerXYZ({state.Pitch, state.Yaw, 0});
         }
 
-        m_Speed += input.GetScrollDelta().y;
-        m_Speed = std::max(m_Speed, 2.5f);
+        state.Speed += input.GetScrollDelta().y;
+        state.Speed = std::max(state.Speed, 2.5f);
 
-        const float speed = m_Speed * static_cast<float>(dt);
+        const float speed = state.Speed * static_cast<float>(dt);
 
         if (input.IsKeyHeld(G::Key::W))
         {
@@ -94,10 +104,5 @@ struct Controller3D : C::System
             transform.Position -= speed * M::Vector<3>(0, 1, 0);
         }
     }
-
-  private:
-    float m_Yaw = 0;
-    float m_Pitch = 0;
-    float m_Speed = 5;
 };
 } // namespace Ivy::Sandbox

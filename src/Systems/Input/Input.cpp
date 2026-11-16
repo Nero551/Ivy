@@ -9,64 +9,70 @@ namespace Ivy::I
 {
 bool Input::IsKeyHeld(const G::Key key)
 {
-    return m_CurrentKeys[ToIndex(key)];
+    return m_Engine.GetStates<InputState>().CurrentKeys[ToIndex(key)];
 }
 
 bool Input::IsKeyPressed(const G::Key key)
 {
-    return m_CurrentKeys[ToIndex(key)] && !m_PreviousKeys[ToIndex(key)];
+    const auto& s = m_Engine.GetStates<InputState>();
+    return s.CurrentKeys[ToIndex(key)] && !s.PreviousKeys[ToIndex(key)];
 }
 
 bool Input::IsKeyReleased(const G::Key key)
 {
-    return !m_CurrentKeys[ToIndex(key)] && m_PreviousKeys[ToIndex(key)];
+    const auto& s = m_Engine.GetStates<InputState>();
+    return !s.CurrentKeys[ToIndex(key)] && s.PreviousKeys[ToIndex(key)];
 }
 
 bool Input::IsMouseButtonHeld(const G::MouseButton button)
 {
-    return m_CurrentMouseButtons[ToIndex(button)];
+    return m_Engine.GetStates<InputState>().CurrentMouseButtons[ToIndex(button)];
 }
 
 bool Input::IsMouseButtonPressed(const G::MouseButton button)
 {
-    return m_CurrentMouseButtons[ToIndex(button)] && !m_PreviousMouseButtons[ToIndex(button)];
+    const auto& s = m_Engine.GetStates<InputState>();
+    return s.CurrentMouseButtons[ToIndex(button)] && !s.PreviousMouseButtons[ToIndex(button)];
 }
 
 bool Input::IsMouseButtonReleased(const G::MouseButton button)
 {
-    return !m_CurrentMouseButtons[ToIndex(button)] && m_PreviousMouseButtons[ToIndex(button)];
+    const auto& s = m_Engine.GetStates<InputState>();
+    return !s.CurrentMouseButtons[ToIndex(button)] && s.PreviousMouseButtons[ToIndex(button)];
 }
 
 M::Vector<2> Input::GetMousePosition() const
 {
-    return m_MousePosition;
+    return m_Engine.GetStates<InputState>().MousePosition;
 }
 
 M::Vector<2> Input::GetMouseDelta() const
 {
-    return m_MousePosition - m_PreviousMousePosition;
+    const auto& s = m_Engine.GetStates<InputState>();
+    return s.MousePosition - s.PreviousMousePosition;
 }
 
 M::Vector<2> Input::GetScrollDelta() const
 {
-    return m_ScrollOffset;
+    return m_Engine.GetStates<InputState>().ScrollOffset;
 }
 
 bool Input::IsScrolling() const
 {
-    return m_ScrollOffset != M::Vector<2>::Zero();
+    return m_Engine.GetStates<InputState>().ScrollOffset != M::Vector<2>::Zero();
 }
 
 G::CursorMode Input::GetMouseMode() const
 {
-    return m_MouseMode;
+    return m_Engine.GetStates<InputState>().MouseMode;
 }
 
 void Input::SetMouseMode(G::CursorMode mode)
 {
-    m_MouseMode = mode;
+    auto& s = m_Engine.GetStates<InputState>();
+    s.MouseMode = mode;
     m_Engine.Window.SetCursorMode(mode);
-    m_PreviousMousePosition = m_MousePosition;
+    s.PreviousMousePosition = s.MousePosition;
 }
 
 constexpr unsigned int Input::ToIndex(G::Key key)
@@ -82,54 +88,66 @@ constexpr unsigned int Input::ToIndex(G::MouseButton button)
 void Input::Start()
 {
     G::Window& window = m_Engine.Window;
-    window.SetCursorPosCallback([&](G::Window&, const double xPos, const double yPos)
-        { m_MousePosition = {static_cast<float>(xPos), static_cast<float>(yPos)}; });
-    ;
 
-    window.SetScrollCallback([&](G::Window&, const double xOffset, const double yOffset)
-        { m_ScrollOffset = {static_cast<float>(xOffset), static_cast<float>(yOffset)}; });
+    window.SetCursorPosCallback(
+        [&](G::Window&, const double xPos, const double yPos)
+        {
+            auto& s = m_Engine.GetStates<InputState>();
+            s.MousePosition = {static_cast<float>(xPos), static_cast<float>(yPos)};
+        });
+
+    window.SetScrollCallback(
+        [&](G::Window&, const double xOffset, const double yOffset)
+        {
+            m_Engine.GetStates<InputState>().ScrollOffset = {
+                static_cast<float>(xOffset), static_cast<float>(yOffset)};
+        });
 
     window.SetKeyCallback(
         [&](G::Window&, G::Key key, int scancode, G::Action action, int mod)
         {
+            auto& s = m_Engine.GetStates<InputState>();
             if (action == G::Action::Press || action == G::Action::Repeat)
             {
-                m_CurrentKeys[ToIndex(key)] = true;
+                s.CurrentKeys[ToIndex(key)] = true;
             }
             else if (action == G::Action::Release)
             {
-                m_CurrentKeys[ToIndex(key)] = false;
+                s.CurrentKeys[ToIndex(key)] = false;
             }
         });
 
     window.SetMouseButtonCallback(
         [&](G::Window&, G::MouseButton button, G::Action action, int mods)
         {
+            auto& s = m_Engine.GetStates<InputState>();
             if (action == G::Action::Press)
             {
-                m_CurrentMouseButtons[ToIndex(button)] = true;
+                s.CurrentMouseButtons[ToIndex(button)] = true;
             }
             else if (action == G::Action::Release)
             {
-                m_CurrentMouseButtons[ToIndex(button)] = false;
+                s.CurrentMouseButtons[ToIndex(button)] = false;
             }
         });
 }
 
 void Input::BeginFrame(double dt)
 {
-    if (m_FirstMouse)
+    auto& s = m_Engine.GetStates<InputState>();
+    if (s.FirstMouse)
     {
-        m_PreviousMousePosition = GetMousePosition();
-        m_FirstMouse = false;
+        s.PreviousMousePosition = s.MousePosition;
+        s.FirstMouse = false;
     }
 }
 
 void Input::EndFrame(double dt)
 {
-    m_ScrollOffset = {0, 0};
-    m_PreviousMousePosition = m_MousePosition;
-    m_PreviousKeys = m_CurrentKeys;
-    m_PreviousMouseButtons = m_CurrentMouseButtons;
+    auto& s = m_Engine.GetStates<InputState>();
+    s.ScrollOffset = {0, 0};
+    s.PreviousMousePosition = s.MousePosition;
+    s.PreviousKeys = s.CurrentKeys;
+    s.PreviousMouseButtons = s.CurrentMouseButtons;
 }
 } // namespace Ivy::I

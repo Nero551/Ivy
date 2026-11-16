@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
@@ -27,6 +28,12 @@
 
 namespace Ivy::Sandbox
 {
+struct StressTester3DState : C::State
+{
+    float Multiplier = 1;
+    std::vector<ECS::EntityID> Points;
+};
+
 struct StressTester3D : C::System
 {
     using C::System::System;
@@ -49,51 +56,53 @@ struct StressTester3D : C::System
 
     void Update(double dt) override
     {
+        auto& state = m_Engine.GetStates<StressTester3DState>();
         auto& input = m_Engine.GetSystems<I::Input>();
         auto& query = m_Engine.ECS.Query;
 
         if (input.IsKeyHeld(G::Key::Left))
         {
-            multiplier -= 5 * dt;
+            state.Multiplier -= 5 * dt;
         }
         if (input.IsKeyHeld(G::Key::Right))
         {
-            multiplier += 5 * dt;
+            state.Multiplier += 5 * dt;
         }
 
-        if (multiplier != 1)
+        if (state.Multiplier != 1)
         {
-            for (auto& point : points)
+            for (auto& point : state.Points)
             {
                 auto& transform = query.GetComponent<CMP::Transform3D>(m_Engine.ECS.GetEntity(point));
-                transform.Position *= multiplier;
+                transform.Position *= state.Multiplier;
             }
         }
 
-        multiplier = 1;
+        state.Multiplier = 1;
     };
 
   private:
-    float multiplier = 1;
-    std::vector<ECS::EntityID> points;
-
     void TwoDimensionalProjection(int increase)
     {
-        points.reserve(M::Pow(360.0f / increase, 1.0f));
+        auto& state = m_Engine.GetStates<StressTester3DState>();
+
+        state.Points.reserve(M::Pow(360.0f / increase, 1.0f));
         D::Log::Info(M::Pow(360.0f / increase, 1.0f));
         for (float theta = -180; theta < 180; theta += increase)
         {
             M::Vector<2> v2 = M::Vector<2>::FromPolar(M::Polar(M::Rad(theta)));
             float proj = v2.StereoProject();
             auto& point = Plot({proj, 0, 0});
-            points.emplace_back(point.GetId());
+            state.Points.emplace_back(point.GetId());
         }
     }
 
     void ThreeDimensionalProjection(int increase)
     {
+        auto& state = m_Engine.GetStates<StressTester3DState>();
+
         D::Log::Info(M::Pow(360.0f / increase, 2.0f));
-        points.reserve(M::Pow(360.0f / increase, 2.0f));
+        state.Points.reserve(M::Pow(360.0f / increase, 2.0f));
 
         for (float theta = -180; theta < 180; theta += increase)
         {
@@ -102,14 +111,16 @@ struct StressTester3D : C::System
                 M::Vector<3> v3 = M::Vector<3>::FromSpherical(M::Spherical(M::Rad(theta), M::Rad(phi)));
                 M::Vector<2> proj = v3.StereoProject();
                 auto& point = Plot({proj.x, proj.y, 0});
-                points.emplace_back(point.GetId());
+                state.Points.emplace_back(point.GetId());
             }
         }
     }
 
     void FourDimensionalProjection(int increase)
     {
-        points.reserve(M::Pow(360.0f / increase, 3.0f));
+        auto& state = m_Engine.GetStates<StressTester3DState>();
+
+        state.Points.reserve(M::Pow(360.0f / increase, 3.0f));
         D::Log::Info(M::Pow(360.0f / increase, 3.0f));
         m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3.0f));
 
@@ -123,7 +134,7 @@ struct StressTester3D : C::System
                         M::HyperSpherical<>{M::Rad(theta), M::Rad(phi), M::Rad(h), 1});
                     M::Vector<3> proj = v4.StereoProject();
                     auto& point = Plot(proj);
-                    points.emplace_back(point.GetId());
+                    state.Points.emplace_back(point.GetId());
                 }
             }
         }

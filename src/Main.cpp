@@ -51,16 +51,25 @@ int main(const int argc, char* argv[])
             // engine.Window.SetSize(1920, 1200);
             // Ivy::G::Context::SwapInterval(0);
 
-            using Sandbox2D = std::tuple<Ivy::Sandbox::VectorFields2D, Ivy::Sandbox::Sandbox2D,
+            using Sandbox2D = std::tuple<Ivy::Sandbox::StressTester2DState, Ivy::Sandbox::VectorFields2DState,
+                Ivy::Sandbox::VectorFields2D, Ivy::Sandbox::Controller2DState, Ivy::Sandbox::Sandbox2D,
                 Ivy::Sandbox::StressTester2D, Ivy::Sandbox::Controller2D>;
 
-            using Sandbox3D = std::tuple<Ivy::Sandbox::VectorFields3D, Ivy::Sandbox::Sandbox3D,
-                Ivy::Sandbox::StressTester3D, Ivy::Sandbox::Controller3D>;
+            using Sandbox3D = std::tuple<Ivy::Sandbox::VectorFields3DState, Ivy::Sandbox::VectorFields3D,
+                Ivy::Sandbox::Sandbox3D, Ivy::Sandbox::StressTester3DState, Ivy::Sandbox::StressTester3D,
+                Ivy::Sandbox::Controller3DState, Ivy::Sandbox::Controller3D>;
+
+            using RendererPlugin = std::tuple<Ivy::R::LightingSystem, Ivy::R::Renderer, Ivy::R::RendererState,
+                Ivy::R::LightingSystemState>;
+
+            engine.AddPlugins<Sandbox3D, RendererPlugin>();
+            engine.AddSystems<Ivy::C::ResourceManager, Ivy::C::TransformSystem, Ivy::I::Input,
+                Ivy::Profiling>();
+
+            engine.AddStates<Ivy::I::InputState, Ivy::ProfilingState, Ivy::C::ResourceManagerState,
+                Ivy::C::TransformSystemState>();
 
             engine.World.SetRoot(Ivy::C::Node::Create(engine.ECS));
-            engine.AddPlugins<Sandbox3D>();
-            engine.AddSystems<Ivy::C::ResourceManager, Ivy::C::TransformSystem, Ivy::I::Input,
-                Ivy::R::LightingSystem, Ivy::R::Renderer, Ivy::Profiling>();
         }};
 
     engine.Run();

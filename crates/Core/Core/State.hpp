@@ -4,6 +4,6 @@ namespace Ivy::C
 struct State
 {
     State() = default;
-    virtual ~State();
+    virtual ~State() = default;
 };
 } // namespace Ivy::C

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Engine.hpp"
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Systems/Resource.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
@@ -7,10 +9,18 @@
 #include <concepts>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 namespace Ivy::C
 {
+
+struct ResourceManagerState : C::State
+{
+    U::SparseSetSoA<std::unique_ptr<IResource>> Resources{};
+    std::unordered_map<std::string, IResource::Handle> ResourceLookup{};
+    U::GIndexPool<> Handles{};
+};
 
 /** @brief Manages the lifetime, storage, and retrieval of resources. */
 struct ResourceManager : System
@@ -31,20 +41,21 @@ struct ResourceManager : System
     Resource<T>& Load(const std::string& name, Args&&... args)
         requires std::constructible_from<Resource<T>, const std::string&, Args...> && NamedResource<T>
     {
+        auto& state = m_Engine.GetStates<ResourceManagerState>();
         std::string key = typeid(T).name() + name;
 
-        if (const auto it = m_ResourceLookup.find(key); it != m_ResourceLookup.end())
+        if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
         {
-            return static_cast<Resource<T>&>(*m_Resources[it->second.Index]);
+            return static_cast<Resource<T>&>(*state.Resources[it->second.Index]);
         }
 
         auto resource = std::make_unique<Resource<T>>(name, std::forward<Args>(args)...);
-        typename Resource<T>::Handle handle = m_Handles.Acquire();
+        typename Resource<T>::Handle handle = state.Handles.Acquire();
         resource->m_Handle = handle;
 
-        m_ResourceLookup.emplace(std::move(key), handle);
+        state.ResourceLookup.emplace(std::move(key), handle);
 
-        return static_cast<Resource<T>&>(**m_Resources.Emplace(handle.Index, std::move(resource)));
+        return static_cast<Resource<T>&>(**state.Resources.Emplace(handle.Index, std::move(resource)));
     }
 
     /**
@@ -60,39 +71,41 @@ struct ResourceManager : System
     template <typename T>
     Resource<T>& Load(T& object) requires(std::move_constructible<T> && NamedResource<T>)
     {
+        auto& state = m_Engine.GetStates<ResourceManagerState>();
         std::string key = typeid(T).name() + object.GetName();
 
-        if (const auto it = m_ResourceLookup.find(key); it != m_ResourceLookup.end())
+        if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
         {
-            return static_cast<Resource<T>&>(*m_Resources[it->second.Index]);
+            return static_cast<Resource<T>&>(*state.Resources[it->second.Index]);
         }
 
         auto resource = std::make_unique<Resource<T>>(std::move(object));
-        typename Resource<T>::Handle handle = m_Handles.Acquire();
+        typename Resource<T>::Handle handle = state.Handles.Acquire();
         resource->m_Handle = handle;
 
-        m_ResourceLookup.emplace(std::move(key), handle);
+        state.ResourceLookup.emplace(std::move(key), handle);
 
-        return static_cast<Resource<T>&>(**m_Resources.Emplace(handle.Index, std::move(resource)));
+        return static_cast<Resource<T>&>(**state.Resources.Emplace(handle.Index, std::move(resource)));
     }
 
     template <typename T>
     Resource<T>& Load(T&& object) requires(std::move_constructible<T> && NamedResource<T>)
     {
+        auto& state = m_Engine.GetStates<ResourceManagerState>();
         std::string key = typeid(T).name() + object.GetName();
 
-        if (const auto it = m_ResourceLookup.find(key); it != m_ResourceLookup.end())
+        if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
         {
-            return static_cast<Resource<T>&>(*m_Resources[it->second.Index]);
+            return static_cast<Resource<T>&>(*state.Resources[it->second.Index]);
         }
 
         auto resource = std::make_unique<Resource<T>>(std::forward<T>(object));
-        typename Resource<T>::Handle handle = m_Handles.Acquire();
+        typename Resource<T>::Handle handle = state.Handles.Acquire();
         resource->m_Handle = handle;
 
-        m_ResourceLookup.emplace(std::move(key), handle);
+        state.ResourceLookup.emplace(std::move(key), handle);
 
-        return static_cast<Resource<T>&>(**m_Resources.Emplace(handle.Index, std::move(resource)));
+        return static_cast<Resource<T>&>(**state.Resources.Emplace(handle.Index, std::move(resource)));
     }
 
     /**
@@ -102,27 +115,29 @@ struct ResourceManager : System
     */
     template <typename T> void Unload(const std::string& name)
     {
+        auto& state = m_Engine.GetStates<ResourceManagerState>();
         std::string key = typeid(T).name() + name;
 
-        const auto it = m_ResourceLookup.find(key);
-        if (it == m_ResourceLookup.end())
+        const auto it = state.ResourceLookup.find(key);
+        if (it == state.ResourceLookup.end())
         {
             return;
         }
 
         const IResource::Handle handle = it->second;
 
-        m_ResourceLookup.erase(it);
-        m_Resources.Erase(handle.Index);
-        m_Handles.Release(handle);
+        state.ResourceLookup.erase(it);
+        state.Resources.Erase(handle.Index);
+        state.Handles.Release(handle);
     }
 
     /** @brief Unloads all resources and resets the resource manager. */
     void UnloadAll()
     {
-        m_Handles.Clear();
-        m_ResourceLookup.clear();
-        m_Resources.Clear();
+        auto& state = m_Engine.GetStates<ResourceManagerState>();
+        state.Handles.Clear();
+        state.ResourceLookup.clear();
+        state.Resources.Clear();
     }
 
     /**
@@ -137,8 +152,10 @@ struct ResourceManager : System
      */
     template <typename T> Resource<T>& Acquire(const IResource::Handle handle) const
     {
-        return static_cast<Resource<T>&>(*m_Resources[handle.Index]);
+        const auto& state = m_Engine.GetStates<ResourceManagerState>();
+        return static_cast<Resource<T>&>(*state.Resources[handle.Index]);
     }
+
     /**
      * @brief Retrieves a resource by its type and name.
      *
@@ -152,7 +169,9 @@ struct ResourceManager : System
      */
     template <typename T> Resource<T>& Acquire(const std::string& name)
     {
-        return static_cast<Resource<T>&>(*m_Resources[m_ResourceLookup.at(typeid(T).name() + name).Index]);
+        auto& state = m_Engine.GetStates<ResourceManagerState>();
+        return static_cast<Resource<T>&>(
+            *state.Resources[state.ResourceLookup.at(typeid(T).name() + name).Index]);
     }
 
     /**
@@ -164,7 +183,8 @@ struct ResourceManager : System
      */
     template <typename T> bool Exists(const std::string& name) const
     {
-        return m_ResourceLookup.contains(typeid(T).name() + name);
+        const auto& state = m_Engine.GetStates<ResourceManagerState>();
+        return state.ResourceLookup.contains(typeid(T).name() + name);
     }
 
     /**
@@ -175,7 +195,8 @@ struct ResourceManager : System
      */
     bool Exists(const IResource::Handle handle) const
     {
-        return m_Resources.Contains(handle.Index) && m_Handles.IsAcquired(handle);
+        const auto& state = m_Engine.GetStates<ResourceManagerState>();
+        return state.Resources.Contains(handle.Index) && state.Handles.IsAcquired(handle);
     }
 
   protected:
@@ -183,10 +204,5 @@ struct ResourceManager : System
     {
         UnloadAll();
     }
-
-  private:
-    U::SparseSetSoA<std::unique_ptr<IResource>> m_Resources{};
-    std::unordered_map<std::string, IResource::Handle> m_ResourceLookup{};
-    U::GIndexPool<> m_Handles{};
 };
 } // namespace Ivy::C

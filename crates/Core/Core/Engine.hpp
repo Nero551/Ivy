@@ -112,7 +112,7 @@ struct Engine
         return {AddSystems<Args>()...};
     }
 
-    template <typename Tuple> decltype(auto) AddPlugins() requires(U::IsTSpec<Tuple, std::tuple>)
+    template <typename Tuple> void AddPlugins() requires(U::IsTSpec<Tuple, std::tuple>)
     {
         return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
             [this]<typename... Args>()
@@ -134,10 +134,9 @@ struct Engine
     }
 
     template <typename... Tuples>
-    std::tuple<Tuples...> AddPlugins()
-        requires(sizeof...(Tuples) != 1 && (U::IsTSpec<Tuples, std::tuple> && ...))
+    void AddPlugins() requires(sizeof...(Tuples) != 1 && (U::IsTSpec<Tuples, std::tuple> && ...))
     {
-        return {AddPlugins<Tuples>()...};
+        (AddPlugins<Tuples>(), ...);
     }
 
     template <typename First, typename Second, typename... Args> void Chain(Execution execution)
@@ -154,12 +153,12 @@ struct Engine
 
     template <IsState T> T& GetStates() const
     {
-        auto system = m_Systems.Find<T>();
-        if (system == m_Systems.end())
+        auto state = m_States.Find<T>();
+        if (state == m_States.end())
         {
-            D::Log::Error(std::format("System {} not found", typeid(T).name()));
+            D::Log::Error(std::format("State {} not found", typeid(T).name()));
         }
-        return static_cast<T&>(**system);
+        return static_cast<T&>(**state);
     }
 
     template <IsState... Args> std::tuple<Args&...> GetStates() const requires(sizeof...(Args) != 1)
@@ -174,7 +173,7 @@ struct Engine
 
     template <IsState T> T& AddStates()
     {
-        m_States.Emplace<T>(std::make_unique<T>(*this));
+        m_States.Emplace<T>(std::make_unique<T>());
         return static_cast<T&>(*m_States.Get<T>());
     }
 

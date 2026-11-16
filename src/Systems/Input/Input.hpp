@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "Graphics/InputEnums/Key.hpp"
@@ -9,6 +10,22 @@
 
 namespace Ivy::I
 {
+struct InputState : C::State
+{
+    G::CursorMode MouseMode = G::CursorMode::Normal;
+    M::Vector<2> MousePosition{0};
+    M::Vector<2> PreviousMousePosition{0};
+    bool FirstMouse = true;
+
+    M::Vector<2> ScrollOffset{0};
+
+    std::array<bool, G::KeyCount> CurrentKeys{};
+    std::array<bool, G::KeyCount> PreviousKeys{};
+
+    std::array<bool, G::MouseButtonCount> CurrentMouseButtons{};
+    std::array<bool, G::MouseButtonCount> PreviousMouseButtons{};
+};
+
 struct Input : C::System
 {
     using C::System::System;
@@ -37,22 +54,9 @@ struct Input : C::System
     void SetMouseMode(G::CursorMode mode);
 
   private:
-    G::CursorMode m_MouseMode = G::CursorMode::Normal;
-    M::Vector<2> m_MousePosition{0};
-    M::Vector<2> m_PreviousMousePosition{0};
-    bool m_FirstMouse = true;
-
-    M::Vector<2> m_ScrollOffset{0};
-
     constexpr unsigned int ToIndex(G::Key key);
 
     constexpr unsigned int ToIndex(G::MouseButton button);
-
-    std::array<bool, G::KeyCount> m_CurrentKeys{};
-    std::array<bool, G::KeyCount> m_PreviousKeys{};
-
-    std::array<bool, G::MouseButtonCount> m_CurrentMouseButtons{};
-    std::array<bool, G::MouseButtonCount> m_PreviousMouseButtons{};
 
   protected:
     void Start() override;

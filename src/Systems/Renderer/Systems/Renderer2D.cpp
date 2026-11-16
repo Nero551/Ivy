@@ -16,7 +16,7 @@ void Renderer::Start2D()
     m_Engine.ECS.EntityDestroyed.Subscribe(
         [this](const ECS::Entity& entity)
         {
-            for (auto& batch : Batches2D)
+            for (auto& batch : m_Engine.GetStates<RendererState>().Batches2D)
             {
                 if (batch.Instances.Contains(entity.GetId().Index))
                 {
@@ -43,11 +43,12 @@ void Renderer::Render2D()
     M::Matrix<4, 4> view = transform.GetModelMatrix().Inverse();
     auto& camPos = transform.m_GlobalPosition;
 
-    GUniformbuffer.Set(view, 0);
-    GUniformbuffer.Set(projection, 64);
-    GUniformbuffer.Set(m_Engine.GetTime(), 128);
-    GUniformbuffer.Set(M::Vector<3>{camPos().x, camPos().y, 0}, 144);
-    GUniformbuffer.Bind();
+    auto& guniformBuffer = m_Engine.GetStates<RendererState>().GUniformbuffer;
+    guniformBuffer.Set(view, 0);
+    guniformBuffer.Set(projection, 64);
+    guniformBuffer.Set(m_Engine.GetTime(), 128);
+    guniformBuffer.Set(M::Vector<3>{camPos().x, camPos().y, 0}, 144);
+    guniformBuffer.Bind();
 
     query.ForEach<CMP::Material, CMP::Transform2D, CMP::Mesh>(
         [&](unsigned int entityId, CMP::Material& materialComponent, CMP::Transform2D& transform,
@@ -60,7 +61,7 @@ void Renderer::Render2D()
 
             FillBatches2D(entityId, transform, materialComponent, meshComponent);
         });
-    for (auto& batch : Batches2D)
+    for (auto& batch : m_Engine.GetStates<RendererState>().Batches2D)
     {
         batch.Render();
     }
@@ -72,8 +73,8 @@ void Renderer::FillBatches2D(unsigned int entityId, CMP::Transform2D& transformC
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
 
-    RenderBatch& batch =
-        Batches2D.GetOrEmplace(materialId, meshId, meshComponent.Mesh, materialComponent.Material);
+    RenderBatch& batch = m_Engine.GetStates<RendererState>().Batches2D.GetOrEmplace(
+        materialId, meshId, meshComponent.Mesh, materialComponent.Material);
 
     if (!batch.Instances.Contains(entityId) || transformComponent.m_GlobalPosition.IsChanged() ||
         transformComponent.m_GlobalRotation.IsChanged() || transformComponent.m_GlobalScale.IsChanged())

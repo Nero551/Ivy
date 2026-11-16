@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
@@ -26,14 +27,21 @@
 
 namespace Ivy::Sandbox
 {
+struct VectorFields3DState : C::State
+{
+    U::CheckedPtr<C::Resource<G::Mesh>> Mesh;
+    U::CheckedPtr<C::Resource<G::Material>> Material;
+};
+
 struct VectorFields3D : C::System
 {
     using C::System::System;
 
     void Start() override
     {
+        auto& state = m_Engine.GetStates<VectorFields3DState>();
         auto& resources = m_Engine.GetSystems<C::ResourceManager>();
-        m_Mesh = &resources.Load(G::Primitives::CreateArrow3D("vectorArrow3D"));
+        state.Mesh = &resources.Load(G::Primitives::CreateArrow3D("vectorArrow3D"));
 
         auto& vertSource = resources.Load<G::ShaderSource>(
             "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
@@ -42,13 +50,15 @@ struct VectorFields3D : C::System
 
         auto& shader = resources.Load<G::Shader>("arrowShader", vertSource, fragSource);
 
-        m_Material = &resources.Load<G::Material>("arrowMat");
-        m_Material->Get().Shader = &shader();
-        m_Material->Get().Color = {1, 1, 1, 1};
+        state.Material = &resources.Load<G::Material>("arrowMat");
+        state.Material->Get().Shader = &shader();
+        state.Material->Get().Color = {1, 1, 1, 1};
     }
 
     void LorenzSystem()
     {
+        auto& state = m_Engine.GetStates<VectorFields3DState>();
+
         float sigma = 10;
         float rho = 28;
         float beta = 8.0f / 3.0f;
@@ -66,17 +76,16 @@ struct VectorFields3D : C::System
         auto& query = m_Engine.ECS.Query;
 
         eq.Solve({0, 0.9, 1, 1.1}, 100, 0.001f,
-            [&](const M::ODEState<float, float, float, float>& state)
+            [&](const M::ODEState<float, float, float, float>& stateOde)
             {
-                auto [x, y, z] = state.State;
-                auto [dx, dy, dz] = eq.Derivative(state).State;
+                auto [x, y, z] = stateOde.State;
+                auto [dx, dy, dz] = eq.Derivative(stateOde).State;
 
                 auto& arrow = Arrow();
 
                 CMP::Transform3D& transform = query.GetComponent<CMP::Transform3D>(arrow);
 
                 transform.Position = M::Vector<3>{x, y, z};
-                // transform.Scale = M::Vector<3>{0.2, 0.1, 0.2};
                 transform.Rotation =
                     M::Quaternion<>::FromTo(M::Vector<3>{1.0f, 0.0f, 0.0f}, M::Vector<3>{dx, dy, dz});
                 magnitudes.push_back(0.3f);
@@ -87,23 +96,21 @@ struct VectorFields3D : C::System
         G::ArrayBuffer buffer{};
 
         buffer.SetData(magnitudes);
-        m_Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        m_Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        m_Mesh->Get().VAO.SetAttribDivisor(2, 1);
+        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
     ECS::Entity& Arrow()
     {
+        auto& state = m_Engine.GetStates<VectorFields3DState>();
         auto& query = m_Engine.ECS.Query;
 
         auto& arrow = R::MeshInstance3D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Mesh>(arrow).Mesh = m_Mesh;
-        query.GetComponent<CMP::Material>(arrow).Material = m_Material;
+        query.GetComponent<CMP::Mesh>(arrow).Mesh = state.Mesh;
+        query.GetComponent<CMP::Material>(arrow).Material = state.Material;
 
         return arrow;
     }
-
-    U::CheckedPtr<C::Resource<G::Mesh>> m_Mesh;
-    U::CheckedPtr<C::Resource<G::Material>> m_Material;
 };
 } // namespace Ivy::Sandbox

@@ -9,19 +9,21 @@ namespace Ivy::C
 
 void TransformSystem::Update(double dt)
 {
+    auto& state = m_Engine.GetStates<TransformSystemState>();
     auto& query = m_Engine.ECS.Query;
     auto& world = m_Engine.World;
     auto& ecs = m_Engine.ECS;
-    if (ecs.EntityHierarchy.Version() != hierarchyVersion || descendants.empty() || ecs.Version != ecsVersion)
+    if (ecs.EntityHierarchy.Version() != state.HierarchyVersion || state.Descendants.empty() ||
+        ecs.Version != state.EcsVersion)
     {
-        descendants = world.GetRoot().GetDescendants();
-        hierarchyVersion = ecs.EntityHierarchy.Version();
-        ecsVersion = ecs.Version;
+        state.Descendants = world.GetRoot().GetDescendants();
+        state.HierarchyVersion = ecs.EntityHierarchy.Version();
+        state.EcsVersion = ecs.Version;
     }
 
     U::CheckedPtr<CMP::Transform2D> parentTransform2D = nullptr;
     U::CheckedPtr<CMP::Transform3D> parentTransform3D = nullptr;
-    for (U::CheckedPtr<ECS::Entity> descendant : descendants)
+    for (U::CheckedPtr<ECS::Entity> descendant : state.Descendants)
     {
         auto& entity = *descendant;
         U::CheckedPtr<ECS::Entity> parent = entity.TryFindParent();
@@ -56,7 +58,6 @@ void TransformSystem::Do2D(
 
     if (parentTransform2D && transform2D->InheritTransform)
     {
-
         transform2D->m_GlobalPosition = parentTransform2D->m_GlobalPosition + transform2D->Position;
         transform2D->m_GlobalRotation = parentTransform2D->m_GlobalRotation + transform2D->Rotation;
         transform2D->m_GlobalScale = parentTransform2D->m_GlobalScale * transform2D->Scale;

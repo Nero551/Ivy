@@ -48,14 +48,16 @@ void Renderer::SetupFramebuffer()
     screenShader().AssignSource(screenVert);
     screenShader().AssignSource(screenFrag);
 
-    ScreenMaterial.Shader = &screenShader();
-    ScreenMaterial.Depth.Enabled = false;
-    ScreenMaterial.Stencil.Enabled = false;
-    ScreenMaterial.Blend.Enabled = false;
+    auto& rState = m_Engine.GetStates<RendererState>();
 
-    ScreenMesh.Vertices = vertices;
-    ScreenMesh.Indices = indices;
-    ScreenMesh.CullMode = G::CullMode::None;
+    rState.ScreenMaterial.Shader = &screenShader();
+    rState.ScreenMaterial.Depth.Enabled = false;
+    rState.ScreenMaterial.Stencil.Enabled = false;
+    rState.ScreenMaterial.Blend.Enabled = false;
+
+    rState.ScreenMesh.Vertices = vertices;
+    rState.ScreenMesh.Indices = indices;
+    rState.ScreenMesh.CullMode = G::CullMode::None;
 
     auto& screenTexture = resources.Load<G::Texture2D>("COLOR_BUFFER");
     screenTexture.Get().Width = window.GetWidth();
@@ -67,15 +69,15 @@ void Renderer::SetupFramebuffer()
     screenTexture.Get().MagFilter = G::TextureFilter::Linear;
     screenTexture.Get().MinFilter = G::TextureFilter::Linear;
 
-    Framebuffer.AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
+    rState.Framebuffer.AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
 
     m_Engine.Window.SetFramebufferSizeCallback(
         [&](G::Window& win, const int w, const int h)
         {
             G::Context::SetViewport(0, 0, w, h);
             auto& graphics = m_Engine.GetSystems<Renderer>();
-            graphics.MSAntiAliasing.OutputBuffer.Resize(w, h);
-            graphics.Framebuffer.Resize(w, h);
+            m_Engine.GetStates<RendererState>().MSAntiAliasing.OutputBuffer.Resize(w, h);
+            m_Engine.GetStates<RendererState>().Framebuffer.Resize(w, h);
         });
 }
 
@@ -85,22 +87,24 @@ void Renderer::PresentFramebuffer()
     int width = window.GetWidth();
     int height = window.GetHeight();
 
-    MSAntiAliasing.OutputBuffer.Blit(Framebuffer, width, height, width, height, G::BufferBit::Color);
+    auto& rState = m_Engine.GetStates<RendererState>();
+    rState.MSAntiAliasing.OutputBuffer.Blit(
+        rState.Framebuffer, width, height, width, height, G::BufferBit::Color);
 
-    MSAntiAliasing.OutputBuffer.Unbind();
+    rState.MSAntiAliasing.OutputBuffer.Unbind();
 
     G::Context::ClearColor(0.08, 0.05, 0.1, 1);
     G::Context::Clear(G::BufferBit::Color);
 
     int i = 0;
-    for (auto& [attachment, texture] : Framebuffer.TextureAttachments)
+    for (auto& [attachment, texture] : rState.Framebuffer.TextureAttachments)
     {
-        ScreenMaterial.AssignTexture(*texture, i);
+        rState.ScreenMaterial.AssignTexture(*texture, i);
         ++i;
     }
 
-    ScreenMaterial.Use();
-    ScreenMesh.Draw();
+    rState.ScreenMaterial.Use();
+    rState.ScreenMesh.Draw();
 }
 
 void Renderer::Start()
@@ -108,9 +112,10 @@ void Renderer::Start()
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);
 
-    GUniformbuffer.Size = 160;
+    auto& rState = m_Engine.GetStates<RendererState>();
+    rState.GUniformbuffer.Size = 160;
 
-    MSAntiAliasing.Generate(m_Engine.Window.GetWidth(), m_Engine.Window.GetHeight());
+    rState.MSAntiAliasing.Generate(m_Engine.Window.GetWidth(), m_Engine.Window.GetHeight());
     SetupFramebuffer();
 
     Start3D();
@@ -119,7 +124,8 @@ void Renderer::Start()
 
 void Renderer::BeginFrame(double dt)
 {
-    MSAntiAliasing.OutputBuffer.Bind();
+    auto& rState = m_Engine.GetStates<RendererState>();
+    rState.MSAntiAliasing.OutputBuffer.Bind();
     G::Context::ClearColor(0.08, 0.05, 0.1, 1);
     G::Context::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
 }
@@ -138,8 +144,9 @@ void Renderer::Render()
 
 void Renderer::Stop()
 {
+    auto& rState = m_Engine.GetStates<RendererState>();
     const G::Texture2D& texture =
-        static_cast<G::Texture2D&>(Framebuffer.GetTexture(G::FramebufferAttachment::Color0));
+        static_cast<G::Texture2D&>(rState.Framebuffer.GetTexture(G::FramebufferAttachment::Color0));
 
     G::Image image = {texture.Width, texture.Height, G::Image::ColorChannels::RGB, texture.ReadPixels()};
     image.SaveToDiskPNG("assets/LastFrame.png", true);

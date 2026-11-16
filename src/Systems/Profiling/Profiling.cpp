@@ -10,41 +10,43 @@ namespace Ivy
 
 void Profiling::Update(const double dt)
 {
-    m_Elapsed += dt;
+    auto& state = m_Engine.GetStates<ProfilingState>();
 
-    FrameMs = dt * 1000.0;
-    ++FrameCount;
+    state.Elapsed += dt;
 
-    if (FrameTimes.size() > 60)
+    state.FrameMs = dt * 1000.0;
+    ++state.FrameCount;
+
+    if (state.FrameTimes.size() > 60)
     {
-        FrameTimes.pop_front();
+        state.FrameTimes.pop_front();
     }
 
-    FrameTimes.push_back(FrameMs);
+    state.FrameTimes.push_back(state.FrameMs);
 
-    if (m_Elapsed >= 1.0)
+    if (state.Elapsed >= 1.0)
     {
-        m_Elapsed = 0.0;
+        state.Elapsed = 0.0;
 
         double sum = 0.0;
 
-        for (const double frame : FrameTimes)
+        for (const double frame : state.FrameTimes)
         {
             sum += frame;
         }
 
-        const double averageFrameMs = sum / FrameTimes.size();
+        const double averageFrameMs = sum / state.FrameTimes.size();
 
         std::array<char, 128> buffer;
 
-        const auto end = std::format_to(
-            buffer.begin(), "FPS: {} | AVG: {:.2f} ms | {:.2f} ms", FrameCount, averageFrameMs, FrameMs);
+        const auto end = std::format_to(buffer.begin(), "FPS: {} | AVG: {:.2f} ms | {:.2f} ms",
+            state.FrameCount, averageFrameMs, state.FrameMs);
 
         *end = '\0';
 
         m_Engine.Window.SetTitle(buffer.data());
 
-        FrameCount = 0;
+        state.FrameCount = 0;
     }
 }
 } // namespace Ivy
