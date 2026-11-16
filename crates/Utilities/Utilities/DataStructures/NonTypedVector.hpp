@@ -120,6 +120,15 @@ template <typename T, std::unsigned_integral NonTypeIdType = unsigned int> struc
         return {.TypedVector = this, .Index = typeId};
     }
 
+    template <auto... Args> NonTypeIdType GetIndex()
+    {
+        if (Contains<Args...>())
+        {
+            return GetTypeId<Args...>();
+        }
+        return InvalidTypeId;
+    }
+
     /** @brief Stores a value for the specified type combination if it does not exist. */
     template <auto... Args> T& Push(const T& value)
     {

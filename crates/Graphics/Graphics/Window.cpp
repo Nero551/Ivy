@@ -1,10 +1,10 @@
 #include "Window.hpp"
+#include "Diagnostics/Log.hpp"
 #include "GLFW/glfw3.h"
 #include "Graphics/GLFWPlatform.hpp"
+#include "Graphics/Image.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "OpenGL.hpp"
-#include "Diagnostics/Log.hpp"
-#include "Graphics/Image.hpp"
 #include <string>
 #include <string_view>
 
@@ -82,6 +82,11 @@ void Window::PollEvents()
 void Window::SetTitle(const std::string& title)
 {
     glfwSetWindowTitle(m_GlfwWindow, title.c_str());
+}
+
+std::string Window::GetTitle() const
+{
+    return glfwGetWindowTitle(m_GlfwWindow);
 }
 
 void Window::SetIcon(const G::Image& icon)

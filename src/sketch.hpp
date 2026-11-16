@@ -1,16 +1,20 @@
 #pragma once
 
+#include "Core/DependencyGraph.hpp"
+#include "Core/Engine.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
+#include "Utilities/stl.hpp"
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <concepts>
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <ostream>
@@ -315,10 +319,8 @@ inline void Test()
 {
     //TODO: download and setup bevy, i would like to know how they do things.
     //
-    // TODO: remove data from systems, start using State.
-    //
     // TODO: [DONE] step 1: integrate the Execution Order thing. \
-    // step 2: create State(singleton-like indexed by type), engine owns all states. systems request state, they do not own it. \
+    // [DONE] step 2: create State(singleton-like indexed by type), engine owns all states. systems request state, they do not own it. \
     // step 3: systems become free functions. no longer objects. \
     // step 4: enforce strict parameters on systems via compile-time dependency chain stuff. \
     // step 5: MULTI-THREADING

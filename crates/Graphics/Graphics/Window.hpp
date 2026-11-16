@@ -122,6 +122,7 @@ struct Window
     void PollEvents();
 
     void SetTitle(const std::string& title);
+    std::string GetTitle() const;
 
     void SetIcon(const G::Image& icon);
 
