@@ -1,6 +1,5 @@
 #include "Engine.hpp"
 
-#include "Core/DependencyGraph.hpp"
 #include "Core/System.hpp"
 #include "Core/SystemManager.hpp"
 #include "Diagnostics/Profiling.hpp"
@@ -59,6 +58,7 @@ void Engine::BeginFrame()
 
     TimeHandler.CalculateTime(G::Context::GetTime());
     Window.PollEvents();
+    Input.FirstMouseCheck();
 
     SM.LoopOver<Execution::BeginFrame>(*this, TimeHandler.GetDelta());
 }
@@ -93,6 +93,7 @@ void Engine::EndFrame()
     IVY_PROFILE_GPU_ZONE("End Frame");
 
     Window.SwapBuffers();
+    Input.Refresh();
 
     SM.LoopOver<Execution::EndFrame>(*this, TimeHandler.GetDelta());
 

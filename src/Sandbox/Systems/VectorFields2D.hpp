@@ -2,23 +2,26 @@
 
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
-#include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
+#include "ECS/Entity.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/DataType.hpp"
 #include "Graphics/Material/Material.hpp"
+#include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
-#include "Graphics/Texture/Texture.hpp"
+#include "Graphics/Shader/Shader.hpp"
+#include "Graphics/Shader/ShaderSource.hpp"
+#include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Equations/ODE.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
 #include "Systems/Resource.hpp"
 #include "Systems/ResourceManager.hpp"
 #include "Utilities/CheckedPtr.hpp"
-#include <array>
 #include <cmath>
 #include <string>
 #include <vector>
@@ -27,390 +30,301 @@ namespace Ivy::Sandbox
 {
 struct VectorFields2DState : C::State
 {
-    U::CheckedPtr<C::Resource<G::Mesh>> Mesh;
-    U::CheckedPtr<C::Resource<G::Material>> Material;
+    U::CheckedPtr<Resource<G::Mesh>> Mesh;
+    U::CheckedPtr<Resource<G::Material>> Material;
 };
 
-struct VectorFields2D : C::System
+namespace VectorFields2D
 {
-    using C::System::System;
+// ── helpers ─────────────────────────────────────────────────────
+inline ECS::Entity& Arrow(C::Engine& eng)
+{
+    auto& state = eng.GetStates<VectorFields2DState>();
+    auto& query = eng.ECS.Query;
 
-    void Start() override
-    {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-        auto& resources = m_Engine.GetSystems<C::ResourceManager>();
-        state.Mesh = &resources.Load(G::Primitives::CreateArrow2D("vectorArrow"));
+    auto& arrow = R::MeshInstance2D::Create(eng.ECS);
+    query.GetComponent<CMP::Mesh>(arrow).Mesh = state.Mesh;
+    query.GetComponent<CMP::Material>(arrow).Material = state.Material;
 
-        auto& vertSource = resources.Load<G::ShaderSource>(
-            "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
-        auto& fragSource = resources.Load<G::ShaderSource>(
-            "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
+    return arrow;
+}
 
-        auto& shader = resources.Load<G::Shader>("arrowShader", vertSource, fragSource);
+// Uploads per-instance magnitudes into the shared VAO.
+inline void Finish(C::Engine& eng, const std::vector<float>& magnitudes)
+{
+    G::ArrayBuffer buffer{};
+    buffer.SetData(magnitudes);
 
-        state.Material = &resources.Load<G::Material>("arrowMat");
-        state.Material->Get().Shader = &shader();
-        state.Material->Get().Color = {1, 1, 1, 1};
-    }
+    auto& mesh = eng.GetStates<VectorFields2DState>().Mesh;
+    mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+    mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
+    mesh->Get().VAO.SetAttribDivisor(2, 1);
+}
 
-    void PendulumModel()
-    {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
+// ── models ──────────────────────────────────────────────────────
+inline void PendulumModel(C::Engine& eng)
+{
+    constexpr float thetaMin = -25.0f;
+    constexpr float thetaMax = 25.0f;
+    constexpr float omegaMin = -25.0f;
+    constexpr float omegaMax = 25.0f;
+    constexpr float thetaStep = 0.125f;
+    constexpr float omegaStep = 0.125f;
 
-        constexpr float thetaMin = -25.0f;
-        constexpr float thetaMax = 25;
-        constexpr float omegaMin = -25.0f;
-        constexpr float omegaMax = 25.0f;
-
-        // Spacing between arrows.
-        constexpr float thetaStep = 0.125;
-        constexpr float omegaStep = 0.125;
-
-        using Equation = M::ODE<float, float, float>;
-
-        const Equation equation{[](float t, float theta, float omega)
-            {
-                const float thetaDot = omega;
-                const float omegaDot = -0.2f * omega - (9.8f / 2.0f) * std::sin(theta);
-
-                return M::ODEState<float, float, float>{t, thetaDot, omegaDot};
-            }};
-
-        std::vector<float> magnitudes{};
-
-        auto& query = m_Engine.ECS.Query;
-
-        for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
+    using Equation = M::ODE<float, float, float>;
+    const Equation equation{[](float t, float theta, float omega)
         {
-            for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
-            {
-                // Evaluate the derivative at this point in phase space.
-                auto [thetaDot, omegaDot] = equation.Derivative({0.0f, theta, omega}).State;
+            const float thetaDot = omega;
+            const float omegaDot = -0.2f * omega - (9.8f / 2.0f) * std::sin(theta);
+            return M::ODEState<float, float, float>{t, thetaDot, omegaDot};
+        }};
 
-                // Skip the arrow if the vector field is effectively zero.
-                if (M::Vector<2>{thetaDot, omegaDot}.Length() < 0.0001f)
-                {
-                    continue;
-                }
+    std::vector<float> magnitudes{};
+    auto& query = eng.ECS.Query;
 
-                // Create one arrow for this grid point.
-                auto& arrow = Arrow();
-
-                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
-
-                transform.Position = M::Vector<2>{theta, omega} * 2;
-                transform.Scale = M::Vector<2>{0.2, 0.1};
-                transform.Rotation = M::Vector<2>{thetaDot, omegaDot}.Angle();
-
-                magnitudes.push_back(M::Vector<2>{thetaDot, omegaDot}.Length());
-
-                m_Engine.World.GetRoot().AttachChild(arrow);
-            }
-        }
-
-        G::ArrayBuffer buffer{};
-
-        buffer.SetData(magnitudes);
-        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
-    }
-
-    void ExponentialModel()
+    for (float theta = thetaMin; theta <= thetaMax; theta += thetaStep)
     {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-
-        const float k = 0.2f;
-
-        using Equation = M::ODE<float, float>;
-
-        const Equation equation{[k](float t, float p) { return M::ODEState<float, float>{t, k * p}; }};
-
-        std::vector<float> magnitudes{};
-
-        auto& query = m_Engine.ECS.Query;
-
-        for (float p = 0; p <= 50; p += 0.5f)
+        for (float omega = omegaMin; omega <= omegaMax; omega += omegaStep)
         {
-            for (float t = 0; t < 50; t += 0.5f)
+            auto [thetaDot, omegaDot] = equation.Derivative({0.0f, theta, omega}).State;
+            const M::Vector<2> v{thetaDot, omegaDot};
+            if (v.Length() < 0.0001f)
             {
-                const auto [dp] = equation.Derivative({t, p}).State;
-
-                const M::Vector<2> pos = {t, p};
-                const M::Vector<2> target = {1, dp};
-
-                auto& arrow = Arrow();
-
-                magnitudes.push_back(target.Length());
-
-                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
-
-                transform.Position = pos;
-                transform.Scale = {0.5f, 0.25f};
-                transform.Rotation = target.Angle();
-
-                m_Engine.World.GetRoot().AttachChild(arrow);
+                continue;
             }
+
+            auto& arrow = Arrow(eng);
+            CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
+
+            transform.Position = M::Vector<2>{theta, omega} * 2;
+            transform.Scale = M::Vector<2>{0.2, 0.1};
+            transform.Rotation = v.Angle();
+
+            magnitudes.push_back(v.Length());
+            eng.World.GetRoot().AttachChild(arrow);
         }
-
-        G::ArrayBuffer buffer{};
-        buffer.SetData(magnitudes);
-
-        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
-    void LogisticModel()
+    Finish(eng, magnitudes);
+}
+
+inline void ExponentialModel(C::Engine& eng)
+{
+    const float k = 0.2f;
+    using Equation = M::ODE<float, float>;
+    const Equation equation{[k](float t, float p) { return M::ODEState<float, float>{t, k * p}; }};
+
+    std::vector<float> magnitudes{};
+    auto& query = eng.ECS.Query;
+
+    for (float p = 0; p <= 50; p += 0.5f)
     {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-
-        const float k = 0.05f;
-        const float a = 15.0f;
-
-        using Equation = M::ODE<float, float>;
-
-        const Equation equation{
-            [k, a](float t, float p) { return M::ODEState<float, float>{t, k * p * (a - p)}; }};
-
-        std::vector<float> magnitudes{};
-
-        auto& query = m_Engine.ECS.Query;
-
-        for (float p = 0; p <= 50; p += 0.5f)
+        for (float t = 0; t < 50; t += 0.5f)
         {
-            for (float t = 0; t < 50; t += 0.5f)
-            {
-                const auto [dp] = equation.Derivative({t, p}).State;
+            const auto [dp] = equation.Derivative({t, p}).State;
+            const M::Vector<2> target{1, dp};
 
-                const M::Vector<2> pos = {t, p};
-                const M::Vector<2> target = {1, dp};
+            auto& arrow = Arrow(eng);
+            CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
-                auto& arrow = Arrow();
+            transform.Position = {t, p};
+            transform.Scale = {0.5f, 0.25f};
+            transform.Rotation = target.Angle();
 
-                magnitudes.push_back(target.Length());
-
-                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
-
-                transform.Position = pos;
-                transform.Scale = {0.5f, 0.25f};
-                transform.Rotation = target.Angle();
-
-                m_Engine.World.GetRoot().AttachChild(arrow);
-            }
+            magnitudes.push_back(target.Length());
+            eng.World.GetRoot().AttachChild(arrow);
         }
-
-        G::ArrayBuffer buffer{};
-        buffer.SetData(magnitudes);
-
-        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
-    void SpringModel()
+    Finish(eng, magnitudes);
+}
+
+inline void LogisticModel(C::Engine& eng)
+{
+    const float k = 0.05f;
+    const float a = 15.0f;
+    using Equation = M::ODE<float, float>;
+    const Equation equation{
+        [k, a](float t, float p) { return M::ODEState<float, float>{t, k * p * (a - p)}; }};
+
+    std::vector<float> magnitudes{};
+    auto& query = eng.ECS.Query;
+
+    for (float p = 0; p <= 50; p += 0.5f)
     {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-
-        const float k = 0.8f;
-        const float m = 1.0f;
-
-        using Equation = M::ODE<float, float, float>;
-
-        const Equation equation{
-            [k, m](float t, float x, float v) { return M::ODEState<float, float, float>{t, v, -k * x / m}; }};
-
-        std::vector<float> magnitudes{};
-
-        auto& query = m_Engine.ECS.Query;
-
-        for (float v = -25; v <= 25; v += 0.5f)
+        for (float t = 0; t < 50; t += 0.5f)
         {
-            for (float x = -25; x < 25; x += 0.5f)
-            {
-                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).State;
+            const auto [dp] = equation.Derivative({t, p}).State;
+            const M::Vector<2> target{1, dp};
 
-                const M::Vector<2> pos = {x, v};
-                const M::Vector<2> target = {dx, dv};
+            auto& arrow = Arrow(eng);
+            CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
-                auto& arrow = Arrow();
+            transform.Position = {t, p};
+            transform.Scale = {0.5f, 0.25f};
+            transform.Rotation = target.Angle();
 
-                magnitudes.push_back(target.Length());
-
-                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
-
-                transform.Position = pos;
-                transform.Scale = {0.5f, 0.25f};
-                transform.Rotation = target.Angle();
-
-                m_Engine.World.GetRoot().AttachChild(arrow);
-            }
+            magnitudes.push_back(target.Length());
+            eng.World.GetRoot().AttachChild(arrow);
         }
-
-        G::ArrayBuffer buffer{};
-        buffer.SetData(magnitudes);
-
-        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
-    void DampenedSpringModel()
+    Finish(eng, magnitudes);
+}
+
+inline void SpringModel(C::Engine& eng)
+{
+    const float k = 0.8f;
+    const float m = 1.0f;
+    using Equation = M::ODE<float, float, float>;
+    const Equation equation{
+        [k, m](float t, float x, float v) { return M::ODEState<float, float, float>{t, v, -k * x / m}; }};
+
+    std::vector<float> magnitudes{};
+    auto& query = eng.ECS.Query;
+
+    for (float v = -25; v <= 25; v += 0.5f)
     {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-
-        const float k = 0.8f;
-        const float m = 1.0f;
-        const float b = 0.5f;
-
-        using Equation = M::ODE<float, float, float>;
-
-        const Equation equation{[k, m, b](float t, float x, float v)
-            { return M::ODEState<float, float, float>{t, v, -k * x / m - b * v / m}; }};
-
-        std::vector<float> magnitudes{};
-
-        auto& query = m_Engine.ECS.Query;
-
-        for (float v = -25; v <= 25; v += 0.5f)
+        for (float x = -25; x < 25; x += 0.5f)
         {
-            for (float x = -25; x < 25; x += 0.5f)
-            {
-                const auto [dx, dv] = equation.Derivative({0.0f, x, v}).State;
+            const auto [dx, dv] = equation.Derivative({0.0f, x, v}).State;
+            const M::Vector<2> target{dx, dv};
 
-                const M::Vector<2> pos = {x, v};
-                const M::Vector<2> target = {dx, dv};
+            auto& arrow = Arrow(eng);
+            CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
-                auto& arrow = Arrow();
+            transform.Position = {x, v};
+            transform.Scale = {0.5f, 0.25f};
+            transform.Rotation = target.Angle();
 
-                magnitudes.push_back(target.Length());
-
-                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
-
-                transform.Position = pos;
-                transform.Scale = {0.5f, 0.25f};
-                transform.Rotation = target.Angle();
-
-                m_Engine.World.GetRoot().AttachChild(arrow);
-            }
+            magnitudes.push_back(target.Length());
+            eng.World.GetRoot().AttachChild(arrow);
         }
-
-        G::ArrayBuffer buffer{};
-        buffer.SetData(magnitudes);
-
-        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
-    void LinearResistiveForceModel()
+    Finish(eng, magnitudes);
+}
+
+inline void DampenedSpringModel(C::Engine& eng)
+{
+    const float k = 0.8f;
+    const float m = 1.0f;
+    const float b = 0.5f;
+    using Equation = M::ODE<float, float, float>;
+    const Equation equation{[k, m, b](float t, float x, float v)
+        { return M::ODEState<float, float, float>{t, v, -k * x / m - b * v / m}; }};
+
+    std::vector<float> magnitudes{};
+    auto& query = eng.ECS.Query;
+
+    for (float v = -25; v <= 25; v += 0.5f)
     {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-
-        const float b = 0.8f;
-        const float m = 1.0f;
-        const float g = 9.8f;
-
-        using Equation = M::ODE<float, float>;
-
-        const Equation equation{
-            [b, m, g](float t, float v) { return M::ODEState<float, float>{t, g - (b / m) * v}; }};
-
-        std::vector<float> magnitudes{};
-
-        auto& query = m_Engine.ECS.Query;
-
-        for (float v = -25; v <= 25; v += 0.5f)
+        for (float x = -25; x < 25; x += 0.5f)
         {
-            for (float t = 0; t < 50; t += 0.5f)
-            {
-                const auto [dv] = equation.Derivative({t, v}).State;
+            const auto [dx, dv] = equation.Derivative({0.0f, x, v}).State;
+            const M::Vector<2> target{dx, dv};
 
-                const M::Vector<2> pos = {t, v};
-                const M::Vector<2> target = {1, dv};
+            auto& arrow = Arrow(eng);
+            CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
-                auto& arrow = Arrow();
+            transform.Position = {x, v};
+            transform.Scale = {0.5f, 0.25f};
+            transform.Rotation = target.Angle();
 
-                magnitudes.push_back(target.Length());
-
-                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
-
-                transform.Position = pos;
-                transform.Scale = {0.5f, 0.25f};
-                transform.Rotation = target.Angle();
-
-                m_Engine.World.GetRoot().AttachChild(arrow);
-            }
+            magnitudes.push_back(target.Length());
+            eng.World.GetRoot().AttachChild(arrow);
         }
-
-        G::ArrayBuffer buffer{};
-        buffer.SetData(magnitudes);
-
-        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
-    void QuadraticResistiveForceModel()
+    Finish(eng, magnitudes);
+}
+
+inline void LinearResistiveForceModel(C::Engine& eng)
+{
+    const float b = 0.8f;
+    const float m = 1.0f;
+    const float g = 9.8f;
+    using Equation = M::ODE<float, float>;
+    const Equation equation{
+        [b, m, g](float t, float v) { return M::ODEState<float, float>{t, g - (b / m) * v}; }};
+
+    std::vector<float> magnitudes{};
+    auto& query = eng.ECS.Query;
+
+    for (float v = -25; v <= 25; v += 0.5f)
     {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-
-        const float g = 9.8f;
-        const float m = 0.046f;
-        const float D = 1.0f;
-        const float p = 1.0f;
-        const float A = 10e-3f * 1.4f;
-
-        using Equation = M::ODE<float, float>;
-
-        const Equation equation{[g, D, p, A, m](float t, float v)
-            { return M::ODEState<float, float>{t, g - (D * p * A / (2.0f * m)) * v * std::abs(v)}; }};
-
-        std::vector<float> magnitudes{};
-
-        auto& query = m_Engine.ECS.Query;
-
-        for (float v = -25; v <= 25; v += 0.5f)
+        for (float t = 0; t < 50; t += 0.5f)
         {
-            for (float t = 0; t < 50; t += 0.5f)
-            {
-                const auto [dv] = equation.Derivative({t, v}).State;
+            const auto [dv] = equation.Derivative({t, v}).State;
+            const M::Vector<2> target{1, dv};
 
-                const M::Vector<2> pos = {t, v};
-                const M::Vector<2> target = {1, dv};
+            auto& arrow = Arrow(eng);
+            CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
-                auto& arrow = Arrow();
+            transform.Position = {t, v};
+            transform.Scale = {0.5f, 0.25f};
+            transform.Rotation = target.Angle();
 
-                magnitudes.push_back(target.Length());
-
-                CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
-
-                transform.Position = pos;
-                transform.Scale = {0.5f, 0.25f};
-                transform.Rotation = target.Angle();
-
-                m_Engine.World.GetRoot().AttachChild(arrow);
-            }
+            magnitudes.push_back(target.Length());
+            eng.World.GetRoot().AttachChild(arrow);
         }
-
-        G::ArrayBuffer buffer{};
-        buffer.SetData(magnitudes);
-
-        state.Mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
-        state.Mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
-        state.Mesh->Get().VAO.SetAttribDivisor(2, 1);
     }
 
-    ECS::Entity& Arrow()
+    Finish(eng, magnitudes);
+}
+
+inline void QuadraticResistiveForceModel(C::Engine& eng)
+{
+    const float g = 9.8f;
+    const float m = 0.046f;
+    const float D = 1.0f;
+    const float p = 1.0f;
+    const float A = 10e-3f * 1.4f;
+    using Equation = M::ODE<float, float>;
+    const Equation equation{[g, D, p, A, m](float t, float v)
+        { return M::ODEState<float, float>{t, g - (D * p * A / (2.0f * m)) * v * std::abs(v)}; }};
+
+    std::vector<float> magnitudes{};
+    auto& query = eng.ECS.Query;
+
+    for (float v = -25; v <= 25; v += 0.5f)
     {
-        auto& state = m_Engine.GetStates<VectorFields2DState>();
-        auto& query = m_Engine.ECS.Query;
+        for (float t = 0; t < 50; t += 0.5f)
+        {
+            const auto [dv] = equation.Derivative({t, v}).State;
+            const M::Vector<2> target{1, dv};
 
-        auto& arrow = R::MeshInstance2D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Mesh>(arrow).Mesh = state.Mesh;
-        query.GetComponent<CMP::Material>(arrow).Material = state.Material;
+            auto& arrow = Arrow(eng);
+            CMP::Transform2D& transform = query.GetComponent<CMP::Transform2D>(arrow);
 
-        return arrow;
+            transform.Position = {t, v};
+            transform.Scale = {0.5f, 0.25f};
+            transform.Rotation = target.Angle();
+
+            magnitudes.push_back(target.Length());
+            eng.World.GetRoot().AttachChild(arrow);
+        }
     }
-};
+
+    Finish(eng, magnitudes);
+}
+
+// ── lifecycle ───────────────────────────────────────────────────
+inline void Start_VectorFields2D(C::Engine& eng)
+{
+    auto& state = eng.GetStates<VectorFields2DState>();
+
+    state.Mesh = &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateArrow2D("vectorArrow"));
+
+    auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
+        eng, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
+    auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
+        eng, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
+    auto& shader = LoadResource<G::Shader>(eng, "arrowShader", vertSource, fragSource);
+
+    state.Material = &ResourceManager::LoadResource<G::Material>(eng, "arrowMat");
+    state.Material->Get().Shader = &shader();
+    state.Material->Get().Color = {1, 1, 1, 1};
+}
+} // namespace VectorFields2D
 } // namespace Ivy::Sandbox

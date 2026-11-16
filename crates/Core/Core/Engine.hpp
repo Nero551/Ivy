@@ -6,6 +6,7 @@
 #include "Core/World/World.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityComponentSystem.hpp"
+#include "Graphics/Input.hpp"
 #include "Graphics/Window.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include <concepts>
@@ -30,6 +31,7 @@ struct Engine
     ECS::EntityComponentSystem ECS{};
     TimeHandler TimeHandler{};
     SystemManager SM;
+    G::InputHandler Input;
 
     template <typename F>
     Engine(F&& configure) requires(std::invocable<F, Engine&>)

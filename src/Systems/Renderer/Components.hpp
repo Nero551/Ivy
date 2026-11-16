@@ -53,11 +53,11 @@ struct Light : ECS::Component
 
 struct Material : ECS::Component
 {
-    U::CheckedPtr<C::Resource<G::Material>> Material{"Material Component Has No Material Assigned"};
+    U::CheckedPtr<Resource<G::Material>> Material{"Material Component Has No Material Assigned"};
 };
 
 struct Mesh : ECS::Component
 {
-    U::CheckedPtr<C::Resource<G::Mesh>> Mesh{"Mesh Component Has No Mesh Assigned"};
+    U::CheckedPtr<Resource<G::Mesh>> Mesh{"Mesh Component Has No Mesh Assigned"};
 };
 } // namespace Ivy::CMP

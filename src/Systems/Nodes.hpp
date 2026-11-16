@@ -5,7 +5,7 @@
 #include "ECS/EntityComponentSystem.hpp"
 #include <tuple>
 #include <utility>
-namespace Ivy::C
+namespace Ivy
 {
 template <typename Base, typename... Components>
 using ExtendComponents =
@@ -43,4 +43,4 @@ struct Node3D
         return entity;
     }
 };
-} // namespace Ivy::C
+} // namespace Ivy

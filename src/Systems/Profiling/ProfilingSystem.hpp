@@ -1,19 +1,29 @@
-#include "Profiling.hpp"
-
-#include "Core/Engine.hpp"
+#pragma once
 
 #include <array>
+#include <deque>
 #include <format>
+
+#include "Core/Engine.hpp"
+#include "Core/State.hpp"
 
 namespace Ivy
 {
-
-void Profiling::Update(const double dt)
+struct ProfilingState : C::State
 {
-    auto& state = m_Engine.GetStates<ProfilingState>();
+    double FrameMs{0};
+    int FrameCount{0};
+    std::deque<double> FrameTimes;
+    double Elapsed{0};
+};
+
+namespace Profiling
+{
+void Update_Profiling(C::Engine& eng, double dt)
+{
+    auto& state = eng.GetStates<ProfilingState>();
 
     state.Elapsed += dt;
-
     state.FrameMs = dt * 1000.0;
     ++state.FrameCount;
 
@@ -21,7 +31,6 @@ void Profiling::Update(const double dt)
     {
         state.FrameTimes.pop_front();
     }
-
     state.FrameTimes.push_back(state.FrameMs);
 
     if (state.Elapsed >= 1.0)
@@ -29,7 +38,6 @@ void Profiling::Update(const double dt)
         state.Elapsed = 0.0;
 
         double sum = 0.0;
-
         for (const double frame : state.FrameTimes)
         {
             sum += frame;
@@ -38,15 +46,13 @@ void Profiling::Update(const double dt)
         const double averageFrameMs = sum / state.FrameTimes.size();
 
         std::array<char, 128> buffer;
-
         const auto end = std::format_to(buffer.begin(), "FPS: {} | AVG: {:.2f} ms | {:.2f} ms",
             state.FrameCount, averageFrameMs, state.FrameMs);
-
         *end = '\0';
 
-        m_Engine.Window.SetTitle(buffer.data());
-
+        eng.Window.SetTitle(buffer.data());
         state.FrameCount = 0;
     }
 }
+} // namespace Profiling
 } // namespace Ivy

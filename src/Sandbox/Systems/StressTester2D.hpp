@@ -2,7 +2,6 @@
 
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
-#include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
@@ -32,114 +31,111 @@ struct StressTester2DState : C::State
     std::vector<ECS::EntityID> Points;
 };
 
-struct StressTester2D : C::System
+namespace StressTester2D
 {
-    using C::System::System;
+// ── helpers ─────────────────────────────────────────────────────
+inline ECS::Entity& CreatePoint(C::Engine& eng)
+{
+    auto& query = eng.ECS.Query;
 
-    void Update(double dt) override
+    if (!ResourceExists<G::Mesh>(eng, "stressPoint"))
     {
-        auto& state = m_Engine.GetStates<StressTester2DState>();
-        auto& input = m_Engine.GetSystems<I::Input>();
-        auto& query = m_Engine.ECS.Query;
+        LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("stressPoint"));
+    }
+    auto& mesh = LoadResource<G::Mesh>(eng, "stressPoint");
+    auto& point = R::MeshInstance2D::Create(eng.ECS);
 
-        if (input.IsKeyHeld(G::Key::Left))
-        {
-            state.Multiplier -= 5 * dt;
-        }
-        if (input.IsKeyHeld(G::Key::Right))
-        {
-            state.Multiplier += 5 * dt;
-        }
+    query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
+    query.GetComponent<CMP::Transform2D>(point).Scale = M::Vector<2>{0.2};
 
-        if (state.Multiplier != 1)
+    if (ResourceExists<G::Material>(eng, "stressMat"))
+    {
+        auto& material = LoadResource<G::Material>(eng, "stressMat");
+        query.GetComponent<CMP::Material>(point).Material = &material;
+    }
+    else
+    {
+        auto& material = LoadResource<G::Material>(eng, "stressMat");
+
+        auto& shader = LoadResource<G::Shader>(eng, "pointShader");
+        shader().AssignSource(LoadResource<G::ShaderSource>(
+            eng, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
+        shader().AssignSource(LoadResource<G::ShaderSource>(
+            eng, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
+
+        material().Shader = &shader();
+        material().Color = {1, 1, 1, 1};
+
+        query.GetComponent<CMP::Material>(point).Material = &material;
+    }
+
+    eng.World.GetRoot().AttachChild(point);
+    return point;
+}
+
+inline ECS::Entity& Plot(C::Engine& eng, const M::Vector<2> vec2)
+{
+    auto& query = eng.ECS.Query;
+    auto& point = CreatePoint(eng);
+    auto& transform = query.GetComponent<CMP::Transform2D>(point);
+
+    transform.Position().x = vec2.x;
+    transform.Position().y = vec2.y;
+
+    return point;
+}
+
+inline void FourDimensionalProjection(C::Engine& eng, int increase)
+{
+    auto& state = eng.GetStates<StressTester2DState>();
+
+    const float count = M::Pow(360.0f / increase, 3.0f);
+    D::Log::Info(count);
+    state.Points.reserve(count);
+    eng.ECS.ReserveEntities(count);
+
+    for (float theta = -180; theta < 180; theta += increase)
+    {
+        for (float phi = -180; phi < 180; phi += increase)
         {
-            for (auto& point : state.Points)
+            for (float h = -180; h < 180; h += increase)
             {
-                auto& transform = query.GetComponent<CMP::Transform2D>(m_Engine.ECS.GetEntity(point));
-                transform.Position *= state.Multiplier;
+                M::Vector<4> v4 = M::Vector<4>::FromHyperSpherical(
+                    M::HyperSpherical(M::Rad(theta), M::Rad(phi), M::Rad(h)));
+                M::Vector<3> proj = v4.StereoProject();
+                auto& point = Plot(eng, {proj.x, proj.y});
+                state.Points.emplace_back(point.GetId());
             }
         }
+    }
+}
 
-        state.Multiplier = 1;
-    };
+// ── lifecycle ───────────────────────────────────────────────────
+inline void Update_StressTester2D(C::Engine& eng, double dt)
+{
+    auto& state = eng.GetStates<StressTester2DState>();
+    auto& input = eng.Input;
+    auto& query = eng.ECS.Query;
 
-    void FourDimensionalProjection(int increase)
+    if (input.IsKeyHeld(G::Key::Left))
     {
-        auto& state = m_Engine.GetStates<StressTester2DState>();
+        state.Multiplier -= 5 * dt;
+    }
+    if (input.IsKeyHeld(G::Key::Right))
+    {
+        state.Multiplier += 5 * dt;
+    }
 
-        state.Points.reserve(M::Pow(360.0f / increase, 3.0f));
-        D::Log::Info(M::Pow(360.0f / increase, 3.0f));
-        m_Engine.ECS.ReserveEntities(M::Pow(360.0f / increase, 3.0f));
-
-        for (float theta = -180; theta < 180; theta += increase)
+    if (state.Multiplier != 1)
+    {
+        for (auto& point : state.Points)
         {
-            for (float phi = -180; phi < 180; phi += increase)
-            {
-                for (float h = -180; h < 180; h += increase)
-                {
-                    M::Vector<4> v4 = M::Vector<4>::FromHyperSpherical(
-                        M::HyperSpherical(M::Rad(theta), M::Rad(phi), M::Rad(h)));
-                    M::Vector<3> proj = v4.StereoProject();
-                    auto& point = Plot({proj.x, proj.y});
-                    state.Points.emplace_back(point.GetId());
-                }
-            }
+            auto& transform = query.GetComponent<CMP::Transform2D>(eng.ECS.GetEntity(point));
+            transform.Position *= state.Multiplier;
         }
     }
 
-    ECS::Entity& CreatePoint()
-    {
-        auto& resourceManager = m_Engine.GetSystems<C::ResourceManager>();
-        auto& query = m_Engine.ECS.Query;
-
-        if (!resourceManager.Exists<G::Mesh>("stressPoint"))
-        {
-            G::Mesh m = G::Primitives::CreateQuad("stressPoint");
-            resourceManager.Load<G::Mesh>(m);
-        }
-        auto& mesh = resourceManager.Load<G::Mesh>("stressPoint");
-        auto& point = R::MeshInstance2D::Create(m_Engine.ECS);
-
-        query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
-        query.GetComponent<CMP::Transform2D>(point).Scale = M::Vector<2>{0.2};
-
-        if (resourceManager.Exists<G::Material>("stressMat"))
-        {
-            auto& material = resourceManager.Load<G::Material>("stressMat");
-            query.GetComponent<CMP::Material>(point).Material = &material;
-        }
-        else
-        {
-            auto& material = resourceManager.Load<G::Material>("stressMat");
-
-            auto& shader = resourceManager.Load<G::Shader>("pointShader");
-
-            shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-                "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
-            shader().AssignSource(resourceManager.Load<G::ShaderSource>(
-                "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
-
-            material().Shader = &shader();
-            material().Color = {1, 1, 1, 1};
-
-            query.GetComponent<CMP::Material>(point).Material = &material;
-        }
-
-        m_Engine.World.GetRoot().AttachChild(point);
-        return point;
-    }
-
-    ECS::Entity& Plot(const M::Vector<2> vec2)
-    {
-        auto& query = m_Engine.ECS.Query;
-
-        auto& point = CreatePoint();
-        auto& transform = query.GetComponent<CMP::Transform2D>(point);
-
-        transform.Position().x = vec2.x;
-        transform.Position().y = vec2.y;
-
-        return point;
-    }
-};
+    state.Multiplier = 1;
+}
+} // namespace StressTester2D
 } // namespace Ivy::Sandbox

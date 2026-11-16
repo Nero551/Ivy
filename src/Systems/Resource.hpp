@@ -3,7 +3,7 @@
 #include <concepts>
 #include <string>
 
-namespace Ivy::C
+namespace Ivy
 {
 
 template <typename T>
@@ -11,11 +11,8 @@ concept NamedResource = requires(T object) { object.GetName(); };
 
 struct IResource
 {
-    using Handle = U::GIndexPool<>::Handle;
-
-  protected:
-    Handle m_Handle{};
-    friend struct ResourceManager;
+    using HandleType = U::GIndexPool<>::Handle;
+    HandleType Handle{};
 };
 
 template <typename T> struct Resource : IResource
@@ -69,20 +66,20 @@ template <typename T> struct Resource : IResource
 
     Resource& operator=(Resource&&) noexcept = default;
 
-    Handle GetHandle() const
+    HandleType GetHandle() const
     {
-        return m_Handle;
+        return Handle;
     }
 
     unsigned int GetResourceId() const
     {
-        return m_Handle.Index;
+        return Handle.Index;
     }
 
     unsigned int GetResourceGeneration() const
     {
-        return m_Handle.Generation;
+        return Handle.Generation;
     }
 };
 
-} // namespace Ivy::C
+} // namespace Ivy

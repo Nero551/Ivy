@@ -8,7 +8,7 @@ namespace Ivy::R
 {
 struct Camera2D
 {
-    using ComponentCombo = C::ExtendComponents<C::Node2D::ComponentCombo, CMP::Camera>;
+    using ComponentCombo = ExtendComponents<Node2D::ComponentCombo, CMP::Camera>;
     static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
         ECS::Entity& entity = ecs.CreateEntity();
@@ -20,7 +20,7 @@ struct Camera2D
 
 struct Camera3D
 {
-    using ComponentCombo = C::ExtendComponents<C::Node3D::ComponentCombo, CMP::Camera>;
+    using ComponentCombo = ExtendComponents<Node3D::ComponentCombo, CMP::Camera>;
     static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
         ECS::Entity& entity = ecs.CreateEntity();
@@ -32,7 +32,7 @@ struct Camera3D
 
 struct Light3D
 {
-    using ComponentCombo = C::ExtendComponents<C::Node3D::ComponentCombo, CMP::Light>;
+    using ComponentCombo = ExtendComponents<Node3D::ComponentCombo, CMP::Light>;
     static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
         ECS::Entity& entity = ecs.CreateEntity();
@@ -43,7 +43,7 @@ struct Light3D
 
 struct MeshInstance2D
 {
-    using ComponentCombo = C::ExtendComponents<C::Node2D::ComponentCombo, CMP::Material, CMP::Mesh>;
+    using ComponentCombo = ExtendComponents<Node2D::ComponentCombo, CMP::Material, CMP::Mesh>;
     static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
         ECS::Entity& entity = ecs.CreateEntity();
@@ -54,7 +54,7 @@ struct MeshInstance2D
 
 struct MeshInstance3D
 {
-    using ComponentCombo = C::ExtendComponents<C::Node3D::ComponentCombo, CMP::Material, CMP::Mesh>;
+    using ComponentCombo = ExtendComponents<Node3D::ComponentCombo, CMP::Material, CMP::Mesh>;
     static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
         ECS::Entity& entity = ecs.CreateEntity();

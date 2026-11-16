@@ -7,15 +7,6 @@
 #include "Utilities/Track.hpp"
 #include <cmath>
 
-namespace Ivy::R
-{
-struct Renderer;
-} // namespace Ivy::R
-namespace Ivy::C
-{
-struct TransformSystem;
-} // namespace Ivy::C
-
 namespace Ivy::CMP
 {
 
@@ -29,9 +20,9 @@ struct Transform2D : ECS::Component
     M::Matrix<4, 4> GetModelMatrix() const
     {
         M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
-        modelMatrix = modelMatrix.Translate({m_GlobalPosition().x, m_GlobalPosition().y, 0});
-        modelMatrix = modelMatrix.RotateZ(m_GlobalRotation);
-        modelMatrix = modelMatrix.Scale({m_GlobalScale().x, m_GlobalScale().y, 1});
+        modelMatrix = modelMatrix.Translate({GlobalPosition().x, GlobalPosition().y, 0});
+        modelMatrix = modelMatrix.RotateZ(GlobalRotation);
+        modelMatrix = modelMatrix.Scale({GlobalScale().x, GlobalScale().y, 1});
         return modelMatrix;
     }
 
@@ -42,20 +33,17 @@ struct Transform2D : ECS::Component
 
     M::Vector<2> GetRight() const
     {
-        return {std::cos(m_GlobalRotation), std::sin(m_GlobalRotation)};
+        return {std::cos(GlobalRotation), std::sin(GlobalRotation)};
     }
 
     M::Vector<2> GetUp() const
     {
-        return {-std::sin(m_GlobalRotation), std::cos(m_GlobalRotation)};
+        return {-std::sin(GlobalRotation), std::cos(GlobalRotation)};
     }
 
-  private:
-    U::Track<M::Vector<2>> m_GlobalPosition = M::Vector<2>::Zero();
-    U::Track<float> m_GlobalRotation = 0;
-    U::Track<M::Vector<2>> m_GlobalScale = M::Vector<2>::One();
-    friend struct C::TransformSystem;
-    friend struct R::Renderer;
+    U::Track<M::Vector<2>> GlobalPosition = M::Vector<2>::Zero();
+    U::Track<float> GlobalRotation = 0;
+    U::Track<M::Vector<2>> GlobalScale = M::Vector<2>::One();
 };
 
 struct Transform3D : ECS::Component
@@ -69,9 +57,9 @@ struct Transform3D : ECS::Component
     M::Matrix<4, 4> GetModelMatrix() const
     {
         M::Matrix<4, 4> modelMatrix = M::Matrix<4, 4>::Identity();
-        modelMatrix = modelMatrix.Translate({m_GlobalPosition});
-        modelMatrix *= m_GlobalRotation().ToMatrix4();
-        modelMatrix = modelMatrix.Scale(m_GlobalScale);
+        modelMatrix = modelMatrix.Translate({GlobalPosition});
+        modelMatrix *= GlobalRotation().ToMatrix4();
+        modelMatrix = modelMatrix.Scale(GlobalScale);
         return modelMatrix;
     }
 
@@ -83,25 +71,22 @@ struct Transform3D : ECS::Component
 
     M::Vector<3> GetRight() const
     {
-        return m_GlobalRotation().Transform({1, 0, 0});
+        return GlobalRotation().Transform({1, 0, 0});
     }
 
     M::Vector<3> GetUp() const
     {
-        return m_GlobalRotation().Transform({0, 1, 0});
+        return GlobalRotation().Transform({0, 1, 0});
     }
 
     M::Vector<3> GetForward() const
     {
-        return m_GlobalRotation().Transform({0, 0, -1});
+        return GlobalRotation().Transform({0, 0, -1});
     }
 
-  private:
     //TODO:this is temporary until i have a proper change detection system (reflection)
-    U::Track<M::Vector<3>> m_GlobalPosition = M::Vector<3>::Zero();
-    U::Track<M::Quaternion<>> m_GlobalRotation = M::Quaternion<>::Identity();
-    U::Track<M::Vector<3>> m_GlobalScale = M::Vector<3>::One();
-    friend struct C::TransformSystem;
-    friend struct R::Renderer;
+    U::Track<M::Vector<3>> GlobalPosition = M::Vector<3>::Zero();
+    U::Track<M::Quaternion<>> GlobalRotation = M::Quaternion<>::Identity();
+    U::Track<M::Vector<3>> GlobalScale = M::Vector<3>::One();
 };
 } // namespace Ivy::CMP

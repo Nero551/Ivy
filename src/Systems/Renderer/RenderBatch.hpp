@@ -27,15 +27,14 @@ struct InstanceData
 
 struct RenderBatch
 {
-    U::CheckedPtr<C::Resource<G::Material>> Material;
-    U::CheckedPtr<C::Resource<G::Mesh>> Mesh;
+    U::CheckedPtr<Resource<G::Material>> Material;
+    U::CheckedPtr<Resource<G::Mesh>> Mesh;
     U::SparseSetSoA<InstanceData> Instances;
     G::ArrayBuffer Buffer;
     G::VertexArray VAO;
     bool DataChanged = false;
 
-    RenderBatch(
-        const U::CheckedPtr<C::Resource<G::Mesh>>& mesh, const U::CheckedPtr<C::Resource<G::Material>>& mat)
+    RenderBatch(const U::CheckedPtr<Resource<G::Mesh>>& mesh, const U::CheckedPtr<Resource<G::Material>>& mat)
         : Material(mat), Mesh(mesh)
     {
         Buffer.Usage = G::BufferUsage::DynamicDraw;
