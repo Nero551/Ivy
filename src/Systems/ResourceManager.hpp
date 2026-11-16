@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/Resource.hpp"
 #include "Core/System.hpp"
+#include "Systems/Resource.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <concepts>

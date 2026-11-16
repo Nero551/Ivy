@@ -1,7 +1,4 @@
 #include "Core/Engine.hpp"
-#include "Core/ExecutionOrder.hpp"
-#include "Core/Resource.hpp"
-#include "Core/ResourceManager.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Protos/MultiThreading.hpp"
@@ -18,6 +15,8 @@
 #include "Systems/Profiling/Profiling.hpp"
 #include "Systems/Renderer/Systems/LightingSystem.hpp"
 #include "Systems/Renderer/Systems/Renderer.hpp"
+#include "Systems/Resource.hpp"
+#include "Systems/ResourceManager.hpp"
 #include "Systems/TransformSystem.hpp"
 #include "sketch.hpp"
 #include <string_view>

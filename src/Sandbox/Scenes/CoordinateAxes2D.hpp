@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/ResourceManager.hpp"
 #include "Core/World/Scene.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -15,6 +14,7 @@
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
+#include "Systems/ResourceManager.hpp"
 
 namespace Ivy::Sandbox
 {

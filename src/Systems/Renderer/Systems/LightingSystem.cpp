@@ -2,9 +2,9 @@
 
 #include "../Components.hpp"
 #include "Core/Engine.hpp"
-#include "Core/ResourceManager.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Systems/Components.hpp"
+#include "Systems/ResourceManager.hpp"
 #include <cstddef>
 
 namespace Ivy::R

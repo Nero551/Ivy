@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/ResourceManager.hpp"
 #include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
@@ -22,6 +21,7 @@
 #include "Systems/Components.hpp"
 #include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Nodes.hpp"
+#include "Systems/ResourceManager.hpp"
 #include <format>
 #include <vector>
 

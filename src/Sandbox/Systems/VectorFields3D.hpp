@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/Resource.hpp"
-#include "Core/ResourceManager.hpp"
 #include "Core/System.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
@@ -18,6 +16,8 @@
 #include "Math/Vector/Vectors.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
+#include "Systems/Resource.hpp"
+#include "Systems/ResourceManager.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include <array>
 #include <cmath>

@@ -1,5 +1,6 @@
 #pragma once
-#include "Core/ExecutionOrder.hpp"
+#include "Core/DependencyGraph.hpp"
+#include "Core/State.hpp"
 #include "Core/System.hpp"
 #include "Core/TimeHandler.hpp"
 #include "Core/World/World.hpp"
@@ -20,10 +21,17 @@
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
 {
-struct State
+
+enum class Execution : unsigned int
 {
-    State() = default;
-    virtual ~State();
+    Start,
+    BeginFrame,
+    FixedUpdate,
+    Update,
+    Render,
+    EndFrame,
+    Stop,
+    Count,
 };
 
 template <typename T>
@@ -92,7 +100,7 @@ struct Engine
     template <IsSystem T> T& AddSystems()
     {
         m_Systems.Emplace<T>(std::make_unique<T>(*this));
-        for (auto& execution : m_ExecutionScheduler)
+        for (auto& execution : m_SystemScheduler)
         {
             execution.Ensure(m_Systems.GetIndex<T>());
         }
@@ -134,7 +142,7 @@ struct Engine
 
     template <typename First, typename Second, typename... Args> void Chain(Execution execution)
     {
-        auto& graph = m_ExecutionScheduler[static_cast<unsigned int>(execution)];
+        auto& graph = m_SystemScheduler[static_cast<unsigned int>(execution)];
 
         graph.Attach(m_Systems.GetIndex<First>(), m_Systems.GetIndex<Second>());
 
@@ -176,8 +184,7 @@ struct Engine
     }
 
   private:
-    std::array<ExecutionOrder<unsigned int>, static_cast<unsigned int>(Execution::Count)>
-        m_ExecutionScheduler;
+    std::array<DependencyGraph<unsigned int>, static_cast<unsigned int>(Execution::Count)> m_SystemScheduler;
     U::TypedVector<std::unique_ptr<System>> m_Systems;
     U::TypedVector<std::unique_ptr<State>> m_States;
 

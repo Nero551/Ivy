@@ -1,7 +1,6 @@
 #include "Renderer.hpp"
 
 #include "Core/Engine.hpp"
-#include "Core/ResourceManager.hpp"
 #include "Graphics/Buffers/BufferBit.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Framebuffer/FramebufferAttachment.hpp"
@@ -23,6 +22,7 @@
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 #include "Graphics/Window.hpp"
 #include "Systems/Components.hpp"
+#include "Systems/ResourceManager.hpp"
 #include <ranges>
 #include <vector>
 

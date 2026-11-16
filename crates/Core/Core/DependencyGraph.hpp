@@ -8,7 +8,7 @@
 #include <vector>
 namespace Ivy::C
 {
-template <std::unsigned_integral T> struct ExecutionOrder
+template <std::unsigned_integral T> struct DependencyGraph
 {
     static constexpr T Invalid = std::numeric_limits<T>::max();
     struct Node
@@ -118,17 +118,5 @@ template <std::unsigned_integral T> struct ExecutionOrder
 
     std::vector<Node> m_Nodes;
     U::SparseSetSoA<T> m_Sources;
-};
-
-enum class Execution : unsigned int
-{
-    Start,
-    BeginFrame,
-    FixedUpdate,
-    Update,
-    Render,
-    EndFrame,
-    Stop,
-    Count,
 };
 } // namespace Ivy::C

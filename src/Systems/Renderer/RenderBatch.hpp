@@ -1,11 +1,11 @@
 #pragma once
-#include "Core/Resource.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/Buffers/BufferUsage.hpp"
 #include "Graphics/Buffers/VertexArray/VertexArray.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Math/Matrix/Matrices.hpp"
+#include "Systems/Resource.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <cstddef>

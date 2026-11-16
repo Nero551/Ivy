@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Resource.hpp"
 #include "ECS/Component.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -9,6 +8,7 @@
 #include "Math/Vector/Vectors.hpp"
 #include "Systems/Renderer/LightType.hpp"
 #include "Systems/Renderer/ProjectionMode.hpp"
+#include "Systems/Resource.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::CMP

@@ -315,6 +315,7 @@ inline void Test()
 {
     //TODO: download and setup bevy, i would like to know how they do things.
     //
+    // TODO: remove data from systems, start using State.
     //
     // TODO: [DONE] step 1: integrate the Execution Order thing. \
     // step 2: create State(singleton-like indexed by type), engine owns all states. systems request state, they do not own it. \
@@ -322,5 +323,10 @@ inline void Test()
     // step 4: enforce strict parameters on systems via compile-time dependency chain stuff. \
     // step 5: MULTI-THREADING
     //
+    //
+    //? system will just be free functions that take engine state,ecs,world,etc  as parameters.
+    //? the dependency is not between systems, its on the state itself. system execution ordering is still needed though.
+    //
+    //? as for thread safety. i think that should be integrated into the engine/ecs itself.
 }
 } // namespace Sketch

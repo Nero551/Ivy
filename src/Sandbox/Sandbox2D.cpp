@@ -1,5 +1,4 @@
 #include "Sandbox/Sandbox2D.hpp"
-#include "Core/ResourceManager.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityID.hpp"
 #include "Graphics/InputEnums/Key.hpp"
@@ -19,6 +18,7 @@
 #include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
+#include "Systems/ResourceManager.hpp"
 #include <cstdlib>
 
 namespace Ivy::Sandbox
