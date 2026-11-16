@@ -3,7 +3,6 @@
 #include "Core/Engine.hpp"
 #include "Core/ResourceManager.hpp"
 #include "Core/System.hpp"
-#include "Core/World/Components.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
@@ -20,6 +19,7 @@
 #include "Math/Coordinates/Polar.hpp"
 #include "Math/Coordinates/Spherical.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/Components.hpp"
 #include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Nodes.hpp"
 #include <format>

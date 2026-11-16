@@ -2,8 +2,6 @@
 
 #include "Core/Engine.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/World/Components.hpp"
-#include "Core/World/Nodes.hpp"
 #include "Core/World/Scene.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -17,6 +15,8 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/Components.hpp"
+#include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
 

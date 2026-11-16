@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Core/System.hpp"
-#include "Core/World/Components.hpp"
 #include "Graphics/AntiAliasing/MSAA.hpp"
 #include "Graphics/Buffers/Framebuffer/Framebuffer.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/RenderBatch.hpp"
 #include "Utilities/DataStructures/Indirect2DVector.hpp"

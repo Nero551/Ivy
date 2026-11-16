@@ -17,15 +17,12 @@ Ivy is a hobby game engine project focused on learning the fundamentals of game 
 
 ## Getting Started
 
-### Prerequisites
+### System Dependencies
 
-- Linux
-- [xmake](https://xmake.io/)
-
-### Install Dependencies
+#### Arch
 
 ```bash
-sudo ./scripts/setup-linux.sh
+sudo pacman -S base-devel clang clang-tools-extra libc++ libc++abi lld ccache cmake ninja git zip unzip tar pkgconf python doxygen gdb xmake
 ```
 
 ### Build and Run

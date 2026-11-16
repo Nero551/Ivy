@@ -1,7 +1,7 @@
-#include "Core/World/Systems/TransformSystem.hpp"
+#include "Systems/TransformSystem.hpp"
 #include "Core/Engine.hpp"
-#include "Core/World/Components.hpp"
 #include "ECS/Entity.hpp"
+#include "Systems/Components.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::C

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/System.hpp"
-#include "Core/World/Components.hpp"
 #include "ECS/Entity.hpp"
+#include "Systems/Components.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include <cstddef>
 #include <vector>

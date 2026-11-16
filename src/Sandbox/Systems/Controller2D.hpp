@@ -1,11 +1,11 @@
 #pragma once
 #include "Core/Engine.hpp"
 #include "Core/System.hpp"
-#include "Core/World/Components.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/Components.hpp"
 #include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/ProjectionMode.hpp"

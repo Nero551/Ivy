@@ -20,8 +20,16 @@
 /** @brief Root namespace for Ivy engine functionality. */
 namespace Ivy::C
 {
+struct State
+{
+    State() = default;
+    virtual ~State();
+};
+
 template <typename T>
 concept IsSystem = std::derived_from<T, C::System>;
+template <typename T>
+concept IsState = std::derived_from<T, C::State>;
 
 /** @brief Main Ivy engine and game loop. Manages the window, world, systems, ECS, and frame lifecycle. */
 struct Engine
@@ -99,7 +107,22 @@ struct Engine
     template <typename Tuple> decltype(auto) AddPlugins() requires(U::IsTSpec<Tuple, std::tuple>)
     {
         return U::UnpackAndRun<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{},
-            [this]<IsSystem... Args>() { return AddSystems<Args...>(); });
+            [this]<typename... Args>()
+            {
+                (
+                    [&]<typename T>()
+                    {
+                        if constexpr (IsSystem<T>)
+                        {
+                            AddSystems<T>();
+                        }
+                        else if constexpr (IsState<T>)
+                        {
+                            AddStates<T>();
+                        }
+                    }.template operator()<Args>(),
+                    ...);
+            });
     }
 
     template <typename... Tuples>
@@ -121,10 +144,43 @@ struct Engine
         }
     }
 
+    template <IsState T> T& GetStates() const
+    {
+        auto system = m_Systems.Find<T>();
+        if (system == m_Systems.end())
+        {
+            D::Log::Error(std::format("System {} not found", typeid(T).name()));
+        }
+        return static_cast<T&>(**system);
+    }
+
+    template <IsState... Args> std::tuple<Args&...> GetStates() const requires(sizeof...(Args) != 1)
+    {
+        return {GetStates<Args>()...};
+    }
+
+    const U::TypedVector<std::unique_ptr<State>>& GetAllStates() const
+    {
+        return m_States;
+    }
+
+    template <IsState T> T& AddStates()
+    {
+        m_States.Emplace<T>(std::make_unique<T>(*this));
+        return static_cast<T&>(*m_States.Get<T>());
+    }
+
+    template <IsState... Args> std::tuple<Args&...> AddStates() requires(sizeof...(Args) != 1)
+    {
+        return {AddStates<Args>()...};
+    }
+
   private:
     std::array<ExecutionOrder<unsigned int>, static_cast<unsigned int>(Execution::Count)>
         m_ExecutionScheduler;
     U::TypedVector<std::unique_ptr<System>> m_Systems;
+    U::TypedVector<std::unique_ptr<State>> m_States;
+
     const std::function<void(Engine&)> m_Configuration;
     bool m_Running = false;
 };

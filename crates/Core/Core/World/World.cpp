@@ -1,10 +1,8 @@
 #include "World.hpp"
 #include "Core/Engine.hpp"
-#include "Core/World/Nodes.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
-#include "Core/World/Systems/TransformSystem.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::C

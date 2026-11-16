@@ -313,19 +313,8 @@ static M::Set<float> R = [](float x) { return true; };
 
 inline void Test()
 {
-
-    // TODO: some sort of ordering mechanic for systems(which system runs first on each part of the loop). \
-    // system execution order. after that, figure out how to parallelize them via my new MT prototype. \
-    // if i can do that. i will be able to run each system(or set of systems) on a different thread. more speed.
-    //
-    // TODO: idea, all systems run on different threads, but option to run some systems together sequentially on 1 thread.
-    //
-    //
     //TODO: download and setup bevy, i would like to know how they do things.
     //
-    //
-    //TODO: now i need a way for safe read & write to the ECS, resources, world, etc. shared states between systems. \
-    // drop the whole multi threading thing, its way too high level for me right now. just integrate the DAG dep chain.
     //
     // TODO: [DONE] step 1: integrate the Execution Order thing. \
     // step 2: create State(singleton-like indexed by type), engine owns all states. systems request state, they do not own it. \

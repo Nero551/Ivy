@@ -1,11 +1,11 @@
 #include "Sandbox/Sandbox3D.hpp"
-#include "Core/World/Components.hpp"
 #include "Graphics/InputEnums/CursorMode.hpp"
 #include "Graphics/InputEnums/Key.hpp"
 #include "Sandbox/Scenes/CoordinateAxes3D.hpp"
 #include "Sandbox/Systems/Controller3D.hpp"
 #include "Sandbox/Systems/StressTester3D.hpp"
 #include "Sandbox/Systems/VectorFields3D.hpp"
+#include "Systems/Components.hpp"
 #include "Systems/Input/Input.hpp"
 #include "Systems/Renderer/Nodes.hpp"
 

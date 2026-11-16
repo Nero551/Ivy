@@ -10,10 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     clang-tools \
     ccache \
     ninja-build \
+    binutils \
+    llvm \
     git \
     curl \
     zip \
     unzip \
+    lld \
     tar \
     pkg-config \
     autoconf \

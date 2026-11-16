@@ -4,7 +4,6 @@
 #include "Core/System.hpp"
 #include "Diagnostics/Profiling.hpp"
 #include "Graphics/Context.hpp"
-#include <cstddef>
 
 namespace Ivy::C
 {
