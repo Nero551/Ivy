@@ -7,21 +7,18 @@
 #include "Systems/ResourceManager.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
-namespace Ivy::R
+namespace Ivy
 {
 struct LightingSystemState : C::State
 {
     U::CheckedPtr<G::Uniformbuffer> LightingBuffer;
 };
 
-namespace Lighting
-{
 inline void Start_Lighting(C::Engine& eng)
 {
     auto& state = eng.GetStates<LightingSystemState>();
 
-    state.LightingBuffer =
-        &ResourceManager::LoadResource<G::Uniformbuffer>(eng, "[Graphics] Lighting Buffer")();
+    state.LightingBuffer = &LoadResource<G::Uniformbuffer>(eng, "[Graphics] Lighting Buffer")();
     state.LightingBuffer->Binding = 1;
 
     constexpr size_t LightStride = 144;
@@ -61,5 +58,4 @@ inline void Render_Lighting(C::Engine& eng)
     state.LightingBuffer->Set(i, 0);
     state.LightingBuffer->Bind();
 }
-} // namespace Lighting
-} // namespace Ivy::R
+} // namespace Ivy

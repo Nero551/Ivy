@@ -45,18 +45,18 @@ struct Grid3D : C::Scene
     void CreateGridLine(const M::Quaternion<> rotation, M::Vector<3> position)
     {
         auto& query = m_Engine.ECS.Query;
-        auto& shader = ResourceManager::LoadResource<G::Shader>(m_Engine, "AxisShader");
+        auto& shader = LoadResource<G::Shader>(m_Engine, "AxisShader");
 
-        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+        shader().AssignSource(LoadResource<G::ShaderSource>(
             m_Engine, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
 
-        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+        shader().AssignSource(LoadResource<G::ShaderSource>(
             m_Engine, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
         G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = ResourceManager::LoadResource<G::Mesh>(m_Engine, m);
+        auto& line = LoadResource<G::Mesh>(m_Engine, m);
 
-        auto& l = R::MeshInstance3D::Create(m_Engine.ECS);
+        auto& l = MeshInstance3D::Create(m_Engine.ECS);
 
         auto& materialComponent = query.GetComponent<CMP::Material>(l);
         auto& meshComponent = query.GetComponent<CMP::Mesh>(l);
@@ -64,8 +64,7 @@ struct Grid3D : C::Scene
 
         meshComponent.Mesh = &line;
 
-        materialComponent.Material =
-            &ResourceManager::LoadResource<G::Material>(m_Engine, "GridLine Material");
+        materialComponent.Material = &LoadResource<G::Material>(m_Engine, "GridLine Material");
         materialComponent.Material->Get().Shader = &shader();
 
         transformComponent.Rotation = rotation;

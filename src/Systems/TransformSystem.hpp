@@ -18,7 +18,7 @@ struct TransformSystemState : C::State
     size_t EcsVersion = 0;
 };
 
-namespace Transform
+namespace
 {
 
 inline void Do2D(
@@ -67,7 +67,7 @@ inline void Do3D(
 
     parentTransform3D = transform3D;
 }
-
+} // namespace
 inline void Update_Transform(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<TransformSystemState>();
@@ -108,5 +108,4 @@ inline void Update_Transform(C::Engine& eng, double dt)
         }
     };
 }
-} // namespace Transform
 } // namespace Ivy

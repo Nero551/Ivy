@@ -34,7 +34,7 @@
 #include "Utilities/DataStructures/Indirect2DVector.hpp"
 #include <vector>
 
-namespace Ivy::R
+namespace Ivy
 {
 
 struct RendererState : C::State
@@ -48,7 +48,7 @@ struct RendererState : C::State
 
     U::Indirect2DVector<RenderBatch> Batches2D, Batches3D;
 };
-namespace Renderer
+namespace
 {
 inline void SetupFramebuffer(C::Engine& eng)
 {
@@ -60,10 +60,10 @@ inline void SetupFramebuffer(C::Engine& eng)
     const std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
     auto& window = eng.Window;
 
-    auto& screenShader = ResourceManager::LoadResource<G::Shader>(eng, "[Graphics] Screen Shader");
-    auto& screenVert = ResourceManager::LoadResource<G::ShaderSource>(
+    auto& screenShader = LoadResource<G::Shader>(eng, "[Graphics] Screen Shader");
+    auto& screenVert = LoadResource<G::ShaderSource>(
         eng, "[Graphics] Screen Vertex", "assets/Shaders/screen.vert", G::ShaderStage::Vertex);
-    auto& screenFrag = ResourceManager::LoadResource<G::ShaderSource>(
+    auto& screenFrag = LoadResource<G::ShaderSource>(
         eng, "[Graphics] Screen Fragment", "assets/Shaders/screen.frag", G::ShaderStage::Fragment);
 
     screenShader().AssignSource(screenVert);
@@ -80,7 +80,7 @@ inline void SetupFramebuffer(C::Engine& eng)
     rState.ScreenMesh.Indices = indices;
     rState.ScreenMesh.CullMode = G::CullMode::None;
 
-    auto& screenTexture = ResourceManager::LoadResource<G::Texture2D>(eng, "COLOR_BUFFER");
+    auto& screenTexture = LoadResource<G::Texture2D>(eng, "COLOR_BUFFER");
     screenTexture.Get().Width = window.GetWidth();
     screenTexture.Get().Height = window.GetHeight();
     screenTexture.Get().InternalFormat = G::TextureInternalFormat::RGB8;
@@ -283,6 +283,7 @@ inline void Render3D(C::Engine& eng)
         batch.Render();
     }
 }
+} // namespace
 
 inline void Start_Renderer(C::Engine& eng)
 {
@@ -322,6 +323,4 @@ inline void Stop_Renderer(C::Engine& eng)
     G::Image image = {texture.Width, texture.Height, G::Image::ColorChannels::RGB, texture.ReadPixels()};
     image.SaveToDiskPNG("assets/LastFrame.png", true);
 }
-} // namespace Renderer
-
-} // namespace Ivy::R
+} // namespace Ivy

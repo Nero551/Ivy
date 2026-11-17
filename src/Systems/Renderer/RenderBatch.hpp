@@ -12,7 +12,7 @@
 #include <functional>
 #include <utility>
 
-namespace Ivy::R
+namespace Ivy
 {
 struct InstanceData
 {
@@ -71,4 +71,4 @@ struct RenderBatch
         }
     };
 };
-} // namespace Ivy::R
+} // namespace Ivy

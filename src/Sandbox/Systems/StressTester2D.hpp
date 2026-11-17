@@ -37,29 +37,29 @@ inline ECS::Entity& CreatePoint(C::Engine& eng)
 {
     auto& query = eng.ECS.Query;
 
-    if (!ResourceManager::ResourceExists<G::Mesh>(eng, "stressPoint"))
+    if (!ResourceExists<G::Mesh>(eng, "stressPoint"))
     {
-        ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("stressPoint"));
+        LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("stressPoint"));
     }
-    auto& mesh = ResourceManager::LoadResource<G::Mesh>(eng, "stressPoint");
-    auto& point = R::MeshInstance2D::Create(eng.ECS);
+    auto& mesh = LoadResource<G::Mesh>(eng, "stressPoint");
+    auto& point = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
     query.GetComponent<CMP::Transform2D>(point).Scale = M::Vector<2>{0.2};
 
-    if (ResourceManager::ResourceExists<G::Material>(eng, "stressMat"))
+    if (ResourceExists<G::Material>(eng, "stressMat"))
     {
-        auto& material = ResourceManager::LoadResource<G::Material>(eng, "stressMat");
+        auto& material = LoadResource<G::Material>(eng, "stressMat");
         query.GetComponent<CMP::Material>(point).Material = &material;
     }
     else
     {
-        auto& material = ResourceManager::LoadResource<G::Material>(eng, "stressMat");
+        auto& material = LoadResource<G::Material>(eng, "stressMat");
 
-        auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "pointShader");
-        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+        auto& shader = LoadResource<G::Shader>(eng, "pointShader");
+        shader().AssignSource(LoadResource<G::ShaderSource>(
             eng, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
-        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+        shader().AssignSource(LoadResource<G::ShaderSource>(
             eng, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
         material().Shader = &shader();

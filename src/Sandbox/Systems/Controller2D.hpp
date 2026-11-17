@@ -46,7 +46,7 @@ inline void Update_Controller2D(C::Engine& eng, double dt)
     auto& transform = query.GetComponent<CMP::Transform2D>(camera);
     auto& cameraComponent = query.GetComponent<CMP::Camera>(camera);
 
-    cameraComponent.ProjectionMode = R::ProjectionMode::Orthographic;
+    cameraComponent.ProjectionMode = ProjectionMode::Orthographic;
     cameraComponent.Left = -eng.Window.GetWidth() / state.Zoom;
     cameraComponent.Bottom = -eng.Window.GetHeight() / state.Zoom;
     cameraComponent.Right = eng.Window.GetWidth() / state.Zoom;

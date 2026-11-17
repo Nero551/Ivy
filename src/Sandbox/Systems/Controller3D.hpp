@@ -44,7 +44,7 @@ inline void Update_Controller3D(C::Engine& eng, double dt)
     auto& transform = query.GetComponent<CMP::Transform3D>(camera);
     auto& cameraComponent = query.GetComponent<CMP::Camera>(camera);
 
-    cameraComponent.ProjectionMode = R::ProjectionMode::Perspective;
+    cameraComponent.ProjectionMode = ProjectionMode::Perspective;
     cameraComponent.Left = 0;
     cameraComponent.Bottom = 0;
     cameraComponent.Right = eng.Window.GetWidth();

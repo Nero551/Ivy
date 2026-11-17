@@ -17,8 +17,6 @@ struct ProfilingState : C::State
     double Elapsed{0};
 };
 
-namespace Profiling
-{
 inline void Update_Profiling(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<ProfilingState>();
@@ -54,5 +52,4 @@ inline void Update_Profiling(C::Engine& eng, double dt)
         state.FrameCount = 0;
     }
 }
-} // namespace Profiling
 } // namespace Ivy

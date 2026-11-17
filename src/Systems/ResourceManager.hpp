@@ -21,9 +21,6 @@ struct ResourceManagerState : C::State
     U::GIndexPool<> Handles{};
 };
 
-namespace ResourceManager
-{
-
 /**
      * @brief Loads a resource or returns an already loaded resource with the same type and name.
      * If the resource already exists but the type doesn't match it will error.
@@ -201,5 +198,4 @@ inline void Stop_ResourceManager(C::Engine& eng)
 {
     UnloadAllResources(eng);
 }
-} // namespace ResourceManager
 } // namespace Ivy

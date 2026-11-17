@@ -20,7 +20,7 @@ inline void Start_Sandbox3D(C::Engine& eng)
     eng.Input.SetMouseMode(G::CursorMode::Disabled);
 
     auto& query = eng.ECS.Query;
-    auto& camera = R::Camera3D::Create(eng.ECS);
+    auto& camera = Camera3D::Create(eng.ECS);
     query.GetComponent<CMP::Transform3D>(camera).Position = {0, 0, 10};
     eng.World.GetRoot().AttachChild(camera);
     eng.World.SetCamera(camera);
@@ -31,16 +31,16 @@ inline void Start_Sandbox3D(C::Engine& eng)
     // StressTester3D::Spawn(eng, 4, 3);
     VectorFields3D::LorenzSystem(eng);
 
-    // auto& square = R::MeshInstance3D::Create(eng.ECS);
+    // auto& square = MeshInstance3D::Create(eng.ECS);
     // query.GetComponent<CMP::Mesh>(square).Mesh =
-    //     &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("TerrainQuad", 20, 20));
+    //     &LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("TerrainQuad", 20, 20));
     //
-    // auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
+    // auto& vertSource = LoadResource<G::ShaderSource>(
     //     eng, "TerrainShaderVert", "assets/Shaders/TerrainShader.vert", G::ShaderStage::Vertex);
-    // auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
+    // auto& fragSource = LoadResource<G::ShaderSource>(
     //     eng, "TerrainShaderFrag", "assets/Shaders/TerrainShader.frag", G::ShaderStage::Fragment);
-    // auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "TerrainShader", vertSource, fragSource);
-    // auto& mat    = ResourceManager::LoadResource<G::Material>(eng, "TerrainMat");
+    // auto& shader = LoadResource<G::Shader>(eng, "TerrainShader", vertSource, fragSource);
+    // auto& mat    = LoadResource<G::Material>(eng, "TerrainMat");
     // mat().Shader = &shader();
     // mat().Color  = {1, 1, 1, 1};
     // shader().HotReload = true;

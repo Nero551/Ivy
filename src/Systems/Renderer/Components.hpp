@@ -22,12 +22,12 @@ struct Camera : ECS::Component
     float Right = 50;
     float Top = 50;
     float Bottom = -50;
-    R::ProjectionMode ProjectionMode = R::ProjectionMode::Orthographic;
+    ProjectionMode ProjectionMode = ProjectionMode::Orthographic;
     float Sensitivity = 0.05f;
 
     M::Matrix<4, 4> GetProjectionMatrix() const
     {
-        if (ProjectionMode == R::ProjectionMode::Orthographic)
+        if (ProjectionMode == ProjectionMode::Orthographic)
         {
             return M::Matrix<4, 4>::Orthographic(Left, Right, Bottom, Top, Near, Far);
         }
@@ -37,7 +37,7 @@ struct Camera : ECS::Component
 
 struct Light : ECS::Component
 {
-    R::LightType Type = R::LightType::Directional;
+    LightType Type = LightType::Directional;
     M::Vector<3> Color = M::Vector<3>{1};
     M::Vector<3> Ambient = M::Vector<3>{0.8};
     M::Vector<3> Diffuse = M::Vector<3>{1};

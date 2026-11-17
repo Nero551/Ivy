@@ -26,19 +26,19 @@ struct CoordinateAxes2D : C::Scene
         auto& query = m_Engine.ECS.Query;
         SetRoot(Node2D::Create(m_Engine.ECS));
 
-        auto& shader = ResourceManager::LoadResource<G::Shader>(m_Engine, "AxisShader");
-        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+        auto& shader = LoadResource<G::Shader>(m_Engine, "AxisShader");
+        shader().AssignSource(LoadResource<G::ShaderSource>(
             m_Engine, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
-        shader().AssignSource(ResourceManager::LoadResource<G::ShaderSource>(
+        shader().AssignSource(LoadResource<G::ShaderSource>(
             m_Engine, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
         G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = ResourceManager::LoadResource<G::Mesh>(m_Engine, m);
+        auto& line = LoadResource<G::Mesh>(m_Engine, m);
 
-        auto& xAxis = R::MeshInstance2D::Create(m_Engine.ECS);
+        auto& xAxis = MeshInstance2D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
         auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
-        xMaterial.Material = &ResourceManager::LoadResource<G::Material>(m_Engine, "X-Axis Material");
+        xMaterial.Material = &LoadResource<G::Material>(m_Engine, "X-Axis Material");
         xMaterial.Material->Get().Shader = &shader();
 
         query.GetComponent<CMP::Transform2D>(xAxis).Scale = {200, 1};
@@ -46,10 +46,10 @@ struct CoordinateAxes2D : C::Scene
 
         xAxis.SetParent(GetRoot());
 
-        auto& yAxis = R::MeshInstance2D::Create(m_Engine.ECS);
+        auto& yAxis = MeshInstance2D::Create(m_Engine.ECS);
         query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
         auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
-        yMaterial.Material = &ResourceManager::LoadResource<G::Material>(m_Engine, "Y-Axis Material");
+        yMaterial.Material = &LoadResource<G::Material>(m_Engine, "Y-Axis Material");
         yMaterial.Material->Get().Shader = &shader();
 
         query.GetComponent<CMP::Transform2D>(yAxis).Rotation = M::Rad(90.0f);

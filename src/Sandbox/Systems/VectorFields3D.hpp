@@ -39,7 +39,7 @@ inline ECS::Entity& Arrow(C::Engine& eng)
     auto& state = eng.GetStates<VectorFields3DState>();
     auto& query = eng.ECS.Query;
 
-    auto& arrow = R::MeshInstance3D::Create(eng.ECS);
+    auto& arrow = MeshInstance3D::Create(eng.ECS);
     query.GetComponent<CMP::Mesh>(arrow).Mesh = state.Mesh;
     query.GetComponent<CMP::Material>(arrow).Material = state.Material;
 
@@ -95,15 +95,15 @@ inline void Start_VectorFields3D(C::Engine& eng)
 {
     auto& state = eng.GetStates<VectorFields3DState>();
 
-    state.Mesh = &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateArrow3D("vectorArrow3D"));
+    state.Mesh = &LoadResource<G::Mesh>(eng, G::Primitives::CreateArrow3D("vectorArrow3D"));
 
-    auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
+    auto& vertSource = LoadResource<G::ShaderSource>(
         eng, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
-    auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
+    auto& fragSource = LoadResource<G::ShaderSource>(
         eng, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
-    auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "arrowShader", vertSource, fragSource);
+    auto& shader = LoadResource<G::Shader>(eng, "arrowShader", vertSource, fragSource);
 
-    state.Material = &ResourceManager::LoadResource<G::Material>(eng, "arrowMat");
+    state.Material = &LoadResource<G::Material>(eng, "arrowMat");
     state.Material->Get().Shader = &shader();
     state.Material->Get().Color = {1, 1, 1, 1};
 }

@@ -27,7 +27,56 @@ namespace Ivy::Sandbox
 {
 namespace Sandbox2D
 {
-// ── file-local simulation state ─────────────────────────────────
+inline ECS::EntityID CreateCircle(C::Engine& eng)
+{
+    auto& query = eng.ECS.Query;
+    auto& circle = MeshInstance2D::Create(eng.ECS);
+
+    query.GetComponent<CMP::Mesh>(circle).Mesh =
+        &LoadResource<G::Mesh>(eng, G::Primitives::CreateCircle("ball"));
+
+    auto& vertSource = LoadResource<G::ShaderSource>(
+        eng, "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+    auto& fragSource = LoadResource<G::ShaderSource>(
+        eng, "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+    auto& shader = LoadResource<G::Shader>(eng, "circleShader", vertSource, fragSource);
+
+    auto& mat = LoadResource<G::Material>(eng, "circleMat");
+    mat().Shader = &shader();
+    mat().Color = {1, 1, 1, 1};
+
+    query.GetComponent<CMP::Material>(circle).Material = &mat;
+    eng.World.GetRoot().AttachChild(circle);
+    query.GetComponent<CMP::Transform2D>(circle).Position = {0, 1};
+
+    return circle.GetId();
+}
+
+inline ECS::EntityID CreateSquare(C::Engine& eng)
+{
+    auto& query = eng.ECS.Query;
+    auto& square = MeshInstance2D::Create(eng.ECS);
+
+    query.GetComponent<CMP::Mesh>(square).Mesh =
+        &LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("cube"));
+
+    auto& vertSource = LoadResource<G::ShaderSource>(
+        eng, "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+    auto& fragSource = LoadResource<G::ShaderSource>(
+        eng, "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+    auto& shader = LoadResource<G::Shader>(eng, "squareShader", vertSource, fragSource);
+
+    auto& mat = LoadResource<G::Material>(eng, "squareMat");
+    mat().Shader = &shader();
+    mat().Color = {1, 1, 1, 1};
+
+    query.GetComponent<CMP::Material>(square).Material = &mat;
+    eng.World.GetRoot().AttachChild(square);
+    query.GetComponent<CMP::Transform2D>(square).Position = {0, 1};
+
+    return square.GetId();
+}
+
 struct Particle
 {
     M::Vector<2> Position;
@@ -42,61 +91,9 @@ inline Particle p;
 inline constexpr M::Vector<2> g{0, -9.8};
 inline float speed = 15;
 
-// ── helper primitives ───────────────────────────────────────────
-inline ECS::EntityID CreateCircle(C::Engine& eng)
-{
-    auto& query = eng.ECS.Query;
-    auto& circle = R::MeshInstance2D::Create(eng.ECS);
-
-    query.GetComponent<CMP::Mesh>(circle).Mesh =
-        &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateCircle("ball"));
-
-    auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
-        eng, "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
-        eng, "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "circleShader", vertSource, fragSource);
-
-    auto& mat = ResourceManager::LoadResource<G::Material>(eng, "circleMat");
-    mat().Shader = &shader();
-    mat().Color = {1, 1, 1, 1};
-
-    query.GetComponent<CMP::Material>(circle).Material = &mat;
-    eng.World.GetRoot().AttachChild(circle);
-    query.GetComponent<CMP::Transform2D>(circle).Position = {0, 1};
-
-    return circle.GetId();
-}
-
-inline ECS::EntityID CreateSquare(C::Engine& eng)
-{
-    auto& query = eng.ECS.Query;
-    auto& square = R::MeshInstance2D::Create(eng.ECS);
-
-    query.GetComponent<CMP::Mesh>(square).Mesh =
-        &ResourceManager::LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("cube"));
-
-    auto& vertSource = ResourceManager::LoadResource<G::ShaderSource>(
-        eng, "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = ResourceManager::LoadResource<G::ShaderSource>(
-        eng, "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = ResourceManager::LoadResource<G::Shader>(eng, "squareShader", vertSource, fragSource);
-
-    auto& mat = ResourceManager::LoadResource<G::Material>(eng, "squareMat");
-    mat().Shader = &shader();
-    mat().Color = {1, 1, 1, 1};
-
-    query.GetComponent<CMP::Material>(square).Material = &mat;
-    eng.World.GetRoot().AttachChild(square);
-    query.GetComponent<CMP::Transform2D>(square).Position = {0, 1};
-
-    return square.GetId();
-}
-
-// ── lifecycle ───────────────────────────────────────────────────
 inline void Start_Sandbox2D(C::Engine& eng)
 {
-    auto& camera = R::Camera2D::Create(eng.ECS);
+    auto& camera = Camera2D::Create(eng.ECS);
     eng.World.GetRoot().AttachChild(camera);
     eng.World.SetCamera(camera);
 
@@ -108,12 +105,12 @@ inline void Start_Sandbox2D(C::Engine& eng)
 
     particleId = CreateSquare(eng);
 
-    for (float theta = 0; theta < 360; theta += 0.5)
-    {
-        auto& point =
-            StressTester2D::Plot(eng, {M::Vector<2>::FromPolar({M::Rad(theta), M::DSin(2 * theta)})});
-        eng.ECS.Query.GetComponent<CMP::Transform2D>(point).Scale = {0.01, 0.01};
-    }
+    // for (float theta = 0; theta < 360; theta += 0.5)
+    // {
+    //     auto& point =
+    //         StressTester2D::Plot(eng, {M::Vector<2>::FromPolar({M::Rad(theta), M::DSin(2 * theta)})});
+    //     eng.ECS.Query.GetComponent<CMP::Transform2D>(point).Scale = {0.01, 0.01};
+    // }
 }
 
 inline void PlayWithBall(C::Engine& eng, double fdt)

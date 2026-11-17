@@ -30,10 +30,11 @@ struct Engine
     TimeHandler TimeHandler{};
     SystemManager SM;
     G::InputHandler Input;
+    const std::function<void(Engine&)> Configuration;
 
     template <typename F>
     Engine(F&& configure) requires(std::invocable<F, Engine&>)
-        : World(*this), m_Configuration(std::forward<F>(configure))
+        : World(*this), Configuration(std::forward<F>(configure))
     {
     }
     Engine(const Engine&) = delete;
@@ -104,8 +105,6 @@ struct Engine
 
   private:
     U::TypedVector<std::unique_ptr<State>> m_States;
-
-    const std::function<void(Engine&)> m_Configuration;
     bool m_Running = false;
 };
 } // namespace Ivy::C

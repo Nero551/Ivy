@@ -322,16 +322,12 @@ inline void Test()
     // TODO: [DONE] step 1: integrate the Execution Order thing. \
     // [DONE] step 2: create State(singleton-like indexed by type), engine owns all states. systems request state, they do not own it. \
     // [DONE] step 3: systems become free functions. no longer objects. \
-    // step 4: plugins, presets of systems + state + dependency chain \
+    // [DONE] step 4: plugins, presets of systems + state + dependency chain \
     // step 5: enforce strict parameters on systems via compile-time dependency chain stuff. \
     // step 6: MULTI-THREADING
     //
-    //
-    //? system will just be free functions that take engine state,ecs,world,etc  as parameters.
-    //? the dependency is not between systems, its on the state itself. system execution ordering is still needed though.
-    //
     //? as for thread safety. i think that should be integrated into the engine/ecs itself.
-//? World doesn't need engine, only ecs. fix that.
-//? configuration in engine is const, doesn't need private. fix that.
+    //
+    //? World doesn't need engine, only ecs. fix that.
 }
 } // namespace Sketch

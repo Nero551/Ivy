@@ -4,7 +4,7 @@
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/ProjectionMode.hpp"
-namespace Ivy::R
+namespace Ivy
 {
 struct Camera2D
 {
@@ -62,4 +62,4 @@ struct MeshInstance3D
         return entity;
     }
 };
-} // namespace Ivy::R
+} // namespace Ivy

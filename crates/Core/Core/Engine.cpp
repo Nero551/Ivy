@@ -41,13 +41,13 @@ double Engine::GetTime() const
 
 void Engine::Start()
 {
-    m_Configuration(*this);
+    Configuration(*this);
 
     IVY_PROFILE_GPU_CONTEXT;
     IVY_PROFILE_ZONE("Start");
     IVY_PROFILE_GPU_ZONE("Start");
 
-    SM.LoopOver<Execution::Start>(*this);
+    SM.LoopOver<Phase::Start>(*this);
 }
 
 void Engine::BeginFrame()
@@ -59,7 +59,7 @@ void Engine::BeginFrame()
     Window.PollEvents();
     Input.FirstMouseCheck();
 
-    SM.LoopOver<Execution::BeginFrame>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::BeginFrame>(*this, TimeHandler.GetDelta());
 }
 
 void Engine::FixedUpdate()
@@ -67,7 +67,7 @@ void Engine::FixedUpdate()
     IVY_PROFILE_ZONE("Fixed Update");
     IVY_PROFILE_GPU_ZONE("Fixed Update");
 
-    SM.LoopOver<Execution::FixedUpdate>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::FixedUpdate>(*this, TimeHandler.GetDelta());
 }
 
 void Engine::Update()
@@ -75,7 +75,7 @@ void Engine::Update()
     IVY_PROFILE_ZONE("Update");
     IVY_PROFILE_GPU_ZONE("Update");
 
-    SM.LoopOver<Execution::Update>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::Update>(*this, TimeHandler.GetDelta());
 }
 
 void Engine::Render()
@@ -83,7 +83,7 @@ void Engine::Render()
     IVY_PROFILE_ZONE("Render");
     IVY_PROFILE_GPU_ZONE("Render");
 
-    SM.LoopOver<Execution::Render>(*this);
+    SM.LoopOver<Phase::Render>(*this);
 }
 
 void Engine::EndFrame()
@@ -94,7 +94,7 @@ void Engine::EndFrame()
     Window.SwapBuffers();
     Input.Refresh();
 
-    SM.LoopOver<Execution::EndFrame>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::EndFrame>(*this, TimeHandler.GetDelta());
 
     IVY_PROFILE_FRAME_MARK;
     IVY_PROFILE_GPU_COLLECT;
@@ -105,7 +105,7 @@ void Engine::Stop()
     IVY_PROFILE_ZONE("Stop");
     IVY_PROFILE_GPU_ZONE("Stop");
 
-    SM.LoopOver<Execution::Stop>(*this);
+    SM.LoopOver<Phase::Stop>(*this);
 
     Window.Delete();
 }
