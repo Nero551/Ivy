@@ -9,7 +9,7 @@ Ivy is a hobby game engine project focused on learning the fundamentals of game 
 
 ## Features
 
-- **Architecture:** ECS-style ([`Framework.md`](docs/Framework.md) ).
+- **Architecture:** ECS-style.
 - **Graphics:** OpenGL, shaders, textures, lighting, framebuffers, and MSAA
 - **Math:** Vectors, matrices, complex, quaternions, functions, ODEs, sets & linear systems
 - **Physics:** dimensional analysis

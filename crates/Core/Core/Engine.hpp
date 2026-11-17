@@ -4,11 +4,10 @@
 
 #include "Core/SystemManager.hpp"
 #include "Core/TimeHandler.hpp"
-#include "Core/World/World.hpp"
+#include "Core/World.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityComponentSystem.hpp"
-#include "Graphics/Input.hpp"
-#include "Graphics/Window.hpp"
+#include "Platform/Window.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include <concepts>
 #include <format>
@@ -24,12 +23,11 @@ namespace Ivy::C
 /** @brief Main Ivy engine and game loop. Manages the window, world, systems, ECS, and frame lifecycle. */
 struct Engine
 {
-    G::Window Window{};
+    Platform::Window Window{};
     ECS::EntityComponentSystem ECS{};
     World World{ECS};
     TimeHandler TimeHandler{};
     SystemManager SM;
-    G::InputHandler Input;
     const std::function<void(Engine&)> Configuration;
 
     template <typename F>

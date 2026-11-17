@@ -1,7 +1,7 @@
 #pragma once
+#include "GLFW/glfw3.h"
 
-#include "../OpenGL.hpp"
-namespace Ivy::G
+namespace Ivy::Platform
 {
 enum class Action
 {
@@ -10,4 +10,4 @@ enum class Action
     Release = GLFW_RELEASE,
 };
 
-} // namespace Ivy::G
+} // namespace Ivy::Platform

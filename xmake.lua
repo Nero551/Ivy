@@ -30,7 +30,8 @@ includes(
 "crates/Reflect",
 "crates/Diagnostics",
 "crates/Physics",
-"crates/Core"
+"crates/Core",
+"crates/Platform"
 )
 
 target("Ivy")
@@ -39,7 +40,7 @@ target("Ivy")
     add_includedirs("src")
     set_pcxxheader("src/pch.hpp")
     add_files("src/**.cpp")
-    add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.Graphics", "Ivy.ECS", "Ivy.Core", "Ivy.Reflect", "Ivy.Diagnostics")
+    add_deps("Ivy.Platform", "Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.Graphics", "Ivy.ECS", "Ivy.Core", "Ivy.Reflect", "Ivy.Diagnostics")
     add_packages("nlohmann_json")
 
     if is_mode("release") then

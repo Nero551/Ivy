@@ -6,7 +6,7 @@
 #include "Graphics/Texture/TextureInternalFormat.hpp"
 
 #include "Diagnostics/Log.hpp"
-#include "Graphics/Image.hpp"
+#include "Utilities/Image.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
@@ -42,7 +42,7 @@ void Texture2D::Generate()
     }
 }
 
-void Texture2D::UseImage(const G::Image& image)
+void Texture2D::UseImage(const U::Image& image)
 {
     Width = image.Width;
     Height = image.Height;
@@ -52,19 +52,19 @@ void Texture2D::UseImage(const G::Image& image)
 
     switch (image.Channels)
     {
-    case G::Image::ColorChannels::R:
+    case U::Image::ColorChannels::R:
         Format = TextureFormat::Red;
         InternalFormat = TextureInternalFormat::R8;
         break;
-    case G::Image::ColorChannels::RG:
+    case U::Image::ColorChannels::RG:
         Format = TextureFormat::RG;
         InternalFormat = TextureInternalFormat::RG8;
         break;
-    case G::Image::ColorChannels::RGB:
+    case U::Image::ColorChannels::RGB:
         Format = TextureFormat::RGB;
         InternalFormat = TextureInternalFormat::RGB8;
         break;
-    case G::Image::ColorChannels::RGBA:
+    case U::Image::ColorChannels::RGBA:
         Format = TextureFormat::RGBA;
         InternalFormat = TextureInternalFormat::RGBA8;
         break;

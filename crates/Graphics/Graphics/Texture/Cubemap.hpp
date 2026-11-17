@@ -6,7 +6,7 @@
 #include "TextureFilter.hpp"
 #include "TextureFormat.hpp"
 #include "TextureWrap.hpp"
-#include "Graphics/Image.hpp"
+#include "Utilities/Image.hpp"
 
 namespace Ivy::G
 {
@@ -21,22 +21,22 @@ namespace Ivy::G
 struct Cubemap : Texture
 {
     /** Image representing the negative Z face of the cubemap. */
-    G::Image Front{};
+    U::Image Front{};
 
     /** Image representing the positive Z face of the cubemap. */
-    G::Image Back{};
+    U::Image Back{};
 
     /** Image representing the positive Y face of the cubemap. */
-    G::Image Top{};
+    U::Image Top{};
 
     /** Image representing the negative Y face of the cubemap. */
-    G::Image Bottom{};
+    U::Image Bottom{};
 
     /** Image representing the positive X face of the cubemap. */
-    G::Image Right{};
+    U::Image Right{};
 
     /** Image representing the negative X face of the cubemap. */
-    G::Image Left{};
+    U::Image Left{};
 
     /** Whether mipmaps should be generated after texture storage is created. */
     bool AutoMipmaps = true;

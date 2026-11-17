@@ -7,7 +7,6 @@ struct Engine;
 struct Plugin
 {
     Plugin() = delete;
-
     static void Setup(Engine& engine) {}
 };
 

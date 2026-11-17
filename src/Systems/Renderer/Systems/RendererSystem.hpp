@@ -12,7 +12,6 @@
 #include "Graphics/Capability.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/DataType.hpp"
-#include "Graphics/Image.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
@@ -24,14 +23,15 @@
 #include "Graphics/Texture/TextureFilter.hpp"
 #include "Graphics/Texture/TextureFormat.hpp"
 #include "Graphics/Texture/TextureInternalFormat.hpp"
-#include "Graphics/Window.hpp"
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Platform/Window.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/RenderBatch.hpp"
 #include "Systems/ResourceManager.hpp"
 #include "Utilities/DataStructures/Indirect2DVector.hpp"
+#include "Utilities/Image.hpp"
 #include <vector>
 
 namespace Ivy
@@ -93,7 +93,7 @@ inline void SetupFramebuffer(C::Engine& eng)
     rState.Framebuffer.AttachTexture(G::FramebufferAttachment::Color0, screenTexture);
 
     eng.Window.SetFramebufferSizeCallback(
-        [&](G::Window& win, const int w, const int h)
+        [&](Platform::Window& win, const int w, const int h)
         {
             G::Context::SetViewport(0, 0, w, h);
             eng.GetStates<RendererState>().MSAntiAliasing.OutputBuffer.Resize(w, h);
@@ -320,7 +320,7 @@ inline void Stop_Renderer(C::Engine& eng)
     const G::Texture2D& texture =
         static_cast<G::Texture2D&>(rState.Framebuffer.GetTexture(G::FramebufferAttachment::Color0));
 
-    G::Image image = {texture.Width, texture.Height, G::Image::ColorChannels::RGB, texture.ReadPixels()};
+    U::Image image = {texture.Width, texture.Height, U::Image::ColorChannels::RGB, texture.ReadPixels()};
     image.SaveToDiskPNG("assets/LastFrame.png", true);
 }
 } // namespace Ivy

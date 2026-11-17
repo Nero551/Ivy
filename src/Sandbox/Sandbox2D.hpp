@@ -4,7 +4,6 @@
 #include "Core/State.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityID.hpp"
-#include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
 #include "Graphics/Shader/Shader.hpp"
@@ -13,6 +12,8 @@
 #include "Math/Common/Random.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Platform/Global.hpp"
+#include "Platform/Key.hpp"
 #include "Sandbox/Scenes/CoordinateAxes2D.hpp"
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
@@ -99,8 +100,8 @@ inline void Start_Sandbox2D(C::Engine& eng)
 
     eng.World.GetRoot().AttachChild(CoordinateAxes2DScene(eng));
 
-    StressTester2D::FourDimensionalProjection(eng, 4);
-    // VectorFields2D::PendulumModel(eng);
+    // StressTester2D::FourDimensionalProjection(eng, 4);
+    VectorFields2D::PendulumModel(eng);
 
     particleId = CreateSquare(eng);
 
@@ -117,23 +118,23 @@ inline void PlayWithBall(C::Engine& eng, double fdt)
     constexpr float b = 0.5f;
     constexpr float restitution = 0.8f;
     auto& query = eng.ECS.Query;
-    auto& input = eng.Input;
+    auto& input = Platform::Input;
     auto& transform = query.GetComponent<CMP::Transform2D>(eng.ECS.GetEntity(particleId));
 
     M::Vector<2> f{0, 0};
-    if (input.IsKeyHeld(G::Key::Up))
+    if (input.IsKeyHeld(Platform::Key::Up))
     {
         f.y += speed;
     }
-    if (input.IsKeyHeld(G::Key::Down))
+    if (input.IsKeyHeld(Platform::Key::Down))
     {
         f.y -= speed;
     }
-    if (input.IsKeyHeld(G::Key::Left))
+    if (input.IsKeyHeld(Platform::Key::Left))
     {
         f.x -= speed;
     }
-    if (input.IsKeyHeld(G::Key::Right))
+    if (input.IsKeyHeld(Platform::Key::Right))
     {
         f.x += speed;
     }
@@ -168,7 +169,7 @@ inline void PlayWithBall(C::Engine& eng, double fdt)
 
 inline void FixedUpdate_Sandbox2D(C::Engine& eng, double fdt)
 {
-    if (eng.Input.IsKeyHeld(G::Key::Escape))
+    if (Platform::Input.IsKeyHeld(Platform::Key::Escape))
     {
         eng.Shutdown();
     }
@@ -188,17 +189,17 @@ inline void FixedUpdate_Sandbox2D(C::Engine& eng, double fdt)
     // StressTester2D::Plot(eng, {static_cast<float>(eng.GetTime()), p.Acceleration.x}, {1, 0, 0, 1});
 
     auto& query = eng.ECS.Query;
-    auto& input = eng.Input;
+    auto& input = Platform::Input;
     auto& transform = query.GetComponent<CMP::Transform2D>(eng.ECS.GetEntity(particleId));
 
     p.Position.y = 0.5;
     M::Vector<2> f{0, 0};
 
-    if (input.IsKeyHeld(G::Key::Left))
+    if (input.IsKeyHeld(Platform::Key::Left))
     {
         f.x -= speed;
     }
-    if (input.IsKeyHeld(G::Key::Right))
+    if (input.IsKeyHeld(Platform::Key::Right))
     {
         f.x += speed;
     }

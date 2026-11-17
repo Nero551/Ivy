@@ -1,28 +1,17 @@
 #pragma once
 
-#include "Core/DependencyGraph.hpp"
-#include "Core/Engine.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
-#include "Utilities/DataStructures/SparseSetSoA.hpp"
-#include "Utilities/DataStructures/TypedVector.hpp"
-#include "Utilities/stl.hpp"
-#include <algorithm>
+#include "Math/Vector/Vectors.hpp"
 #include <array>
 #include <cmath>
 #include <concepts>
 #include <cstdlib>
-#include <functional>
 #include <iostream>
-#include <limits>
 #include <ostream>
-#include <span>
 #include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
 
 namespace Sketch
 {
@@ -37,33 +26,31 @@ namespace Sketch
 //TODO: all this time i been thinking how to make cpu side more automatic for graphics. \
 //i should be thinking about how to make cpu -> gpu pipeline easier to MODIFY and use. not make gpu/shaders as automatic as possible.
 
+//TODO: define VariableCount method to math objects (vector,quaternion,matrix,complex,math tuple,etc)
+// TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables. \
+// this will be needed for partial derivatives specifically.
+//
+//TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, IsMathTuple, IsLinearEq, IsLinearSys etc \
+// define them using the IsSpec family in Utilities/IsSpecialization.hpp
+//
+// TODO: prevent math tuples from being `input-able to Function.
+//
+// TODO: setup custom clang-tidy module/ check (IvyTidy)
+//TODO: new performance bottleneck: renderer.
+
+//TODO: Utilities crate needs a nice cleaning. especially data structures. they are packed with all kinds of unnecessary edge case handling.
+//TODO: i need to formally define convergence and divergence & limits (numerically ofc).
+//
+// TODO: input should have a reference to the currently "focused" window.
+//
+// TODO: automatic differentiation via dual numbers.
+//
+// TODO: tracy is not working, the macro which defines it when debug mode doesn't work.
+//
+//TODO: enforce strict parameters on systems via compile-time dependency chain stuff & MULTI-THREADING
+//? as for thread safety. i think that should be integrated into the engine/ecs itself.
+
 using namespace Ivy;
-
-using Index = unsigned int;
-template <typename T, Index Size> struct Array
-{
-    static bool Contains(const Index index)
-    {
-        return index < Size;
-    }
-
-    T& At(Index index)
-    {
-        if (!Contains(index))
-        {
-            D::Log::Error("Array: Out of bounds.");
-        }
-        return m_Data[index];
-    }
-
-    T& operator[](Index index)
-    {
-        return m_Data[index];
-    }
-
-  private:
-    T m_Data[Size];
-};
 
 template <unsigned int... Dimensions> struct Tensor
 {
@@ -228,106 +215,12 @@ template <M::Scalar In, typename Out> Out Product(const M::Function<Out, In>& f,
     return result;
 };
 
-enum class GPUBackend
-{
-    OpenGL,
-    Vulkan,
-    DX12,
-};
-
-struct OpenGLBuffer
-{
-    int GL;
-};
-struct VulkanBuffer
-{
-    int Vulk;
-};
-
-struct NoBEImpl
-{
-    int NO_BACKEND_FOR_THIS;
-};
-
-template <GPUBackend BE, typename GL = NoBEImpl, typename VK = NoBEImpl, typename DX12 = NoBEImpl>
-using SelectBE = std::conditional_t<BE == GPUBackend::OpenGL, GL,
-    std::conditional_t<BE == GPUBackend::Vulkan, VK,
-        std::conditional_t<BE == GPUBackend::DX12, DX12, NoBEImpl>>>;
-
-static constexpr GPUBackend Backend = GPUBackend::OpenGL;
-
-struct Buffer : SelectBE<Backend, OpenGLBuffer, VulkanBuffer>
-{
-};
-
-// TODO: another idea could be to have free functions for each of openGL and vulkan, etc. structs (buffer) just selects based on backend. \
-// and have my own custom api layer than unifies openGL and vulkan under custom api interface, convert vulkan and openGL to this api.
-
-//TODO: if i can't bind all gpu APIs under 1 interface, i could do a mix of both ideas. \
-// have 2 modes , forward+ and compatibility, where forward+ uses the implementation for vk or dx12. \
-// and compatibility uses gl or dx11/10. just like godot.
-
-void DoVulkan(unsigned int id) {}
-void DoOpenGL(unsigned int id) {}
-
-struct Shader
-{
-    unsigned int id = 0;
-    Shader()
-    {
-        switch (Backend)
-        {
-        case GPUBackend::OpenGL:
-            DoOpenGL(id);
-            break;
-        case GPUBackend::Vulkan:
-            DoVulkan(id);
-            break;
-        case GPUBackend::DX12:
-            break;
-        }
-    }
-};
-
-//TODO: define VariableCount method to math objects (vector,quaternion,matrix,complex,math tuple,etc)
-// TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables. \
-// this will be needed for partial derivatives specifically.
-//
-//TODO: concepts i might need: IsQuaternion, IsVector, IsComplex, IsMatrix, IsODE, IsFunction, IsMathTuple, IsLinearEq, IsLinearSys etc \
-// define them using the IsSpec family in Utilities/IsSpecialization.hpp
-//
-// TODO: prevent math tuples from being `input-able to Function.
-//
-// TODO: setup custom clang-tidy module/ check (IvyTidy)
-//TODO: new performance bottleneck: renderer.
-
-//TODO: Utilities crate needs a nice cleaning. especially data structures. they are packed with all kinds of unnecessary edge case handling.
-//TODO: i need to formally define convergence and divergence & limits (numerically ofc).
-//
-// TODO: remove window from graphics and make a new crate (Platform Handling / Window Management, whatever). \
-// it will handle input from mouse, keyboard, joystick, wi        ndow management, basically what glfw does + some custom stuff (action mapper)
-//
-// TODO: automatic differentiation via dual numbers.
-//
-// TODO: tracy is not working, the macro which defines it when debug mode doesn't work.
-
 static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
 inline void Test()
 {
-    //TODO: download and setup bevy, i would like to know how they do things.
-    //
-    // TODO: [DONE] step 1: integrate the Execution Order thing. \
-    // [DONE] step 2: create State(singleton-like indexed by type), engine owns all states. systems request state, they do not own it. \
-    // [DONE] step 3: systems become free functions. no longer objects. \
-    // [DONE] step 4: plugins, presets of systems + state + dependency chain \
-    // step 5: enforce strict parameters on systems via compile-time dependency chain stuff. \
-    // step 6: MULTI-THREADING
-    //
-    //? as for thread safety. i think that should be integrated into the engine/ecs itself.
-    //
-    //? World doesn't need engine, only ecs. fix that.
+    M::Vector<3> v;
 }
 } // namespace Sketch

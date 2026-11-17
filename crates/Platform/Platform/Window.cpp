@@ -1,14 +1,13 @@
 #include "Window.hpp"
+#include "CursorMode.hpp"
 #include "Diagnostics/Log.hpp"
-#include "GLFW/glfw3.h"
-#include "Graphics/GLFWPlatform.hpp"
-#include "Graphics/Image.hpp"
-#include "Graphics/InputEnums/CursorMode.hpp"
+#include "GLFWPlatform.hpp"
 #include "OpenGL.hpp"
+#include "Utilities/Image.hpp"
 #include <string>
 #include <string_view>
 
-namespace Ivy::G
+namespace Ivy::Platform
 {
 void Window::Generate(const int width, const int height, std::string_view title)
 {
@@ -70,15 +69,6 @@ void Window::SwapBuffers()
     glfwSwapBuffers(m_GlfwWindow);
 }
 
-void Window::PollEvents()
-{
-    if (!IsGenerated())
-    {
-        return;
-    }
-    glfwPollEvents();
-}
-
 void Window::SetTitle(const std::string& title)
 {
     glfwSetWindowTitle(m_GlfwWindow, title.c_str());
@@ -89,7 +79,7 @@ std::string Window::GetTitle() const
     return glfwGetWindowTitle(m_GlfwWindow);
 }
 
-void Window::SetIcon(const G::Image& icon)
+void Window::SetIcon(const U::Image& icon)
 {
     if (GetPlatform() == GLFWPlatform::Wayland)
     {
@@ -149,7 +139,7 @@ void Window::SetCursorMode(CursorMode mode)
     glfwSetInputMode(m_GlfwWindow, GLFW_CURSOR, static_cast<int>(mode));
 }
 
-void Window::SetCursor(const G::Image& icon)
+void Window::SetCursor(const U::Image& icon)
 {
     GLFWimage image;
     image.height = icon.Height;
@@ -180,4 +170,4 @@ void Window::SetConfiguration()
     glfwWindowHint(GLFW_SAMPLES, Config.Samples);
     glfwWindowHint(GLFW_VISIBLE, Config.Visibility);
 }
-} // namespace Ivy::G
+} // namespace Ivy::Platform

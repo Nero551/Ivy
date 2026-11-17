@@ -1,6 +1,6 @@
 #pragma once
-#include "OpenGL.hpp"
-namespace Ivy::G
+#include <GLFW/glfw3.h>
+namespace Ivy::Platform
 {
 
 enum class GLFWPlatform
@@ -12,4 +12,4 @@ enum class GLFWPlatform
     Null = GLFW_PLATFORM_NULL
 };
 
-} // namespace Ivy::G
+} // namespace Ivy::Platform

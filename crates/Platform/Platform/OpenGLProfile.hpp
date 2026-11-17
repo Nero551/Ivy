@@ -1,11 +1,11 @@
 #pragma once
-#include "OpenGL.hpp"
 
-namespace Ivy::G
+#include <GLFW/glfw3.h>
+namespace Ivy::Platform
 {
 enum class OpenGLProfile
 {
     Core = GLFW_OPENGL_CORE_PROFILE,
     Compatibility = GLFW_OPENGL_COMPAT_PROFILE
 };
-} // namespace Ivy::G
+} // namespace Ivy::Platform

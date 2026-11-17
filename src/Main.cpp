@@ -3,7 +3,7 @@
 #include "Core/Engine.hpp"
 #include "Core/Plugin.hpp"
 #include "Core/SystemManager.hpp"
-#include "Graphics/Context.hpp"
+#include "Platform/Global.hpp"
 #include "Plugins.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Profiling/ProfilingSystem.hpp"
@@ -27,7 +27,11 @@ int main(const int argc, char* argv[])
         }
     }
 
-    G::Context::Initialize();
+    // Sketch::Test();
+    // return 0;
+
+    Platform::Initialize();
+
     C::Engine engine{[](C::Engine& engine)
         {
             engine.Window.Config.X11ClassName = "ivy_engine";
@@ -36,7 +40,7 @@ int main(const int argc, char* argv[])
             engine.Window.Generate(800, 600, "Ivy");
             engine.Window.SetIcon({"assets/icon.png"});
             engine.Window.SetCursor({"assets/cursor.png"});
-            engine.Input.Initialize(engine.Window);
+            Platform::Input.SetActiveWindow(engine.Window);
 
             engine.AddStates<ProfilingState, ResourceManagerState, TransformSystemState>();
 
@@ -44,12 +48,12 @@ int main(const int argc, char* argv[])
 
             engine.SM.AddSystems<C::Phase::Stop, Stop_ResourceManager>();
 
-            engine.AddPlugins<Sandbox2DPlugin, RendererPlugin>();
+            engine.AddPlugins<Sandbox3DPlugin, RendererPlugin>();
 
             engine.World.SetRoot(Node::Create(engine.ECS));
         }};
 
     engine.Run();
-    Ivy::G::Context::Terminate();
+    Ivy::Platform::Terminate();
     return 0;
 }

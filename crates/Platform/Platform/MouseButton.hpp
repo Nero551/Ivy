@@ -1,7 +1,7 @@
 #pragma once
-#include "../OpenGL.hpp"
 
-namespace Ivy::G
+#include <GLFW/glfw3.h>
+namespace Ivy::Platform
 {
 
 static constexpr unsigned int MouseButtonCount = GLFW_MOUSE_BUTTON_LAST + 1;
@@ -18,4 +18,4 @@ enum class MouseButton
     Button7 = GLFW_MOUSE_BUTTON_7,
     Button8 = GLFW_MOUSE_BUTTON_8,
 };
-} // namespace Ivy::G
+} // namespace Ivy::Platform

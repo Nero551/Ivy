@@ -1,2 +1,0 @@
-Make Data struct , it's the base class for all things that are written or read from the disk. it will use other classes
-such as JSON serializer , binary serializer, YAML serializer , etc. that will be the start of the Data-Driven system.

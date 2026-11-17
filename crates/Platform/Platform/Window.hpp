@@ -1,12 +1,11 @@
 #pragma once
+#include "Action.hpp"
+#include "CursorMode.hpp"
 #include "GLFW/glfw3.h"
 #include "GLFWPlatform.hpp"
-#include "Graphics/OpenGLProfile.hpp"
-#include "InputEnums/Action.hpp"
-#include "InputEnums/CursorMode.hpp"
-#include "InputEnums/Key.hpp"
-#include "InputEnums/MouseButton.hpp"
-#include "OpenGL.hpp"
+#include "Key.hpp"
+#include "MouseButton.hpp"
+#include "OpenGLProfile.hpp"
 #include "Utilities/stl.hpp"
 #include <concepts>
 #include <string>
@@ -14,9 +13,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "Graphics/Image.hpp"
+#include "Utilities/Image.hpp"
 
-namespace Ivy::G
+namespace Ivy::Platform
 {
 
 /**
@@ -118,13 +117,10 @@ struct Window
     /** Swaps the front and back buffers. */
     void SwapBuffers();
 
-    /** Processes pending GLFW events. */
-    void PollEvents();
-
     void SetTitle(const std::string& title);
     std::string GetTitle() const;
 
-    void SetIcon(const G::Image& icon);
+    void SetIcon(const U::Image& icon);
 
     /** @param height New height in pixels */
     void SetHeight(int height);
@@ -249,8 +245,24 @@ struct Window
             });
     }
 
+    template <typename F>
+    void SetWindowFocusCallback(F&& f) requires(std::same_as<std::invoke_result_t<F, Window&, bool>, void>)
+    {
+        m_WindowFocusedCallback = std::forward<F>(f);
+        glfwSetWindowFocusCallback(m_GlfwWindow,
+            [](GLFWwindow* w, bool focused)
+            {
+                Window* win = static_cast<Window*>(glfwGetWindowUserPointer(w));
+                if (win == nullptr || !win->m_WindowFocusedCallback)
+                {
+                    return;
+                }
+                win->m_WindowFocusedCallback(*win, focused);
+            });
+    }
+
     void SetCursorMode(CursorMode mode);
-    void SetCursor(const G::Image& icon);
+    void SetCursor(const U::Image& icon);
     void SetDefaultCursor();
 
   private:
@@ -263,7 +275,8 @@ struct Window
     stl::function<void(Window&, Key, int, Action, int)> m_KeyCallback;
     stl::function<void(Window&, MouseButton, Action, int)> m_MouseButtonCallback;
     stl::function<void(Window&, bool)> m_CursorEnteredCallback;
+    stl::function<void(Window&, bool)> m_WindowFocusedCallback;
 
     void SetConfiguration();
 };
-} // namespace Ivy::G
+} // namespace Ivy::Platform

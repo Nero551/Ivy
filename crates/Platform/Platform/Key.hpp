@@ -1,8 +1,9 @@
 #pragma once
-#include "../OpenGL.hpp"
+
+#include "OpenGL.hpp"
 #include <string>
 
-namespace Ivy::G
+namespace Ivy::Platform
 {
 
 static constexpr unsigned int KeyCount = GLFW_KEY_LAST + 1;
@@ -161,4 +162,4 @@ inline std::string GetKeyName(Key key)
     return glfwGetKeyName(static_cast<GLenum>(key), 0);
 }
 
-} // namespace Ivy::G
+} // namespace Ivy::Platform

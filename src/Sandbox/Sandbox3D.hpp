@@ -2,8 +2,9 @@
 
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
-#include "Graphics/InputEnums/CursorMode.hpp"
-#include "Graphics/InputEnums/Key.hpp"
+#include "Platform/CursorMode.hpp"
+#include "Platform/Global.hpp"
+#include "Platform/Key.hpp"
 #include "Sandbox/Scenes/CoordinateAxes3D.hpp"
 #include "Sandbox/Systems/Controller3D.hpp"
 #include "Sandbox/Systems/StressTester3D.hpp"
@@ -17,7 +18,7 @@ namespace Sandbox3D
 {
 inline void Start_Sandbox3D(C::Engine& eng)
 {
-    eng.Input.SetMouseMode(G::CursorMode::Disabled);
+    Platform::Input.SetMouseMode(Platform::CursorMode::Disabled);
 
     auto& query = eng.ECS.Query;
     auto& camera = Camera3D::Create(eng.ECS);
@@ -53,7 +54,7 @@ inline void Start_Sandbox3D(C::Engine& eng)
 
 inline void FixedUpdate_Sandbox3D(C::Engine& eng, double dt)
 {
-    if (eng.Input.IsKeyHeld(G::Key::Escape))
+    if (Platform::Input.IsKeyHeld(Platform::Key::Escape))
     {
         eng.Shutdown();
     }

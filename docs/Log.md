@@ -183,3 +183,6 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 ---
 
 ### Week 20 · November 12–19
+
+- multi-threading prototype
+- architecture redesign

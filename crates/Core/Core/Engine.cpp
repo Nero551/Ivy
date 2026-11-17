@@ -2,14 +2,14 @@
 
 #include "Core/SystemManager.hpp"
 #include "Diagnostics/Profiling.hpp"
-#include "Graphics/Context.hpp"
+#include "Platform/Global.hpp"
 
 namespace Ivy::C
 {
 
 void Engine::Run()
 {
-    TimeHandler.Initialize(G::Context::GetTime());
+    TimeHandler.Initialize(Platform::GetTime());
     m_Running = true;
 
     Start();
@@ -55,9 +55,9 @@ void Engine::BeginFrame()
     IVY_PROFILE_ZONE("Begin Frame");
     IVY_PROFILE_GPU_ZONE("Begin Frame");
 
-    TimeHandler.CalculateTime(G::Context::GetTime());
-    Window.PollEvents();
-    Input.FirstMouseCheck();
+    TimeHandler.CalculateTime(Platform::GetTime());
+    Platform::PollEvents();
+    Platform::Input.FirstMouseCheck();
 
     SM.LoopOver<Phase::BeginFrame>(*this, TimeHandler.GetDelta());
 }
@@ -92,7 +92,7 @@ void Engine::EndFrame()
     IVY_PROFILE_GPU_ZONE("End Frame");
 
     Window.SwapBuffers();
-    Input.Refresh();
+    Platform::Input.Refresh();
 
     SM.LoopOver<Phase::EndFrame>(*this, TimeHandler.GetDelta());
 

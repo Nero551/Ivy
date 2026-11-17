@@ -2,9 +2,10 @@
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
 #include "Diagnostics/Log.hpp"
-#include "Graphics/InputEnums/Key.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Platform/Global.hpp"
+#include "Platform/Key.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/ProjectionMode.hpp"
@@ -25,9 +26,9 @@ namespace Controller2D
 inline void Update_Controller2D(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<Controller2DState>();
-    auto& input = eng.Input;
+    auto& input = Platform::Input;
 
-    if (input.IsKeyPressed(G::Key::T))
+    if (input.IsKeyPressed(Platform::Key::T))
     {
         D::Log::Info(eng.ECS.EntityAmount());
     }
@@ -35,10 +36,11 @@ inline void Update_Controller2D(C::Engine& eng, double dt)
     auto& query = eng.ECS.Query;
     auto& camera = eng.World.GetCamera();
 
-    if (!input.IsKeyHeld(G::Key::LeftShift))
+    if (!input.IsKeyHeld(Platform::Key::LeftShift))
     {
-        state.Zoom += input.IsKeyHeld(G::Key::LeftControl) ? input.GetScrollDelta().y * M::PI * M::PHI :
-                                                             input.GetScrollDelta().y;
+        state.Zoom += input.IsKeyHeld(Platform::Key::LeftControl) ?
+            input.GetScrollDelta().y * M::PI * M::PHI :
+            input.GetScrollDelta().y;
     }
 
     state.Zoom = std::max(state.Zoom, 2.0f);
@@ -52,7 +54,7 @@ inline void Update_Controller2D(C::Engine& eng, double dt)
     cameraComponent.Right = eng.Window.GetWidth() / state.Zoom;
     cameraComponent.Top = eng.Window.GetHeight() / state.Zoom;
 
-    if (input.IsKeyHeld(G::Key::LeftShift))
+    if (input.IsKeyHeld(Platform::Key::LeftShift))
     {
         state.Speed += input.GetScrollDelta().y;
     }
@@ -60,19 +62,19 @@ inline void Update_Controller2D(C::Engine& eng, double dt)
     state.Speed = std::max(state.Speed, 2.5f);
     const float speed = state.Speed * static_cast<float>(dt);
 
-    if (input.IsKeyHeld(G::Key::A))
+    if (input.IsKeyHeld(Platform::Key::A))
     {
         transform.Position -= speed * M::Vector<2>(1, 0);
     }
-    if (input.IsKeyHeld(G::Key::D))
+    if (input.IsKeyHeld(Platform::Key::D))
     {
         transform.Position += speed * M::Vector<2>(1, 0);
     }
-    if (input.IsKeyHeld(G::Key::W))
+    if (input.IsKeyHeld(Platform::Key::W))
     {
         transform.Position += speed * M::Vector<2>(0, 1);
     }
-    if (input.IsKeyHeld(G::Key::S))
+    if (input.IsKeyHeld(Platform::Key::S))
     {
         transform.Position -= speed * M::Vector<2>(0, 1);
     }

@@ -2,11 +2,12 @@
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
 #include "Diagnostics/Log.hpp"
-#include "Graphics/InputEnums/CursorMode.hpp"
-#include "Graphics/InputEnums/Key.hpp"
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Platform/CursorMode.hpp"
+#include "Platform/Global.hpp"
+#include "Platform/Key.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/ProjectionMode.hpp"
@@ -26,15 +27,16 @@ namespace Controller3D
 inline void Update_Controller3D(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<Controller3DState>();
-    auto& input = eng.Input;
+    auto& input = Platform::Input;
 
-    if (input.IsKeyReleased(G::Key::Q))
+    if (input.IsKeyReleased(Platform::Key::Q))
     {
-        input.SetMouseMode(input.GetMouseMode() == G::CursorMode::Disabled ? G::CursorMode::Normal :
-                                                                             G::CursorMode::Disabled);
+        input.SetMouseMode(input.GetMouseMode() == Platform::CursorMode::Disabled ?
+                Platform::CursorMode::Normal :
+                Platform::CursorMode::Disabled);
     }
 
-    if (input.IsKeyPressed(G::Key::T))
+    if (input.IsKeyPressed(Platform::Key::T))
     {
         D::Log::Info(eng.ECS.EntityAmount());
     }
@@ -50,7 +52,7 @@ inline void Update_Controller3D(C::Engine& eng, double dt)
     cameraComponent.Right = eng.Window.GetWidth();
     cameraComponent.Top = eng.Window.GetHeight();
 
-    if (input.GetMouseMode() == G::CursorMode::Disabled)
+    if (input.GetMouseMode() == Platform::CursorMode::Disabled)
     {
         const float xOffset = M::Rad(-input.GetMouseDelta().x * cameraComponent.Sensitivity);
         const float yOffset = M::Rad(-input.GetMouseDelta().y * cameraComponent.Sensitivity);
@@ -67,27 +69,27 @@ inline void Update_Controller3D(C::Engine& eng, double dt)
     state.Speed = std::max(state.Speed, 2.5f);
     const float speed = state.Speed * static_cast<float>(dt);
 
-    if (input.IsKeyHeld(G::Key::W))
+    if (input.IsKeyHeld(Platform::Key::W))
     {
         transform.Position += speed * transform.GetForward();
     }
-    if (input.IsKeyHeld(G::Key::S))
+    if (input.IsKeyHeld(Platform::Key::S))
     {
         transform.Position -= speed * transform.GetForward();
     }
-    if (input.IsKeyHeld(G::Key::A))
+    if (input.IsKeyHeld(Platform::Key::A))
     {
         transform.Position -= speed * transform.GetRight();
     }
-    if (input.IsKeyHeld(G::Key::D))
+    if (input.IsKeyHeld(Platform::Key::D))
     {
         transform.Position += speed * transform.GetRight();
     }
-    if (input.IsKeyHeld(G::Key::Space))
+    if (input.IsKeyHeld(Platform::Key::Space))
     {
         transform.Position += speed * M::Vector<3>(0, 1, 0);
     }
-    if (input.IsKeyHeld(G::Key::LeftShift))
+    if (input.IsKeyHeld(Platform::Key::LeftShift))
     {
         transform.Position -= speed * M::Vector<3>(0, 1, 0);
     }

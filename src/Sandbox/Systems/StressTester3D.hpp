@@ -5,7 +5,6 @@
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
-#include "Graphics/InputEnums/Key.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
@@ -18,6 +17,8 @@
 #include "Math/Coordinates/Polar.hpp"
 #include "Math/Coordinates/Spherical.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Platform/Global.hpp"
+#include "Platform/Key.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -169,14 +170,14 @@ inline void Spawn(C::Engine& eng, int dimension, int craziness)
 inline void Update_StressTester3D(C::Engine& eng, double dt)
 {
     auto& state = eng.GetStates<StressTester3DState>();
-    auto& input = eng.Input;
+    auto& input = Platform::Input;
     auto& query = eng.ECS.Query;
 
-    if (input.IsKeyHeld(G::Key::Left))
+    if (input.IsKeyHeld(Platform::Key::Left))
     {
         state.Multiplier -= 5 * dt;
     }
-    if (input.IsKeyHeld(G::Key::Right))
+    if (input.IsKeyHeld(Platform::Key::Right))
     {
         state.Multiplier += 5 * dt;
     }
