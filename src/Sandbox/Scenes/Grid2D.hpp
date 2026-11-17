@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/World/Scene.hpp"
+#include "ECS/Entity.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
@@ -10,6 +10,8 @@
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Color/Color.hpp"
 #include "Math/Common/Trigonometry.hpp"
+#include "Math/Vector/Vectors.hpp"
+#include "Systems/Components.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -17,69 +19,67 @@
 
 namespace Ivy
 {
-struct Grid2D : C::Scene
+namespace
 {
-    using C::Scene::Scene;
+void CreateGridLine(C::Engine& eng, ECS::Entity& root, float rotation, M::Vector<2> position)
+{
+    auto& query = eng.ECS.Query;
 
-    void Initialize() override
+    auto& shader = LoadResource<G::Shader>(eng, "AxisShader");
+
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+
+    G::Mesh m = G::Primitives::CreateLine("Line");
+    auto& line = LoadResource<G::Mesh>(eng, m);
+
+    auto& l = MeshInstance2D::Create(eng.ECS);
+
+    auto& materialComponent = query.GetComponent<CMP::Material>(l);
+    auto& meshComponent = query.GetComponent<CMP::Mesh>(l);
+    auto& transformComponent = query.GetComponent<CMP::Transform2D>(l);
+
+    meshComponent.Mesh = &line;
+
+    materialComponent.Material = &LoadResource<G::Material>(eng, "GridLine Material");
+    materialComponent.Material->Get().Shader = &shader();
+
+    transformComponent.Rotation = rotation;
+    transformComponent.Position = position;
+    transformComponent.Scale = {200, 1};
+
+    materialComponent.Material->Get().Color = M::Color::Gray;
+
+    root.AttachChild(l);
+}
+
+void CreateXY(C::Engine& eng, ECS::Entity& root)
+{
+    for (int x = -100; x < 100; ++x)
     {
-        SetRoot(Node::Create(m_Engine.ECS));
-        CreateXY();
-    }
-
-  private:
-    void CreateGridLine(float rotation, M::Vector<2> position)
-    {
-        auto& query = m_Engine.ECS.Query;
-
-        auto& shader = LoadResource<G::Shader>(m_Engine, "AxisShader");
-
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
-
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
-
-        G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = LoadResource<G::Mesh>(m_Engine, m);
-
-        auto& l = MeshInstance2D::Create(m_Engine.ECS);
-
-        auto& materialComponent = query.GetComponent<CMP::Material>(l);
-        auto& meshComponent = query.GetComponent<CMP::Mesh>(l);
-        auto& transformComponent = query.GetComponent<CMP::Transform2D>(l);
-
-        meshComponent.Mesh = &line;
-
-        materialComponent.Material = &LoadResource<G::Material>(m_Engine, "GridLine Material");
-        materialComponent.Material->Get().Shader = &shader();
-
-        transformComponent.Rotation = rotation;
-        transformComponent.Position = position;
-        transformComponent.Scale = {200, 1};
-
-        materialComponent.Material->Get().Color = M::Color::Gray;
-
-        l.SetParent(GetRoot());
-    }
-
-    void CreateXY()
-    {
-        for (int x = -100; x < 100; ++x)
+        if (x != 0)
         {
-            if (x != 0)
-            {
-                CreateGridLine(M::Rad(90.0f), {static_cast<float>(x), 0});
-            }
-        }
-
-        for (int y = -100; y < 100; ++y)
-        {
-            if (y != 0)
-            {
-                CreateGridLine(0, {0, static_cast<float>(y)});
-            }
+            CreateGridLine(eng, root, M::Rad(90.0f), {static_cast<float>(x), 0});
         }
     }
-};
+
+    for (int y = -100; y < 100; ++y)
+    {
+        if (y != 0)
+        {
+            CreateGridLine(eng, root, 0, {0, static_cast<float>(y)});
+        }
+    }
+}
+
+} // namespace
+ECS::Entity& Grid2DScene(C::Engine& eng)
+{
+    auto& root = Node::Create(eng.ECS);
+    CreateXY(eng, root);
+    return root;
+}
 } // namespace Ivy

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/World/Scene.hpp"
+#include "ECS/Entity.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
@@ -12,6 +12,7 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/Components.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -19,122 +20,125 @@
 
 namespace Ivy
 {
-struct Grid3D : C::Scene
+namespace
 {
-    using C::Scene::Scene;
-    int Number = 100;
+void CreateGridLine(C::Engine& eng, ECS::Entity& root, const M::Quaternion<> rotation, M::Vector<3> position)
+{
+    auto& query = eng.ECS.Query;
+    auto& shader = LoadResource<G::Shader>(eng, "AxisShader");
 
-    void Initialize() override
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+
+    G::Mesh m = G::Primitives::CreateLine("Line");
+    auto& line = LoadResource<G::Mesh>(eng, m);
+
+    auto& l = MeshInstance3D::Create(eng.ECS);
+
+    auto& materialComponent = query.GetComponent<CMP::Material>(l);
+    auto& meshComponent = query.GetComponent<CMP::Mesh>(l);
+    auto& transformComponent = query.GetComponent<CMP::Transform3D>(l);
+
+    meshComponent.Mesh = &line;
+
+    materialComponent.Material = &LoadResource<G::Material>(eng, "GridLine Material");
+    materialComponent.Material->Get().Shader = &shader();
+
+    transformComponent.Rotation = rotation;
+    transformComponent.Position = position;
+    transformComponent.Scale = {200, 1, 1};
+
+    materialComponent.Material->Get().Color = M::Color::Gray;
+
+    root.AttachChild(l);
+}
+
+void CreateXY(C::Engine& eng, ECS::Entity& root, int number)
+{
+    for (int x = -number; x < number; ++x)
     {
-        SetRoot(Node::Create(m_Engine.ECS));
-
-        CreateXY();
-        CreateXZ();
-        CreateYZ();
-
-        // for (int theta = 0; theta <= 360; ++theta) {
-        // for (int phi = 0; phi <= 360; ++phi) {
-        // }
-        // float r = 3;
-        // CreateGridLine({M::Rad(theta), 0, 0}, 0);
-        // CreateGridLine(M::Quaternion::FromEulerXYZ({M::Rad(theta), M::Rad(theta),
-        // M::Rad(theta)}), 0);
-    }
-
-  private:
-    void CreateGridLine(const M::Quaternion<> rotation, M::Vector<3> position)
-    {
-        auto& query = m_Engine.ECS.Query;
-        auto& shader = LoadResource<G::Shader>(m_Engine, "AxisShader");
-
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
-
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
-
-        G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = LoadResource<G::Mesh>(m_Engine, m);
-
-        auto& l = MeshInstance3D::Create(m_Engine.ECS);
-
-        auto& materialComponent = query.GetComponent<CMP::Material>(l);
-        auto& meshComponent = query.GetComponent<CMP::Mesh>(l);
-        auto& transformComponent = query.GetComponent<CMP::Transform3D>(l);
-
-        meshComponent.Mesh = &line;
-
-        materialComponent.Material = &LoadResource<G::Material>(m_Engine, "GridLine Material");
-        materialComponent.Material->Get().Shader = &shader();
-
-        transformComponent.Rotation = rotation;
-        transformComponent.Position = position;
-        transformComponent.Scale = {200, 1, 1};
-
-        materialComponent.Material->Get().Color = M::Color::Gray;
-
-        l.SetParent(GetRoot());
-    }
-
-    void CreateXY()
-    {
-        for (int x = -Number; x < Number; ++x)
+        if (x != 0)
         {
-            if (x != 0)
-            {
-                CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)}), {static_cast<float>(x), 0, 0});
-            }
-        }
-
-        for (int y = -Number; y < Number; ++y)
-        {
-            if (y != 0)
-            {
-                CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, 0}), {0, static_cast<float>(y), 0});
-            }
+            CreateGridLine(eng, root, M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)}),
+                {static_cast<float>(x), 0, 0});
         }
     }
 
-    void CreateXZ()
+    for (int y = -number; y < number; ++y)
     {
-        for (int x = -Number; x < Number; ++x)
+        if (y != 0)
         {
-            if (x != 0)
-            {
-                CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0}), {static_cast<float>(x), 0, 0});
-            }
+            CreateGridLine(
+                eng, root, M::Quaternion<>::FromEulerXYZ({0, 0, 0}), {0, static_cast<float>(y), 0});
         }
+    }
+}
 
-        for (int z = -Number; z < Number; ++z)
+void CreateXZ(C::Engine& eng, ECS::Entity& root, int number)
+{
+    for (int x = -number; x < number; ++x)
+    {
+        if (x != 0)
         {
-            if (z != 0)
-            {
-                CreateGridLine(M::Quaternion<>::FromEulerXYZ({0, 0, 0}), {0, 0, static_cast<float>(z)});
-            }
+            CreateGridLine(eng, root, M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0}),
+                {static_cast<float>(x), 0, 0});
         }
     }
 
-    void CreateYZ()
+    for (int z = -number; z < number; ++z)
     {
-        for (int y = -Number; y < Number; ++y)
+        if (z != 0)
         {
-            if (y != 0)
-            {
-                CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0}), {0, static_cast<float>(y), 0});
-            }
-        }
-
-        for (int z = -Number; z < Number; ++z)
-        {
-            if (z != 0)
-            {
-                CreateGridLine(
-                    M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)}), {0, 0, static_cast<float>(z)});
-            }
+            CreateGridLine(
+                eng, root, M::Quaternion<>::FromEulerXYZ({0, 0, 0}), {0, 0, static_cast<float>(z)});
         }
     }
-};
+}
+
+void CreateYZ(C::Engine& eng, ECS::Entity& root, int number)
+{
+    for (int y = -number; y < number; ++y)
+    {
+        if (y != 0)
+        {
+            CreateGridLine(eng, root, M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0}),
+                {0, static_cast<float>(y), 0});
+        }
+    }
+
+    for (int z = -number; z < number; ++z)
+    {
+        if (z != 0)
+        {
+            CreateGridLine(eng, root, M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)}),
+                {0, 0, static_cast<float>(z)});
+        }
+    }
+}
+
+ECS::Entity& Grid3DScene(C::Engine& eng)
+{
+    auto& root = Node::Create(eng.ECS);
+
+    int number = 100;
+
+    CreateXY(eng, root, number);
+    CreateXZ(eng, root, number);
+    CreateYZ(eng, root, number);
+
+    // for (int theta = 0; theta <= 360; ++theta) {
+    // for (int phi = 0; phi <= 360; ++phi) {
+    // }
+    // float r = 3;
+    // CreateGridLine({M::Rad(theta), 0, 0}, 0);
+    // CreateGridLine(M::Quaternion::FromEulerXYZ({M::Rad(theta), M::Rad(theta),
+    // M::Rad(theta)}), 0);
+    //
+
+    return root;
+}
+}; // namespace
 } // namespace Ivy

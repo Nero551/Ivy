@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
+#include "ECS/EntityComponentSystem.hpp"
 #include "ECS/EntityID.hpp"
-#include "Scene.hpp"
 
 namespace Ivy::C
 {
@@ -15,23 +16,38 @@ struct Engine;
  */
 struct World
 {
-    World(Engine& engine) : m_Engine(engine) {}
+    World(ECS::EntityComponentSystem& ecs) : m_ECS(ecs) {}
 
     int MaxLights = 24;
-    void SetRoot(const ECS::Entity& entity);
-    ECS::Entity& GetRoot();
-    void SetCamera(const ECS::Entity& entity);
-    ECS::Entity& GetCamera();
-
-    template <typename T, typename... Args> T CreateScene(Args&&... args)
+    void SetRoot(const ECS::Entity& entity)
     {
-        T scene{m_Engine};
-        scene.Initialize(args...);
-        return scene;
+        m_Root = entity.GetId();
+    }
+    ECS::Entity& GetRoot()
+    {
+        auto root = m_ECS.TryFindEntity(m_Root);
+        if (!root)
+        {
+            D::Log::Error("No Root Is Set Or Root Is Not An Entity");
+        }
+        return *root;
+    }
+    void SetCamera(const ECS::Entity& entity)
+    {
+        m_ActiveCamera = entity.GetId();
+    }
+    ECS::Entity& GetCamera()
+    {
+        auto camera = m_ECS.TryFindEntity(m_ActiveCamera);
+        if (!camera)
+        {
+            D::Log::Error("No Active Camera Is Set Or Active Camera Is Not An Entity");
+        }
+        return *camera;
     }
 
   private:
-    Engine& m_Engine;
+    ECS::EntityComponentSystem& m_ECS;
     ECS::EntityID m_Root{};
     ECS::EntityID m_ActiveCamera{};
 };

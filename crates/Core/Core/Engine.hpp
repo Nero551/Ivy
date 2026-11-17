@@ -25,8 +25,8 @@ namespace Ivy::C
 struct Engine
 {
     G::Window Window{};
-    World World{*this};
     ECS::EntityComponentSystem ECS{};
+    World World{ECS};
     TimeHandler TimeHandler{};
     SystemManager SM;
     G::InputHandler Input;
@@ -34,7 +34,7 @@ struct Engine
 
     template <typename F>
     Engine(F&& configure) requires(std::invocable<F, Engine&>)
-        : World(*this), Configuration(std::forward<F>(configure))
+        : World(ECS), Configuration(std::forward<F>(configure))
     {
     }
     Engine(const Engine&) = delete;

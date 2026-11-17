@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/World/Scene.hpp"
+#include "ECS/Entity.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Topology.hpp"
@@ -22,85 +22,82 @@
 
 namespace Ivy::Sandbox
 {
-struct CoordinateAxes3D : C::Scene
+
+ECS::Entity& CoordinateAxes3DScene(C::Engine& eng)
 {
-    using C::Scene::Scene;
-    void Initialize() override
-    {
-        auto& query = m_Engine.ECS.Query;
-        SetRoot(Node::Create(m_Engine.ECS));
+    auto& query = eng.ECS.Query;
+    auto& root = Node::Create(eng.ECS);
 
-        auto& lightShader = LoadResource<G::Shader>(m_Engine, "lightShader");
-        lightShader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "lightFrag", "assets/Shaders/lightShader.frag", G::ShaderStage::Fragment)());
-        lightShader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "lightVert", "assets/Shaders/lightShader.vert", G::ShaderStage::Vertex)());
+    auto& lightShader = LoadResource<G::Shader>(eng, "lightShader");
+    lightShader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "lightFrag", "assets/Shaders/lightShader.frag", G::ShaderStage::Fragment)());
+    lightShader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "lightVert", "assets/Shaders/lightShader.vert", G::ShaderStage::Vertex)());
 
-        auto& lightMaterial = LoadResource<G::Material>(m_Engine, "lightMaterial");
-        lightMaterial().Shader = &lightShader();
+    auto& lightMaterial = LoadResource<G::Material>(eng, "lightMaterial");
+    lightMaterial().Shader = &lightShader();
 
-        auto& light = Light3D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Transform3D>(light).Rotation =
-            M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5f)});
-        light.SetParent(GetRoot());
+    auto& light = Light3D::Create(eng.ECS);
+    query.GetComponent<CMP::Transform3D>(light).Rotation =
+        M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(32.5f)});
+    root.AttachChild(light);
 
-        auto& light2 = Light3D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Transform3D>(light2).Rotation =
-            M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5f)});
-        light2.SetParent(GetRoot());
+    auto& light2 = Light3D::Create(eng.ECS);
+    query.GetComponent<CMP::Transform3D>(light2).Rotation =
+        M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5f)});
+    root.AttachChild(light2);
 
-        auto& shader = LoadResource<G::Shader>(m_Engine, "AxisShader");
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+    auto& shader = LoadResource<G::Shader>(eng, "AxisShader");
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
-        G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = LoadResource<G::Mesh>(m_Engine, m);
+    G::Mesh m = G::Primitives::CreateLine("Line");
+    auto& line = LoadResource<G::Mesh>(eng, m);
 
-        auto& xAxis = MeshInstance3D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
-        auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
-        xMaterial.Material = &LoadResource<G::Material>(m_Engine, "X-Axis Material");
-        xMaterial.Material->Get().Shader = &shader();
+    auto& xAxis = MeshInstance3D::Create(eng.ECS);
+    query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
+    auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
+    xMaterial.Material = &LoadResource<G::Material>(eng, "X-Axis Material");
+    xMaterial.Material->Get().Shader = &shader();
 
-        query.GetComponent<CMP::Transform3D>(xAxis).Scale = {200, 1, 1};
-        xMaterial.Material->Get().Color = M::Color::Red;
+    query.GetComponent<CMP::Transform3D>(xAxis).Scale = {200, 1, 1};
+    xMaterial.Material->Get().Color = M::Color::Red;
 
-        GetRoot().AttachChild(xAxis);
+    root.AttachChild(xAxis);
 
-        auto& yAxis = MeshInstance3D::Create(m_Engine.ECS);
+    auto& yAxis = MeshInstance3D::Create(eng.ECS);
 
-        query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
+    query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
 
-        auto& yTransform = query.GetComponent<CMP::Transform3D>(yAxis);
-        yTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)});
-        yTransform.Scale = {200, 1, 1};
+    auto& yTransform = query.GetComponent<CMP::Transform3D>(yAxis);
+    yTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, 0, M::Rad(90.0f)});
+    yTransform.Scale = {200, 1, 1};
 
-        auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
-        yMaterial.Material = &LoadResource<G::Material>(m_Engine, "Y-Axis Material");
-        yMaterial.Material->Get().Shader = &shader();
-        yMaterial.Material->Get().Color = M::Color::Green;
+    auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
+    yMaterial.Material = &LoadResource<G::Material>(eng, "Y-Axis Material");
+    yMaterial.Material->Get().Shader = &shader();
+    yMaterial.Material->Get().Color = M::Color::Green;
 
-        yAxis.SetParent(GetRoot());
+    root.AttachChild(yAxis);
 
-        auto& zAxis = MeshInstance3D::Create(m_Engine.ECS);
+    auto& zAxis = MeshInstance3D::Create(eng.ECS);
 
-        query.GetComponent<CMP::Mesh>(zAxis).Mesh = &line;
+    query.GetComponent<CMP::Mesh>(zAxis).Mesh = &line;
 
-        auto& zTransform = query.GetComponent<CMP::Transform3D>(zAxis);
-        zTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0});
-        zTransform.Scale = {200, 1, 1};
+    auto& zTransform = query.GetComponent<CMP::Transform3D>(zAxis);
+    zTransform.Rotation = M::Quaternion<>::FromEulerXYZ({0, M::Rad(90.0f), 0});
+    zTransform.Scale = {200, 1, 1};
 
-        auto& zMaterial = query.GetComponent<CMP::Material>(zAxis);
-        zMaterial.Material = &LoadResource<G::Material>(m_Engine, "Z-Axis Material");
-        zMaterial.Material->Get().Shader = &shader();
-        zMaterial.Material->Get().Color = M::Color::Blue;
+    auto& zMaterial = query.GetComponent<CMP::Material>(zAxis);
+    zMaterial.Material = &LoadResource<G::Material>(eng, "Z-Axis Material");
+    zMaterial.Material->Get().Shader = &shader();
+    zMaterial.Material->Get().Color = M::Color::Blue;
 
-        zAxis.SetParent(GetRoot());
+    root.AttachChild(zAxis);
 
-        // Grid3D grid = m_Engine.World.CreateScene<Grid3D>();
-        // GetRoot().AttachChild(grid.GetRoot());
-    }
+    root.AttachChild(Grid3DScene(eng));
+    return root;
 };
 } // namespace Ivy::Sandbox

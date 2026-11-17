@@ -1,4 +1,5 @@
 #pragma once
+#include "Diagnostics/Log.hpp"
 #include <concepts>
 #include <functional>
 #include <limits>

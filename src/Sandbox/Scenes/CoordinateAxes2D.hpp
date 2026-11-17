@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/World/Scene.hpp"
+#include "ECS/Entity.hpp"
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Primitives/Primitives.hpp"
@@ -9,7 +9,6 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Grid2D.hpp"
-#include "Math/Color/Color.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
@@ -18,48 +17,43 @@
 
 namespace Ivy::Sandbox
 {
-struct CoordinateAxes2D : C::Scene
+ECS::Entity& CoordinateAxes2DScene(C::Engine& eng)
 {
-    using C::Scene::Scene;
-    void Initialize() override
-    {
-        auto& query = m_Engine.ECS.Query;
-        SetRoot(Node2D::Create(m_Engine.ECS));
+    auto& query = eng.ECS.Query;
+    auto& root = Node2D::Create(eng.ECS);
 
-        auto& shader = LoadResource<G::Shader>(m_Engine, "AxisShader");
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
-        shader().AssignSource(LoadResource<G::ShaderSource>(
-            m_Engine, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+    auto& shader = LoadResource<G::Shader>(eng, "AxisShader");
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+    shader().AssignSource(LoadResource<G::ShaderSource>(
+        eng, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
-        G::Mesh m = G::Primitives::CreateLine("Line");
-        auto& line = LoadResource<G::Mesh>(m_Engine, m);
+    G::Mesh m = G::Primitives::CreateLine("Line");
+    auto& line = LoadResource<G::Mesh>(eng, m);
 
-        auto& xAxis = MeshInstance2D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
-        auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
-        xMaterial.Material = &LoadResource<G::Material>(m_Engine, "X-Axis Material");
-        xMaterial.Material->Get().Shader = &shader();
+    auto& xAxis = MeshInstance2D::Create(eng.ECS);
+    query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
+    auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
+    xMaterial.Material = &LoadResource<G::Material>(eng, "X-Axis Material");
+    xMaterial.Material->Get().Shader = &shader();
 
-        query.GetComponent<CMP::Transform2D>(xAxis).Scale = {200, 1};
-        xMaterial.Material->Get().Color = M::Color::Red;
+    query.GetComponent<CMP::Transform2D>(xAxis).Scale = {200, 1};
+    xMaterial.Material->Get().Color = M::Color::Red;
 
-        xAxis.SetParent(GetRoot());
+    root.AttachChild(xAxis);
+    auto& yAxis = MeshInstance2D::Create(eng.ECS);
+    query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
+    auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
+    yMaterial.Material = &LoadResource<G::Material>(eng, "Y-Axis Material");
+    yMaterial.Material->Get().Shader = &shader();
 
-        auto& yAxis = MeshInstance2D::Create(m_Engine.ECS);
-        query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
-        auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
-        yMaterial.Material = &LoadResource<G::Material>(m_Engine, "Y-Axis Material");
-        yMaterial.Material->Get().Shader = &shader();
+    query.GetComponent<CMP::Transform2D>(yAxis).Rotation = M::Rad(90.0f);
+    query.GetComponent<CMP::Transform2D>(yAxis).Scale = {200, 1};
+    yMaterial.Material->Get().Color = M::Color::Green;
 
-        query.GetComponent<CMP::Transform2D>(yAxis).Rotation = M::Rad(90.0f);
-        query.GetComponent<CMP::Transform2D>(yAxis).Scale = {200, 1};
-        yMaterial.Material->Get().Color = M::Color::Green;
+    root.AttachChild(yAxis);
 
-        yAxis.SetParent(GetRoot());
-
-        Grid2D grid = m_Engine.World.CreateScene<Grid2D>();
-        GetRoot().AttachChild(grid.GetRoot());
-    }
-};
+    root.AttachChild(Grid2DScene(eng));
+    return root;
+}
 } // namespace Ivy::Sandbox

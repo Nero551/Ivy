@@ -25,8 +25,7 @@ inline void Start_Sandbox3D(C::Engine& eng)
     eng.World.GetRoot().AttachChild(camera);
     eng.World.SetCamera(camera);
 
-    CoordinateAxes3D coordinateAxes = eng.World.CreateScene<CoordinateAxes3D>();
-    eng.World.GetRoot().AttachChild(coordinateAxes.GetRoot());
+    eng.World.GetRoot().AttachChild(CoordinateAxes3DScene(eng));
 
     // StressTester3D::Spawn(eng, 4, 3);
     VectorFields3D::LorenzSystem(eng);

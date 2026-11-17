@@ -1,4 +1,5 @@
 #pragma once
+#include "Diagnostics/Log.hpp"
 #include "Entity.hpp"
 #include "EntityID.hpp"
 #include "Query.hpp"
@@ -6,9 +7,9 @@
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/HierarchyTree.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
-#include "Diagnostics/Log.hpp"
 #include "Utilities/Event.hpp"
 #include <cstddef>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -34,8 +35,8 @@ struct EntityComponentSystem
 
         for (decltype(EntityID::Index) i : doomed)
         {
-            EntityDestroyed.Fire(m_Entities[i]);
-            Query.RemoveAllComponents(m_Entities[i]);
+            EntityDestroyed.Fire(*m_Entities[i]);
+            Query.RemoveAllComponents(*m_Entities[i]);
             EntityHierarchy.Detach(i);
             m_Ids.Release(i);
             m_Entities.Erase(i);
@@ -51,12 +52,12 @@ struct EntityComponentSystem
 
     Entity& GetEntity(EntityID id)
     {
-        return m_Entities[id.Index];
+        return *m_Entities[id.Index];
     }
 
     Entity& GetActiveEntity(decltype(EntityID::Index) id)
     {
-        return m_Entities[id];
+        return *m_Entities[id];
     }
 
     Entity& CreateEntity()
@@ -66,11 +67,11 @@ struct EntityComponentSystem
         entity.m_Id = id;
 
         EntityHierarchy.Ensure(id.Index);
-        auto it = m_Entities.Emplace(id.Index, std::move(entity));
-        EntityCreated.Fire(*it);
+        auto it = m_Entities.Emplace(id.Index, std::make_unique<Entity>(std::move(entity)));
+        EntityCreated.Fire(**it);
 
         ++Version;
-        return *it;
+        return **it;
     }
 
     Entity& FindEntity(EntityID id)
@@ -79,7 +80,7 @@ struct EntityComponentSystem
         {
             D::Log::Error("Entity Not Found: ", id);
         }
-        return m_Entities[id.Index];
+        return *m_Entities[id.Index];
     }
 
     Entity& FindActiveEntity(decltype(EntityID::Index) id)
@@ -88,7 +89,7 @@ struct EntityComponentSystem
         {
             D::Log::Error("Entity Not Found: ", id);
         }
-        return m_Entities[id];
+        return *m_Entities[id];
     }
 
     U::CheckedPtr<Entity> TryFindEntity(EntityID id)
@@ -97,7 +98,7 @@ struct EntityComponentSystem
         {
             return nullptr;
         }
-        return &m_Entities[id.Index];
+        return &*m_Entities[id.Index];
     }
 
     U::CheckedPtr<Entity> TryFindActiveEntity(decltype(EntityID::Index) id)
@@ -106,7 +107,7 @@ struct EntityComponentSystem
         {
             return nullptr;
         }
-        return &m_Entities[id];
+        return &*m_Entities[id];
     }
 
     decltype(EntityID::Index) EntityAmount() const
@@ -115,7 +116,7 @@ struct EntityComponentSystem
     }
 
   private:
-    U::SparseSetSoA<Entity, decltype(EntityID::Index)> m_Entities{};
+    U::SparseSetSoA<std::unique_ptr<Entity>, decltype(EntityID::Index)> m_Entities{};
     U::GIndexPool<decltype(EntityID::Index), decltype(EntityID::Generation)> m_Ids{};
 };
 
