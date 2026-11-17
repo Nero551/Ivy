@@ -12,7 +12,7 @@ struct Query;
 
 struct Entity
 {
-    Entity(EntityComponentSystem& ecs) : m_ECS(&ecs) {}
+    Entity(EntityComponentSystem& ecs, EntityID id) : m_ECS(&ecs), m_Id(id) {}
     Entity(const Entity&) = delete;
     Entity& operator=(const Entity&) = delete;
     Entity(Entity&&) noexcept = default;
@@ -54,6 +54,5 @@ struct Entity
     U::CheckedPtr<IArchetype> m_Archetype;
 
     friend struct Query;
-    friend struct EntityComponentSystem;
 };
 } // namespace Ivy::ECS

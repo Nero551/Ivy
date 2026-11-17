@@ -12,8 +12,22 @@ namespace Ivy::Platform
 {
 struct InputHandler
 {
-    void FirstMouseCheck();
-    void Refresh();
+    void FirstMouseCheck()
+    {
+        if (m_FirstMouse)
+        {
+            m_PreviousMousePosition = m_MousePosition;
+            m_FirstMouse = false;
+        }
+    }
+
+    void Refresh()
+    {
+        m_ScrollOffset = {0, 0};
+        m_PreviousMousePosition = m_MousePosition;
+        m_PreviousKeys = m_CurrentKeys;
+        m_PreviousMouseButtons = m_CurrentMouseButtons;
+    }
 
     void SetActiveWindow(Window& window)
     {
@@ -50,30 +64,79 @@ struct InputHandler
                     m_CurrentMouseButtons[ToIndex(button)] = false;
                 }
             });
+
+        m_Window->SetCursorMode(m_MouseMode);
     }
 
-    bool IsKeyHeld(Key key) const;
+    bool HasActiveWindow() const
+    {
+        return m_Window != nullptr;
+    }
 
-    bool IsKeyPressed(Key key) const;
+    bool IsKeyHeld(Key key) const
+    {
+        return m_CurrentKeys[ToIndex(key)];
+    }
 
-    bool IsKeyReleased(Key key) const;
+    bool IsKeyPressed(Key key) const
+    {
+        return m_CurrentKeys[ToIndex(key)] && !m_PreviousKeys[ToIndex(key)];
+    }
 
-    bool IsMouseButtonHeld(MouseButton button) const;
+    bool IsKeyReleased(Key key) const
+    {
+        return !m_CurrentKeys[ToIndex(key)] && m_PreviousKeys[ToIndex(key)];
+    }
 
-    bool IsMouseButtonPressed(MouseButton button) const;
+    bool IsMouseButtonHeld(MouseButton button) const
+    {
+        return m_CurrentMouseButtons[ToIndex(button)];
+    }
 
-    bool IsMouseButtonReleased(MouseButton button) const;
+    bool IsMouseButtonPressed(MouseButton button) const
+    {
+        return m_CurrentMouseButtons[ToIndex(button)] && !m_PreviousMouseButtons[ToIndex(button)];
+    }
 
-    M::Vector<2> GetMousePosition() const;
+    bool IsMouseButtonReleased(MouseButton button) const
+    {
+        return !m_CurrentMouseButtons[ToIndex(button)] && m_PreviousMouseButtons[ToIndex(button)];
+    }
 
-    M::Vector<2> GetMouseDelta() const;
-    M::Vector<2> GetScrollDelta() const;
+    M::Vector<2> GetMousePosition() const
+    {
+        return m_MousePosition;
+    }
 
-    bool IsScrolling() const;
+    M::Vector<2> GetMouseDelta() const
+    {
+        return m_MousePosition - m_PreviousMousePosition;
+    }
 
-    CursorMode GetMouseMode() const;
+    M::Vector<2> GetScrollDelta() const
+    {
+        return m_ScrollOffset;
+    }
 
-    void SetMouseMode(CursorMode mode);
+    bool IsScrolling() const
+    {
+        return m_ScrollOffset != M::Vector<2>::Zero();
+    }
+
+    CursorMode GetMouseMode() const
+    {
+        return m_MouseMode;
+    }
+
+    void SetMouseMode(CursorMode mode)
+    {
+        m_MouseMode = mode;
+        if (HasActiveWindow())
+        {
+            m_Window->SetCursorMode(mode);
+        }
+        m_PreviousMousePosition = m_MousePosition;
+    }
 
     constexpr unsigned int ToIndex(Key key) const
     {

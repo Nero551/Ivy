@@ -63,11 +63,8 @@ struct EntityComponentSystem
     Entity& CreateEntity()
     {
         const EntityID id = m_Ids.Acquire();
-        Entity entity{*this};
-        entity.m_Id = id;
-
         EntityHierarchy.Ensure(id.Index);
-        auto it = m_Entities.Emplace(id.Index, std::make_unique<Entity>(std::move(entity)));
+        auto it = m_Entities.Emplace(id.Index, std::make_unique<Entity>(*this, id));
         EntityCreated.Fire(**it);
 
         ++Version;

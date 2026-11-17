@@ -41,8 +41,6 @@ namespace Sketch
 //TODO: Utilities crate needs a nice cleaning. especially data structures. they are packed with all kinds of unnecessary edge case handling.
 //TODO: i need to formally define convergence and divergence & limits (numerically ofc).
 //
-// TODO: input should have a reference to the currently "focused" window.
-//
 // TODO: automatic differentiation via dual numbers.
 //
 // TODO: tracy is not working, the macro which defines it when debug mode doesn't work.
@@ -219,8 +217,5 @@ static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
-inline void Test()
-{
-    M::Vector<3> v;
-}
+inline void Test() {}
 } // namespace Sketch
