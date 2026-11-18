@@ -9,17 +9,17 @@ namespace Ivy::C
 
 void Engine::Run()
 {
-    TimeHandler.Initialize(Platform::GetTime());
+    Time.Initialize(Platform::GetTime());
     m_Running = true;
 
     Start();
     while (m_Running)
     {
         BeginFrame();
-        while (TimeHandler.ShouldFixedUpdate())
+        while (Time.ShouldFixedUpdate())
         {
             FixedUpdate();
-            TimeHandler.ConsumeFixedUpdate();
+            Time.ConsumeFixedUpdate();
         }
 
         Update();
@@ -36,7 +36,7 @@ void Engine::Shutdown()
 
 double Engine::GetTime() const
 {
-    return TimeHandler.GetTime();
+    return Time.GetTime();
 }
 
 void Engine::Start()
@@ -55,11 +55,11 @@ void Engine::BeginFrame()
     IVY_PROFILE_ZONE("Begin Frame");
     IVY_PROFILE_GPU_ZONE("Begin Frame");
 
-    TimeHandler.CalculateTime(Platform::GetTime());
+    Time.CalculateTime(Platform::GetTime());
     Platform::PollEvents();
     Platform::Input.FirstMouseCheck();
 
-    SM.LoopOver<Phase::BeginFrame>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::BeginFrame>(*this);
 }
 
 void Engine::FixedUpdate()
@@ -67,7 +67,7 @@ void Engine::FixedUpdate()
     IVY_PROFILE_ZONE("Fixed Update");
     IVY_PROFILE_GPU_ZONE("Fixed Update");
 
-    SM.LoopOver<Phase::FixedUpdate>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::FixedUpdate>(*this);
 }
 
 void Engine::Update()
@@ -75,7 +75,7 @@ void Engine::Update()
     IVY_PROFILE_ZONE("Update");
     IVY_PROFILE_GPU_ZONE("Update");
 
-    SM.LoopOver<Phase::Update>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::Update>(*this);
 }
 
 void Engine::Render()
@@ -94,7 +94,7 @@ void Engine::EndFrame()
     Window.SwapBuffers();
     Platform::Input.Refresh();
 
-    SM.LoopOver<Phase::EndFrame>(*this, TimeHandler.GetDelta());
+    SM.LoopOver<Phase::EndFrame>(*this);
 
     IVY_PROFILE_FRAME_MARK;
     IVY_PROFILE_GPU_COLLECT;

@@ -7,6 +7,7 @@
 #include "Core/World.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityComponentSystem.hpp"
+#include "ECS/Query.hpp"
 #include "Platform/Window.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include <concepts>
@@ -26,8 +27,8 @@ struct Engine
     Platform::Window Window{};
     ECS::EntityComponentSystem ECS{};
     World World{ECS};
-    TimeHandler TimeHandler{};
-    SystemManager SM;
+    TimeHandler Time{};
+    SystemManager SM{};
     const std::function<void(Engine&)> Configuration;
 
     template <typename F>
@@ -104,5 +105,59 @@ struct Engine
   private:
     U::TypedVector<std::unique_ptr<State>> m_States;
     bool m_Running = false;
+};
+
+template <typename T> requires(IsState<T>)
+struct Fetch<T>
+{
+    static T& Get(Engine& e)
+    {
+        return e.GetStates<T>();
+    };
+};
+
+template <> struct Fetch<ECS::EntityComponentSystem>
+{
+    static ECS::EntityComponentSystem& Get(Engine& e)
+    {
+        return e.ECS;
+    };
+};
+template <> struct Fetch<ECS::Query>
+{
+    static ECS::Query& Get(Engine& e)
+    {
+        return e.ECS.Query;
+    };
+};
+
+template <> struct Fetch<World>
+{
+    static World& Get(Engine& e)
+    {
+        return e.World;
+    };
+};
+
+template <> struct Fetch<Engine>
+{
+    static Engine& Get(Engine& e)
+    {
+        return e;
+    };
+};
+template <> struct Fetch<TimeHandler>
+{
+    static const TimeHandler& Get(Engine& e)
+    {
+        return e.Time;
+    };
+};
+template <> struct Fetch<double>
+{
+    static decltype(auto) Get(Engine& e)
+    {
+        return e.Time.GetDelta();
+    };
 };
 } // namespace Ivy::C

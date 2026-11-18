@@ -28,7 +28,7 @@ int main(const int argc, char* argv[])
         }
     }
 
-    Sketch::Test();
+    // Sketch::Test();
     // return 0;
 
     Platform::Initialize();

@@ -98,6 +98,15 @@ struct EntityComponentSystem
         return &*m_Entities[id.Index];
     }
 
+    U::CheckedPtr<const Entity> TryFindEntity(EntityID id) const
+    {
+        if (!m_Ids.IsAcquired(id))
+        {
+            return nullptr;
+        }
+        return &*m_Entities[id.Index];
+    }
+
     U::CheckedPtr<Entity> TryFindActiveEntity(decltype(EntityID::Index) id)
     {
         if (!m_Entities.Contains(id))

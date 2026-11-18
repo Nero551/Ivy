@@ -3,6 +3,7 @@
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
 
+#include "Core/World.hpp"
 #include "ECS/Entity.hpp"
 #include "Systems/Components.hpp"
 #include "Utilities/CheckedPtr.hpp"
@@ -68,12 +69,9 @@ inline void Do3D(
     parentTransform3D = transform3D;
 }
 } // namespace
-inline void Update_Transform(C::Engine& eng, double dt)
+inline void Update_Transform(
+    TransformSystemState& state, const C::World& world, const ECS::EntityComponentSystem& ecs)
 {
-    auto& state = eng.GetStates<TransformSystemState>();
-    auto& query = eng.ECS.Query;
-    auto& world = eng.World;
-    auto& ecs = eng.ECS;
     if (ecs.EntityHierarchy.Version() != state.HierarchyVersion || state.Descendants.empty() ||
         ecs.Version != state.EcsVersion)
     {
@@ -88,12 +86,12 @@ inline void Update_Transform(C::Engine& eng, double dt)
     {
         auto& entity = *descendant;
         U::CheckedPtr<ECS::Entity> parent = entity.TryFindParent();
-        U::CheckedPtr<CMP::Transform2D> transform2D = query.TryGetComponent<CMP::Transform2D>(entity);
+        U::CheckedPtr<CMP::Transform2D> transform2D = ecs.Query.TryGetComponent<CMP::Transform2D>(entity);
         if (transform2D)
         {
             if (parent)
             {
-                parentTransform2D = query.TryGetComponent<CMP::Transform2D>(*parent);
+                parentTransform2D = ecs.Query.TryGetComponent<CMP::Transform2D>(*parent);
             }
             Do2D(transform2D, parentTransform2D);
         }
@@ -101,9 +99,9 @@ inline void Update_Transform(C::Engine& eng, double dt)
         {
             if (parent)
             {
-                parentTransform3D = query.TryGetComponent<CMP::Transform3D>(*parent);
+                parentTransform3D = ecs.Query.TryGetComponent<CMP::Transform3D>(*parent);
             }
-            U::CheckedPtr<CMP::Transform3D> transform3D = query.TryGetComponent<CMP::Transform3D>(entity);
+            U::CheckedPtr<CMP::Transform3D> transform3D = ecs.Query.TryGetComponent<CMP::Transform3D>(entity);
             Do3D(transform3D, parentTransform3D);
         }
     };

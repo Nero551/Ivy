@@ -12,6 +12,8 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+#include <tuple>
+#include <type_traits>
 
 namespace Sketch
 {
@@ -36,7 +38,7 @@ namespace Sketch
 // TODO: prevent math tuples from being `input-able to Function.
 //
 // TODO: setup custom clang-tidy module/ check (IvyTidy)
-//TODO: new performance bottleneck: renderer.
+//TODO: new performance bottleneck: renderer. use gpu rendering, compute shaders
 
 //TODO: Utilities crate needs a nice cleaning. especially data structures. they are packed with all kinds of unnecessary edge case handling.
 //TODO: i need to formally define convergence and divergence & limits (numerically ofc).
@@ -47,6 +49,7 @@ namespace Sketch
 //
 //TODO: enforce strict parameters on systems via compile-time dependency chain stuff & MULTI-THREADING
 //? as for thread safety. i think that should be integrated into the engine/ecs itself.
+//? think about deferred structural changes. for example, AddEntity() checks if any threads are reading, if yes. defer the change till after.
 
 using namespace Ivy;
 

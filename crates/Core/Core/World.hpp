@@ -32,6 +32,15 @@ struct World
         }
         return *root;
     }
+    const ECS::Entity& GetRoot() const
+    {
+        auto root = m_ECS.TryFindEntity(m_Root);
+        if (!root)
+        {
+            D::Log::Error("No Root Is Set Or Root Is Not An Entity");
+        }
+        return *root;
+    }
     void SetCamera(const ECS::Entity& entity)
     {
         m_ActiveCamera = entity.GetId();
