@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/State.hpp"
-#include "Systems/Resource.hpp"
+#include "Systems/Asset.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <concepts>
@@ -13,10 +13,10 @@
 namespace Ivy
 {
 
-struct ResourceManagerState : C::State
+struct AssetManagerState : C::State
 {
-    U::SparseSetSoA<std::unique_ptr<IResource>> Resources{};
-    std::unordered_map<std::string, IResource::HandleType> ResourceLookup{};
+    U::SparseSetSoA<std::unique_ptr<IAsset>> Assets{};
+    std::unordered_map<std::string, IAsset::HandleType> AssetLookup{};
     U::GIndexPool<> Handles{};
 };
 
@@ -32,23 +32,23 @@ struct ResourceManagerState : C::State
      * @return Reference to the loaded resource.
      */
 template <typename T, typename... Args>
-Resource<T>& LoadResource(ResourceManagerState& state, const std::string& name, Args&&... args)
-    requires std::constructible_from<Resource<T>, const std::string&, Args...> && NamedResource<T>
+Asset<T>& LoadAsset(AssetManagerState& state, const std::string& name, Args&&... args)
+    requires std::constructible_from<Asset<T>, const std::string&, Args...> && NamedAsset<T>
 {
     std::string key = typeid(T).name() + name;
 
-    if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
+    if (const auto it = state.AssetLookup.find(key); it != state.AssetLookup.end())
     {
-        return static_cast<Resource<T>&>(*state.Resources[it->second.Index]);
+        return static_cast<Asset<T>&>(*state.Assets[it->second.Index]);
     }
 
-    auto resource = std::make_unique<Resource<T>>(name, std::forward<Args>(args)...);
-    typename Resource<T>::HandleType handle = state.Handles.Acquire();
+    auto resource = std::make_unique<Asset<T>>(name, std::forward<Args>(args)...);
+    typename Asset<T>::HandleType handle = state.Handles.Acquire();
     resource->Handle = handle;
 
-    state.ResourceLookup.emplace(std::move(key), handle);
+    state.AssetLookup.emplace(std::move(key), handle);
 
-    return static_cast<Resource<T>&>(**state.Resources.Emplace(handle.Index, std::move(resource)));
+    return static_cast<Asset<T>&>(**state.Assets.Emplace(handle.Index, std::move(resource)));
 }
 
 /**
@@ -62,43 +62,42 @@ Resource<T>& LoadResource(ResourceManagerState& state, const std::string& name, 
      * @return Reference to the loaded resource.
      */
 template <typename T>
-Resource<T>& LoadResource(ResourceManagerState& state, T& object)
-    requires(std::move_constructible<T> && NamedResource<T>)
+Asset<T>& LoadAsset(AssetManagerState& state, T& object) requires(std::move_constructible<T> && NamedAsset<T>)
 {
     std::string key = typeid(T).name() + object.GetName();
 
-    if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
+    if (const auto it = state.AssetLookup.find(key); it != state.AssetLookup.end())
     {
-        return static_cast<Resource<T>&>(*state.Resources[it->second.Index]);
+        return static_cast<Asset<T>&>(*state.Assets[it->second.Index]);
     }
 
-    auto resource = std::make_unique<Resource<T>>(std::move(object));
-    typename Resource<T>::HandleType handle = state.Handles.Acquire();
+    auto resource = std::make_unique<Asset<T>>(std::move(object));
+    typename Asset<T>::HandleType handle = state.Handles.Acquire();
     resource->Handle = handle;
 
-    state.ResourceLookup.emplace(std::move(key), handle);
+    state.AssetLookup.emplace(std::move(key), handle);
 
-    return static_cast<Resource<T>&>(**state.Resources.Emplace(handle.Index, std::move(resource)));
+    return static_cast<Asset<T>&>(**state.Assets.Emplace(handle.Index, std::move(resource)));
 }
 
 template <typename T>
-Resource<T>& LoadResource(ResourceManagerState& state, T&& object)
-    requires(std::move_constructible<T> && NamedResource<T>)
+Asset<T>& LoadAsset(AssetManagerState& state, T&& object)
+    requires(std::move_constructible<T> && NamedAsset<T>)
 {
     std::string key = typeid(T).name() + object.GetName();
 
-    if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
+    if (const auto it = state.AssetLookup.find(key); it != state.AssetLookup.end())
     {
-        return static_cast<Resource<T>&>(*state.Resources[it->second.Index]);
+        return static_cast<Asset<T>&>(*state.Assets[it->second.Index]);
     }
 
-    auto resource = std::make_unique<Resource<T>>(std::forward<T>(object));
-    typename Resource<T>::HandleType handle = state.Handles.Acquire();
+    auto resource = std::make_unique<Asset<T>>(std::forward<T>(object));
+    typename Asset<T>::HandleType handle = state.Handles.Acquire();
     resource->Handle = handle;
 
-    state.ResourceLookup.emplace(std::move(key), handle);
+    state.AssetLookup.emplace(std::move(key), handle);
 
-    return static_cast<Resource<T>&>(**state.Resources.Emplace(handle.Index, std::move(resource)));
+    return static_cast<Asset<T>&>(**state.Assets.Emplace(handle.Index, std::move(resource)));
 }
 
 /**
@@ -106,29 +105,29 @@ Resource<T>& LoadResource(ResourceManagerState& state, T&& object)
     * @param name name of the resource to unload.
     * @tparam T type of the resource to unload.
     */
-template <typename T> void UnloadResource(ResourceManagerState& state, const std::string& name)
+template <typename T> void UnloadAsset(AssetManagerState& state, const std::string& name)
 {
     std::string key = typeid(T).name() + name;
 
-    const auto it = state.ResourceLookup.find(key);
-    if (it == state.ResourceLookup.end())
+    const auto it = state.AssetLookup.find(key);
+    if (it == state.AssetLookup.end())
     {
         return;
     }
 
-    const IResource::HandleType handle = it->second;
+    const IAsset::HandleType handle = it->second;
 
-    state.ResourceLookup.erase(it);
-    state.Resources.Erase(handle.Index);
+    state.AssetLookup.erase(it);
+    state.Assets.Erase(handle.Index);
     state.Handles.Release(handle);
 }
 
 /** @brief Unloads all resources and resets the resource manager. */
-inline void UnloadAllResources(ResourceManagerState& state)
+inline void UnloadAllAssets(AssetManagerState& state)
 {
     state.Handles.Clear();
-    state.ResourceLookup.clear();
-    state.Resources.Clear();
+    state.AssetLookup.clear();
+    state.Assets.Clear();
 }
 
 /**
@@ -141,10 +140,9 @@ inline void UnloadAllResources(ResourceManagerState& state)
      * @param handle Handle of the resource to retrieve.
      * @return Reference to the resource.
      */
-template <typename T>
-Resource<T>& AcquireResource(ResourceManagerState& state, const IResource::HandleType handle)
+template <typename T> Asset<T>& AcquireAsset(AssetManagerState& state, const IAsset::HandleType handle)
 {
-    return static_cast<Resource<T>&>(*state.Resources[handle.Index]);
+    return static_cast<Asset<T>&>(*state.Assets[handle.Index]);
 }
 
 /**
@@ -158,10 +156,9 @@ Resource<T>& AcquireResource(ResourceManagerState& state, const IResource::Handl
      * @param name Name of the resource.
      * @return Reference to the resource.
      */
-template <typename T> Resource<T>& AcquireResource(ResourceManagerState& state, const std::string& name)
+template <typename T> Asset<T>& AcquireAsset(AssetManagerState& state, const std::string& name)
 {
-    return static_cast<Resource<T>&>(
-        *state.Resources[state.ResourceLookup.at(typeid(T).name() + name).Index]);
+    return static_cast<Asset<T>&>(*state.Assets[state.AssetLookup.at(typeid(T).name() + name).Index]);
 }
 
 /**
@@ -171,9 +168,9 @@ template <typename T> Resource<T>& AcquireResource(ResourceManagerState& state, 
      * @param name Name of the resource.
      * @return True if the resource exists, otherwise false.
      */
-template <typename T> bool ResourceExists(const ResourceManagerState& state, const std::string& name)
+template <typename T> bool AssetExists(const AssetManagerState& state, const std::string& name)
 {
-    return state.ResourceLookup.contains(typeid(T).name() + name);
+    return state.AssetLookup.contains(typeid(T).name() + name);
 }
 
 /**
@@ -182,13 +179,13 @@ template <typename T> bool ResourceExists(const ResourceManagerState& state, con
      * @param handle Handle to check.
      * @return True if the handle refers to an acquired resource, otherwise false.
      */
-inline bool ResourceExists(const ResourceManagerState& state, const IResource::HandleType handle)
+inline bool AssetExists(const AssetManagerState& state, const IAsset::HandleType handle)
 {
-    return state.Resources.Contains(handle.Index) && state.Handles.IsAcquired(handle);
+    return state.Assets.Contains(handle.Index) && state.Handles.IsAcquired(handle);
 }
 
-inline void Stop_ResourceManager(ResourceManagerState& state)
+inline void Stop_AssetManager(AssetManagerState& state)
 {
-    UnloadAllResources(state);
+    UnloadAllAssets(state);
 }
 } // namespace Ivy

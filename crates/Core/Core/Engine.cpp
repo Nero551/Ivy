@@ -33,12 +33,6 @@ void Engine::Shutdown()
 {
     m_Running = false;
 }
-
-double Engine::GetTime() const
-{
-    return Time.GetTime();
-}
-
 void Engine::Start()
 {
     Configuration(*this);

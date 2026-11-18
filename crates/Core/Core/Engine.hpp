@@ -58,9 +58,6 @@ struct Engine
     /** @brief Requests the engine to shut down. */
     void Shutdown();
 
-    /** @brief Returns elapsed engine time in seconds. */
-    double GetTime() const;
-
     template <IsState T> T& GetStates() const
     {
         auto state = m_States.Find<T>();
@@ -146,13 +143,6 @@ template <> struct Fetch<Platform::Window>
     };
 };
 
-template <> struct Fetch<Engine>
-{
-    static Engine& Get(Engine& e)
-    {
-        return e;
-    };
-};
 template <> struct Fetch<TimeHandler>
 {
     static const TimeHandler& Get(Engine& e)
@@ -160,11 +150,11 @@ template <> struct Fetch<TimeHandler>
         return e.Time;
     };
 };
-template <> struct Fetch<double>
+template <> struct Fetch<Engine>
 {
-    static decltype(auto) Get(Engine& e)
+    static Engine& Get(Engine& e)
     {
-        return e.Time.GetDelta();
+        return e;
     };
 };
 } // namespace Ivy::C

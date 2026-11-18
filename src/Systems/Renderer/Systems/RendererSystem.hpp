@@ -26,10 +26,10 @@
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Platform/Window.hpp"
+#include "Systems/AssetManager.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/RenderBatch.hpp"
-#include "Systems/ResourceManager.hpp"
 #include "Utilities/DataStructures/Indirect2DVector.hpp"
 #include "Utilities/Image.hpp"
 #include <vector>
@@ -50,7 +50,7 @@ struct RendererState : C::State
 };
 namespace
 {
-inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, ResourceManagerState& resources)
+inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, AssetManagerState& resources)
 {
     const std::vector<G::Vertex> vertices = {G::Vertex({-1.0f, -1.0f, 0.0f, 1.0f}, {}, {0.0f, 0.0f}, {}),
         G::Vertex({1.0f, -1.0f, 0.0f, 1.0f}, {}, {1.0f, 0.0f}, {}),
@@ -58,10 +58,10 @@ inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, Re
         G::Vertex({-1.0f, 1.0f, 0.0f, 1.0f}, {}, {0.0f, 1.0f}, {})};
 
     const std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
-    auto& screenShader = LoadResource<G::Shader>(resources, "[Graphics] Screen Shader");
-    auto& screenVert = LoadResource<G::ShaderSource>(
+    auto& screenShader = LoadAsset<G::Shader>(resources, "[Graphics] Screen Shader");
+    auto& screenVert = LoadAsset<G::ShaderSource>(
         resources, "[Graphics] Screen Vertex", "assets/Shaders/screen.vert", G::ShaderStage::Vertex);
-    auto& screenFrag = LoadResource<G::ShaderSource>(
+    auto& screenFrag = LoadAsset<G::ShaderSource>(
         resources, "[Graphics] Screen Fragment", "assets/Shaders/screen.frag", G::ShaderStage::Fragment);
 
     screenShader().AssignSource(screenVert);
@@ -76,7 +76,7 @@ inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, Re
     rState.ScreenMesh.Indices = indices;
     rState.ScreenMesh.CullMode = G::CullMode::None;
 
-    auto& screenTexture = LoadResource<G::Texture2D>(resources, "COLOR_BUFFER");
+    auto& screenTexture = LoadAsset<G::Texture2D>(resources, "COLOR_BUFFER");
     screenTexture.Get().Width = window.GetWidth();
     screenTexture.Get().Height = window.GetHeight();
     screenTexture.Get().InternalFormat = G::TextureInternalFormat::RGB8;
@@ -282,7 +282,7 @@ inline void Render3D(
 } // namespace
 
 inline void Start_Renderer(RendererState& rState, ECS::EntityComponentSystem& ecs, Platform::Window& window,
-    ResourceManagerState& resources)
+    AssetManagerState& resources)
 {
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);

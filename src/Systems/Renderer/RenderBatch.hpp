@@ -5,7 +5,7 @@
 #include "Graphics/Material/Material.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Math/Matrix/Matrices.hpp"
-#include "Systems/Resource.hpp"
+#include "Systems/Asset.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include <cstddef>
@@ -27,14 +27,14 @@ struct InstanceData
 
 struct RenderBatch
 {
-    U::CheckedPtr<Resource<G::Material>> Material;
-    U::CheckedPtr<Resource<G::Mesh>> Mesh;
+    U::CheckedPtr<Asset<G::Material>> Material;
+    U::CheckedPtr<Asset<G::Mesh>> Mesh;
     U::SparseSetSoA<InstanceData> Instances;
     G::ArrayBuffer Buffer;
     G::VertexArray VAO;
     bool DataChanged = false;
 
-    RenderBatch(const U::CheckedPtr<Resource<G::Mesh>>& mesh, const U::CheckedPtr<Resource<G::Material>>& mat)
+    RenderBatch(const U::CheckedPtr<Asset<G::Mesh>>& mesh, const U::CheckedPtr<Asset<G::Material>>& mat)
         : Material(mat), Mesh(mesh)
     {
         Buffer.Usage = G::BufferUsage::DynamicDraw;

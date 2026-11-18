@@ -14,28 +14,28 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/AssetManager.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
-#include "Systems/ResourceManager.hpp"
 
 namespace Ivy::Sandbox
 {
 
 ECS::Entity& CoordinateAxes3DScene(C::Engine& eng)
 {
-    auto& resources = eng.GetStates<ResourceManagerState>();
+    auto& resources = eng.GetStates<AssetManagerState>();
     auto& query = eng.ECS.Query;
     auto& root = Node::Create(eng.ECS);
 
-    auto& lightShader = LoadResource<G::Shader>(resources, "lightShader");
-    lightShader().AssignSource(LoadResource<G::ShaderSource>(
+    auto& lightShader = LoadAsset<G::Shader>(resources, "lightShader");
+    lightShader().AssignSource(LoadAsset<G::ShaderSource>(
         resources, "lightFrag", "assets/Shaders/lightShader.frag", G::ShaderStage::Fragment)());
-    lightShader().AssignSource(LoadResource<G::ShaderSource>(
+    lightShader().AssignSource(LoadAsset<G::ShaderSource>(
         resources, "lightVert", "assets/Shaders/lightShader.vert", G::ShaderStage::Vertex)());
 
-    auto& lightMaterial = LoadResource<G::Material>(resources, "lightMaterial");
+    auto& lightMaterial = LoadAsset<G::Material>(resources, "lightMaterial");
     lightMaterial().Shader = &lightShader();
 
     auto& light = Light3D::Create(eng.ECS);
@@ -48,19 +48,19 @@ ECS::Entity& CoordinateAxes3DScene(C::Engine& eng)
         M::Quaternion<>::FromEulerXYZ(M::Vector<3>{M::Rad(-32.5f)});
     root.AttachChild(light2);
 
-    auto& shader = LoadResource<G::Shader>(resources, "AxisShader");
-    shader().AssignSource(LoadResource<G::ShaderSource>(
+    auto& shader = LoadAsset<G::Shader>(resources, "AxisShader");
+    shader().AssignSource(LoadAsset<G::ShaderSource>(
         resources, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
-    shader().AssignSource(LoadResource<G::ShaderSource>(
+    shader().AssignSource(LoadAsset<G::ShaderSource>(
         resources, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
     G::Mesh m = G::Primitives::CreateLine("Line");
-    auto& line = LoadResource<G::Mesh>(resources, m);
+    auto& line = LoadAsset<G::Mesh>(resources, m);
 
     auto& xAxis = MeshInstance3D::Create(eng.ECS);
     query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
     auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
-    xMaterial.Material = &LoadResource<G::Material>(resources, "X-Axis Material");
+    xMaterial.Material = &LoadAsset<G::Material>(resources, "X-Axis Material");
     xMaterial.Material->Get().Shader = &shader();
 
     query.GetComponent<CMP::Transform3D>(xAxis).Scale = {200, 1, 1};
@@ -77,7 +77,7 @@ ECS::Entity& CoordinateAxes3DScene(C::Engine& eng)
     yTransform.Scale = {200, 1, 1};
 
     auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
-    yMaterial.Material = &LoadResource<G::Material>(resources, "Y-Axis Material");
+    yMaterial.Material = &LoadAsset<G::Material>(resources, "Y-Axis Material");
     yMaterial.Material->Get().Shader = &shader();
     yMaterial.Material->Get().Color = M::Color::Green;
 
@@ -92,7 +92,7 @@ ECS::Entity& CoordinateAxes3DScene(C::Engine& eng)
     zTransform.Scale = {200, 1, 1};
 
     auto& zMaterial = query.GetComponent<CMP::Material>(zAxis);
-    zMaterial.Material = &LoadResource<G::Material>(resources, "Z-Axis Material");
+    zMaterial.Material = &LoadAsset<G::Material>(resources, "Z-Axis Material");
     zMaterial.Material->Get().Shader = &shader();
     zMaterial.Material->Get().Color = M::Color::Blue;
 

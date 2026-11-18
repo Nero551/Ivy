@@ -17,10 +17,10 @@
 #include "Math/Vector/Vectors.hpp"
 #include "Platform/Global.hpp"
 #include "Platform/Key.hpp"
+#include "Systems/AssetManager.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
-#include "Systems/ResourceManager.hpp"
 #include <vector>
 
 namespace Ivy::Sandbox
@@ -36,32 +36,32 @@ namespace StressTester2D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& CreatePoint(C::Engine& eng)
 {
-    auto& resources = eng.GetStates<ResourceManagerState>();
+    auto& resources = eng.GetStates<AssetManagerState>();
     auto& query = eng.ECS.Query;
 
-    if (!ResourceExists<G::Mesh>(resources, "stressPoint"))
+    if (!AssetExists<G::Mesh>(resources, "stressPoint"))
     {
-        LoadResource<G::Mesh>(resources, G::Primitives::CreateQuad("stressPoint"));
+        LoadAsset<G::Mesh>(resources, G::Primitives::CreateQuad("stressPoint"));
     }
-    auto& mesh = LoadResource<G::Mesh>(resources, "stressPoint");
+    auto& mesh = LoadAsset<G::Mesh>(resources, "stressPoint");
     auto& point = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
     query.GetComponent<CMP::Transform2D>(point).Scale = M::Vector<2>{0.2};
 
-    if (ResourceExists<G::Material>(resources, "stressMat"))
+    if (AssetExists<G::Material>(resources, "stressMat"))
     {
-        auto& material = LoadResource<G::Material>(resources, "stressMat");
+        auto& material = LoadAsset<G::Material>(resources, "stressMat");
         query.GetComponent<CMP::Material>(point).Material = &material;
     }
     else
     {
-        auto& material = LoadResource<G::Material>(resources, "stressMat");
+        auto& material = LoadAsset<G::Material>(resources, "stressMat");
 
-        auto& shader = LoadResource<G::Shader>(resources, "pointShader");
-        shader().AssignSource(LoadResource<G::ShaderSource>(
+        auto& shader = LoadAsset<G::Shader>(resources, "pointShader");
+        shader().AssignSource(LoadAsset<G::ShaderSource>(
             resources, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
-        shader().AssignSource(LoadResource<G::ShaderSource>(
+        shader().AssignSource(LoadAsset<G::ShaderSource>(
             resources, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
         material().Shader = &shader();

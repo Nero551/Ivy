@@ -12,11 +12,11 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/AssetManager.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
-#include "Systems/ResourceManager.hpp"
 
 namespace Ivy
 {
@@ -24,18 +24,18 @@ namespace
 {
 void CreateGridLine(C::Engine& eng, ECS::Entity& root, const M::Quaternion<> rotation, M::Vector<3> position)
 {
-    auto& resources = eng.GetStates<ResourceManagerState>();
+    auto& resources = eng.GetStates<AssetManagerState>();
     auto& query = eng.ECS.Query;
-    auto& shader = LoadResource<G::Shader>(resources, "AxisShader");
+    auto& shader = LoadAsset<G::Shader>(resources, "AxisShader");
 
-    shader().AssignSource(LoadResource<G::ShaderSource>(
+    shader().AssignSource(LoadAsset<G::ShaderSource>(
         resources, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
 
-    shader().AssignSource(LoadResource<G::ShaderSource>(
+    shader().AssignSource(LoadAsset<G::ShaderSource>(
         resources, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
     G::Mesh m = G::Primitives::CreateLine("Line");
-    auto& line = LoadResource<G::Mesh>(resources, m);
+    auto& line = LoadAsset<G::Mesh>(resources, m);
 
     auto& l = MeshInstance3D::Create(eng.ECS);
 
@@ -45,7 +45,7 @@ void CreateGridLine(C::Engine& eng, ECS::Entity& root, const M::Quaternion<> rot
 
     meshComponent.Mesh = &line;
 
-    materialComponent.Material = &LoadResource<G::Material>(resources, "GridLine Material");
+    materialComponent.Material = &LoadAsset<G::Material>(resources, "GridLine Material");
     materialComponent.Material->Get().Shader = &shader();
 
     transformComponent.Rotation = rotation;

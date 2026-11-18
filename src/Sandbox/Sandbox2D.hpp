@@ -18,10 +18,10 @@
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields2D.hpp"
+#include "Systems/AssetManager.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
-#include "Systems/ResourceManager.hpp"
 #include <cmath>
 
 namespace Ivy::Sandbox
@@ -30,20 +30,20 @@ namespace Sandbox2D
 {
 inline ECS::EntityID CreateCircle(C::Engine& eng)
 {
-    auto& resources = eng.GetStates<ResourceManagerState>();
+    auto& resources = eng.GetStates<AssetManagerState>();
     auto& query = eng.ECS.Query;
     auto& circle = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(circle).Mesh =
-        &LoadResource<G::Mesh>(resources, G::Primitives::CreateCircle("ball"));
+        &LoadAsset<G::Mesh>(resources, G::Primitives::CreateCircle("ball"));
 
-    auto& vertSource = LoadResource<G::ShaderSource>(
+    auto& vertSource = LoadAsset<G::ShaderSource>(
         resources, "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadResource<G::ShaderSource>(
+    auto& fragSource = LoadAsset<G::ShaderSource>(
         resources, "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(resources, "circleShader", vertSource, fragSource);
+    auto& shader = LoadAsset<G::Shader>(resources, "circleShader", vertSource, fragSource);
 
-    auto& mat = LoadResource<G::Material>(resources, "circleMat");
+    auto& mat = LoadAsset<G::Material>(resources, "circleMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 
@@ -56,20 +56,20 @@ inline ECS::EntityID CreateCircle(C::Engine& eng)
 
 inline ECS::EntityID CreateSquare(C::Engine& eng)
 {
-    auto& resources = eng.GetStates<ResourceManagerState>();
+    auto& resources = eng.GetStates<AssetManagerState>();
     auto& query = eng.ECS.Query;
     auto& square = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(square).Mesh =
-        &LoadResource<G::Mesh>(resources, G::Primitives::CreateQuad("cube"));
+        &LoadAsset<G::Mesh>(resources, G::Primitives::CreateQuad("cube"));
 
-    auto& vertSource = LoadResource<G::ShaderSource>(
+    auto& vertSource = LoadAsset<G::ShaderSource>(
         resources, "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadResource<G::ShaderSource>(
+    auto& fragSource = LoadAsset<G::ShaderSource>(
         resources, "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(resources, "squareShader", vertSource, fragSource);
+    auto& shader = LoadAsset<G::Shader>(resources, "squareShader", vertSource, fragSource);
 
-    auto& mat = LoadResource<G::Material>(resources, "squareMat");
+    auto& mat = LoadAsset<G::Material>(resources, "squareMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 

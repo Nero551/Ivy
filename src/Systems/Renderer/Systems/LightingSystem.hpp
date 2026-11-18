@@ -2,9 +2,9 @@
 #include "Core/Engine.hpp"
 #include "Core/State.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
+#include "Systems/AssetManager.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
-#include "Systems/ResourceManager.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy
@@ -14,9 +14,9 @@ struct LightingSystemState : C::State
     U::CheckedPtr<G::Uniformbuffer> LightingBuffer;
 };
 
-inline void Start_Lighting(LightingSystemState& state, const C::World& world, ResourceManagerState& resources)
+inline void Start_Lighting(LightingSystemState& state, const C::World& world, AssetManagerState& resources)
 {
-    state.LightingBuffer = &LoadResource<G::Uniformbuffer>(resources, "[Graphics] Lighting Buffer")();
+    state.LightingBuffer = &LoadAsset<G::Uniformbuffer>(resources, "[Graphics] Lighting Buffer")();
     state.LightingBuffer->Binding = 1;
 
     constexpr size_t LightStride = 144;

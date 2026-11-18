@@ -6,9 +6,9 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/Asset.hpp"
 #include "Systems/Renderer/LightType.hpp"
 #include "Systems/Renderer/ProjectionMode.hpp"
-#include "Systems/Resource.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy::CMP
@@ -53,11 +53,11 @@ struct Light : ECS::Component
 
 struct Material : ECS::Component
 {
-    U::CheckedPtr<Resource<G::Material>> Material{"Material Component Has No Material Assigned"};
+    U::CheckedPtr<Asset<G::Material>> Material{"Material Component Has No Material Assigned"};
 };
 
 struct Mesh : ECS::Component
 {
-    U::CheckedPtr<Resource<G::Mesh>> Mesh{"Mesh Component Has No Mesh Assigned"};
+    U::CheckedPtr<Asset<G::Mesh>> Mesh{"Mesh Component Has No Mesh Assigned"};
 };
 } // namespace Ivy::CMP

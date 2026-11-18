@@ -2,7 +2,7 @@
 #include "Core/DependencyGraph.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include <array>
-#include <tuple>
+#include <functional>
 #include <type_traits>
 namespace Ivy::C
 {
@@ -19,7 +19,7 @@ enum class Phase : unsigned int
     Count,
 };
 
-template <typename T> struct Fetch
+template <typename> struct Fetch
 {
     static_assert("Parameter is Unfetchable");
     static decltype(auto) Get(Engine& e) {}
@@ -27,13 +27,11 @@ template <typename T> struct Fetch
 
 template <typename> struct SystemSig;
 
-template <typename... A, bool NE> struct SystemSig<void (*)(A...) noexcept(NE)>
+template <typename... Args, bool IsNoexcept> struct SystemSig<void (*)(Args...) noexcept(IsNoexcept)>
 {
-    using Args = std::tuple<A...>;
-
     template <auto F> static void Invoke(Engine& e)
     {
-        F(Fetch<std::remove_cvref_t<A>>::Get(e)...);
+        F(Fetch<std::remove_cvref_t<Args>>::Get(e)...);
     }
 };
 
@@ -83,6 +81,7 @@ struct SystemManager
     }
 
     std::array<DependencyGraph<unsigned>, static_cast<unsigned>(Phase::Count)> m_Scheduler;
-    std::array<U::TypedVector<void (*)(Engine&)>, static_cast<unsigned>(Phase::Count)> m_Systems;
+    std::array<U::TypedVector<std::move_only_function<void(Engine&)>>, static_cast<unsigned>(Phase::Count)>
+        m_Systems;
 };
 } // namespace Ivy::C

@@ -220,5 +220,9 @@ static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
-inline void Test() {}
+inline void Test()
+{
+    //TODO: think about making State also have methods, will make alot of things easier. also call it Resource to match bevy \
+    // rename MY resources to Assets.
+}
 } // namespace Sketch

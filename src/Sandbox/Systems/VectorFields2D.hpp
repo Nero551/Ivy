@@ -16,11 +16,11 @@
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Equations/ODE.hpp"
 #include "Math/Vector/Vectors.hpp"
+#include "Systems/Asset.hpp"
+#include "Systems/AssetManager.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
-#include "Systems/Resource.hpp"
-#include "Systems/ResourceManager.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include <cmath>
 #include <string>
@@ -30,8 +30,8 @@ namespace Ivy::Sandbox
 {
 struct VectorFields2DState : C::State
 {
-    U::CheckedPtr<Resource<G::Mesh>> Mesh;
-    U::CheckedPtr<Resource<G::Material>> Material;
+    U::CheckedPtr<Asset<G::Mesh>> Mesh;
+    U::CheckedPtr<Asset<G::Material>> Material;
 };
 
 namespace VectorFields2D
@@ -310,17 +310,17 @@ inline void QuadraticResistiveForceModel(C::Engine& eng)
 }
 
 // ── lifecycle ───────────────────────────────────────────────────
-inline void Start_VectorFields2D(VectorFields2DState& state, ResourceManagerState& resources)
+inline void Start_VectorFields2D(VectorFields2DState& state, AssetManagerState& resources)
 {
-    state.Mesh = &LoadResource<G::Mesh>(resources, G::Primitives::CreateArrow2D("vectorArrow"));
+    state.Mesh = &LoadAsset<G::Mesh>(resources, G::Primitives::CreateArrow2D("vectorArrow"));
 
-    auto& vertSource = LoadResource<G::ShaderSource>(
+    auto& vertSource = LoadAsset<G::ShaderSource>(
         resources, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadResource<G::ShaderSource>(
+    auto& fragSource = LoadAsset<G::ShaderSource>(
         resources, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(resources, "arrowShader", vertSource, fragSource);
+    auto& shader = LoadAsset<G::Shader>(resources, "arrowShader", vertSource, fragSource);
 
-    state.Material = &LoadResource<G::Material>(resources, "arrowMat");
+    state.Material = &LoadAsset<G::Material>(resources, "arrowMat");
     state.Material->Get().Shader = &shader();
     state.Material->Get().Color = {1, 1, 1, 1};
 }
