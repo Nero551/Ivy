@@ -14,26 +14,22 @@ struct LightingSystemState : C::State
     U::CheckedPtr<G::Uniformbuffer> LightingBuffer;
 };
 
-inline void Start_Lighting(C::Engine& eng)
+inline void Start_Lighting(LightingSystemState& state, const C::World& world, ResourceManagerState& resources)
 {
-    auto& state = eng.GetStates<LightingSystemState>();
-
-    state.LightingBuffer = &LoadResource<G::Uniformbuffer>(eng, "[Graphics] Lighting Buffer")();
+    state.LightingBuffer = &LoadResource<G::Uniformbuffer>(resources, "[Graphics] Lighting Buffer")();
     state.LightingBuffer->Binding = 1;
 
     constexpr size_t LightStride = 144;
     constexpr size_t HeaderSize = 16;
 
-    state.LightingBuffer->Size = HeaderSize + eng.World.MaxLights * LightStride;
+    state.LightingBuffer->Size = HeaderSize + world.MaxLights * LightStride;
 }
 
-inline void Render_Lighting(C::Engine& eng)
+inline void Render_Lighting(LightingSystemState& state, ECS::EntityComponentSystem& ecs)
 {
-    auto& state = eng.GetStates<LightingSystemState>();
-
     int i = 0;
     constexpr unsigned int LightStride = 144;
-    eng.ECS.Query.ForEach<CMP::Light, CMP::Transform3D>(
+    ecs.Query.ForEach<CMP::Light, CMP::Transform3D>(
         [&](unsigned int, CMP::Light& lightComponent, CMP::Transform3D& transform)
         {
             const unsigned int LightOffset = 16 + i * LightStride;

@@ -23,18 +23,19 @@ namespace
 {
 void CreateGridLine(C::Engine& eng, ECS::Entity& root, float rotation, M::Vector<2> position)
 {
+    auto& resources = eng.GetStates<ResourceManagerState>();
     auto& query = eng.ECS.Query;
 
-    auto& shader = LoadResource<G::Shader>(eng, "AxisShader");
+    auto& shader = LoadResource<G::Shader>(resources, "AxisShader");
 
     shader().AssignSource(LoadResource<G::ShaderSource>(
-        eng, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+        resources, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
 
     shader().AssignSource(LoadResource<G::ShaderSource>(
-        eng, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+        resources, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
     G::Mesh m = G::Primitives::CreateLine("Line");
-    auto& line = LoadResource<G::Mesh>(eng, m);
+    auto& line = LoadResource<G::Mesh>(resources, m);
 
     auto& l = MeshInstance2D::Create(eng.ECS);
 
@@ -44,7 +45,7 @@ void CreateGridLine(C::Engine& eng, ECS::Entity& root, float rotation, M::Vector
 
     meshComponent.Mesh = &line;
 
-    materialComponent.Material = &LoadResource<G::Material>(eng, "GridLine Material");
+    materialComponent.Material = &LoadResource<G::Material>(resources, "GridLine Material");
     materialComponent.Material->Get().Shader = &shader();
 
     transformComponent.Rotation = rotation;

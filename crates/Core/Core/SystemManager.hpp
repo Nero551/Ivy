@@ -27,7 +27,7 @@ template <typename T> struct Fetch
 
 template <typename> struct SystemSig;
 
-template <typename R, typename... A, bool NE> struct SystemSig<R (*)(A...) noexcept(NE)>
+template <typename... A, bool NE> struct SystemSig<void (*)(A...) noexcept(NE)>
 {
     using Args = std::tuple<A...>;
 

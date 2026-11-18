@@ -36,32 +36,33 @@ namespace StressTester2D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& CreatePoint(C::Engine& eng)
 {
+    auto& resources = eng.GetStates<ResourceManagerState>();
     auto& query = eng.ECS.Query;
 
-    if (!ResourceExists<G::Mesh>(eng, "stressPoint"))
+    if (!ResourceExists<G::Mesh>(resources, "stressPoint"))
     {
-        LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("stressPoint"));
+        LoadResource<G::Mesh>(resources, G::Primitives::CreateQuad("stressPoint"));
     }
-    auto& mesh = LoadResource<G::Mesh>(eng, "stressPoint");
+    auto& mesh = LoadResource<G::Mesh>(resources, "stressPoint");
     auto& point = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
     query.GetComponent<CMP::Transform2D>(point).Scale = M::Vector<2>{0.2};
 
-    if (ResourceExists<G::Material>(eng, "stressMat"))
+    if (ResourceExists<G::Material>(resources, "stressMat"))
     {
-        auto& material = LoadResource<G::Material>(eng, "stressMat");
+        auto& material = LoadResource<G::Material>(resources, "stressMat");
         query.GetComponent<CMP::Material>(point).Material = &material;
     }
     else
     {
-        auto& material = LoadResource<G::Material>(eng, "stressMat");
+        auto& material = LoadResource<G::Material>(resources, "stressMat");
 
-        auto& shader = LoadResource<G::Shader>(eng, "pointShader");
+        auto& shader = LoadResource<G::Shader>(resources, "pointShader");
         shader().AssignSource(LoadResource<G::ShaderSource>(
-            eng, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
+            resources, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
         shader().AssignSource(LoadResource<G::ShaderSource>(
-            eng, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
+            resources, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
         material().Shader = &shader();
         material().Color = {1, 1, 1, 1};
@@ -111,26 +112,26 @@ inline void FourDimensionalProjection(C::Engine& eng, int increase)
 }
 
 // ── lifecycle ───────────────────────────────────────────────────
-inline void Update_StressTester2D(C::Engine& eng, double dt)
+inline void Update_StressTester2D(
+    StressTester2DState& state, ECS::EntityComponentSystem& ecs, const C::TimeHandler& time)
 {
-    auto& state = eng.GetStates<StressTester2DState>();
     auto& input = Platform::Input;
-    auto& query = eng.ECS.Query;
+    auto& query = ecs.Query;
 
     if (input.IsKeyHeld(Platform::Key::Left))
     {
-        state.Multiplier -= 5 * dt;
+        state.Multiplier -= 5 * time.GetDelta();
     }
     if (input.IsKeyHeld(Platform::Key::Right))
     {
-        state.Multiplier += 5 * dt;
+        state.Multiplier += 5 * time.GetDelta();
     }
 
     if (state.Multiplier != 1)
     {
         for (auto& point : state.Points)
         {
-            auto& transform = query.GetComponent<CMP::Transform2D>(eng.ECS.GetEntity(point));
+            auto& transform = query.GetComponent<CMP::Transform2D>(ecs.GetEntity(point));
             transform.Position *= state.Multiplier;
         }
     }

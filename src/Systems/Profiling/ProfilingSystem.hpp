@@ -17,12 +17,10 @@ struct ProfilingState : C::State
     double Elapsed{0};
 };
 
-inline void Update_Profiling(C::Engine& eng, double dt)
+inline void Update_Profiling(ProfilingState& state, Platform::Window& window, const C::TimeHandler& time)
 {
-    auto& state = eng.GetStates<ProfilingState>();
-
-    state.Elapsed += dt;
-    state.FrameMs = dt * 1000.0;
+    state.Elapsed += time.GetDelta();
+    state.FrameMs = time.GetDelta() * 1000.0;
     ++state.FrameCount;
 
     if (state.FrameTimes.size() > 60)
@@ -48,7 +46,7 @@ inline void Update_Profiling(C::Engine& eng, double dt)
             state.FrameCount, averageFrameMs, state.FrameMs);
         *end = '\0';
 
-        eng.Window.SetTitle(buffer.data());
+        window.SetTitle(buffer.data());
         state.FrameCount = 0;
     }
 }

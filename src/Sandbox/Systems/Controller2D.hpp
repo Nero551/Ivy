@@ -23,18 +23,18 @@ struct Controller2DState : C::State
 
 namespace Controller2D
 {
-inline void Update_Controller2D(C::Engine& eng, double dt)
+inline void Update_Controller2D(Controller2DState& state, ECS::EntityComponentSystem& ecs, C::World& world,
+    Platform::Window& window, const C::TimeHandler& time)
 {
-    auto& state = eng.GetStates<Controller2DState>();
     auto& input = Platform::Input;
 
     if (input.IsKeyPressed(Platform::Key::T))
     {
-        D::Log::Info(eng.ECS.EntityAmount());
+        D::Log::Info(ecs.EntityAmount());
     }
 
-    auto& query = eng.ECS.Query;
-    auto& camera = eng.World.GetCamera();
+    auto& query = ecs.Query;
+    auto& camera = world.GetCamera();
 
     if (!input.IsKeyHeld(Platform::Key::LeftShift))
     {
@@ -49,10 +49,10 @@ inline void Update_Controller2D(C::Engine& eng, double dt)
     auto& cameraComponent = query.GetComponent<CMP::Camera>(camera);
 
     cameraComponent.ProjectionMode = ProjectionMode::Orthographic;
-    cameraComponent.Left = -eng.Window.GetWidth() / state.Zoom;
-    cameraComponent.Bottom = -eng.Window.GetHeight() / state.Zoom;
-    cameraComponent.Right = eng.Window.GetWidth() / state.Zoom;
-    cameraComponent.Top = eng.Window.GetHeight() / state.Zoom;
+    cameraComponent.Left = -window.GetWidth() / state.Zoom;
+    cameraComponent.Bottom = -window.GetHeight() / state.Zoom;
+    cameraComponent.Right = window.GetWidth() / state.Zoom;
+    cameraComponent.Top = window.GetHeight() / state.Zoom;
 
     if (input.IsKeyHeld(Platform::Key::LeftShift))
     {
@@ -60,7 +60,7 @@ inline void Update_Controller2D(C::Engine& eng, double dt)
     }
 
     state.Speed = std::max(state.Speed, 2.5f);
-    const float speed = state.Speed * static_cast<float>(dt);
+    const float speed = state.Speed * static_cast<float>(time.GetDelta());
 
     if (input.IsKeyHeld(Platform::Key::A))
     {

@@ -30,19 +30,20 @@ namespace Sandbox2D
 {
 inline ECS::EntityID CreateCircle(C::Engine& eng)
 {
+    auto& resources = eng.GetStates<ResourceManagerState>();
     auto& query = eng.ECS.Query;
     auto& circle = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(circle).Mesh =
-        &LoadResource<G::Mesh>(eng, G::Primitives::CreateCircle("ball"));
+        &LoadResource<G::Mesh>(resources, G::Primitives::CreateCircle("ball"));
 
     auto& vertSource = LoadResource<G::ShaderSource>(
-        eng, "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+        resources, "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
     auto& fragSource = LoadResource<G::ShaderSource>(
-        eng, "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(eng, "circleShader", vertSource, fragSource);
+        resources, "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+    auto& shader = LoadResource<G::Shader>(resources, "circleShader", vertSource, fragSource);
 
-    auto& mat = LoadResource<G::Material>(eng, "circleMat");
+    auto& mat = LoadResource<G::Material>(resources, "circleMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 
@@ -55,19 +56,20 @@ inline ECS::EntityID CreateCircle(C::Engine& eng)
 
 inline ECS::EntityID CreateSquare(C::Engine& eng)
 {
+    auto& resources = eng.GetStates<ResourceManagerState>();
     auto& query = eng.ECS.Query;
     auto& square = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(square).Mesh =
-        &LoadResource<G::Mesh>(eng, G::Primitives::CreateQuad("cube"));
+        &LoadResource<G::Mesh>(resources, G::Primitives::CreateQuad("cube"));
 
     auto& vertSource = LoadResource<G::ShaderSource>(
-        eng, "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+        resources, "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
     auto& fragSource = LoadResource<G::ShaderSource>(
-        eng, "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(eng, "squareShader", vertSource, fragSource);
+        resources, "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+    auto& shader = LoadResource<G::Shader>(resources, "squareShader", vertSource, fragSource);
 
-    auto& mat = LoadResource<G::Material>(eng, "squareMat");
+    auto& mat = LoadResource<G::Material>(resources, "squareMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 
@@ -113,7 +115,7 @@ inline void Start_Sandbox2D(C::Engine& eng)
     // }
 }
 
-inline void PlayWithBall(C::Engine& eng, double fdt)
+inline void PlayWithBall(C::Engine& eng, const C::TimeHandler& time)
 {
     constexpr float b = 0.5f;
     constexpr float restitution = 0.8f;
@@ -145,7 +147,7 @@ inline void PlayWithBall(C::Engine& eng, double fdt)
 
     p.Force = f * p.Mass + R + p.Mass * g;
     p.Acceleration = p.Force / p.Mass;
-    p.Velocity += p.Acceleration * fdt;
+    p.Velocity += p.Acceleration * time.GetFixedDelta();
 
     if (p.Position.y < 0.5)
     {
@@ -153,7 +155,7 @@ inline void PlayWithBall(C::Engine& eng, double fdt)
         p.Position.y = 0.5;
     }
 
-    p.Position += p.Velocity * fdt;
+    p.Position += p.Velocity * time.GetFixedDelta();
     transform.Position = p.Position;
 
     D::Log::Info("[[[");
@@ -167,7 +169,7 @@ inline void PlayWithBall(C::Engine& eng, double fdt)
     D::Log::Info("]]]");
 }
 
-inline void FixedUpdate_Sandbox2D(C::Engine& eng, double fdt)
+inline void FixedUpdate_Sandbox2D(C::Engine& eng, const C::TimeHandler& time)
 {
     if (Platform::Input.IsKeyHeld(Platform::Key::Escape))
     {
@@ -207,12 +209,12 @@ inline void FixedUpdate_Sandbox2D(C::Engine& eng, double fdt)
     M::Vector<2> dampening = -0.4 * p.Velocity;
     p.Force = f * p.Mass + -0.5 * p.Position + dampening;
     p.Acceleration = p.Force / p.Mass;
-    p.Velocity += p.Acceleration * fdt;
-    p.Position += p.Velocity * fdt;
+    p.Velocity += p.Acceleration * time.GetFixedDelta();
+    p.Position += p.Velocity * time.GetFixedDelta();
 
     transform.Position = p.Position;
 
-    // PlayWithBall(eng, fdt);
+    // PlayWithBall(eng, time);
 }
 } // namespace Sandbox2D
 } // namespace Ivy::Sandbox

@@ -52,14 +52,14 @@ inline void Start_Sandbox3D(C::Engine& eng)
     // eng.World.GetRoot().AttachChild(square);
 }
 
-inline void FixedUpdate_Sandbox3D(C::Engine& eng, double dt)
+inline void FixedUpdate_Sandbox3D(C::Engine& eng, const C::TimeHandler& time)
 {
     if (Platform::Input.IsKeyHeld(Platform::Key::Escape))
     {
         eng.Shutdown();
     }
 
-    // StressTester3D::Update_StressTester3D(eng, dt);
+    // StressTester3D::Update_StressTester3D(eng, time);
 }
 } // namespace Sandbox3D
 } // namespace Ivy::Sandbox

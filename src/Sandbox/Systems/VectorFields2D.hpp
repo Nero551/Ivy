@@ -310,19 +310,17 @@ inline void QuadraticResistiveForceModel(C::Engine& eng)
 }
 
 // ── lifecycle ───────────────────────────────────────────────────
-inline void Start_VectorFields2D(C::Engine& eng)
+inline void Start_VectorFields2D(VectorFields2DState& state, ResourceManagerState& resources)
 {
-    auto& state = eng.GetStates<VectorFields2DState>();
-
-    state.Mesh = &LoadResource<G::Mesh>(eng, G::Primitives::CreateArrow2D("vectorArrow"));
+    state.Mesh = &LoadResource<G::Mesh>(resources, G::Primitives::CreateArrow2D("vectorArrow"));
 
     auto& vertSource = LoadResource<G::ShaderSource>(
-        eng, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
+        resources, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
     auto& fragSource = LoadResource<G::ShaderSource>(
-        eng, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadResource<G::Shader>(eng, "arrowShader", vertSource, fragSource);
+        resources, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
+    auto& shader = LoadResource<G::Shader>(resources, "arrowShader", vertSource, fragSource);
 
-    state.Material = &LoadResource<G::Material>(eng, "arrowMat");
+    state.Material = &LoadResource<G::Material>(resources, "arrowMat");
     state.Material->Get().Shader = &shader();
     state.Material->Get().Color = {1, 1, 1, 1};
 }

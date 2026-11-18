@@ -138,6 +138,13 @@ template <> struct Fetch<World>
         return e.World;
     };
 };
+template <> struct Fetch<Platform::Window>
+{
+    static Platform::Window& Get(Engine& e)
+    {
+        return e.Window;
+    };
+};
 
 template <> struct Fetch<Engine>
 {

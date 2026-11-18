@@ -24,9 +24,9 @@ struct Controller3DState : C::State
 
 namespace Controller3D
 {
-inline void Update_Controller3D(C::Engine& eng, double dt)
+inline void Update_Controller3D(Controller3DState& state, ECS::EntityComponentSystem& ecs, C::World& world,
+    Platform::Window& window, const C::TimeHandler& time)
 {
-    auto& state = eng.GetStates<Controller3DState>();
     auto& input = Platform::Input;
 
     if (input.IsKeyReleased(Platform::Key::Q))
@@ -38,19 +38,19 @@ inline void Update_Controller3D(C::Engine& eng, double dt)
 
     if (input.IsKeyPressed(Platform::Key::T))
     {
-        D::Log::Info(eng.ECS.EntityAmount());
+        D::Log::Info(ecs.EntityAmount());
     }
 
-    auto& query = eng.ECS.Query;
-    auto& camera = eng.World.GetCamera();
+    auto& query = ecs.Query;
+    auto& camera = world.GetCamera();
     auto& transform = query.GetComponent<CMP::Transform3D>(camera);
     auto& cameraComponent = query.GetComponent<CMP::Camera>(camera);
 
     cameraComponent.ProjectionMode = ProjectionMode::Perspective;
     cameraComponent.Left = 0;
     cameraComponent.Bottom = 0;
-    cameraComponent.Right = eng.Window.GetWidth();
-    cameraComponent.Top = eng.Window.GetHeight();
+    cameraComponent.Right = window.GetWidth();
+    cameraComponent.Top = window.GetHeight();
 
     if (input.GetMouseMode() == Platform::CursorMode::Disabled)
     {
@@ -67,7 +67,7 @@ inline void Update_Controller3D(C::Engine& eng, double dt)
 
     state.Speed += input.GetScrollDelta().y;
     state.Speed = std::max(state.Speed, 2.5f);
-    const float speed = state.Speed * static_cast<float>(dt);
+    const float speed = state.Speed * static_cast<float>(time.GetDelta());
 
     if (input.IsKeyHeld(Platform::Key::W))
     {

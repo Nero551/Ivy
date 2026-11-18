@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Engine.hpp"
 #include "Core/State.hpp"
 #include "Systems/Resource.hpp"
 #include "Utilities/DataStructures/GIndexPool.hpp"
@@ -33,10 +32,9 @@ struct ResourceManagerState : C::State
      * @return Reference to the loaded resource.
      */
 template <typename T, typename... Args>
-Resource<T>& LoadResource(C::Engine& eng, const std::string& name, Args&&... args)
+Resource<T>& LoadResource(ResourceManagerState& state, const std::string& name, Args&&... args)
     requires std::constructible_from<Resource<T>, const std::string&, Args...> && NamedResource<T>
 {
-    auto& state = eng.GetStates<ResourceManagerState>();
     std::string key = typeid(T).name() + name;
 
     if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
@@ -64,9 +62,9 @@ Resource<T>& LoadResource(C::Engine& eng, const std::string& name, Args&&... arg
      * @return Reference to the loaded resource.
      */
 template <typename T>
-Resource<T>& LoadResource(C::Engine& eng, T& object) requires(std::move_constructible<T> && NamedResource<T>)
+Resource<T>& LoadResource(ResourceManagerState& state, T& object)
+    requires(std::move_constructible<T> && NamedResource<T>)
 {
-    auto& state = eng.GetStates<ResourceManagerState>();
     std::string key = typeid(T).name() + object.GetName();
 
     if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
@@ -84,9 +82,9 @@ Resource<T>& LoadResource(C::Engine& eng, T& object) requires(std::move_construc
 }
 
 template <typename T>
-Resource<T>& LoadResource(C::Engine& eng, T&& object) requires(std::move_constructible<T> && NamedResource<T>)
+Resource<T>& LoadResource(ResourceManagerState& state, T&& object)
+    requires(std::move_constructible<T> && NamedResource<T>)
 {
-    auto& state = eng.GetStates<ResourceManagerState>();
     std::string key = typeid(T).name() + object.GetName();
 
     if (const auto it = state.ResourceLookup.find(key); it != state.ResourceLookup.end())
@@ -108,9 +106,8 @@ Resource<T>& LoadResource(C::Engine& eng, T&& object) requires(std::move_constru
     * @param name name of the resource to unload.
     * @tparam T type of the resource to unload.
     */
-template <typename T> void UnloadResource(C::Engine& eng, const std::string& name)
+template <typename T> void UnloadResource(ResourceManagerState& state, const std::string& name)
 {
-    auto& state = eng.GetStates<ResourceManagerState>();
     std::string key = typeid(T).name() + name;
 
     const auto it = state.ResourceLookup.find(key);
@@ -127,9 +124,8 @@ template <typename T> void UnloadResource(C::Engine& eng, const std::string& nam
 }
 
 /** @brief Unloads all resources and resets the resource manager. */
-inline void UnloadAllResources(C::Engine& eng)
+inline void UnloadAllResources(ResourceManagerState& state)
 {
-    auto& state = eng.GetStates<ResourceManagerState>();
     state.Handles.Clear();
     state.ResourceLookup.clear();
     state.Resources.Clear();
@@ -145,9 +141,9 @@ inline void UnloadAllResources(C::Engine& eng)
      * @param handle Handle of the resource to retrieve.
      * @return Reference to the resource.
      */
-template <typename T> Resource<T>& AcquireResource(C::Engine& eng, const IResource::HandleType handle)
+template <typename T>
+Resource<T>& AcquireResource(ResourceManagerState& state, const IResource::HandleType handle)
 {
-    const auto& state = eng.GetStates<ResourceManagerState>();
     return static_cast<Resource<T>&>(*state.Resources[handle.Index]);
 }
 
@@ -162,9 +158,8 @@ template <typename T> Resource<T>& AcquireResource(C::Engine& eng, const IResour
      * @param name Name of the resource.
      * @return Reference to the resource.
      */
-template <typename T> Resource<T>& AcquireResource(C::Engine& eng, const std::string& name)
+template <typename T> Resource<T>& AcquireResource(ResourceManagerState& state, const std::string& name)
 {
-    auto& state = eng.GetStates<ResourceManagerState>();
     return static_cast<Resource<T>&>(
         *state.Resources[state.ResourceLookup.at(typeid(T).name() + name).Index]);
 }
@@ -176,9 +171,8 @@ template <typename T> Resource<T>& AcquireResource(C::Engine& eng, const std::st
      * @param name Name of the resource.
      * @return True if the resource exists, otherwise false.
      */
-template <typename T> bool ResourceExists(C::Engine& eng, const std::string& name)
+template <typename T> bool ResourceExists(const ResourceManagerState& state, const std::string& name)
 {
-    const auto& state = eng.GetStates<ResourceManagerState>();
     return state.ResourceLookup.contains(typeid(T).name() + name);
 }
 
@@ -188,14 +182,13 @@ template <typename T> bool ResourceExists(C::Engine& eng, const std::string& nam
      * @param handle Handle to check.
      * @return True if the handle refers to an acquired resource, otherwise false.
      */
-inline bool ResourceExists(C::Engine& eng, const IResource::HandleType handle)
+inline bool ResourceExists(const ResourceManagerState& state, const IResource::HandleType handle)
 {
-    const auto& state = eng.GetStates<ResourceManagerState>();
     return state.Resources.Contains(handle.Index) && state.Handles.IsAcquired(handle);
 }
 
-inline void Stop_ResourceManager(C::Engine& eng)
+inline void Stop_ResourceManager(ResourceManagerState& state)
 {
-    UnloadAllResources(eng);
+    UnloadAllResources(state);
 }
 } // namespace Ivy

@@ -19,22 +19,23 @@ namespace Ivy::Sandbox
 {
 ECS::Entity& CoordinateAxes2DScene(C::Engine& eng)
 {
+    auto& resources = eng.GetStates<ResourceManagerState>();
     auto& query = eng.ECS.Query;
     auto& root = Node2D::Create(eng.ECS);
 
-    auto& shader = LoadResource<G::Shader>(eng, "AxisShader");
+    auto& shader = LoadResource<G::Shader>(resources, "AxisShader");
     shader().AssignSource(LoadResource<G::ShaderSource>(
-        eng, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+        resources, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
     shader().AssignSource(LoadResource<G::ShaderSource>(
-        eng, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+        resources, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
     G::Mesh m = G::Primitives::CreateLine("Line");
-    auto& line = LoadResource<G::Mesh>(eng, m);
+    auto& line = LoadResource<G::Mesh>(resources, m);
 
     auto& xAxis = MeshInstance2D::Create(eng.ECS);
     query.GetComponent<CMP::Mesh>(xAxis).Mesh = &line;
     auto& xMaterial = query.GetComponent<CMP::Material>(xAxis);
-    xMaterial.Material = &LoadResource<G::Material>(eng, "X-Axis Material");
+    xMaterial.Material = &LoadResource<G::Material>(resources, "X-Axis Material");
     xMaterial.Material->Get().Shader = &shader();
 
     query.GetComponent<CMP::Transform2D>(xAxis).Scale = {200, 1};
@@ -44,7 +45,7 @@ ECS::Entity& CoordinateAxes2DScene(C::Engine& eng)
     auto& yAxis = MeshInstance2D::Create(eng.ECS);
     query.GetComponent<CMP::Mesh>(yAxis).Mesh = &line;
     auto& yMaterial = query.GetComponent<CMP::Material>(yAxis);
-    yMaterial.Material = &LoadResource<G::Material>(eng, "Y-Axis Material");
+    yMaterial.Material = &LoadResource<G::Material>(resources, "Y-Axis Material");
     yMaterial.Material->Get().Shader = &shader();
 
     query.GetComponent<CMP::Transform2D>(yAxis).Rotation = M::Rad(90.0f);

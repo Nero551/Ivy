@@ -39,10 +39,11 @@ namespace StressTester3D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& CreatePoint(C::Engine& eng, M::Vector<4> col)
 {
+    auto& resources = eng.GetStates<ResourceManagerState>();
     auto& query = eng.ECS.Query;
 
     G::Mesh m = G::Primitives::CreateQuad("point");
-    auto& mesh = LoadResource<G::Mesh>(eng, m);
+    auto& mesh = LoadResource<G::Mesh>(resources, m);
 
     auto& point = MeshInstance3D::Create(eng.ECS);
 
@@ -51,21 +52,21 @@ inline ECS::Entity& CreatePoint(C::Engine& eng, M::Vector<4> col)
 
     const std::string name = std::format("m{}{}{}", col.z, col.x, col.y);
 
-    if (ResourceExists<G::Material>(eng, name))
+    if (ResourceExists<G::Material>(resources, name))
     {
-        auto& material = LoadResource<G::Material>(eng, name);
+        auto& material = LoadResource<G::Material>(resources, name);
         query.GetComponent<CMP::Material>(point).Material = &material;
     }
     else
     {
-        auto& material = LoadResource<G::Material>(eng, name);
+        auto& material = LoadResource<G::Material>(resources, name);
         material().Color = col;
 
-        auto& shader = LoadResource<G::Shader>(eng, "pointShader");
+        auto& shader = LoadResource<G::Shader>(resources, "pointShader");
         shader().AssignSource(LoadResource<G::ShaderSource>(
-            eng, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
+            resources, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
         shader().AssignSource(LoadResource<G::ShaderSource>(
-            eng, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
+            resources, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
         material().Shader = &shader();
         query.GetComponent<CMP::Material>(point).Material = &material;
@@ -167,26 +168,26 @@ inline void Spawn(C::Engine& eng, int dimension, int craziness)
 }
 
 // ── lifecycle ───────────────────────────────────────────────────
-inline void Update_StressTester3D(C::Engine& eng, double dt)
+inline void Update_StressTester3D(
+    StressTester3DState& state, ECS::EntityComponentSystem& ecs, const C::TimeHandler& time)
 {
-    auto& state = eng.GetStates<StressTester3DState>();
     auto& input = Platform::Input;
-    auto& query = eng.ECS.Query;
+    auto& query = ecs.Query;
 
     if (input.IsKeyHeld(Platform::Key::Left))
     {
-        state.Multiplier -= 5 * dt;
+        state.Multiplier -= 5 * time.GetDelta();
     }
     if (input.IsKeyHeld(Platform::Key::Right))
     {
-        state.Multiplier += 5 * dt;
+        state.Multiplier += 5 * time.GetDelta();
     }
 
     if (state.Multiplier != 1)
     {
         for (auto& point : state.Points)
         {
-            auto& transform = query.GetComponent<CMP::Transform3D>(eng.ECS.GetEntity(point));
+            auto& transform = query.GetComponent<CMP::Transform3D>(ecs.GetEntity(point));
             transform.Position *= state.Multiplier;
         }
     }
