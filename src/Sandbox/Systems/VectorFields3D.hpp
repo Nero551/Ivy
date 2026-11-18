@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 #include "ECS/Entity.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/DataType.hpp"
@@ -15,7 +15,7 @@
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Systems/Asset.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -25,7 +25,7 @@
 
 namespace Ivy::Sandbox
 {
-struct VectorFields3DState : C::State
+struct VectorFields3DState
 {
     U::CheckedPtr<Asset<G::Mesh>> Mesh;
     U::CheckedPtr<Asset<G::Material>> Material;
@@ -36,7 +36,7 @@ namespace VectorFields3D
 // ─── helper ─────────────────────────────────────────────────
 inline ECS::Entity& Arrow(C::Engine& eng)
 {
-    auto& state = eng.GetStates<VectorFields3DState>();
+    auto& state = eng.GetRes<VectorFields3DState>();
     auto& query = eng.ECS.Query;
 
     auto& arrow = MeshInstance3D::Create(eng.ECS);
@@ -84,24 +84,24 @@ inline void LorenzSystem(C::Engine& eng)
     G::ArrayBuffer buffer{};
     buffer.SetData(magnitudes);
 
-    auto& mesh = eng.GetStates<VectorFields3DState>().Mesh;
+    auto& mesh = eng.GetRes<VectorFields3DState>().Mesh;
     mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
     mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
     mesh->Get().VAO.SetAttribDivisor(2, 1);
 }
 
 // ─── lifecycle (suffixed) ──────────────────────────────────
-inline void Start_VectorFields3D(VectorFields3DState& state, AssetManagerState& resources)
+inline void Start_VectorFields3D(C::Res<VectorFields3DState>& state, C::Res<AssetServer>& resources)
 {
-    state.Mesh = &LoadAsset<G::Mesh>(resources, G::Primitives::CreateArrow3D("vectorArrow3D"));
+    state.Mesh = &resources.LoadAsset<G::Mesh>(G::Primitives::CreateArrow3D("vectorArrow3D"));
 
-    auto& vertSource = LoadAsset<G::ShaderSource>(
-        resources, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadAsset<G::ShaderSource>(
-        resources, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadAsset<G::Shader>(resources, "arrowShader", vertSource, fragSource);
+    auto& vertSource = resources.LoadAsset<G::ShaderSource>(
+        "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
+    auto& fragSource = resources.LoadAsset<G::ShaderSource>(
+        "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
+    auto& shader = resources.LoadAsset<G::Shader>("arrowShader", vertSource, fragSource);
 
-    state.Material = &LoadAsset<G::Material>(resources, "arrowMat");
+    state.Material = &resources.LoadAsset<G::Material>("arrowMat");
     state.Material->Get().Shader = &shader();
     state.Material->Get().Color = {1, 1, 1, 1};
 }

@@ -8,6 +8,7 @@
 #include "Utilities/DataStructures/HierarchyTree.hpp"
 #include "Utilities/DataStructures/SparseSetSoA.hpp"
 #include "Utilities/Event.hpp"
+#include <concepts>
 #include <cstddef>
 #include <memory>
 #include <utility>
@@ -114,6 +115,14 @@ struct EntityComponentSystem
             return nullptr;
         }
         return &*m_Entities[id];
+    }
+
+    template <typename F> void ForEachEntity(F&& action) const requires(std::invocable<F, Entity&>)
+    {
+        for (auto& entityPtr : m_Entities)
+        {
+            action(*entityPtr);
+        }
     }
 
     decltype(EntityID::Index) EntityAmount() const

@@ -5,11 +5,11 @@
 #include <format>
 
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 
 namespace Ivy
 {
-struct ProfilingState : C::State
+struct ProfilingData
 {
     double FrameMs{0};
     int FrameCount{0};
@@ -17,7 +17,8 @@ struct ProfilingState : C::State
     double Elapsed{0};
 };
 
-inline void Update_Profiling(ProfilingState& state, Platform::Window& window, const C::TimeHandler& time)
+inline void Update_Profiling(
+    C::Res<ProfilingData>& state, Platform::Window& window, const C::TimeHandler& time)
 {
     state.Elapsed += time.GetDelta();
     state.FrameMs = time.GetDelta() * 1000.0;

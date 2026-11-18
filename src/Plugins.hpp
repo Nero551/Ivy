@@ -16,12 +16,27 @@
 namespace Ivy
 {
 
+struct RendererPlugin : C::Plugin
+{
+    static void Setup(C::Engine& engine)
+    {
+        engine.AddRes<RendererState, LightingSystemState>();
+
+        engine.SM.AddSystems<C::Phase::Start, Start_Renderer, Start_Lighting>();
+        engine.SM.AddSystems<Ivy::C::Phase::BeginFrame, BeginFrame_Renderer>();
+        engine.SM.AddSystems<Ivy::C::Phase::Render, Render_Renderer, Render_Lighting>();
+        engine.SM.AddSystems<Ivy::C::Phase::Stop, Stop_Renderer>();
+
+        engine.SM.Chain<Ivy::C::Phase::Render, Render_Lighting, Render_Renderer>();
+    }
+};
+
 struct Sandbox3DPlugin : C::Plugin
 {
     static void Setup(C::Engine& engine)
     {
-        engine.AddStates<Sandbox::VectorFields3DState, Sandbox::Controller3DState,
-            Sandbox::StressTester3DState>();
+        engine
+            .AddRes<Sandbox::VectorFields3DState, Sandbox::Controller3DState, Sandbox::StressTester3DState>();
 
         engine.SM.AddSystems<Ivy::C::Phase::Start, Sandbox::Sandbox3D::Start_Sandbox3D,
             Sandbox::VectorFields3D::Start_VectorFields3D>();
@@ -32,6 +47,8 @@ struct Sandbox3DPlugin : C::Plugin
 
         engine.SM.Chain<Ivy::C::Phase::Start, Sandbox::VectorFields3D::Start_VectorFields3D,
             Sandbox::Sandbox3D::Start_Sandbox3D>();
+
+        engine.AddPlugins<RendererPlugin>();
     }
 };
 
@@ -39,8 +56,8 @@ struct Sandbox2DPlugin : C::Plugin
 {
     static void Setup(C::Engine& engine)
     {
-        engine.AddStates<Sandbox::VectorFields2DState, Sandbox::Controller2DState,
-            Sandbox::StressTester2DState>();
+        engine
+            .AddRes<Sandbox::VectorFields2DState, Sandbox::Controller2DState, Sandbox::StressTester2DState>();
 
         engine.SM.AddSystems<Ivy::C::Phase::Start, Sandbox::Sandbox2D::Start_Sandbox2D,
             Sandbox::VectorFields2D::Start_VectorFields2D>();
@@ -51,21 +68,8 @@ struct Sandbox2DPlugin : C::Plugin
 
         engine.SM.Chain<Ivy::C::Phase::Start, Sandbox::VectorFields2D::Start_VectorFields2D,
             Sandbox::Sandbox2D::Start_Sandbox2D>();
-    }
-};
 
-struct RendererPlugin : C::Plugin
-{
-    static void Setup(C::Engine& engine)
-    {
-        engine.AddStates<RendererState, LightingSystemState>();
-
-        engine.SM.AddSystems<C::Phase::Start, Start_Renderer, Start_Lighting>();
-        engine.SM.AddSystems<Ivy::C::Phase::BeginFrame, BeginFrame_Renderer>();
-        engine.SM.AddSystems<Ivy::C::Phase::Render, Render_Renderer, Render_Lighting>();
-        engine.SM.AddSystems<Ivy::C::Phase::Stop, Stop_Renderer>();
-
-        engine.SM.Chain<Ivy::C::Phase::Render, Render_Lighting, Render_Renderer>();
+        engine.AddPlugins<RendererPlugin>();
     }
 };
 } // namespace Ivy

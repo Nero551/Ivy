@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/EntityID.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -18,7 +18,7 @@
 #include "Sandbox/Systems/Controller2D.hpp"
 #include "Sandbox/Systems/StressTester2D.hpp"
 #include "Sandbox/Systems/VectorFields2D.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -30,20 +30,20 @@ namespace Sandbox2D
 {
 inline ECS::EntityID CreateCircle(C::Engine& eng)
 {
-    auto& resources = eng.GetStates<AssetManagerState>();
+    auto& resources = eng.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
     auto& circle = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(circle).Mesh =
-        &LoadAsset<G::Mesh>(resources, G::Primitives::CreateCircle("ball"));
+        &resources.LoadAsset<G::Mesh>(G::Primitives::CreateCircle("ball"));
 
-    auto& vertSource = LoadAsset<G::ShaderSource>(
-        resources, "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadAsset<G::ShaderSource>(
-        resources, "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadAsset<G::Shader>(resources, "circleShader", vertSource, fragSource);
+    auto& vertSource = resources.LoadAsset<G::ShaderSource>(
+        "circleShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+    auto& fragSource = resources.LoadAsset<G::ShaderSource>(
+        "circleShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+    auto& shader = resources.LoadAsset<G::Shader>("circleShader", vertSource, fragSource);
 
-    auto& mat = LoadAsset<G::Material>(resources, "circleMat");
+    auto& mat = resources.LoadAsset<G::Material>("circleMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 
@@ -56,20 +56,20 @@ inline ECS::EntityID CreateCircle(C::Engine& eng)
 
 inline ECS::EntityID CreateSquare(C::Engine& eng)
 {
-    auto& resources = eng.GetStates<AssetManagerState>();
+    auto& resources = eng.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
     auto& square = MeshInstance2D::Create(eng.ECS);
 
     query.GetComponent<CMP::Mesh>(square).Mesh =
-        &LoadAsset<G::Mesh>(resources, G::Primitives::CreateQuad("cube"));
+        &resources.LoadAsset<G::Mesh>(G::Primitives::CreateQuad("cube"));
 
-    auto& vertSource = LoadAsset<G::ShaderSource>(
-        resources, "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadAsset<G::ShaderSource>(
-        resources, "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadAsset<G::Shader>(resources, "squareShader", vertSource, fragSource);
+    auto& vertSource = resources.LoadAsset<G::ShaderSource>(
+        "squareShaderVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex);
+    auto& fragSource = resources.LoadAsset<G::ShaderSource>(
+        "squareShaderFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment);
+    auto& shader = resources.LoadAsset<G::Shader>("squareShader", vertSource, fragSource);
 
-    auto& mat = LoadAsset<G::Material>(resources, "squareMat");
+    auto& mat = resources.LoadAsset<G::Material>("squareMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
 

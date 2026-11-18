@@ -15,7 +15,7 @@
 #include "Platform/Key.hpp"
 #include "Sandbox/Scenes/CoordinateAxes3D.hpp"
 #include "Sandbox/Systems/VectorFields3D.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -40,18 +40,17 @@ inline void Start_Sandbox3D(C::Engine& eng)
     VectorFields3D::LorenzSystem(eng);
 
     auto& square = MeshInstance3D::Create(eng.ECS);
-    query.GetComponent<CMP::Mesh>(square).Mesh = &LoadAsset<G::Mesh>(
-        eng.AddStates<AssetManagerState>(), G::Primitives::CreateQuad("TerrainQuad", 20, 20));
+    query.GetComponent<CMP::Mesh>(square).Mesh =
+        &eng.GetRes<AssetServer>().LoadAsset<G::Mesh>(G::Primitives::CreateQuad("TerrainQuad", 20, 20));
 
-    auto& vertSource = LoadAsset<G::ShaderSource>(eng.AddStates<AssetManagerState>(), "TerrainShaderVert",
-        "assets/Shaders/TerrainShader.vert", G::ShaderStage::Vertex);
+    auto& vertSource = eng.GetRes<AssetServer>().LoadAsset<G::ShaderSource>(
+        "TerrainShaderVert", "assets/Shaders/TerrainShader.vert", G::ShaderStage::Vertex);
 
-    auto& fragSource = LoadAsset<G::ShaderSource>(eng.AddStates<AssetManagerState>(),
+    auto& fragSource = eng.GetRes<AssetServer>().LoadAsset<G::ShaderSource>(
 
         "TerrainShaderFrag", "assets/Shaders/TerrainShader.frag", G::ShaderStage::Fragment);
-    auto& shader =
-        LoadAsset<G::Shader>(eng.AddStates<AssetManagerState>(), "TerrainShader", vertSource, fragSource);
-    auto& mat = LoadAsset<G::Material>(eng.AddStates<AssetManagerState>(), "TerrainMat");
+    auto& shader = eng.GetRes<AssetServer>().LoadAsset<G::Shader>("TerrainShader", vertSource, fragSource);
+    auto& mat = eng.GetRes<AssetServer>().LoadAsset<G::Material>("TerrainMat");
     mat().Shader = &shader();
     mat().Color = {1, 1, 1, 1};
     shader().HotReload = true;

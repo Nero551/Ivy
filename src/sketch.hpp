@@ -47,7 +47,6 @@ namespace Sketch
 //
 // TODO: tracy is not working, the macro which defines it when debug mode doesn't work.
 //
-//TODO: enforce strict parameters on systems via compile-time dependency chain stuff & MULTI-THREADING
 //? as for thread safety. i think that should be integrated into the engine/ecs itself.
 //? think about deferred structural changes. for example, AddEntity() checks if any threads are reading, if yes. defer the change till after.
 
@@ -222,7 +221,7 @@ static M::Set<float> R = [](float x) { return true; };
 
 inline void Test()
 {
-    //TODO: think about making State also have methods, will make alot of things easier. also call it Resource to match bevy \
-    // rename MY resources to Assets.
+    //TODO: think about making State also have methods, will make alot of things easier. \
+    // consider renaming State to Resource or Server.
 }
 } // namespace Sketch

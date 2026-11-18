@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
@@ -17,7 +17,7 @@
 #include "Math/Equations/ODE.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Systems/Asset.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -28,7 +28,7 @@
 
 namespace Ivy::Sandbox
 {
-struct VectorFields2DState : C::State
+struct VectorFields2DState
 {
     U::CheckedPtr<Asset<G::Mesh>> Mesh;
     U::CheckedPtr<Asset<G::Material>> Material;
@@ -39,7 +39,7 @@ namespace VectorFields2D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& Arrow(C::Engine& eng)
 {
-    auto& state = eng.GetStates<VectorFields2DState>();
+    auto& state = eng.GetRes<VectorFields2DState>();
     auto& query = eng.ECS.Query;
 
     auto& arrow = MeshInstance2D::Create(eng.ECS);
@@ -55,7 +55,7 @@ inline void Finish(C::Engine& eng, const std::vector<float>& magnitudes)
     G::ArrayBuffer buffer{};
     buffer.SetData(magnitudes);
 
-    auto& mesh = eng.GetStates<VectorFields2DState>().Mesh;
+    auto& mesh = eng.GetRes<VectorFields2DState>().Mesh;
     mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
     mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
     mesh->Get().VAO.SetAttribDivisor(2, 1);
@@ -310,17 +310,17 @@ inline void QuadraticResistiveForceModel(C::Engine& eng)
 }
 
 // ── lifecycle ───────────────────────────────────────────────────
-inline void Start_VectorFields2D(VectorFields2DState& state, AssetManagerState& resources)
+inline void Start_VectorFields2D(C::Res<VectorFields2DState>& state, C::Res<AssetServer>& resources)
 {
-    state.Mesh = &LoadAsset<G::Mesh>(resources, G::Primitives::CreateArrow2D("vectorArrow"));
+    state.Mesh = &resources.LoadAsset<G::Mesh>(G::Primitives::CreateArrow2D("vectorArrow"));
 
-    auto& vertSource = LoadAsset<G::ShaderSource>(
-        resources, "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
-    auto& fragSource = LoadAsset<G::ShaderSource>(
-        resources, "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
-    auto& shader = LoadAsset<G::Shader>(resources, "arrowShader", vertSource, fragSource);
+    auto& vertSource = resources.LoadAsset<G::ShaderSource>(
+        "arrowShaderVert", "assets/Shaders/arrow.vert", G::ShaderStage::Vertex);
+    auto& fragSource = resources.LoadAsset<G::ShaderSource>(
+        "arrowShaderFrag", "assets/Shaders/arrow.frag", G::ShaderStage::Fragment);
+    auto& shader = resources.LoadAsset<G::Shader>("arrowShader", vertSource, fragSource);
 
-    state.Material = &LoadAsset<G::Material>(resources, "arrowMat");
+    state.Material = &resources.LoadAsset<G::Material>("arrowMat");
     state.Material->Get().Shader = &shader();
     state.Material->Get().Color = {1, 1, 1, 1};
 }

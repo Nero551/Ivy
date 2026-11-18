@@ -5,7 +5,7 @@
 #include "Core/SystemManager.hpp"
 #include "Platform/Global.hpp"
 #include "Plugins.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Profiling/ProfilingSystem.hpp"
 #include "Systems/TransformSystem.hpp"
@@ -43,9 +43,9 @@ int main(const int argc, char* argv[])
             engine.Window.SetCursor({"assets/cursor.png"});
             Platform::Input.SetActiveWindow(engine.Window);
 
-            engine.AddStates<ProfilingState, AssetManagerState, TransformSystemState>();
+            engine.AddRes<ProfilingData, AssetServer, TransformSystemState>();
             engine.SM.AddSystems<C::Phase::Update, Update_Profiling, Update_Transform>();
-            engine.SM.AddSystems<C::Phase::Stop, Stop_AssetManager>();
+            engine.SM.AddSystems<C::Phase::Stop, Stop_AssetServer>();
             engine.AddPlugins<Sandbox2DPlugin, RendererPlugin>();
             engine.World.SetRoot(Node::Create(engine.ECS));
         }};

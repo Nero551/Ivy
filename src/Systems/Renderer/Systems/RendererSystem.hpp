@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 
 #include "ECS/Entity.hpp"
 #include "Graphics/AntiAliasing/MSAA.hpp"
@@ -26,7 +26,7 @@
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Platform/Window.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/RenderBatch.hpp"
@@ -37,7 +37,7 @@
 namespace Ivy
 {
 
-struct RendererState : C::State
+struct RendererState
 {
 
     G::Framebuffer Framebuffer{"Graphics system has no Framebuffer to use"};
@@ -50,7 +50,8 @@ struct RendererState : C::State
 };
 namespace
 {
-inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, AssetManagerState& resources)
+inline void SetupFramebuffer(
+    C::Res<RendererState>& rState, Platform::Window& window, C::Res<AssetServer>& assets)
 {
     const std::vector<G::Vertex> vertices = {G::Vertex({-1.0f, -1.0f, 0.0f, 1.0f}, {}, {0.0f, 0.0f}, {}),
         G::Vertex({1.0f, -1.0f, 0.0f, 1.0f}, {}, {1.0f, 0.0f}, {}),
@@ -58,11 +59,11 @@ inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, As
         G::Vertex({-1.0f, 1.0f, 0.0f, 1.0f}, {}, {0.0f, 1.0f}, {})};
 
     const std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
-    auto& screenShader = LoadAsset<G::Shader>(resources, "[Graphics] Screen Shader");
-    auto& screenVert = LoadAsset<G::ShaderSource>(
-        resources, "[Graphics] Screen Vertex", "assets/Shaders/screen.vert", G::ShaderStage::Vertex);
-    auto& screenFrag = LoadAsset<G::ShaderSource>(
-        resources, "[Graphics] Screen Fragment", "assets/Shaders/screen.frag", G::ShaderStage::Fragment);
+    auto& screenShader = assets.LoadAsset<G::Shader>("[Graphics] Screen Shader");
+    auto& screenVert = assets.LoadAsset<G::ShaderSource>(
+        "[Graphics] Screen Vertex", "assets/Shaders/screen.vert", G::ShaderStage::Vertex);
+    auto& screenFrag = assets.LoadAsset<G::ShaderSource>(
+        "[Graphics] Screen Fragment", "assets/Shaders/screen.frag", G::ShaderStage::Fragment);
 
     screenShader().AssignSource(screenVert);
     screenShader().AssignSource(screenFrag);
@@ -76,7 +77,7 @@ inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, As
     rState.ScreenMesh.Indices = indices;
     rState.ScreenMesh.CullMode = G::CullMode::None;
 
-    auto& screenTexture = LoadAsset<G::Texture2D>(resources, "COLOR_BUFFER");
+    auto& screenTexture = assets.LoadAsset<G::Texture2D>("COLOR_BUFFER");
     screenTexture.Get().Width = window.GetWidth();
     screenTexture.Get().Height = window.GetHeight();
     screenTexture.Get().InternalFormat = G::TextureInternalFormat::RGB8;
@@ -96,7 +97,7 @@ inline void SetupFramebuffer(RendererState& rState, Platform::Window& window, As
             rState.Framebuffer.Resize(w, h);
         });
 }
-inline void PresentFramebuffer(RendererState& rState, Platform::Window& window)
+inline void PresentFramebuffer(C::Res<RendererState>& rState, Platform::Window& window)
 {
     int width = window.GetWidth();
     int height = window.GetHeight();
@@ -120,7 +121,7 @@ inline void PresentFramebuffer(RendererState& rState, Platform::Window& window)
     rState.ScreenMesh.Draw();
 }
 
-inline void Start2D(ECS::EntityComponentSystem& ecs, RendererState& rState)
+inline void Start2D(ECS::EntityComponentSystem& ecs, C::Res<RendererState>& rState)
 {
     ecs.EntityDestroyed.Subscribe(
         [&rState](const ECS::Entity& entity)
@@ -134,8 +135,8 @@ inline void Start2D(ECS::EntityComponentSystem& ecs, RendererState& rState)
             }
         });
 }
-inline void FillBatches2D(RendererState& rState, unsigned int entityId, CMP::Transform2D& transformComponent,
-    CMP::Material& materialComponent, CMP::Mesh& meshComponent)
+inline void FillBatches2D(C::Res<RendererState>& rState, unsigned int entityId,
+    CMP::Transform2D& transformComponent, CMP::Material& materialComponent, CMP::Mesh& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
@@ -157,8 +158,8 @@ inline void FillBatches2D(RendererState& rState, unsigned int entityId, CMP::Tra
         batch.DataChanged = true;
     }
 }
-inline void Render2D(
-    C::World& world, ECS::EntityComponentSystem& ecs, RendererState& rState, const C::TimeHandler& time)
+inline void Render2D(C::World& world, ECS::EntityComponentSystem& ecs, C::Res<RendererState>& rState,
+    const C::TimeHandler& time)
 {
     const auto& camera = world.GetCamera();
     auto& query = ecs.Query;
@@ -199,7 +200,7 @@ inline void Render2D(
     }
 }
 
-inline void Start3D(ECS::EntityComponentSystem& ecs, RendererState& rState)
+inline void Start3D(ECS::EntityComponentSystem& ecs, C::Res<RendererState>& rState)
 {
     ecs.EntityDestroyed.Subscribe(
         [&rState](const ECS::Entity& entity)
@@ -213,8 +214,8 @@ inline void Start3D(ECS::EntityComponentSystem& ecs, RendererState& rState)
             }
         });
 }
-inline void FillBatches3D(RendererState& rState, unsigned int entityId, CMP::Transform3D& transformComponent,
-    CMP::Material& materialComponent, CMP::Mesh& meshComponent)
+inline void FillBatches3D(C::Res<RendererState>& rState, unsigned int entityId,
+    CMP::Transform3D& transformComponent, CMP::Material& materialComponent, CMP::Mesh& meshComponent)
 {
     unsigned int materialId = materialComponent.Material->GetHandle().Index;
     unsigned int meshId = meshComponent.Mesh->GetHandle().Index;
@@ -236,8 +237,8 @@ inline void FillBatches3D(RendererState& rState, unsigned int entityId, CMP::Tra
         batch.DataChanged = true;
     }
 }
-inline void Render3D(
-    C::World& world, ECS::EntityComponentSystem& ecs, RendererState& rState, const C::TimeHandler& time)
+inline void Render3D(C::World& world, ECS::EntityComponentSystem& ecs, C::Res<RendererState>& rState,
+    const C::TimeHandler& time)
 {
     const auto& camera = world.GetCamera();
     auto& query = ecs.Query;
@@ -281,8 +282,8 @@ inline void Render3D(
 }
 } // namespace
 
-inline void Start_Renderer(RendererState& rState, ECS::EntityComponentSystem& ecs, Platform::Window& window,
-    AssetManagerState& resources)
+inline void Start_Renderer(C::Res<RendererState>& rState, ECS::EntityComponentSystem& ecs,
+    Platform::Window& window, C::Res<AssetServer>& resources)
 {
     G::Context::Enable(G::Capability::ProgramPointSize);
     G::Context::Enable(G::Capability::Multisample);
@@ -295,14 +296,14 @@ inline void Start_Renderer(RendererState& rState, ECS::EntityComponentSystem& ec
     Start3D(ecs, rState);
     Start2D(ecs, rState);
 }
-inline void BeginFrame_Renderer(RendererState& rState)
+inline void BeginFrame_Renderer(C::Res<RendererState>& rState)
 {
     rState.MSAntiAliasing.OutputBuffer.Bind();
     G::Context::ClearColor(0.08, 0.05, 0.1, 1);
     G::Context::Clear(G::BufferBit::Color | G::BufferBit::Depth | G::BufferBit::Stencil);
 }
 
-inline void Render_Renderer(C::World& world, ECS::EntityComponentSystem& ecs, RendererState& rState,
+inline void Render_Renderer(C::World& world, ECS::EntityComponentSystem& ecs, C::Res<RendererState>& rState,
     const C::TimeHandler& time, Platform::Window& window)
 {
     Render2D(world, ecs, rState, time);
@@ -310,7 +311,7 @@ inline void Render_Renderer(C::World& world, ECS::EntityComponentSystem& ecs, Re
     PresentFramebuffer(rState, window);
 }
 
-inline void Stop_Renderer(RendererState& rState)
+inline void Stop_Renderer(C::Res<RendererState>& rState)
 {
     const G::Texture2D& texture =
         static_cast<G::Texture2D&>(rState.Framebuffer.GetTexture(G::FramebufferAttachment::Color0));

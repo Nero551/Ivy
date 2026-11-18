@@ -1,22 +1,23 @@
 #pragma once
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 #include "Graphics/Buffers/Uniformbuffer/Uniformbuffer.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Utilities/CheckedPtr.hpp"
 
 namespace Ivy
 {
-struct LightingSystemState : C::State
+struct LightingSystemState
 {
     U::CheckedPtr<G::Uniformbuffer> LightingBuffer;
 };
 
-inline void Start_Lighting(LightingSystemState& state, const C::World& world, AssetManagerState& resources)
+inline void Start_Lighting(
+    C::Res<LightingSystemState>& state, const C::World& world, C::Res<AssetServer>& resources)
 {
-    state.LightingBuffer = &LoadAsset<G::Uniformbuffer>(resources, "[Graphics] Lighting Buffer")();
+    state.LightingBuffer = &resources.LoadAsset<G::Uniformbuffer>("[Graphics] Lighting Buffer")();
     state.LightingBuffer->Binding = 1;
 
     constexpr size_t LightStride = 144;
@@ -25,7 +26,7 @@ inline void Start_Lighting(LightingSystemState& state, const C::World& world, As
     state.LightingBuffer->Size = HeaderSize + world.MaxLights * LightStride;
 }
 
-inline void Render_Lighting(LightingSystemState& state, ECS::EntityComponentSystem& ecs)
+inline void Render_Lighting(C::Res<LightingSystemState>& state, ECS::EntityComponentSystem& ecs)
 {
     int i = 0;
     constexpr unsigned int LightStride = 144;

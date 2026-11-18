@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Plugin.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 
 #include "Core/SystemManager.hpp"
 #include "Core/TimeHandler.hpp"
@@ -58,35 +58,35 @@ struct Engine
     /** @brief Requests the engine to shut down. */
     void Shutdown();
 
-    template <IsState T> T& GetStates() const
+    template <typename T> Res<T>& GetRes() const
     {
-        auto state = m_States.Find<T>();
-        if (state == m_States.end())
+        auto res = m_Resources.Find<Res<T>>();
+        if (res == m_Resources.end())
         {
-            D::Log::Error(std::format("State {} not found", typeid(T).name()));
+            D::Log::Error(std::format("Res {} not found", typeid(T).name()));
         }
-        return static_cast<T&>(**state);
+        return static_cast<Res<T>&>(**res);
     }
 
-    template <IsState... Args> std::tuple<Args&...> GetStates() const requires(sizeof...(Args) != 1)
+    template <typename... Args> std::tuple<Res<Args>&...> GetRes() const requires(sizeof...(Args) != 1)
     {
-        return {GetStates<Args>()...};
+        return {GetRes<Args>()...};
     }
 
-    const U::TypedVector<std::unique_ptr<State>>& GetAllStates() const
+    template <typename T> Res<T>& AddRes()
     {
-        return m_States;
+        auto existing = m_Resources.Find<Res<T>>();
+        if (existing != m_Resources.end())
+        {
+            return static_cast<Res<T>&>(**existing);
+        }
+        m_Resources.Emplace<Res<T>>(std::make_unique<Res<T>>());
+        return static_cast<Res<T>&>(*m_Resources.Get<Res<T>>());
     }
 
-    template <IsState T> T& AddStates()
+    template <typename... Args> std::tuple<Res<Args>&...> AddRes() requires(sizeof...(Args) != 1)
     {
-        m_States.Emplace<T>(std::make_unique<T>());
-        return static_cast<T&>(*m_States.Get<T>());
-    }
-
-    template <IsState... Args> std::tuple<Args&...> AddStates() requires(sizeof...(Args) != 1)
-    {
-        return {AddStates<Args>()...};
+        return {AddRes<Args>()...};
     }
 
     template <IsPlugin P> void AddPlugins()
@@ -100,16 +100,15 @@ struct Engine
     }
 
   private:
-    U::TypedVector<std::unique_ptr<State>> m_States;
+    U::TypedVector<std::unique_ptr<IRes>> m_Resources;
     bool m_Running = false;
 };
 
-template <typename T> requires(IsState<T>)
-struct Fetch<T>
+template <IsRes T> struct Fetch<T>
 {
     static T& Get(Engine& e)
     {
-        return e.GetStates<T>();
+        return e.GetRes<typename T::Base>();
     };
 };
 

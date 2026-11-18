@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 #include "Diagnostics/Log.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Vector/Vectors.hpp"
@@ -13,7 +13,7 @@
 
 namespace Ivy::Sandbox
 {
-struct Controller2DState : C::State
+struct Controller2DState
 {
     float Yaw = 0;
     float Pitch = 0;
@@ -23,8 +23,8 @@ struct Controller2DState : C::State
 
 namespace Controller2D
 {
-inline void Update_Controller2D(Controller2DState& state, ECS::EntityComponentSystem& ecs, C::World& world,
-    Platform::Window& window, const C::TimeHandler& time)
+inline void Update_Controller2D(C::Res<Controller2DState>& state, ECS::EntityComponentSystem& ecs,
+    C::World& world, Platform::Window& window, const C::TimeHandler& time)
 {
     auto& input = Platform::Input;
 

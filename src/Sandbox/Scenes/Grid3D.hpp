@@ -12,7 +12,7 @@
 #include "Math/Common/Trigonometry.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Nodes.hpp"
 #include "Systems/Renderer/Components.hpp"
@@ -24,18 +24,18 @@ namespace
 {
 void CreateGridLine(C::Engine& eng, ECS::Entity& root, const M::Quaternion<> rotation, M::Vector<3> position)
 {
-    auto& resources = eng.GetStates<AssetManagerState>();
+    auto& resources = eng.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
-    auto& shader = LoadAsset<G::Shader>(resources, "AxisShader");
+    auto& shader = resources.LoadAsset<G::Shader>("AxisShader");
 
-    shader().AssignSource(LoadAsset<G::ShaderSource>(
-        resources, "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
+    shader().AssignSource(resources.LoadAsset<G::ShaderSource>(
+        "axisFrag", "assets/Shaders/axisShader.frag", G::ShaderStage::Fragment)());
 
-    shader().AssignSource(LoadAsset<G::ShaderSource>(
-        resources, "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
+    shader().AssignSource(resources.LoadAsset<G::ShaderSource>(
+        "axisVert", "assets/Shaders/axisShader.vert", G::ShaderStage::Vertex)());
 
     G::Mesh m = G::Primitives::CreateLine("Line");
-    auto& line = LoadAsset<G::Mesh>(resources, m);
+    auto& line = resources.LoadAsset<G::Mesh>(m);
 
     auto& l = MeshInstance3D::Create(eng.ECS);
 
@@ -45,7 +45,7 @@ void CreateGridLine(C::Engine& eng, ECS::Entity& root, const M::Quaternion<> rot
 
     meshComponent.Mesh = &line;
 
-    materialComponent.Material = &LoadAsset<G::Material>(resources, "GridLine Material");
+    materialComponent.Material = &resources.LoadAsset<G::Material>("GridLine Material");
     materialComponent.Material->Get().Shader = &shader();
 
     transformComponent.Rotation = rotation;

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 
 #include "Core/World.hpp"
 #include "ECS/Entity.hpp"
@@ -12,7 +11,7 @@
 
 namespace Ivy
 {
-struct TransformSystemState : C::State
+struct TransformSystemState
 {
     std::vector<U::CheckedPtr<ECS::Entity>> Descendants;
     size_t HierarchyVersion = 0;
@@ -70,7 +69,7 @@ inline void Do3D(
 }
 } // namespace
 inline void Update_Transform(
-    TransformSystemState& state, const C::World& world, const ECS::EntityComponentSystem& ecs)
+    C::Res<TransformSystemState>& state, const C::World& world, const ECS::EntityComponentSystem& ecs)
 {
     if (ecs.EntityHierarchy.Version() != state.HierarchyVersion || state.Descendants.empty() ||
         ecs.Version != state.EcsVersion)

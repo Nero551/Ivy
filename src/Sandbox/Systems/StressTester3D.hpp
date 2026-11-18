@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.hpp"
-#include "Core/State.hpp"
+#include "Core/Res.hpp"
 #include "Diagnostics/Log.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityID.hpp"
@@ -19,7 +19,7 @@
 #include "Math/Vector/Vectors.hpp"
 #include "Platform/Global.hpp"
 #include "Platform/Key.hpp"
-#include "Systems/AssetManager.hpp"
+#include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
@@ -28,7 +28,7 @@
 
 namespace Ivy::Sandbox
 {
-struct StressTester3DState : C::State
+struct StressTester3DState
 {
     float Multiplier = 1;
     std::vector<ECS::EntityID> Points;
@@ -39,11 +39,11 @@ namespace StressTester3D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& CreatePoint(C::Engine& eng, M::Vector<4> col)
 {
-    auto& resources = eng.GetStates<AssetManagerState>();
+    auto& resources = eng.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
 
     G::Mesh m = G::Primitives::CreateQuad("point");
-    auto& mesh = LoadAsset<G::Mesh>(resources, m);
+    auto& mesh = resources.LoadAsset<G::Mesh>(m);
 
     auto& point = MeshInstance3D::Create(eng.ECS);
 
@@ -52,21 +52,21 @@ inline ECS::Entity& CreatePoint(C::Engine& eng, M::Vector<4> col)
 
     const std::string name = std::format("m{}{}{}", col.z, col.x, col.y);
 
-    if (AssetExists<G::Material>(resources, name))
+    if (resources.AssetExists<G::Material>(name))
     {
-        auto& material = LoadAsset<G::Material>(resources, name);
+        auto& material = resources.LoadAsset<G::Material>(name);
         query.GetComponent<CMP::Material>(point).Material = &material;
     }
     else
     {
-        auto& material = LoadAsset<G::Material>(resources, name);
+        auto& material = resources.LoadAsset<G::Material>(name);
         material().Color = col;
 
-        auto& shader = LoadAsset<G::Shader>(resources, "pointShader");
-        shader().AssignSource(LoadAsset<G::ShaderSource>(
-            resources, "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
-        shader().AssignSource(LoadAsset<G::ShaderSource>(
-            resources, "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
+        auto& shader = resources.LoadAsset<G::Shader>("pointShader");
+        shader().AssignSource(resources.LoadAsset<G::ShaderSource>(
+            "pointVert", "assets/Shaders/shader.vert", G::ShaderStage::Vertex));
+        shader().AssignSource(resources.LoadAsset<G::ShaderSource>(
+            "pointFrag", "assets/Shaders/shader.frag", G::ShaderStage::Fragment));
 
         material().Shader = &shader();
         query.GetComponent<CMP::Material>(point).Material = &material;
@@ -91,7 +91,7 @@ inline ECS::Entity& Plot(C::Engine& eng, const M::Vector<3> vec3, const M::Vecto
 
 inline void TwoDimensionalProjection(C::Engine& eng, int increase)
 {
-    auto& state = eng.GetStates<StressTester3DState>();
+    auto& state = eng.GetRes<StressTester3DState>();
 
     const float count = M::Pow(360.0f / increase, 1.0f);
     state.Points.reserve(count);
@@ -108,7 +108,7 @@ inline void TwoDimensionalProjection(C::Engine& eng, int increase)
 
 inline void ThreeDimensionalProjection(C::Engine& eng, int increase)
 {
-    auto& state = eng.GetStates<StressTester3DState>();
+    auto& state = eng.GetRes<StressTester3DState>();
 
     const float count = M::Pow(360.0f / increase, 2.0f);
     D::Log::Info(count);
@@ -128,7 +128,7 @@ inline void ThreeDimensionalProjection(C::Engine& eng, int increase)
 
 inline void FourDimensionalProjection(C::Engine& eng, int increase)
 {
-    auto& state = eng.GetStates<StressTester3DState>();
+    auto& state = eng.GetRes<StressTester3DState>();
 
     const float count = M::Pow(360.0f / increase, 3.0f);
     D::Log::Info(count);
@@ -169,7 +169,7 @@ inline void Spawn(C::Engine& eng, int dimension, int craziness)
 
 // ── lifecycle ───────────────────────────────────────────────────
 inline void Update_StressTester3D(
-    StressTester3DState& state, ECS::EntityComponentSystem& ecs, const C::TimeHandler& time)
+    C::Res<StressTester3DState>& state, ECS::EntityComponentSystem& ecs, const C::TimeHandler& time)
 {
     auto& input = Platform::Input;
     auto& query = ecs.Query;
