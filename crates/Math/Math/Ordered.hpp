@@ -35,7 +35,7 @@ template <typename... Args> struct Ordered
             std::index_sequence_for<Args...>{});
     }
 
-    template <std::size_t N> constexpr auto Split() const
+    template <std::size_t N> constexpr decltype(auto) Split() const
     {
         static_assert(N <= Size, "Split index out of bounds");
 

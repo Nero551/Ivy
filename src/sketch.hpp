@@ -221,7 +221,7 @@ static M::Set<float> R = [](float x) { return true; };
 
 inline void Test()
 {
-    //TODO: think about making State also have methods, will make alot of things easier. \
-    // consider renaming State to Resource or Server.
+    D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
 }
+
 } // namespace Sketch

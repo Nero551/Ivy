@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Math/Ordered.hpp"
 #include "Utilities/stl.hpp"
 #include <concepts>
 #include <type_traits>
@@ -53,7 +54,15 @@ template <typename T> struct Set
     {
         return Set{[set = *this](const T& x) { return !set.Belongs(x); }};
     }
-
+    template <typename... Os> Set<Ordered<T, Os...>> Cartesian(const Set<Os>&... others)
+    {
+        return {[set = *this, &others...](const Ordered<T, Os...>& x)
+            {
+                return set.Belongs(x.template Get<0>()) &&
+                    (x.template Split<1>().second.Apply(
+                        [&others...](const Os&... os) { return (others.Belongs(os) && ...); }));
+            }};
+    }
     /** @brief Returns the empty set. */
     static Set Empty()
     {
