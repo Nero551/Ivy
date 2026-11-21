@@ -45,7 +45,7 @@ struct RenderBatch
     {
         Material->Get().Use();
 
-        Mesh->Get().VAO.SetVertexBuffer(Buffer, 1, sizeof(InstanceData));
+        Mesh->Get().VAO.SetArrayBuffer(Buffer, 1, sizeof(InstanceData));
         unsigned int instanceCount = Instances.Size();
         if (DataChanged)
         {
@@ -58,17 +58,5 @@ struct RenderBatch
 
         Mesh->Get().DrawInstanced(instanceCount);
     }
-
-    using BatchKey = std::pair<struct G::Material*, struct G::Mesh*>;
-    struct BatchKeyHash
-    {
-        std::size_t operator()(const BatchKey& key) const
-        {
-            const std::size_t h1 = std::hash<struct G::Material*>{}(key.first);
-            const std::size_t h2 = std::hash<struct G::Mesh*>{}(key.second);
-
-            return h1 ^ (h2 << 1U);
-        }
-    };
 };
 } // namespace Ivy

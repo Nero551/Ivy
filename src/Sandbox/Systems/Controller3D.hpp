@@ -51,6 +51,8 @@ inline void Update_Controller3D(C::Res<Controller3DState>& state, ECS::EntityCom
     cameraComponent.Bottom = 0;
     cameraComponent.Right = window.GetWidth();
     cameraComponent.Top = window.GetHeight();
+    cameraComponent.Near = 0.1f;
+    cameraComponent.Far = 100;
 
     if (input.GetMouseMode() == Platform::CursorMode::Disabled)
     {

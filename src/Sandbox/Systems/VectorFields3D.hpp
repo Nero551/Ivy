@@ -85,7 +85,7 @@ inline void LorenzSystem(C::Engine& eng)
     buffer.SetData(magnitudes);
 
     auto& mesh = eng.GetRes<VectorFields3DState>().Mesh;
-    mesh->Get().VAO.SetVertexBuffer(buffer, 2, sizeof(float));
+    mesh->Get().VAO.SetArrayBuffer(buffer, 2, sizeof(float));
     mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
     mesh->Get().VAO.SetAttribDivisor(2, 1);
 }

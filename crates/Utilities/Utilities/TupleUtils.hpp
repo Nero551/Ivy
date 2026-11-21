@@ -8,6 +8,8 @@
 #include <utility>
 namespace Ivy::U
 {
+namespace
+{
 template <typename... Args> struct ConnectIntoTuple;
 
 template <> struct ConnectIntoTuple<>
@@ -24,13 +26,12 @@ template <typename... Args> struct ConnectOne<std::tuple<Args...>>
 {
     using Type = typename ConnectIntoTuple<Args...>::Type;
 };
-
 template <typename T, typename... Rest> struct ConnectIntoTuple<T, Rest...>
 {
     using Type = decltype(std::tuple_cat(std::declval<typename ConnectOne<std::remove_cvref_t<T>>::Type>(),
         std::declval<typename ConnectIntoTuple<Rest...>::Type>()));
 };
-
+} // namespace
 template <typename... Args> using ConnectArgsIntoTuple = ConnectIntoTuple<Args...>::Type;
 
 template <typename Tuple, typename F, std::size_t... I, typename... Args>
@@ -46,7 +47,8 @@ decltype(auto) UnpackAndRun(std::index_sequence<I...>, Tuple&& tuple, F&& action
     return std::forward<F>(action)(
         std::get<I>(std::forward<Tuple>(tuple))..., std::forward<Args>(otherParams)...);
 }
-
+namespace
+{
 template <typename... Args> struct AreUniqueTrait : std::true_type
 {
 };
@@ -56,7 +58,19 @@ struct AreUniqueTrait<T, Args...>
     : std::bool_constant<((!std::same_as<T, Args>) && ...) && AreUniqueTrait<Args...>::value>
 {
 };
-
+} // namespace
 template <typename... Args>
 concept AreUnique = AreUniqueTrait<Args...>::value;
+namespace
+{
+template <typename T> struct TupleContainsTrait : std::false_type
+{
+};
+template <typename... Args> struct TupleContainsTrait<std::tuple<Args...>> : std::true_type
+{
+};
+} // namespace
+
+template <typename T>
+concept TupleContains = TupleContainsTrait<T>::value;
 } // namespace Ivy::U

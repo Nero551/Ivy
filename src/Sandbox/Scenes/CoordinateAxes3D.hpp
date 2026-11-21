@@ -98,7 +98,7 @@ ECS::Entity& CoordinateAxes3DScene(C::Engine& eng)
 
     root.AttachChild(zAxis);
 
-    root.AttachChild(Grid3DScene(eng));
+    // root.AttachChild(Grid3DScene(eng));
     return root;
 };
 } // namespace Ivy::Sandbox

@@ -1,9 +1,9 @@
 #include "../Primitives.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 
-namespace Ivy::G
+namespace Ivy::G::Primitives
 {
-Mesh Primitives::CreateArrow2D(const std::string& name)
+Mesh CreateArrow2D(const std::string& name)
 {
     Mesh mesh(name);
 
@@ -23,7 +23,7 @@ Mesh Primitives::CreateArrow2D(const std::string& name)
     return mesh;
 }
 
-Mesh Primitives::CreateArrow3D(const std::string& name)
+Mesh CreateArrow3D(const std::string& name)
 {
     Mesh mesh(name);
 
@@ -106,4 +106,4 @@ Mesh Primitives::CreateArrow3D(const std::string& name)
 
     return mesh;
 }
-} // namespace Ivy::G
+} // namespace Ivy::G::Primitives

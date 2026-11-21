@@ -43,8 +43,7 @@ void VertexArray::Unbind()
     glBindVertexArray(0);
 }
 
-void VertexArray::SetVertexBuffer(
-    ArrayBuffer& vbo, const int bindingIndex, const int stride, const int offset)
+void VertexArray::SetArrayBuffer(ArrayBuffer& vbo, const int bindingIndex, const int stride, const int offset)
 {
     vbo.Generate();
     Generate();

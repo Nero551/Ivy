@@ -24,8 +24,10 @@ struct Camera3D
     static ECS::Entity& Create(ECS::EntityComponentSystem& ecs)
     {
         ECS::Entity& entity = ecs.CreateEntity();
-        std::get<CMP::Camera&>(ecs.Query.SetArchetype<ComponentCombo>(entity)).ProjectionMode =
-            ProjectionMode::Perspective;
+        auto& camComp = std::get<CMP::Camera&>(ecs.Query.SetArchetype<ComponentCombo>(entity));
+        camComp.ProjectionMode = ProjectionMode::Perspective;
+        camComp.Near = 0.1f;
+        camComp.Far = 100.0f;
         return entity;
     }
 };

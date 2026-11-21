@@ -29,7 +29,7 @@ int main(const int argc, char* argv[])
     }
 
     Sketch::Test();
-    // return 0;
+    return 0;
 
     Platform::Initialize();
 
@@ -46,7 +46,7 @@ int main(const int argc, char* argv[])
             engine.AddRes<ProfilingData, AssetServer, TransformSystemState>();
             engine.SM.AddSystems<C::Phase::Update, Update_Profiling, Update_Transform>();
             engine.SM.AddSystems<C::Phase::Stop, Stop_AssetServer>();
-            engine.AddPlugins<Sandbox2DPlugin, RendererPlugin>();
+            engine.AddPlugins<Sandbox3DPlugin, RendererPlugin>();
             engine.World.SetRoot(Node::Create(engine.ECS));
         }};
 

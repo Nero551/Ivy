@@ -37,7 +37,7 @@ void Mesh::Generate()
     EBO.SetData(Indices);
 
     VAO.SetIndexBuffer(EBO);
-    VAO.SetVertexBuffer(VBO, 0, sizeof(Vertex), 0);
+    VAO.SetArrayBuffer(VBO, 0, sizeof(Vertex), 0);
 
     VAO.SetAttribPointer(0, 4, DataType::Float, 0, offsetof(Vertex, Position));
     VAO.SetAttribPointer(1, 4, DataType::Float, 0, offsetof(Vertex, Color));

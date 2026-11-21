@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/BasicOperations.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
 #include "Math/Scalar.hpp"

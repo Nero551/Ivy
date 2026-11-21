@@ -9,14 +9,13 @@
 #include <utility>
 #include <vector>
 
-namespace Ivy::R
+namespace Ivy::G::Primitives
 {
-using G::Vertex;
 
 G::Mesh CreateUVSphere(const std::string& name, const float radius, const int sectors, const int stacks)
 {
 
-    std::vector<G::Vertex> vertices;
+    std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
     vertices.reserve((stacks + 1) * (sectors + 1));
@@ -76,4 +75,4 @@ G::Mesh CreateUVSphere(const std::string& name, const float radius, const int se
 
     return mesh;
 }
-} // namespace Ivy::R
+} // namespace Ivy::G::Primitives

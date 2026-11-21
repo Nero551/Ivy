@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Diagnostics/Log.hpp"
+#include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
@@ -8,12 +9,13 @@
 #include <array>
 #include <cmath>
 #include <concepts>
+#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <ostream>
 #include <string>
 #include <tuple>
-#include <type_traits>
+#include <utility>
 
 namespace Sketch
 {
@@ -215,13 +217,61 @@ template <M::Scalar In, typename Out> Out Product(const M::Function<Out, In>& f,
     return result;
 };
 
+template <unsigned int K, unsigned int Component, M::Scalar T = float> struct KVector
+{
+
+  private:
+    std::array<std::array<T, Component>, K> m_Data{};
+};
+
+template <unsigned int Component, M::Scalar T> struct KVector<1, Component, T>
+{
+};
+
+template <unsigned int Component, M::Scalar T> using Bivector = KVector<2, Component, T>;
+
 static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
+template <unsigned int Index, typename O, M::Scalar... Is>
+M::Function<O, Is...> PartialDifferentiate(
+    const M::Function<O, Is...>& f, std::tuple_element_t<Index, std::tuple<Is...>> dx = 0.001f)
+{
+    return [&f, dx](const Is&... ins)
+    {
+        auto args = std::tuple<Is...>{ins...};
+
+        return [&f, &args, dx]<std::size_t... Indices>(std::index_sequence<Indices...>)
+        {
+            using Param = std::tuple_element_t<Index, std::tuple<Is...>>;
+            return M::Derivative(
+                M::Function<O, Param>{[&](const Param& x)
+                    { return std::invoke(f, (Indices == Index ? x : std::get<Indices>(args))...); }},
+                std::get<Index>(args), dx);
+        }(std::index_sequence_for<Is...>{});
+    };
+}
+
+template <typename O, M::Scalar... Is>
+M::Function<M::Vector<sizeof...(Is)>, Is...> Gradient(const M::Function<O, Is...>& f)
+{
+    return {[&f](const Is&... ins)
+        {
+            return [&f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+            { return M::Vector<sizeof...(Is), float>{PartialDifferentiate<Indices>(f)(ins...)...}; }(
+                std::index_sequence_for<Is...>{});
+        }};
+}
+
 inline void Test()
 {
-    D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
+    //TODO: rework vectors to support future K-vectors (watch intro to geometric algebra)
+    //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
+    M::Function<float, float, float, float> f = [](float x, float y, float z)
+    { return x * x * y + 3 * y * z * z + std::sin(x * z); };
+    D::Log::Info(Gradient(f)(1.0f, 2.0f, 0.5f));
+    // D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
 }
 
 } // namespace Sketch
