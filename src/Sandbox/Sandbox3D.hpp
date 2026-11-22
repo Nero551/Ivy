@@ -19,10 +19,12 @@
 #include "Platform/Global.hpp"
 #include "Platform/Key.hpp"
 #include "Sandbox/Scenes/CoordinateAxes3D.hpp"
+#include "Sandbox/Systems/StressTester3D.hpp"
 #include "Systems/AssetServer.hpp"
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
+#include "sketch.hpp"
 #include <cmath>
 #include <vector>
 
@@ -30,6 +32,7 @@ namespace Ivy::Sandbox
 {
 namespace Sandbox3D
 {
+
 inline void Start_Sandbox3D(C::Engine& eng)
 {
     Platform::Input.SetMouseMode(Platform::CursorMode::Disabled);
@@ -43,7 +46,7 @@ inline void Start_Sandbox3D(C::Engine& eng)
     eng.World.GetRoot().AttachChild(CoordinateAxes3DScene(eng));
 
     auto& resources = eng.GetRes<AssetServer>();
-    G::Mesh m = G::Primitives::CreateCube("mvPoint");
+    G::Mesh m = G::Primitives::CreateUVSphere("mvPoint");
     m.CullMode = G::CullMode::None;
     auto& mesh = resources.LoadAsset<G::Mesh>(m);
 
@@ -59,20 +62,21 @@ inline void Start_Sandbox3D(C::Engine& eng)
 
     std::vector<float> magnitudes{};
 
-    M::Function<M::Vector<2>, float, float> f = [](float x, float y)
-    { return M::Vector<2>{x * x + y * y, x * x - y * y}; };
-    for (float x = -5.0f; x < 5.0f; x += 0.1)
+    M::Function<float, float, float> f = [](float x, float y) { return x * x * y; };
+    auto gradient = Sketch::Gradient(f);
+    auto delv = Sketch::DirectionalDerivative(f, M::Vector<2>{1, 1}.Normalized());
+    for (float x = -5.0f; x < 5.0f; x += 0.05)
     {
-        for (float y = -5.0f; y < 5.0f; y += 0.1)
+        for (float y = -5.0f; y < 5.0f; y += 0.05)
         {
-            magnitudes.push_back(f(x, y).Length() / 20.0f);
+            magnitudes.push_back(delv(x, y));
             auto& point = MeshInstance3D::Create(eng.ECS);
             query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
             query.GetComponent<CMP::Material>(point).Material = &material;
 
             auto& transform = query.GetComponent<CMP::Transform3D>(point);
-            transform.Scale = M::Vector<3>{0.5f};
-            transform.Position = {f(x, y).x, f(x, y).y, 0};
+            transform.Scale = M::Vector<3>{0.1f};
+            transform.Position = {x, f(x, y), y};
             eng.World.GetRoot().AttachChild(point);
         }
     }

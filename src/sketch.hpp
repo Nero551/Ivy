@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Diagnostics/Log.hpp"
+#include "Math/Common/Constants.hpp"
+#include "Math/Common/Logarithms.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Scalar.hpp"
@@ -235,7 +237,7 @@ static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 
 template <unsigned int Index, typename O, M::Scalar... Is>
-M::Function<O, Is...> PartialDifferentiate(
+M::Function<O, Is...> PartialDerivative(
     const M::Function<O, Is...>& f, std::tuple_element_t<Index, std::tuple<Is...>> dx = 0.001f)
 {
     return [&f, dx](const Is&... ins)
@@ -259,18 +261,25 @@ M::Function<M::Vector<sizeof...(Is)>, Is...> Gradient(const M::Function<O, Is...
     return {[&f](const Is&... ins)
         {
             return [&f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
-            { return M::Vector<sizeof...(Is), float>{PartialDifferentiate<Indices>(f)(ins...)...}; }(
+            { return M::Vector<sizeof...(Is), float>{PartialDerivative<Indices>(f)(ins...)...}; }(
                 std::index_sequence_for<Is...>{});
         }};
 }
 
+template <typename O, M::Scalar... Is>
+M::Function<float, Is...> DirectionalDerivative(
+    const M::Function<O, Is...>& f, const M::Vector<sizeof...(Is)>& v)
+{
+    return [&f, v = v](const Is&... ins) { return v.Dot(Gradient(f)(ins...)); };
+}
+
 inline void Test()
 {
-    //TODO: rework vectors to support future K-vectors (watch intro to geometric algebra)
+    //TODO: get rid of Integral, Derivative, etc. just keep the function returning versions.
+    //TODO: rework vectors to support future k-vectors (watch intro to geometric algebra)
     //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
-    M::Function<float, float, float, float> f = [](float x, float y, float z)
-    { return x * x * y + 3 * y * z * z + std::sin(x * z); };
-    D::Log::Info(Gradient(f)(1.0f, 2.0f, 0.5f));
+    M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
+    D::Log::Info(DirectionalDerivative(f, {1, 0, 0})(-1, 0, M::E));
     // D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
 }
 
