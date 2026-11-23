@@ -1,8 +1,8 @@
 #include "../Primitives.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Graphics/Mesh/CullMode.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Mesh/Vertex.hpp"
-#include "Diagnostics/Log.hpp"
 
 #include <string>
 #include <utility>

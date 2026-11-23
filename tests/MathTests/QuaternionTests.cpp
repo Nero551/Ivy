@@ -148,7 +148,7 @@ TEST(Quaternion, QPolarRoundTrip)
     Vector<3> axisInput(1, 1, 0);
     QPolar<float> qp(axisInput, PI / 4.0f, 2.0f);
     // QPolar ctor normalizes axis
-    EXPECT_NEAR(qp.Axis.Length(), 1.0f, 1e-6f);
+    EXPECT_NEAR(qp.Axis.Magnitude(), 1.0f, 1e-6f);
 
     Quaternion<> q = Quaternion<>::FromQPolar(qp);
     QPolar<float> back = q.ToQPolar();

@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/BasicOperations.hpp"
 #include "Math/Ordered.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/stl.hpp"
@@ -11,10 +12,10 @@ namespace Ivy::M
 template <typename Output, typename... Inputs> struct Function;
 template <typename F>
 concept IsFunction = U::IsTSpec<F, Function>;
-
 /** @brief Represents a mathematical function mapping an Input type to an Output type. */
 template <typename Output, typename... Inputs> struct Function
 {
+    using OutputType = Output;
     /**
      * @brief Constructs a function from a callable returning Output when given Input.
      * @param f Callable used to evaluate the function.
@@ -51,6 +52,38 @@ template <typename Output, typename... Inputs> struct Function
         { return g(middles...).Apply([f](const Inputs... inputs) { return f(inputs...); }); };
     }
 
+  private:
+    template <typename T> decltype(auto) ResolveArgument(const T& arg, const Inputs... ins)
+    {
+        if constexpr (IsFunction<T>)
+        {
+            return arg(ins...);
+        }
+        else
+        {
+            return arg;
+        }
+    }
+    template <typename T, bool = IsFunction<T>> struct ResolveType
+    {
+        using Type = T;
+    };
+
+    template <typename T> struct ResolveType<T, true>
+    {
+        using Type = typename T::OutputType;
+    };
+
+    template <typename T> using ResolveType_t = typename ResolveType<T>::Type;
+
+  public:
+    template <auto Func, typename... Args>
+    Function<std::invoke_result_t<decltype(Func), Output, ResolveType_t<Args>...>, Inputs...> Op(
+        Args&&... args) requires std::invocable<decltype(Func), Output, ResolveType_t<Args>...>
+    {
+        return [f = *this, ... args = std::forward<Args>(args)](const Inputs... ins)
+        { return std::invoke(Func, f.Evaluate(ins...), f.ResolveArgument(args, ins...)...); };
+    }
     /** @brief Composes this function with another function, producing f(g(x)). */
     template <typename... Middles>
     Function<Output, Middles...> operator()(const Function<Inputs, Middles...>&... functions) const

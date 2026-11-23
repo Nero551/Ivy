@@ -1,11 +1,11 @@
 #pragma once
 #include "Archetype.hpp"
 #include "Component.hpp"
+#include "Diagnostics/Log.hpp"
 #include "ECS/EntityID.hpp"
 #include "Entity.hpp"
 #include "Utilities/CheckedPtr.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
-#include "Diagnostics/Log.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/TupleUtils.hpp"
 #include <array>
@@ -20,7 +20,6 @@ namespace Ivy::ECS
 struct Query
 {
 
-    using Cache = std::vector<std::vector<std::pair<unsigned int, std::vector<void*>>>>;
     Query() = default;
 
     template <typename... Args>

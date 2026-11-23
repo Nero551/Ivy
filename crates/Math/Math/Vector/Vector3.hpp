@@ -1,12 +1,12 @@
 #pragma once
 // IWYU pragma: private, include "Math/Vector/Vectors.hpp"
 
+#include "Diagnostics/Log.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/Spherical.hpp"
 #include "Math/Scalar.hpp"
-#include "Diagnostics/Log.hpp"
 #include "Vectors.hpp"
 
 namespace Ivy::M
@@ -109,21 +109,21 @@ template <Scalar T> struct Vector<3, T>
     }
 
     /** @brief Returns the squared length of the vector. */
-    constexpr T LengthSquared() const
+    constexpr T MagnitudeSquared() const
     {
         return x * x + y * y + z * z;
     }
 
     /** @brief Returns the length of the vector. */
-    constexpr T Length() const
+    constexpr T Magnitude() const
     {
-        return std::sqrt(LengthSquared());
+        return std::sqrt(MagnitudeSquared());
     }
 
     /** @brief Returns a normalized copy of the vector. */
     constexpr Vector Normalized() const
     {
-        const T length = Length();
+        const T length = Magnitude();
 
         if (length == 0)
         {
@@ -148,13 +148,13 @@ template <Scalar T> struct Vector<3, T>
     /** @brief Returns the distance to another vector. */
     constexpr T Distance(const Vector& vector) const
     {
-        return (*this - vector).Length();
+        return (*this - vector).Magnitude();
     }
 
     /** @brief Projects the vector stereographically onto a 2D plane. */
     constexpr Vector<2> StereoProject() const
     {
-        const T r = Length();
+        const T r = Magnitude();
 
         return {r * x / (r - z), r * y / (r - z)};
     }
@@ -174,7 +174,7 @@ template <Scalar T> struct Vector<3, T>
     /** @brief Converts the vector to spherical coordinates. */
     constexpr Spherical<T> ToSpherical() const
     {
-        return {Elevation(), Azimuth(), Length()};
+        return {Elevation(), Azimuth(), Magnitude()};
     }
 
     /** @brief Compares the vector against another using an error tolerance. */
@@ -192,7 +192,7 @@ template <Scalar T> struct Vector<3, T>
             return false;
         }
 
-        return Cross(vector).LengthSquared() < EPSILON * EPSILON;
+        return Cross(vector).MagnitudeSquared() < EPSILON * EPSILON;
     }
 
     /** @brief Determines whether two non-zero vectors are perpendicular. */

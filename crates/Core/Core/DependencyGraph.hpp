@@ -39,6 +39,7 @@ template <std::unsigned_integral T> struct DependencyGraph
             T node = static_cast<T>(i);
             m_Sources.Push(node, node);
         }
+        m_Dirty = true;
     }
 
     bool Exists(T node) const
@@ -55,6 +56,7 @@ template <std::unsigned_integral T> struct DependencyGraph
         m_Nodes[pred].Successors.push_back(suc);
         m_Nodes[suc].Predecessors.push_back(pred);
         m_Sources.Erase(suc);
+        m_Dirty = true;
     }
 
     bool Detach(T pred, T suc)
@@ -81,41 +83,46 @@ template <std::unsigned_integral T> struct DependencyGraph
         {
             m_Sources.Push(suc, suc);
         }
-
+        m_Dirty = true;
         return true;
     }
-    template <typename F> void ForEachDescendant(T node, F&& action) const requires std::invocable<F, T>
+    std::span<const T> TopologicalOrder()
     {
-        if (!Exists(node))
+        if (m_Dirty)
         {
-            return;
-        }
-
-        std::vector<bool> visited(m_Nodes.size(), false);
-
-        auto Traverse = [&](auto&& self, T current) -> void
-        {
-            for (T child : m_Nodes[current].Successors)
+            m_Order.clear();
+            std::vector<T> indeg(m_Nodes.size());
+            for (size_t i = 0; i < m_Nodes.size(); ++i)
             {
-                if (visited[child])
-                {
-                    continue;
-                }
-
-                visited[child] = true;
-                action(child);
-                self(self, child);
+                indeg[i] = static_cast<T>(m_Nodes[i].Predecessors.size());
             }
-        };
 
-        Traverse(Traverse, node);
+            for (T s : m_Sources.Data())
+            {
+                m_Order.push_back(s);
+            }
+            for (size_t h = 0; h < m_Order.size(); ++h)
+            {
+                for (T next : m_Nodes[m_Order[h]].Successors)
+                {
+                    if (--indeg[next] == 0)
+                    {
+                        m_Order.push_back(next);
+                    }
+                }
+            }
+
+            // m_Order.size() < m_Nodes.size()  ==> cycle, report it
+            m_Dirty = false;
+        }
+        return m_Order;
     }
-
     std::span<const T> ViewSources() const
     {
         return m_Sources.Data();
     }
-
+    std::vector<T> m_Order;
+    bool m_Dirty = false;
     std::vector<Node> m_Nodes;
     U::SparseSetSoA<T> m_Sources;
 };

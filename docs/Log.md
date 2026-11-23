@@ -186,3 +186,10 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 
 - multi-threading prototype
 - architecture redesign
+
+---
+
+### Week 21 · November 20–27
+
+- partial & directional derivatives
+- gradient, curvature

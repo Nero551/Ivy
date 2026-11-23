@@ -83,7 +83,7 @@ TEST(QPolar, ConstructionNormalizesAxis)
 {
     Vector<3> unnormalized(3.0f, 4.0f, 0.0f);
     QPolar<float> qp(unnormalized, PI / 2.0f, 1.0f);
-    EXPECT_NEAR(qp.Axis.Length(), 1.0f, 1e-6f);
+    EXPECT_NEAR(qp.Axis.Magnitude(), 1.0f, 1e-6f);
     EXPECT_NEAR(qp.Axis.x, 0.6f, 1e-6f);
     EXPECT_NEAR(qp.Axis.y, 0.8f, 1e-6f);
 }

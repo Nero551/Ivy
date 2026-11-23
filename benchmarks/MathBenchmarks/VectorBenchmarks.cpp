@@ -1,5 +1,5 @@
-#include "Math/Vector/Vectors.hpp"
 #include "Math/Common/Constants.hpp"
+#include "Math/Vector/Vectors.hpp"
 #include <benchmark/benchmark.h>
 #include <cmath>
 
@@ -35,7 +35,7 @@ static void BM_Vector2_Length(benchmark::State& state)
     Vector<2> a(3.0f, 4.0f);
     for (auto _ : state)
     {
-        auto r = a.Length();
+        auto r = a.Magnitude();
         benchmark::DoNotOptimize(r);
     }
 }
@@ -146,7 +146,7 @@ static void BM_Vector3_Length(benchmark::State& state)
     Vector<3> a(1.0f, 2.0f, 2.0f);
     for (auto _ : state)
     {
-        auto r = a.Length();
+        auto r = a.Magnitude();
         benchmark::DoNotOptimize(r);
     }
 }

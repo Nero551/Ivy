@@ -4,6 +4,7 @@ namespace Ivy::C
 {
 struct IRes
 {
+    virtual ~IRes() = default;
 };
 
 template <typename T> struct Res : T, IRes

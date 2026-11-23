@@ -139,7 +139,7 @@ template <Scalar T = float> struct Quaternion
         {
             Vector<3, T> axis = a.Cross(Vector<3, T>::Right()).Normalized();
 
-            if (M::NearlyEquals(axis.LengthSquared(), T{0}))
+            if (M::NearlyEquals(axis.MagnitudeSquared(), T{0}))
             {
                 axis = a.Cross(Vector<3, T>::Up()).Normalized();
             }

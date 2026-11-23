@@ -127,8 +127,8 @@ ECS::Entity& Grid3DScene(C::Engine& eng)
     int number = 100;
 
     CreateXY(eng, root, number);
-    CreateXZ(eng, root, number);
-    CreateYZ(eng, root, number);
+    // CreateXZ(eng, root, number);
+    // CreateYZ(eng, root, number);
 
     // for (int theta = 0; theta <= 360; ++theta) {
     // for (int phi = 0; phi <= 360; ++phi) {

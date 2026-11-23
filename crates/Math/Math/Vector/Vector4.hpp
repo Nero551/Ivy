@@ -1,12 +1,12 @@
 #pragma once
 // IWYU pragma: private, include "Math/Vector/Vectors.hpp"
 
+#include "Diagnostics/Log.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/HyperSpherical.hpp"
 #include "Math/Scalar.hpp"
-#include "Diagnostics/Log.hpp"
 #include "Vectors.hpp"
 #include <ostream>
 
@@ -98,21 +98,21 @@ template <Scalar T> struct Vector<4, T>
     }
 
     /** @brief Returns the squared length of the vector. */
-    constexpr T LengthSquared() const
+    constexpr T MagnitudeSquared() const
     {
         return x * x + y * y + z * z + w * w;
     }
 
     /** @brief Returns the length of the vector. */
-    constexpr T Length() const
+    constexpr T Magnitude() const
     {
-        return std::sqrt(LengthSquared());
+        return std::sqrt(MagnitudeSquared());
     }
 
     /** @brief Returns a normalized copy of the vector. */
     constexpr Vector Normalized() const
     {
-        const T length = Length();
+        const T length = Magnitude();
 
         if (length == 0)
         {
@@ -138,13 +138,13 @@ template <Scalar T> struct Vector<4, T>
     /** @brief Returns the distance to another vector. */
     constexpr T Distance(const Vector& vector) const
     {
-        return (*this - vector).Length();
+        return (*this - vector).Magnitude();
     }
 
     /** @brief Projects the vector stereographically onto a 3D space. */
     constexpr Vector<3> StereoProject() const
     {
-        const T r = Length();
+        const T r = Magnitude();
 
         return {r * x / (r - w), r * y / (r - w), r * z / (r - w)};
     }
@@ -170,7 +170,7 @@ template <Scalar T> struct Vector<4, T>
     /** @brief Converts the vector to hyperspherical coordinates. */
     constexpr HyperSpherical<T> ToHyperSpherical() const
     {
-        return {Elevation(), Azimuth(), HyperAngle(), Length()};
+        return {Elevation(), Azimuth(), HyperAngle(), Magnitude()};
     }
 
     /** @brief Compares the vector against another using an error tolerance. */

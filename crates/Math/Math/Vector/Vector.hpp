@@ -53,7 +53,7 @@ template <unsigned int Components, Scalar T = float> struct Vector
     }
 
     /** @brief Returns the squared length of the vector. */
-    constexpr T LengthSquared() const
+    constexpr T MagnitudeSquared() const
     {
         T result = 0;
         for (const T& fl : m_Data)
@@ -64,15 +64,15 @@ template <unsigned int Components, Scalar T = float> struct Vector
     }
 
     /** @brief Returns the length of the vector. */
-    constexpr T Length() const
+    constexpr T Magnitude() const
     {
-        return std::sqrt(LengthSquared());
+        return std::sqrt(MagnitudeSquared());
     }
 
     /** @brief Returns a normalized copy of the vector. */
     constexpr Vector Normalized() const
     {
-        const T length = Length();
+        const T length = Magnitude();
 
         if (length == 0)
         {
@@ -114,13 +114,13 @@ template <unsigned int Components, Scalar T = float> struct Vector
     /** @brief Returns the distance to another vector. */
     constexpr T Distance(const Vector& vector) const
     {
-        return (*this - vector).Length();
+        return (*this - vector).Magnitude();
     }
 
     /** @brief Projects the vector stereographically onto a lower dimensional vector(N - 1). */
     constexpr Vector<Components - 1> StereoProject() const
     {
-        const T r = Length();
+        const T r = Magnitude();
         Vector<Components - 1> result;
 
         for (int i = 0; i < Components - 1; ++i)

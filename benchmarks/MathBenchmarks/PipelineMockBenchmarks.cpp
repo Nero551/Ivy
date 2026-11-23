@@ -29,7 +29,7 @@ static void BM_Pipeline_PhysicsTick(benchmark::State& state)
         position = position + velocity * dt;
 
         Quaternion<> dq = Quaternion<>::FromQPolar(
-            QPolar<float>(angularVelocity.Normalized(), angularVelocity.Length() * dt));
+            QPolar<float>(angularVelocity.Normalized(), angularVelocity.Magnitude() * dt));
         orientation = (dq * orientation).Normalized();
 
         Vector<3> forward = orientation.Transform(Vector<3>::Forward());

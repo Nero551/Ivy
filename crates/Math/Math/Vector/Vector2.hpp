@@ -1,13 +1,13 @@
 #pragma once
 // IWYU pragma: private, include "Math/Vector/Vectors.hpp"
 
+#include "Diagnostics/Log.hpp"
 #include "Math/Common/Comparison.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Coordinates/Polar.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Diagnostics/Log.hpp"
 #include "Vectors.hpp"
 #include <ostream>
 
@@ -74,15 +74,15 @@ template <Scalar T> struct Vector<2, T>
     }
 
     /** @brief Returns the squared length of the vector. */
-    constexpr T LengthSquared() const
+    constexpr T MagnitudeSquared() const
     {
         return x * x + y * y;
     }
 
     /** @brief Returns the length of the vector. */
-    constexpr T Length() const
+    constexpr T Magnitude() const
     {
-        return std::sqrt(LengthSquared());
+        return std::sqrt(MagnitudeSquared());
     }
 
     /** @brief Returns the angle of the vector from the positive x-axis. */
@@ -94,7 +94,7 @@ template <Scalar T> struct Vector<2, T>
     /** @brief Returns a normalized copy of the vector. */
     constexpr Vector Normalized() const
     {
-        const T length = Length();
+        const T length = Magnitude();
 
         if (length == 0)
         {
@@ -119,7 +119,7 @@ template <Scalar T> struct Vector<2, T>
     /** @brief Returns the distance to another vector. */
     constexpr T Distance(const Vector& vector) const
     {
-        return (*this - vector).Length();
+        return (*this - vector).Magnitude();
     }
 
     /** @brief Determines whether two non-zero vectors are parallel. */
@@ -147,7 +147,7 @@ template <Scalar T> struct Vector<2, T>
     /** @brief Projects the vector stereographically onto a line. */
     constexpr T StereoProject() const
     {
-        const T r = Length();
+        const T r = Magnitude();
 
         return r * x / (r - y);
     }
@@ -155,7 +155,7 @@ template <Scalar T> struct Vector<2, T>
     /** @brief Converts the vector to polar coordinates. */
     constexpr Polar<T> ToPolar() const
     {
-        return {Angle(), Length()};
+        return {Angle(), Magnitude()};
     }
 
     /** @brief Compares the vector against another using an error tolerance. */

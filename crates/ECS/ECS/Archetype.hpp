@@ -1,9 +1,9 @@
 #pragma once
 #include "Component.hpp"
+#include "Diagnostics/Log.hpp"
 #include "ECS/EntityID.hpp"
 #include "Entity.hpp"
 #include "Utilities/DataStructures/SparseSetAoS.hpp"
-#include "Diagnostics/Log.hpp"
 #include "Utilities/TupleUtils.hpp"
 #include <array>
 #include <bitset>

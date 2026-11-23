@@ -46,7 +46,7 @@ inline void Start_Sandbox3D(C::Engine& eng)
     eng.World.GetRoot().AttachChild(CoordinateAxes3DScene(eng));
 
     auto& resources = eng.GetRes<AssetServer>();
-    G::Mesh m = G::Primitives::CreateUVSphere("mvPoint");
+    G::Mesh m = G::Primitives::CreateArrow3D("mvPoint");
     m.CullMode = G::CullMode::None;
     auto& mesh = resources.LoadAsset<G::Mesh>(m);
 
@@ -61,25 +61,32 @@ inline void Start_Sandbox3D(C::Engine& eng)
     material().Shader = &shader();
 
     std::vector<float> magnitudes{};
-
-    M::Function<float, float, float> f = [](float x, float y) { return x * x * y; };
-    auto gradient = Sketch::Gradient(f);
-    auto delv = Sketch::DirectionalDerivative(f, M::Vector<2>{1, 1}.Normalized());
-    for (float x = -5.0f; x < 5.0f; x += 0.05)
+    float max = 5.0f;
+    float min = -5.0f;
+    M::Function<M::Vector<2>, float, float> f = [](float x, float y)
+    { return M::Vector<2>{x * y, y * y - x * x}; };
+    auto dvdx = Sketch::PartialDerivative<0>(f);
+    auto dvdy = Sketch::PartialDerivative<1>(f);
+    for (float x = min; x < max; x += 0.5)
     {
-        for (float y = -5.0f; y < 5.0f; y += 0.05)
+        for (float y = min; y < max; y += 0.5)
         {
-            magnitudes.push_back(delv(x, y));
+            M::Vector<3> pos = {x, y, 0};
+            M::Vector<3> dir = {f(x, y).x, f(x, y).y, 0};
+            magnitudes.push_back(f(x, y).Magnitude() / 5.);
+
             auto& point = MeshInstance3D::Create(eng.ECS);
             query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
             query.GetComponent<CMP::Material>(point).Material = &material;
 
             auto& transform = query.GetComponent<CMP::Transform3D>(point);
-            transform.Scale = M::Vector<3>{0.1f};
-            transform.Position = {x, f(x, y), y};
+            transform.Scale = M::Vector<3>{0.4f};
+            transform.Position = pos;
+            transform.Rotation = M::Quaternion<>::FromTo({1, 0, 0}, M::Vector<3>{dir.x, dir.y, 0});
             eng.World.GetRoot().AttachChild(point);
         }
     }
+
     G::ArrayBuffer buffer{};
     buffer.SetData(magnitudes);
 

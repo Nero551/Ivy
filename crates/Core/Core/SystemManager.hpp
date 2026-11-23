@@ -64,13 +64,10 @@ struct SystemManager
 
     template <Phase P> void LoopOver(Engine& engine)
     {
-        auto& graph = m_Scheduler[static_cast<unsigned>(P)];
         auto& systems = m_Systems[static_cast<unsigned>(P)];
-
-        for (unsigned src : graph.ViewSources())
+        for (unsigned i : m_Scheduler[static_cast<unsigned>(P)].TopologicalOrder())
         {
-            systems[src](engine);
-            graph.ForEachDescendant(src, [&](unsigned i) { systems[i](engine); });
+            systems[i](engine);
         }
     }
 
@@ -81,7 +78,6 @@ struct SystemManager
     }
 
     std::array<DependencyGraph<unsigned>, static_cast<unsigned>(Phase::Count)> m_Scheduler;
-    std::array<U::TypedVector<std::move_only_function<void(Engine&)>>, static_cast<unsigned>(Phase::Count)>
-        m_Systems;
+    std::array<U::TypedVector<void (*)(Engine&)>, static_cast<unsigned>(Phase::Count)> m_Systems;
 };
 } // namespace Ivy::C

@@ -42,11 +42,11 @@ TEST(Vector2, ZeroAndOne)
 TEST(Vector2, LengthAndNormalized)
 {
     Vector<2> v(3.0f, 4.0f);
-    EXPECT_FLOAT_EQ(v.LengthSquared(), 25.0f);
-    EXPECT_FLOAT_EQ(v.Length(), 5.0f);
+    EXPECT_FLOAT_EQ(v.MagnitudeSquared(), 25.0f);
+    EXPECT_FLOAT_EQ(v.Magnitude(), 5.0f);
 
     Vector<2> n = v.Normalized();
-    EXPECT_NEAR(n.Length(), 1.0f, 1e-6f);
+    EXPECT_NEAR(n.Magnitude(), 1.0f, 1e-6f);
     EXPECT_NEAR(n.x, 0.6f, 1e-6f);
     EXPECT_NEAR(n.y, 0.8f, 1e-6f);
 
@@ -307,11 +307,11 @@ TEST(Vector4, IndexAccess)
 TEST(Vector4, LengthAndNormalized)
 {
     Vector<4> v(1.0f, 2.0f, 2.0f, 4.0f);
-    EXPECT_FLOAT_EQ(v.LengthSquared(), 25.0f);
-    EXPECT_FLOAT_EQ(v.Length(), 5.0f);
+    EXPECT_FLOAT_EQ(v.MagnitudeSquared(), 25.0f);
+    EXPECT_FLOAT_EQ(v.Magnitude(), 5.0f);
 
     Vector<4> n = v.Normalized();
-    EXPECT_NEAR(n.Length(), 1.0f, 1e-6f);
+    EXPECT_NEAR(n.Magnitude(), 1.0f, 1e-6f);
 
     Vector<4> zero;
     EXPECT_EQ(zero.Normalized(), Vector<4>::Zero());
@@ -372,11 +372,11 @@ TEST(VectorGeneric, ConstructionAndData)
 TEST(VectorGeneric, LengthAndNormalization)
 {
     Vector<5> v(1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
-    EXPECT_FLOAT_EQ(v.LengthSquared(), 55.0f);
-    EXPECT_NEAR(v.Length(), std::sqrt(55.0f), 1e-6f);
+    EXPECT_FLOAT_EQ(v.MagnitudeSquared(), 55.0f);
+    EXPECT_NEAR(v.Magnitude(), std::sqrt(55.0f), 1e-6f);
 
     Vector<5> n = v.Normalized();
-    EXPECT_NEAR(n.Length(), 1.0f, 1e-6f);
+    EXPECT_NEAR(n.Magnitude(), 1.0f, 1e-6f);
 
     Vector<5> zero;
     EXPECT_EQ(zero.Normalized(), Vector<5>::Zero());

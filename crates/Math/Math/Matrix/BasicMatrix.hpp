@@ -1,10 +1,10 @@
 #pragma once
 // IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Diagnostics/Log.hpp"
 #include <algorithm>
 #include <array>
 #include <concepts>

@@ -28,11 +28,11 @@ namespace Sketch
 //TODO: rethink the render pipeline (look at bevy's render graph. bevy is pretty nice)
 // TODO: need particle system (cpu particle & gpu particle(compute shaders))
 // TODO: first thing i should do after physics is compute shaders and SSBO, actually finish LearnOpenGL.
+//TODO: use a DAG to represent render pipeline, dependencies between render passes just like system.
 
 //TODO: all this time i been thinking how to make cpu side more automatic for graphics. \
 //i should be thinking about how to make cpu -> gpu pipeline easier to MODIFY and use. not make gpu/shaders as automatic as possible.
 
-//TODO: define VariableCount method to math objects (vector,quaternion,matrix,complex,math tuple,etc)
 // TODO: define VariableCount trait. 1 for floats,double,int,etc, then each math type specifies its number of variables. \
 // this will be needed for partial derivatives specifically.
 //
@@ -53,6 +53,8 @@ namespace Sketch
 //
 //? as for thread safety. i think that should be integrated into the engine/ecs itself.
 //? think about deferred structural changes. for example, AddEntity() checks if any threads are reading, if yes. defer the change till after.
+
+//TODO: cool names for my libraries. ex: "Flow" for physics. "Bloom" for graphics,
 
 using namespace Ivy;
 
@@ -255,31 +257,54 @@ M::Function<O, Is...> PartialDerivative(
     };
 }
 
-template <typename O, M::Scalar... Is>
-M::Function<M::Vector<sizeof...(Is)>, Is...> Gradient(const M::Function<O, Is...>& f)
+template <M::Scalar O, M::Scalar... Is>
+M::Function<M::Vector<sizeof...(Is), O>, Is...> Gradient(const M::Function<O, Is...>& f)
 {
     return {[&f](const Is&... ins)
         {
             return [&f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
-            { return M::Vector<sizeof...(Is), float>{PartialDerivative<Indices>(f)(ins...)...}; }(
+            { return M::Vector<sizeof...(Is), O>{PartialDerivative<Indices>(f)(ins...)...}; }(
                 std::index_sequence_for<Is...>{});
         }};
 }
 
-template <typename O, M::Scalar... Is>
-M::Function<float, Is...> DirectionalDerivative(
-    const M::Function<O, Is...>& f, const M::Vector<sizeof...(Is)>& v)
+template <M::Scalar T, typename O, M::Scalar... Is>
+M::Function<O, Is...> DirectionalDerivative(
+    const M::Function<O, Is...>& f, const M::Vector<sizeof...(Is), T>& v)
 {
-    return [&f, v = v](const Is&... ins) { return v.Dot(Gradient(f)(ins...)); };
+    return [&f, v](const Is&... ins)
+    {
+        return [&v, &f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+        { return ((v(Indices) * PartialDerivative<Indices>(f)(ins...)) + ...); }(
+            std::index_sequence_for<Is...>{});
+    };
 }
-
+template <typename O, M::Scalar I>
+M::Function<float, I> Curvature(const M::Function<O, I>& f) requires(requires(O out) {
+    out.Normalized();
+    out.Magnitude();
+})
+{
+    auto derivative = M::Differentiate(f);
+    auto unitTangent = derivative.template Op<&O::Normalized>();
+    auto tangentDerivative = M::Differentiate(unitTangent);
+    return tangentDerivative.template Op<&O::Magnitude>() / derivative.template Op<&O::Magnitude>();
+}
 inline void Test()
 {
-    //TODO: get rid of Integral, Derivative, etc. just keep the function returning versions.
+    //TODO: get rid of Integral, Derivative, etc. just keep the function returning versions and call those Integral, Derivative, etc.
+    //TODO: remove EvaluateInverse(), keep only Inverse().
     //TODO: rework vectors to support future k-vectors (watch intro to geometric algebra)
     //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
-    M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
-    D::Log::Info(DirectionalDerivative(f, {1, 0, 0})(-1, 0, M::E));
+    // M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
+    // D::Log::Info(PartialDerivative<0>(f)(-1, 0, M::E));
+    // D::Log::Info(Gradient(f)(-1, 0, M::E));
+    // D::Log::Info(DirectionalDerivative(f, M::Vector<3>{1, 0, 0})(-1, 0, M::E));
+
+    // M::Function<M::Vector<3>, float> g = [](float t)
+    // { return M::Vector<3>{std::cos(t), std::sin(t), t / 5.0f}; };
+    // D::Log::Info(Curvature(g)(10));
+
     // D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
 }
 

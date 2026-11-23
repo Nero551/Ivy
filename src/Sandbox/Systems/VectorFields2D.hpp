@@ -88,7 +88,7 @@ inline void PendulumModel(C::Engine& eng)
         {
             auto [thetaDot, omegaDot] = equation.Derivative({0.0f, theta, omega}).State;
             const M::Vector<2> v{thetaDot, omegaDot};
-            if (v.Length() < 0.0001f)
+            if (v.Magnitude() < 0.0001f)
             {
                 continue;
             }
@@ -100,7 +100,7 @@ inline void PendulumModel(C::Engine& eng)
             transform.Scale = M::Vector<2>{0.2, 0.1};
             transform.Rotation = v.Angle();
 
-            magnitudes.push_back(v.Length());
+            magnitudes.push_back(v.Magnitude());
             eng.World.GetRoot().AttachChild(arrow);
         }
     }
@@ -131,7 +131,7 @@ inline void ExponentialModel(C::Engine& eng)
             transform.Scale = {0.5f, 0.25f};
             transform.Rotation = target.Angle();
 
-            magnitudes.push_back(target.Length());
+            magnitudes.push_back(target.Magnitude());
             eng.World.GetRoot().AttachChild(arrow);
         }
     }
@@ -164,7 +164,7 @@ inline void LogisticModel(C::Engine& eng)
             transform.Scale = {0.5f, 0.25f};
             transform.Rotation = target.Angle();
 
-            magnitudes.push_back(target.Length());
+            magnitudes.push_back(target.Magnitude());
             eng.World.GetRoot().AttachChild(arrow);
         }
     }
@@ -197,7 +197,7 @@ inline void SpringModel(C::Engine& eng)
             transform.Scale = {0.5f, 0.25f};
             transform.Rotation = target.Angle();
 
-            magnitudes.push_back(target.Length());
+            magnitudes.push_back(target.Magnitude());
             eng.World.GetRoot().AttachChild(arrow);
         }
     }
@@ -231,7 +231,7 @@ inline void DampenedSpringModel(C::Engine& eng)
             transform.Scale = {0.5f, 0.25f};
             transform.Rotation = target.Angle();
 
-            magnitudes.push_back(target.Length());
+            magnitudes.push_back(target.Magnitude());
             eng.World.GetRoot().AttachChild(arrow);
         }
     }
@@ -265,7 +265,7 @@ inline void LinearResistiveForceModel(C::Engine& eng)
             transform.Scale = {0.5f, 0.25f};
             transform.Rotation = target.Angle();
 
-            magnitudes.push_back(target.Length());
+            magnitudes.push_back(target.Magnitude());
             eng.World.GetRoot().AttachChild(arrow);
         }
     }
@@ -301,7 +301,7 @@ inline void QuadraticResistiveForceModel(C::Engine& eng)
             transform.Scale = {0.5f, 0.25f};
             transform.Rotation = target.Angle();
 
-            magnitudes.push_back(target.Length());
+            magnitudes.push_back(target.Magnitude());
             eng.World.GetRoot().AttachChild(arrow);
         }
     }
