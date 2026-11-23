@@ -3,6 +3,10 @@
 #include "Function.hpp"
 #include "Math/BasicOperations.hpp"
 #include "Math/Scalar.hpp"
+#include "Math/Vector/Vectors.hpp"
+#include <cstddef>
+#include <tuple>
+#include <utility>
 
 namespace Ivy::M
 {
@@ -64,5 +68,47 @@ Output Derivative(const Function<Output, Input>& f, Input x, const Input dx = 0.
     requires(Subtractive<Output, Output> && Divisible<Output, Input>)
 {
     return Differentiate(f, dx, method)(x);
+}
+
+template <unsigned int Index, typename O, M::Scalar... Is>
+M::Function<O, Is...> PartialDerivative(
+    const M::Function<O, Is...>& f, std::tuple_element_t<Index, std::tuple<Is...>> dx = 0.001f)
+{
+    return [&f, dx](const Is&... ins)
+    {
+        auto args = std::tuple<Is...>{ins...};
+
+        return [&f, &args, dx]<std::size_t... Indices>(std::index_sequence<Indices...>)
+        {
+            using Param = std::tuple_element_t<Index, std::tuple<Is...>>;
+            return M::Derivative(
+                M::Function<O, Param>{[&](const Param& x)
+                    { return std::invoke(f, (Indices == Index ? x : std::get<Indices>(args))...); }},
+                std::get<Index>(args), dx);
+        }(std::index_sequence_for<Is...>{});
+    };
+}
+
+template <M::Scalar O, M::Scalar... Is>
+M::Function<Vector<sizeof...(Is), O>, Is...> Gradient(const M::Function<O, Is...>& f)
+{
+    return {[&f](const Is&... ins)
+        {
+            return [&f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+            { return M::Vector<sizeof...(Is), O>{PartialDerivative<Indices>(f)(ins...)...}; }(
+                std::index_sequence_for<Is...>{});
+        }};
+}
+
+template <M::Scalar T, typename O, M::Scalar... Is>
+M::Function<O, Is...> DirectionalDerivative(
+    const M::Function<O, Is...>& f, const M::Vector<sizeof...(Is), T>& v)
+{
+    return [&f, v](const Is&... ins)
+    {
+        return [&v, &f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+        { return ((v(Indices) * PartialDerivative<Indices>(f)(ins...)) + ...); }(
+            std::index_sequence_for<Is...>{});
+    };
 }
 } // namespace Ivy::M

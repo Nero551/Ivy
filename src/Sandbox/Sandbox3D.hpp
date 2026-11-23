@@ -12,6 +12,7 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Common/Constraints.hpp"
+#include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
 #include "Math/Vector/Vectors.hpp"
@@ -24,7 +25,6 @@
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
-#include "sketch.hpp"
 #include <cmath>
 #include <vector>
 
@@ -65,8 +65,8 @@ inline void Start_Sandbox3D(C::Engine& eng)
     float min = -5.0f;
     M::Function<M::Vector<2>, float, float> f = [](float x, float y)
     { return M::Vector<2>{x * y, y * y - x * x}; };
-    auto dvdx = Sketch::PartialDerivative<0>(f);
-    auto dvdy = Sketch::PartialDerivative<1>(f);
+    auto dvdx = M::PartialDerivative<0>(f);
+    auto dvdy = M::PartialDerivative<1>(f);
     for (float x = min; x < max; x += 0.5)
     {
         for (float y = min; y < max; y += 0.5)

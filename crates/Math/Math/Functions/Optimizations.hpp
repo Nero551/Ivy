@@ -105,4 +105,16 @@ M::Ordered<Output, Input> Minimize(
     }
     return {best, bestx};
 }
+
+template <typename O, M::Scalar I>
+M::Function<float, I> Curvature(const M::Function<O, I>& f) requires(requires(O out) {
+    out.Normalized();
+    out.Magnitude();
+})
+{
+    auto derivative = M::Differentiate(f);
+    auto unitTangent = derivative.template Op<&O::Normalized>();
+    auto tangentDerivative = M::Differentiate(unitTangent);
+    return tangentDerivative.template Op<&O::Magnitude>() / derivative.template Op<&O::Magnitude>();
+}
 } // namespace Ivy::M
