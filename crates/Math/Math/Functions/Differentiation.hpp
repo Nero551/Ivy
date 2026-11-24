@@ -1,8 +1,9 @@
 #pragma once
 #include "Diagnostics/Log.hpp"
 #include "Function.hpp"
-#include "Math/BasicOperations.hpp"
+#include "Math/OperationTraits.hpp"
 #include "Math/Scalar.hpp"
+#include "Math/Traits.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include <cstddef>
 #include <tuple>
@@ -111,4 +112,37 @@ M::Function<O, Is...> DirectionalDerivative(
             std::index_sequence_for<Is...>{});
     };
 }
+
+template <typename O, M::Scalar... Is>
+M::Function<M::ScalarType<O>, Is...> Divergence(const M::Function<O, Is...>& f)
+    requires(M::Indexable<O> && M::VariableCount<Is...> == M::VariableCount<O>)
+{
+    return [&f](const Is&... ins)
+    {
+        return [&f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+        { return (PartialDerivative<Indices>(f)(ins...)(Indices) + ...); }(std::index_sequence_for<Is...>{});
+    };
+}
+
+template <typename O, M::Scalar... Is>
+M::Function<M::ScalarType<O>, Is...> Curl(const M::Function<O, Is...>& f)
+    requires(M::Indexable<O> && M::VariableCount<O> == 2 && M::VariableCount<O> == M::VariableCount<Is...>)
+{
+    return [&f](const Is&... ins)
+    { return M::PartialDerivative<0>(f)(ins...)(1) - M::PartialDerivative<1>(f)(ins...)(0); };
+}
+
+template <typename O, M::Scalar... Is>
+M::Function<O, Is...> Curl(const M::Function<O, Is...>& f)
+    requires(M::Indexable<O> && M::VariableCount<O> == 3 && M::VariableCount<O> == M::VariableCount<Is...>)
+{
+    return [&f](const Is&... ins)
+    {
+        auto dx = M::PartialDerivative<0>(f)(ins...);
+        auto dy = M::PartialDerivative<1>(f)(ins...);
+        auto dz = M::PartialDerivative<2>(f)(ins...);
+        return O{dy(2) - dz(1), dz(0) - dx(2), dx(1) - dy(0)};
+    };
+}
+
 } // namespace Ivy::M

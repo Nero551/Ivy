@@ -2,6 +2,7 @@
 
 #include "Core/Engine.hpp"
 #include "Core/TimeHandler.hpp"
+#include "Diagnostics/Log.hpp"
 #include "Graphics/Buffers/ArrayBuffer/ArrayBuffer.hpp"
 #include "Graphics/DataType.hpp"
 #include "Graphics/Material/Material.hpp"
@@ -12,6 +13,7 @@
 #include "Graphics/Shader/ShaderSource.hpp"
 #include "Graphics/Shader/ShaderStage.hpp"
 #include "Math/Common/Constraints.hpp"
+#include "Math/Equations/ODE.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Quaternion/Quaternion.hpp"
@@ -25,7 +27,10 @@
 #include "Systems/Components.hpp"
 #include "Systems/Renderer/Components.hpp"
 #include "Systems/Renderer/Nodes.hpp"
+#include "sketch.hpp"
+#include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <vector>
 
 namespace Ivy::Sandbox
@@ -63,30 +68,35 @@ inline void Start_Sandbox3D(C::Engine& eng)
     std::vector<float> magnitudes{};
     float max = 5.0f;
     float min = -5.0f;
-    M::Function<M::Vector<2>, float, float> f = [](float x, float y)
-    { return M::Vector<2>{x * y, y * y - x * x}; };
-    auto dvdx = M::PartialDerivative<0>(f);
-    auto dvdy = M::PartialDerivative<1>(f);
+    M::Function<M::Vector<3>, float, float, float> f = [](float x, float y, float z)
+    { return M::Vector<3>{x * y * z, 3 * y * y, 5 * (x + z)}; };
+
+    auto div = M::Divergence(f);
+    D::Log::Info(div(2, -1, 3));
+
     for (float x = min; x < max; x += 0.5)
     {
         for (float y = min; y < max; y += 0.5)
         {
-            M::Vector<3> pos = {x, y, 0};
-            M::Vector<3> dir = {f(x, y).x, f(x, y).y, 0};
-            magnitudes.push_back(f(x, y).Magnitude() / 5.);
+            for (float z = min; z < max; z += 0.5)
+            {
+                M::Vector<3> pos = {x, y, z};
+                M::Vector<3> dir = f(x, y, z);
+                magnitudes.push_back(std::abs(div(x, y, z)) / 10.0f);
 
-            auto& point = MeshInstance3D::Create(eng.ECS);
-            query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
-            query.GetComponent<CMP::Material>(point).Material = &material;
+                auto& point = MeshInstance3D::Create(eng.ECS);
+                query.GetComponent<CMP::Mesh>(point).Mesh = &mesh;
+                query.GetComponent<CMP::Material>(point).Material = &material;
 
-            auto& transform = query.GetComponent<CMP::Transform3D>(point);
-            transform.Scale = M::Vector<3>{0.4f};
-            transform.Position = pos;
-            transform.Rotation = M::Quaternion<>::FromTo({1, 0, 0}, M::Vector<3>{dir.x, dir.y, 0});
-            eng.World.GetRoot().AttachChild(point);
+                auto& transform = query.GetComponent<CMP::Transform3D>(point);
+                transform.Scale = M::Vector<3>{0.4f};
+                transform.Scale().x = std::clamp(f(x, y, z).Magnitude() / 30.0f, 0.0f, 0.5f);
+                transform.Position = pos;
+                transform.Rotation = M::Quaternion<>::FromTo({1, 0, 0}, dir);
+                eng.World.GetRoot().AttachChild(point);
+            }
         }
     }
-
     G::ArrayBuffer buffer{};
     buffer.SetData(magnitudes);
 

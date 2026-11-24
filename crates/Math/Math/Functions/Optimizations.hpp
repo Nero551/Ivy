@@ -1,11 +1,11 @@
 #pragma once
-#include "Math/BasicOperations.hpp"
+#include "Math/OperationTraits.hpp"
+#include "Math/Scalar.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Random.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Ordered.hpp"
-#include "Math/Scalar.hpp"
 #include <limits>
 namespace Ivy::M
 {
@@ -107,7 +107,7 @@ M::Ordered<Output, Input> Minimize(
 }
 
 template <typename O, M::Scalar I>
-M::Function<float, I> Curvature(const M::Function<O, I>& f) requires(requires(O out) {
+M::Function<I, I> Curvature(const M::Function<O, I>& f) requires(requires(O out) {
     out.Normalized();
     out.Magnitude();
 })

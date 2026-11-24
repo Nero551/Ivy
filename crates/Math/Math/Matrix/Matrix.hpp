@@ -2,8 +2,8 @@
 // IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
 
 #include "BasicMatrix.hpp"
-#include "Math/Scalar.hpp"
 #include "Diagnostics/Log.hpp"
+#include "Math/Scalar.hpp"
 
 namespace Ivy::M
 {
@@ -110,8 +110,7 @@ struct Matrix : BasicMatrix<Row, Column, Matrix, T>
 
         if (M::NearlyEquals(determinant, 0))
         {
-            D::Log::Error("Matrix is not invertible");
-            return Matrix::Identity();
+            return Matrix::Zero();
         }
 
         Matrix cofactorMatrix{0};

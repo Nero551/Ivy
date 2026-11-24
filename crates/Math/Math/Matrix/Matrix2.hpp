@@ -1,10 +1,10 @@
 #pragma once
 // IWYU pragma: private, include "Math/Matrix/Matrices.hpp"
 
+#include "Diagnostics/Log.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Matrix/Matrices.hpp"
 #include "Math/Vector/Vectors.hpp"
-#include "Diagnostics/Log.hpp"
 
 namespace Ivy::M
 {
@@ -61,7 +61,7 @@ template <Scalar T> struct Matrix<2, 2, T> : BasicMatrix<2, 2, Matrix, T>
 
         if (std::abs(det) < EPSILON)
         {
-            D::Log::Error("Matrix is singular and cannot be inverted.");
+            return Matrix::Zero();
         }
 
         double invDet = 1.0 / det;

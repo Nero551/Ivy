@@ -1,8 +1,8 @@
 #pragma once
-#include "Math/BasicOperations.hpp"
+#include "Math/OperationTraits.hpp"
+#include "Math/Scalar.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
-#include "Math/Scalar.hpp"
 
 #include "Math/Functions/Function.hpp"
 namespace Ivy::M

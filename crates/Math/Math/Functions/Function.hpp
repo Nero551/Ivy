@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/BasicOperations.hpp"
+#include "Math/OperationTraits.hpp"
 #include "Math/Ordered.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include "Utilities/stl.hpp"

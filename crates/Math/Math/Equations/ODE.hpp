@@ -41,7 +41,7 @@ template <Scalar Independent, typename... States> struct ODEState
  * Currently uses Explicit Euler integration.
  *
  * @tparam Independent Scalar type of the independent variable.
- * @tparam StateValue Type of the dependent state.
+ * @tparam Statess Type of the dependent states.
  */
 template <M::Scalar Independent, typename... States> struct ODE
 {
@@ -93,17 +93,17 @@ template <M::Scalar Independent, typename... States> struct ODE
     {
         D::Log::Assert(dx > 0, "dx must be positive");
 
-        State result = initial;
+        State state = initial;
 
-        action(result);
-        while (result.x < target)
+        action(state);
+        while (state.x < target)
         {
-            const Independent step = std::min(dx, target - result.x);
-            result = Step(result, step);
-            action(result);
+            const Independent step = std::min(dx, target - state.x);
+            state = Step(state, step);
+            action(state);
         }
 
-        return result;
+        return state;
     }
 
   private:

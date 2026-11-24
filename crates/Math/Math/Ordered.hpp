@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/BasicOperations.hpp"
+#include "Math/OperationTraits.hpp"
 #include "Utilities/Concepts.hpp"
 #include "Utilities/TupleUtils.hpp"
 #include <cstddef>

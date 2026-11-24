@@ -2,7 +2,6 @@
 #include "Math/Common/Exponentials.hpp"
 #include <concepts>
 #include <iostream>
-
 namespace Ivy::M
 {
 
@@ -11,9 +10,6 @@ concept Additive = requires(T a, O b) { a + b; };
 
 template <typename T>
 concept SquareRoot = requires(T a) { Sqrt(a); };
-
-template <typename T>
-concept CubicRoot = requires(T a) { Cqrt(a); };
 
 template <typename T, typename O>
 concept Power = requires(T a, O b) { Pow(a, b); };
@@ -31,7 +27,7 @@ template <typename T>
 concept Negatable = requires(T a) { -a; };
 
 template <typename T>
-concept Indexable = requires(T object, unsigned int i) { object(i); };
+concept Indexable = (requires(T object, unsigned int i) { object(i); });
 
 template <typename T>
 concept Printable = requires(T a) { std::cout << a; };
@@ -49,4 +45,5 @@ template <typename T, typename O>
 using MultiplicationResult = decltype(std::declval<T>() * std::declval<O>());
 
 template <typename T, typename O> using DivisionResult = decltype(std::declval<T>() / std::declval<O>());
+
 } // namespace Ivy::M

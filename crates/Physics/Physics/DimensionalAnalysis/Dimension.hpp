@@ -1,7 +1,6 @@
 #pragma once
-#include "Math/BasicOperations.hpp"
+#include "Math/OperationTraits.hpp"
 #include "Math/Common/Exponentials.hpp"
-#include "Math/Scalar.hpp"
 
 #include "Physics/DimensionalAnalysis/Dimensional.hpp"
 #include "Utilities/IsSpecialization.hpp"

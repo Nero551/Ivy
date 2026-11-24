@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Diagnostics/Log.hpp"
-#include "Math/BasicOperations.hpp"
 #include "Math/Common/Constants.hpp"
+#include "Math/Common/Exponentials.hpp"
 #include "Math/Common/Logarithms.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
-#include "Math/Scalar.hpp"
+#include "Math/Functions/Optimizations.hpp"
 #include "Math/Set.hpp"
+#include "Math/Traits.hpp"
 #include "Math/Vector/Vectors.hpp"
 #include "Utilities/IsSpecialization.hpp"
 #include <array>
@@ -27,6 +28,10 @@ namespace Ivy::M
 
 template <M::Scalar T, unsigned int C>
 struct VariableCountTrait<M::Vector<C, T>> : std::integral_constant<unsigned int, C>
+{
+};
+
+template <Scalar T, unsigned int C> struct ScalarTypeTrait<Vector<C, T>> : std::type_identity<T>
 {
 };
 
@@ -251,58 +256,30 @@ template <unsigned int Component, M::Scalar T> using Bivector = KVector<2, Compo
 static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
-template <unsigned int Index, typename T, typename... Ts>
-decltype(auto) AcquireScalar(const T& value, const Ts&... values)
-    requires((M::Indexable<Ts> && ...) && (!M::Scalar<Ts> && ...))
-{
-    if constexpr (Index < M::VariableCount<T>)
-    {
-        return value(Index);
-    }
-    else
-    {
-        return AcquireScalar<Index - M::VariableCount<T>>(values...);
-    }
-}
-
-template <unsigned int Index, M::Scalar... Ts> decltype(auto) AcquireScalar(const Ts&... scalars)
-{
-    return std::get<Index>(std::tuple<Ts...>{scalars...});
-}
-
-template <typename O, M::Scalar... Is>
-M::Function<float, Is...> Divergence(const M::Function<O, Is...>& f)
-    requires(M::Indexable<O> && sizeof...(Is) == M::VariableCount<O>)
-{
-    return [&f](const Is&... ins)
-    {
-        return [&f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
-        { return (PartialDerivative<Indices>(f)(ins...)(Indices) + ...); }(std::index_sequence_for<Is...>{});
-    };
-}
 inline void Test()
 {
-    //TODO: extend VariableCount trait to all math objects. define VariableCount static value in it own hpp, \
-    //  put trait for each object in its definition file
-
     //TODO: get rid of Integral, Derivative, etc. just keep the function returning versions and call those Integral, Derivative, etc.
     //TODO: remove EvaluateInverse(), keep only Inverse().
     //TODO: rework vectors to support future k-vectors (watch intro to geometric algebra)
     //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
-    M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
-    D::Log::Info(M::PartialDerivative<0>(f)(-1, 0, M::E));
-    D::Log::Info(M::Gradient(f)(-1, 0, M::E));
-    D::Log::Info(M::DirectionalDerivative(f, M::Vector<3>{1, 0, 0})(-1, 0, M::E));
+    // M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
+    // D::Log::Info(M::PartialDerivative<0>(f)(-1, 0, M::E));
+    // D::Log::Info(M::Gradient(f)(-1, 0, M::E));
+    // D::Log::Info(M::DirectionalDerivative(f, M::Vector<3>{1, 0, 0})(-1, 0, M::E));
 
-    M::Function<M::Vector<3>, float, float, float> h = [](float x, float y, float z)
-    { return M::Vector<3>{std::sin(x), std::cos(z), std::tan(y)}; };
+    // M::Function<M::Vector<3>, float, float, float> h = [](float x, float y, float z)
+    // { return M::Vector<3>{std::sin(x), std::cos(z), std::tan(y)}; };
 
-    D::Log::Info(Divergence(h)(M::PI, 0, M::PI / 2.0f));
+    // D::Log::Info(M::Divergence(h)(M::PI, 0, M::PI / 2.0f));
     // D::Log::Info(AcquireScalar<5>(M::Vector<2>{5, 2}, M::Vector<3>{3, 6, 10}, M::Vector<2>{7, 9}));
 
     // M::Function<M::Vector<3>, float> g = [](float t)
     // { return M::Vector<3>{std::cos(t), std::sin(t), t / 5.0f}; };
-    // D::Log::Info(Curvature(g)(10));
+    // D::Log::Info(M::Curvature(g)(10));
+    //
+    M::Function<M::Vector<3>, float, float, float> c = [](float x, float y, float z)
+    { return M::Vector<3>{x * x * y + z * z * z, y * y * z + x * x * x, z * z * x + y * y * y}; };
+    D::Log::Info(M::Curl(c)(1, 2, 3));
 
     // D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
 }
