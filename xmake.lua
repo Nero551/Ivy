@@ -1,24 +1,23 @@
 set_languages("c++26")
 set_toolchains("clang")
 
----@diagnostic disable-next-line: param-type-not-match
 add_rules("plugin.compile_commands.autoupdate", { lsp = "clang" })
 add_rules("mode.debug", "mode.release")
 add_rules("c++.unity_build")
 
-add_requires("tracy v0.13.1", "glfw 3.4", "glad 0.1.36", "stb", "gtest", "benchmark 1.9.5", "nlohmann_json")
-add_requireconfs("**", { override = true, configs = { shared = false, system = false } })
+
+add_requires("tracy v0.13.1", "glfw 3.4", "glad 0.1.36", "stb", "gtest", "benchmark", "nlohmann_json")
+add_requireconfs("**", { override = true, configs = { shared = false } })
 
 if is_mode("release") then
     set_optimize("fastest")
 
-    set_policy("build.optimization.lto", true)
     add_defines("RELEASE")
     set_strip("all")
 
 else
     -- set_policy("build.sanitizer.address", true)
-    -- set_policy("build.sanitizer.undefined", true)
+    -- set_policy("build.sanitizer.undefined", false)
     -- set_policy("build.sanitizer.thread", true)
     -- set_policy("build.sanitizer.memory", true)
     add_defines("DEBUG", "TRACY_ENABLE", "TRACY_PROFILE_MEMORY")
@@ -49,6 +48,7 @@ target("Ivy")
 
     if is_mode("release") then
         remove_files("src/TracyMemory.cpp")
+        set_policy("build.optimization.lto", true)
     end
 
 target("Ivy.Tests")
@@ -67,4 +67,7 @@ target("Ivy.Benchmarks")
     add_deps("Ivy.Utilities", "Ivy.Math", "Ivy.Physics", "Ivy.ECS", "Ivy.Graphics", "Ivy.Core")
     set_pcxxheader("src/pch.hpp")
 
+    if is_mode("release") then
+        set_policy("build.optimization.lto", true)
+    end
     add_packages("benchmark")

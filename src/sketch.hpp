@@ -7,6 +7,7 @@
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Functions/Optimizations.hpp"
+#include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
 #include "Math/Traits.hpp"
 #include "Math/Vector/Vectors.hpp"
@@ -256,19 +257,27 @@ template <unsigned int Component, M::Scalar T> using Bivector = KVector<2, Compo
 static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
+
+template <M::Scalar O, M::Scalar... Is> M::Function<O, Is...> Laplacian(const M::Function<O, Is...>& f)
+{
+    return M::Divergence(M::Gradient(f));
+}
+
 inline void Test()
 {
     //TODO: get rid of Integral, Derivative, etc. just keep the function returning versions and call those Integral, Derivative, etc.
     //TODO: remove EvaluateInverse(), keep only Inverse().
     //TODO: rework vectors to support future k-vectors (watch intro to geometric algebra)
     //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
+    //
+    // TODO: make resource manager, engine should own that instead of having random methods.
     // M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
     // D::Log::Info(M::PartialDerivative<0>(f)(-1, 0, M::E));
     // D::Log::Info(M::Gradient(f)(-1, 0, M::E));
     // D::Log::Info(M::DirectionalDerivative(f, M::Vector<3>{1, 0, 0})(-1, 0, M::E));
 
     // M::Function<M::Vector<3>, float, float, float> h = [](float x, float y, float z)
-    // { return M::Vector<3>{std::sin(x), std::cos(z), std::tan(y)}; };
+    // { return M::Vector<3>{std::sin(x), std::cos(z), std::tan(y)}; };s
 
     // D::Log::Info(M::Divergence(h)(M::PI, 0, M::PI / 2.0f));
     // D::Log::Info(AcquireScalar<5>(M::Vector<2>{5, 2}, M::Vector<3>{3, 6, 10}, M::Vector<2>{7, 9}));
