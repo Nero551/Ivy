@@ -7,6 +7,7 @@
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
 #include "Math/Functions/Optimizations.hpp"
+#include "Math/Matrix/Matrices.hpp"
 #include "Math/Scalar.hpp"
 #include "Math/Set.hpp"
 #include "Math/Traits.hpp"
@@ -257,12 +258,6 @@ template <unsigned int Component, M::Scalar T> using Bivector = KVector<2, Compo
 static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
-
-template <M::Scalar O, M::Scalar... Is> M::Function<O, Is...> Laplacian(const M::Function<O, Is...>& f)
-{
-    return M::Divergence(M::Gradient(f));
-}
-
 inline void Test()
 {
     //TODO: get rid of Integral, Derivative, etc. just keep the function returning versions and call those Integral, Derivative, etc.
@@ -287,9 +282,17 @@ inline void Test()
     // { return M::Vector<3>{std::cos(t), std::sin(t), t / 5.0f}; };
     // D::Log::Info(M::Curvature(g)(10));
     //
-    M::Function<M::Vector<3>, float, float, float> c = [](float x, float y, float z)
-    { return M::Vector<3>{x * x * y + z * z * z, y * y * z + x * x * x, z * z * x + y * y * y}; };
-    D::Log::Info(M::Curl(c)(1, 2, 3));
+    // M::Function<M::Vector<3>, float, float, float> c = [](float x, float y, float z)
+    // { return M::Vector<3>{x * x * y + z * z * z, y * y * z + x * x * x, z * z * x + y * y * y}; };
+    // D::Log::Info(M::Curl(c)(1, 2, 3));
+    //
+    // M::Function<float, float, float, float> l = [](float x, float y, float z)
+    // { return x * x * y + 3 * y * y * z + 2 * z * z * z + std::sin(x * y); };
+    // D::Log::Info(Laplacian(l)(1.2, 0.7, -0.4));
+
+    M::Function<M::Vector<3>, float, float, float> j = [](float x, float y, float z)
+    { return M::Vector<3>{x * x * y + std::sin(z), M::Exp(x) + y * z * z, x * y * z + std::cos(y)}; };
+    D::Log::Info(Jacobian(j)(1, 2, 0.5));
 
     // D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
 }
