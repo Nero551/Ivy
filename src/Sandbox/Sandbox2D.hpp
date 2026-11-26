@@ -30,7 +30,7 @@ namespace Sandbox2D
 {
 inline ECS::EntityID CreateCircle(C::Engine& eng)
 {
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
     auto& circle = MeshInstance2D::Create(eng.ECS);
 
@@ -56,7 +56,7 @@ inline ECS::EntityID CreateCircle(C::Engine& eng)
 
 inline ECS::EntityID CreateSquare(C::Engine& eng)
 {
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
     auto& square = MeshInstance2D::Create(eng.ECS);
 

@@ -39,7 +39,7 @@ namespace StressTester3D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& CreatePoint(C::Engine& eng, M::Vector<4> col)
 {
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
 
     G::Mesh m = G::Primitives::CreateQuad("point");
@@ -91,7 +91,7 @@ inline ECS::Entity& Plot(C::Engine& eng, const M::Vector<3> vec3, const M::Vecto
 
 inline void TwoDimensionalProjection(C::Engine& eng, int increase)
 {
-    auto& state = eng.GetRes<StressTester3DState>();
+    auto& state = eng.RM.GetRes<StressTester3DState>();
 
     const float count = M::Pow(360.0f / increase, 1.0f);
     state.Points.reserve(count);
@@ -108,7 +108,7 @@ inline void TwoDimensionalProjection(C::Engine& eng, int increase)
 
 inline void ThreeDimensionalProjection(C::Engine& eng, int increase)
 {
-    auto& state = eng.GetRes<StressTester3DState>();
+    auto& state = eng.RM.GetRes<StressTester3DState>();
 
     const float count = M::Pow(360.0f / increase, 2.0f);
     D::Log::Info(count);
@@ -128,7 +128,7 @@ inline void ThreeDimensionalProjection(C::Engine& eng, int increase)
 
 inline void FourDimensionalProjection(C::Engine& eng, int increase)
 {
-    auto& state = eng.GetRes<StressTester3DState>();
+    auto& state = eng.RM.GetRes<StressTester3DState>();
 
     const float count = M::Pow(360.0f / increase, 3.0f);
     D::Log::Info(count);

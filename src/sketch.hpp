@@ -253,8 +253,6 @@ inline void Test()
     //TODO: rework vectors to support future k-vectors (watch intro to geometric algebra)
     //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
 
-    //TODO: make ResourceManager struct instead of leaving it all in engine.
-
     // M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
     // D::Log::Info(M::PartialDerivative<0>(f)(-1, 0, M::E));
     // D::Log::Info(M::Gradient(f)(-1, 0, M::E));

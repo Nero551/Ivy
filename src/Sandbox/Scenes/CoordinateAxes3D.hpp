@@ -25,7 +25,7 @@ namespace Ivy::Sandbox
 
 ECS::Entity& CoordinateAxes3DScene(C::Engine& eng)
 {
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
     auto& root = Node::Create(eng.ECS);
 

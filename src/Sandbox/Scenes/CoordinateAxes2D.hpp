@@ -19,7 +19,7 @@ namespace Ivy::Sandbox
 {
 ECS::Entity& CoordinateAxes2DScene(C::Engine& eng)
 {
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
     auto& root = Node2D::Create(eng.ECS);
 

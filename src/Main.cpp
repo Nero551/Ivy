@@ -43,7 +43,7 @@ int main(const int argc, char* argv[])
             engine.Window.SetCursor({"assets/cursor.png"});
             Platform::Input.SetActiveWindow(engine.Window);
 
-            engine.AddRes<ProfilingData, AssetServer, TransformSystemState>();
+            engine.RM.AddRes<ProfilingData, AssetServer, TransformSystemState>();
             engine.SM.AddSystems<C::Phase::Update, Update_Profiling, Update_Transform>();
             engine.SM.AddSystems<C::Phase::Stop, Stop_AssetServer>();
             engine.AddPlugins<Sandbox3DPlugin, RendererPlugin>();

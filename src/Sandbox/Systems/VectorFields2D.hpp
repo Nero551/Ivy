@@ -39,7 +39,7 @@ namespace VectorFields2D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& Arrow(C::Engine& eng)
 {
-    auto& state = eng.GetRes<VectorFields2DState>();
+    auto& state = eng.RM.GetRes<VectorFields2DState>();
     auto& query = eng.ECS.Query;
 
     auto& arrow = MeshInstance2D::Create(eng.ECS);
@@ -55,7 +55,7 @@ inline void Finish(C::Engine& eng, const std::vector<float>& magnitudes)
     G::ArrayBuffer buffer{};
     buffer.SetData(magnitudes);
 
-    auto& mesh = eng.GetRes<VectorFields2DState>().Mesh;
+    auto& mesh = eng.RM.GetRes<VectorFields2DState>().Mesh;
     mesh->Get().VAO.SetArrayBuffer(buffer, 2, sizeof(float));
     mesh->Get().VAO.SetAttribPointer(11, 1, G::DataType::Float, 2, 0);
     mesh->Get().VAO.SetAttribDivisor(2, 1);

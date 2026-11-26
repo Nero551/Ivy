@@ -24,7 +24,7 @@ namespace
 {
 void CreateGridLine(C::Engine& eng, ECS::Entity& root, const M::Quaternion<> rotation, M::Vector<3> position)
 {
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
     auto& shader = resources.LoadAsset<G::Shader>("AxisShader");
 

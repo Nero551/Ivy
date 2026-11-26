@@ -50,7 +50,7 @@ inline void Start_Sandbox3D(C::Engine& eng)
 
     eng.World.GetRoot().AttachChild(CoordinateAxes3DScene(eng));
 
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     G::Mesh m = G::Primitives::CreateArrow3D("mvPoint");
     m.CullMode = G::CullMode::None;
     auto& mesh = resources.LoadAsset<G::Mesh>(m);
@@ -109,16 +109,16 @@ inline void Start_Sandbox3D(C::Engine& eng)
 
     // auto& square = MeshInstance3D::Create(eng.ECS);
     // query.GetComponent<CMP::Mesh>(square).Mesh =
-    //     &eng.GetRes<AssetServer>().LoadAsset<G::Mesh>(G::Primitives::CreateQuad("TerrainQuad", 20, 20));
+    //     &eng.RM.GetRes<AssetServer>().LoadAsset<G::Mesh>(G::Primitives::CreateQuad("TerrainQuad", 20, 20));
 
-    // auto& vertSource = eng.GetRes<AssetServer>().LoadAsset<G::ShaderSource>(
+    // auto& vertSource = eng.RM.GetRes<AssetServer>().LoadAsset<G::ShaderSource>(
     //     "TerrainShaderVert", "assets/Shaders/TerrainShader.vert", G::ShaderStage::Vertex);
 
-    // auto& fragSource = eng.GetRes<AssetServer>().LoadAsset<G::ShaderSource>(
+    // auto& fragSource = eng.RM.GetRes<AssetServer>().LoadAsset<G::ShaderSource>(
 
     //     "TerrainShaderFrag", "assets/Shaders/TerrainShader.frag", G::ShaderStage::Fragment);
-    // auto& shader = eng.GetRes<AssetServer>().LoadAsset<G::Shader>("TerrainShader", vertSource, fragSource);
-    // auto& mat = eng.GetRes<AssetServer>().LoadAsset<G::Material>("TerrainMat");
+    // auto& shader = eng.RM.GetRes<AssetServer>().LoadAsset<G::Shader>("TerrainShader", vertSource, fragSource);
+    // auto& mat = eng.RM.GetRes<AssetServer>().LoadAsset<G::Material>("TerrainMat");
     // mat().Shader = &shader();
     // mat().Color = {1, 1, 1, 1};
     // shader().HotReload = true;

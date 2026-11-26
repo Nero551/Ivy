@@ -36,7 +36,7 @@ namespace StressTester2D
 // ── helpers ─────────────────────────────────────────────────────
 inline ECS::Entity& CreatePoint(C::Engine& eng)
 {
-    auto& resources = eng.GetRes<AssetServer>();
+    auto& resources = eng.RM.GetRes<AssetServer>();
     auto& query = eng.ECS.Query;
 
     if (!resources.AssetExists<G::Mesh>("stressPoint"))
@@ -88,7 +88,7 @@ inline ECS::Entity& Plot(C::Engine& eng, const M::Vector<2> vec2)
 
 inline void FourDimensionalProjection(C::Engine& eng, int increase)
 {
-    auto& state = eng.GetRes<StressTester2DState>();
+    auto& state = eng.RM.GetRes<StressTester2DState>();
 
     const float count = M::Pow(360.0f / increase, 3.0f);
     D::Log::Info(count);

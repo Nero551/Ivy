@@ -20,7 +20,7 @@ struct RendererPlugin : C::Plugin
 {
     static void Setup(C::Engine& engine)
     {
-        engine.AddRes<RendererState, LightingSystemState>();
+        engine.RM.AddRes<RendererState, LightingSystemState>();
 
         engine.SM.AddSystems<C::Phase::Start, Start_Renderer, Start_Lighting>();
         engine.SM.AddSystems<Ivy::C::Phase::BeginFrame, BeginFrame_Renderer>();
@@ -35,7 +35,7 @@ struct Sandbox3DPlugin : C::Plugin
 {
     static void Setup(C::Engine& engine)
     {
-        engine
+        engine.RM
             .AddRes<Sandbox::VectorFields3DState, Sandbox::Controller3DState, Sandbox::StressTester3DState>();
 
         engine.SM.AddSystems<Ivy::C::Phase::Start, Sandbox::Sandbox3D::Start_Sandbox3D,
@@ -56,7 +56,7 @@ struct Sandbox2DPlugin : C::Plugin
 {
     static void Setup(C::Engine& engine)
     {
-        engine
+        engine.RM
             .AddRes<Sandbox::VectorFields2DState, Sandbox::Controller2DState, Sandbox::StressTester2DState>();
 
         engine.SM.AddSystems<Ivy::C::Phase::Start, Sandbox::Sandbox2D::Start_Sandbox2D,

@@ -2,7 +2,6 @@
 #include "Core/DependencyGraph.hpp"
 #include "Utilities/DataStructures/TypedVector.hpp"
 #include <array>
-#include <functional>
 #include <type_traits>
 namespace Ivy::C
 {
@@ -19,9 +18,9 @@ enum class Phase : unsigned int
     Count,
 };
 
-template <typename> struct Fetch
+template <typename T> struct Fetch
 {
-    static_assert("Parameter is Unfetchable");
+    static_assert(sizeof(T) == 0);
     static decltype(auto) Get(Engine& e) {}
 };
 
