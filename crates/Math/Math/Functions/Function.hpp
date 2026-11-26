@@ -79,7 +79,7 @@ template <typename Output, typename... Inputs> struct Function
   public:
     template <auto Func, typename... Args>
     Function<std::invoke_result_t<decltype(Func), Output, ResolveType_t<Args>...>, Inputs...> Op(
-        Args&&... args) requires std::invocable<decltype(Func), Output, ResolveType_t<Args>...>
+        Args&&... args) const requires std::invocable<decltype(Func), Output, ResolveType_t<Args>...>
     {
         return [f = *this, ... args = std::forward<Args>(args)](const Inputs... ins)
         { return std::invoke(Func, f.Evaluate(ins...), f.ResolveArgument(args, ins...)...); };

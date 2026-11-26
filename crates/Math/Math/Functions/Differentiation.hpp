@@ -35,7 +35,7 @@ Output AverageRateOfChange(const Function<Output, Input>& f, const Input start, 
  * @note Only available for functions with a scalar Input type.
  */
 template <typename Output, Scalar Input>
-Function<Output, Input> Differentiate(const Function<Output, Input>& f, Input dx = 0.001f,
+Function<Output, Input> Derivative(const Function<Output, Input>& f, const Input dx = 0.001f,
     DifferentiationMethod method = DifferentiationMethod::Central)
     requires(Subtractive<Output, Output> && Divisible<Output, Input>)
 {
@@ -57,24 +57,9 @@ Function<Output, Input> Differentiate(const Function<Output, Input>& f, Input dx
     };
 }
 
-/**
- * @brief Evaluates the numerical derivative at x.
- * @param x Input value at which to evaluate the derivative.
- * @param dx Step size used for numerical differentiation.
- * @param method Numerical differentiation method to use.
- * @return The numerical derivative at x.
- */
-template <typename Output, Scalar Input>
-Output Derivative(const Function<Output, Input>& f, Input x, const Input dx = 0.001f,
-    const DifferentiationMethod method = DifferentiationMethod::Central)
-    requires(Subtractive<Output, Output> && Divisible<Output, Input>)
-{
-    return Differentiate(f, dx, method)(x);
-}
-
 template <unsigned int Index, typename O, M::Scalar... Is>
 M::Function<O, Is...> PartialDerivative(
-    const M::Function<O, Is...>& f, std::tuple_element_t<Index, std::tuple<Is...>> dx = 0.001f)
+    const M::Function<O, Is...>& f, std::tuple_element_t<Index, const std::tuple<Is...>> dx = 0.001f)
 {
     return [f, dx](const Is&... ins)
     {
@@ -86,89 +71,93 @@ M::Function<O, Is...> PartialDerivative(
             return M::Derivative(
                 M::Function<O, Param>{[&](const Param& x)
                     { return std::invoke(f, (Indices == Index ? x : std::get<Indices>(args))...); }},
-                std::get<Index>(args), dx);
+                dx)(std::get<Index>(args));
         }(std::index_sequence_for<Is...>{});
     };
 }
 
 template <M::Scalar T, typename O, M::Scalar... Is>
 M::Function<O, Is...> DirectionalDerivative(
-    const M::Function<O, Is...>& f, const M::Vector<sizeof...(Is), T>& v)
+    const M::Function<O, Is...>& f, const M::Vector<sizeof...(Is), T>& v, const T dx = 0.001f)
 {
-    return [f, v](const Is&... ins)
+    return [dx, f, v](const Is&... ins)
     {
-        return [&v, f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
-        { return ((v(Indices) * PartialDerivative<Indices>(f)(ins...)) + ...); }(
+        return [dx, &v, f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+        { return ((v(Indices) * PartialDerivative<Indices>(f, dx)(ins...)) + ...); }(
             std::index_sequence_for<Is...>{});
     };
 }
 
 template <M::Scalar O, M::Scalar... Is>
-M::Function<Vector<sizeof...(Is), O>, Is...> Gradient(const M::Function<O, Is...>& f)
+M::Function<Vector<sizeof...(Is), O>, Is...> Gradient(const M::Function<O, Is...>& f, const O dx = 0.001f)
 {
-    return {[f](const Is&... ins)
+    return {[f, dx](const Is&... ins)
         {
-            return [f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
-            { return M::Vector<sizeof...(Is), O>{PartialDerivative<Indices>(f)(ins...)...}; }(
+            return [dx, f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+            { return M::Vector<sizeof...(Is), O>{PartialDerivative<Indices>(f, dx)(ins...)...}; }(
                 std::index_sequence_for<Is...>{});
         }};
 }
 
 template <typename O, M::Scalar... Is>
-M::Function<M::ScalarType<O>, Is...> Divergence(const M::Function<O, Is...>& f)
+M::Function<M::ScalarType<O>, Is...> Divergence(
+    const M::Function<O, Is...>& f, const ScalarType<O> dx = 0.001f)
     requires(M::Indexable<O> && M::VariableCount<Is...> == M::VariableCount<O>)
 {
-    return [f](const Is&... ins)
+    return [f, dx](const Is&... ins)
     {
-        return [f, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
-        { return (PartialDerivative<Indices>(f)(ins...)(Indices) + ...); }(std::index_sequence_for<Is...>{});
+        return [f, dx, &ins...]<std::size_t... Indices>(std::index_sequence<Indices...>)
+        { return (PartialDerivative<Indices>(f, dx)(ins...)(Indices) + ...); }(
+            std::index_sequence_for<Is...>{});
     };
 }
 
 template <typename O, M::Scalar... Is>
-M::Function<M::ScalarType<O>, Is...> Curl(const M::Function<O, Is...>& f)
+M::Function<M::ScalarType<O>, Is...> Curl(const M::Function<O, Is...>& f, const ScalarType<O> dx = 0.001f)
     requires(M::Indexable<O> && M::VariableCount<O> == 2 && M::VariableCount<O> == M::VariableCount<Is...>)
 {
-    return [f](const Is&... ins)
-    { return M::PartialDerivative<0>(f)(ins...)(1) - M::PartialDerivative<1>(f)(ins...)(0); };
+    return [f, dx](const Is&... ins)
+    { return M::PartialDerivative<0>(f, dx)(ins...)(1) - M::PartialDerivative<1>(f, dx)(ins...)(0); };
 }
 
 template <typename O, M::Scalar... Is>
-M::Function<O, Is...> Curl(const M::Function<O, Is...>& f)
+M::Function<O, Is...> Curl(const M::Function<O, Is...>& f, const ScalarType<O> dx = 0.001f)
     requires(M::Indexable<O> && M::VariableCount<O> == 3 && M::VariableCount<O> == M::VariableCount<Is...>)
 {
-    return [f](const Is&... ins)
+    return [f, dx](const Is&... ins)
     {
-        auto dx = M::PartialDerivative<0>(f)(ins...);
-        auto dy = M::PartialDerivative<1>(f)(ins...);
-        auto dz = M::PartialDerivative<2>(f)(ins...);
-        return O{dy(2) - dz(1), dz(0) - dx(2), dx(1) - dy(0)};
+        auto delx = M::PartialDerivative<0>(f, dx)(ins...);
+        auto dely = M::PartialDerivative<1>(f, dx)(ins...);
+        auto delz = M::PartialDerivative<2>(f, dx)(ins...);
+        return O{dely(2) - delz(1), delz(0) - delx(2), delx(1) - dely(0)};
     };
 }
 
-template <M::Scalar O, M::Scalar... Is> M::Function<O, Is...> Laplacian(const M::Function<O, Is...>& f)
+template <M::Scalar O, M::Scalar... Is>
+M::Function<O, Is...> Laplacian(const M::Function<O, Is...>& f, const O dx = 0.001f)
 {
-    return M::Divergence(M::Gradient(f));
+    return M::Divergence(M::Gradient(f, dx), dx);
 }
 
 template <typename O, M::Scalar... Is>
-M::Function<M::Matrix<M::VariableCount<O>, sizeof...(Is)>, Is...> Jacobian(const M::Function<O, Is...>& f)
+M::Function<M::Matrix<M::VariableCount<O>, sizeof...(Is)>, Is...> Jacobian(
+    const M::Function<O, Is...>& f, const ScalarType<O> dx = 0.001f)
 {
-    return [f](const Is&... ins)
+    return [f, dx](const Is&... ins)
     {
-        M::Matrix<M::VariableCount<O>, sizeof...(Is)> jacobian{};
+        M::Matrix<M::VariableCount<O>, sizeof...(Is), ScalarType<O>> jacobian{};
         if constexpr (VariableCount<O> == 1)
         {
-            [&jacobian, f, &ins...]<size_t... Indices>(std::index_sequence<Indices...>)
-            { ((jacobian(0, Indices) = M::PartialDerivative<Indices>(f)(ins...)), ...); }(
+            [&jacobian, f, dx, &ins...]<size_t... Indices>(std::index_sequence<Indices...>)
+            { ((jacobian(0, Indices) = M::PartialDerivative<Indices>(f, dx)(ins...)), ...); }(
                 std::index_sequence_for<Is...>{});
         }
         else
         {
             for (int i = 0; i < M::VariableCount<O>; ++i)
             {
-                [&jacobian, i, f, &ins...]<size_t... Indices>(std::index_sequence<Indices...>)
-                { ((jacobian(i, Indices) = M::PartialDerivative<Indices>(f)(ins...)(i)), ...); }(
+                [&jacobian, i, f, dx, &ins...]<size_t... Indices>(std::index_sequence<Indices...>)
+                { ((jacobian(i, Indices) = M::PartialDerivative<Indices>(f, dx)(ins...)(i)), ...); }(
                     std::index_sequence_for<Is...>{});
             }
         }

@@ -27,16 +27,6 @@
 
 namespace Ivy::M
 {
-
-template <M::Scalar T, unsigned int C>
-struct VariableCountTrait<M::Vector<C, T>> : std::integral_constant<unsigned int, C>
-{
-};
-
-template <Scalar T, unsigned int C> struct ScalarTypeTrait<Vector<C, T>> : std::type_identity<T>
-{
-};
-
 }; // namespace Ivy::M
 
 namespace Sketch
@@ -260,8 +250,6 @@ static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
 inline void Test()
 {
-    //TODO: get rid of Integral, Derivative, etc. just keep the function returning versions and call those Integral, Derivative, etc.
-    //TODO: remove EvaluateInverse(), keep only Inverse().
     //TODO: rework vectors to support future k-vectors (watch intro to geometric algebra)
     //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
 
@@ -290,9 +278,9 @@ inline void Test()
     // { return x * x * y + 3 * y * y * z + 2 * z * z * z + std::sin(x * y); };
     // D::Log::Info(Laplacian(l)(1.2, 0.7, -0.4));
 
-    M::Function<M::Vector<3>, float, float, float> j = [](float x, float y, float z)
-    { return M::Vector<3>{x * x * y + std::sin(z), M::Exp(x) + y * z * z, x * y * z + std::cos(y)}; };
-    D::Log::Info(Jacobian(j)(1, 2, 0.5));
+    // M::Function<M::Vector<3>, float, float, float> j = [](float x, float y, float z)
+    // { return M::Vector<3>{x * x * y + std::sin(z), M::Exp(x) + y * z * z, x * y * z + std::cos(y)}; };
+    // D::Log::Info(Jacobian(j)(1, 2, 0.5));
 
     // D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
 }

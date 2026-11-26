@@ -1,11 +1,11 @@
 #pragma once
-#include "Math/OperationTraits.hpp"
-#include "Math/Scalar.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Random.hpp"
 #include "Math/Functions/Differentiation.hpp"
 #include "Math/Functions/Function.hpp"
+#include "Math/OperationTraits.hpp"
 #include "Math/Ordered.hpp"
+#include "Math/Scalar.hpp"
 #include <limits>
 namespace Ivy::M
 {
@@ -29,7 +29,7 @@ Input NewtonMethod(const Function<Output, Input>& f, Input initialGuess, Input e
         {
             break;
         }
-        Input dfx = Derivative(f, x);
+        Input dfx = Derivative(f)(x);
         D::Log::Assert(std::abs(dfx) > epsilon, "Netwon's Method: Derivative is too close to zero: ", dfx);
 
         x -= fx / dfx;
@@ -53,8 +53,8 @@ M::Ordered<Output, Input> Maximize(
     {
         best = (f(a) > f(b) ? f(a) : f(b));
     }
-    auto df = M::Differentiate(f);
-    auto ddf = M::Differentiate(df);
+    auto df = M::Derivative(f);
+    auto ddf = M::Derivative(df);
     for (unsigned int i = 0; i < iterations; ++i)
     {
         Output guess = M::NewtonMethod(df, M::Random(a, b));
@@ -87,8 +87,8 @@ M::Ordered<Output, Input> Minimize(
     {
         best = (f(a) > f(b) ? f(b) : f(a));
     }
-    auto df = M::Differentiate(f);
-    auto ddf = M::Differentiate(df);
+    auto df = M::Derivative(f);
+    auto ddf = M::Derivative(df);
     for (unsigned int i = 0; i < iterations; ++i)
     {
         Output guess = M::NewtonMethod(df, M::Random(a, b));
@@ -112,9 +112,9 @@ M::Function<I, I> Curvature(const M::Function<O, I>& f) requires(requires(O out)
     out.Magnitude();
 })
 {
-    auto derivative = M::Differentiate(f);
+    auto derivative = M::Derivative(f);
     auto unitTangent = derivative.template Op<&O::Normalized>();
-    auto tangentDerivative = M::Differentiate(unitTangent);
+    auto tangentDerivative = M::Derivative(unitTangent);
     return tangentDerivative.template Op<&O::Magnitude>() / derivative.template Op<&O::Magnitude>();
 }
 } // namespace Ivy::M

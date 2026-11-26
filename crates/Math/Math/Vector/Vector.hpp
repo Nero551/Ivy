@@ -4,9 +4,11 @@
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Interpolation.hpp"
 #include "Math/Scalar.hpp"
+#include "Math/Traits.hpp"
 #include <array>
 #include <concepts>
 #include <ostream>
+#include <type_traits>
 namespace Ivy::M
 {
 /**
@@ -341,6 +343,15 @@ template <unsigned int Components, Scalar T = float> struct Vector
 
   private:
     std::array<T, Components> m_Data{0};
+};
+
+template <M::Scalar T, unsigned int C>
+struct VariableCountTrait<M::Vector<C, T>> : std::integral_constant<unsigned int, C>
+{
+};
+
+template <Scalar T, unsigned int C> struct ScalarTypeTrait<Vector<C, T>> : std::type_identity<T>
+{
 };
 
 } // namespace Ivy::M

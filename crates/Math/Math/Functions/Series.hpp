@@ -1,8 +1,8 @@
 #pragma once
-#include "Math/OperationTraits.hpp"
-#include "Math/Scalar.hpp"
 #include "Math/Common/Constants.hpp"
 #include "Math/Common/Exponentials.hpp"
+#include "Math/OperationTraits.hpp"
+#include "Math/Scalar.hpp"
 
 #include "Math/Functions/Function.hpp"
 namespace Ivy::M
@@ -15,7 +15,7 @@ namespace Ivy::M
 * @return A function representing the Taylor polynomial approximation.
 */
 template <typename Output, Scalar Input>
-Function<Output, Input> Taylor(const Function<Output, Input>& f, unsigned int terms, Input a)
+Function<Output, Input> Taylor(const Function<Output, Input>& f, const unsigned int terms, Input a)
     requires(Additive<Output, Output> && Multiplicative<Output, Input>)
 {
     return [terms, a, f](const Input x)
@@ -26,7 +26,7 @@ Function<Output, Input> Taylor(const Function<Output, Input>& f, unsigned int te
         for (unsigned int n = 0; n < terms; ++n)
         {
             result += currentFunc(a) * Pow(x - a, n) / Factorial(n);
-            currentFunc = Differentiate(currentFunc, EPSILON * terms * 10);
+            currentFunc = Derivative(currentFunc, EPSILON * terms * 10);
         }
 
         return result;

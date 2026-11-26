@@ -1,9 +1,9 @@
 #pragma once
+#include "Diagnostics/Log.hpp"
 #include "Function.hpp"
+#include "Math/Common/Constants.hpp"
 #include "Math/OperationTraits.hpp"
 #include "Math/Scalar.hpp"
-#include "Math/Common/Constants.hpp"
-#include "Diagnostics/Log.hpp"
 
 namespace Ivy::M
 {
@@ -20,23 +20,7 @@ template <typename Input, typename Output>
 Output Average(const Function<Input, Output>& f, const Input start, const Input end)
     requires(Scalar<Input> && Additive<Output, Output> && Divisible<Output, Input>)
 {
-    return Integral(f, start, end) / (end - start);
-}
-
-/**
- * @brief Evaluates the definite integral from lowerBound to upperBound.
- * @param lowerBound Lower bound of the integration interval.
- * @param upperBound Upper bound of the integration interval.
- * @param dx Step size used for numerical integration.
- * @param method Numerical integration method to use.
- * @return The approximate value of the integral.
- */
-template <typename Output, Scalar Input>
-Output Integral(const Function<Output, Input>& f, const Input lowerBound, Input upperBound,
-    const Input dx = EPSILON, const IntegrationMethod method = IntegrationMethod::Midpoint)
-    requires(Additive<Output, Output> && Multiplicative<Output, Input> && Divisible<Output, Input>)
-{
-    return Integrate(f, lowerBound, dx, method)(upperBound);
+    return Integrate(f, start)(end) / (end - start);
 }
 
 /**
