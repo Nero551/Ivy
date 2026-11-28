@@ -13,7 +13,7 @@ static constexpr int MaxComponentTypes = 64;
 inline unsigned int NextComponentId()
 {
     static unsigned int counter = 0;
-    D::Log::Assert(counter < MaxComponentTypes, "Too many component types for Signature");
+    D::Log::Assert(counter < MaxComponentTypes, "Too many component types");
     return counter++;
 }
 

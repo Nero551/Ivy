@@ -126,48 +126,6 @@ TEST(Vector2, ArithmeticVectorToVector)
     // NOTE: Vector<2> has no vector-vector division operator.
 }
 
-TEST(Vector2, ArithmeticScalar)
-{
-    Vector<2> a(1.0f, 2.0f);
-    EXPECT_EQ(a + 1.0f, Vector<2>(2.0f, 3.0f));
-    EXPECT_EQ(a - 1.0f, Vector<2>(0.0f, 1.0f));
-    EXPECT_EQ(a * 2.0f, Vector<2>(2.0f, 4.0f));
-    EXPECT_EQ(a / 2.0f, Vector<2>(0.5f, 1.0f));
-    EXPECT_EQ(1.0f + a, Vector<2>(2.0f, 3.0f));
-    EXPECT_EQ(1.0f - a, Vector<2>(0.0f, -1.0f));
-    EXPECT_EQ(2.0f * a, Vector<2>(2.0f, 4.0f));
-    EXPECT_EQ(2.0f / a, Vector<2>(2.0f, 1.0f));
-}
-
-TEST(Vector2, CompoundAssignment)
-{
-    Vector<2> a(1.0f, 2.0f);
-    Vector<2> b(3.0f, 4.0f);
-
-    Vector<2> t = a;
-    t += b;
-    EXPECT_EQ(t, Vector<2>(4.0f, 6.0f));
-    t = a;
-    t -= b;
-    EXPECT_EQ(t, Vector<2>(-2.0f, -2.0f));
-    t = a;
-    t *= b;
-    EXPECT_EQ(t, Vector<2>(3.0f, 8.0f));
-
-    t = a;
-    t += 1.0f;
-    EXPECT_EQ(t, Vector<2>(2.0f, 3.0f));
-    t = a;
-    t -= 1.0f;
-    EXPECT_EQ(t, Vector<2>(0.0f, 1.0f));
-    t = a;
-    t *= 2.0f;
-    EXPECT_EQ(t, Vector<2>(2.0f, 4.0f));
-    t = a;
-    t /= 2.0f;
-    EXPECT_EQ(t, Vector<2>(0.5f, 1.0f));
-}
-
 TEST(Vector2, EqualityAndNearlyEquals)
 {
     Vector<2> a(1.0f, 2.0f);
@@ -279,7 +237,6 @@ TEST(Vector3, AllOperators)
     EXPECT_EQ(a * b, Vector<3>(4.0f, 10.0f, 18.0f));
     EXPECT_EQ(a / b, Vector<3>(0.25f, 0.4f, 0.5f));
 
-    EXPECT_EQ(a + 1.0f, Vector<3>(2.0f, 3.0f, 4.0f));
     EXPECT_EQ(2.0f * a, Vector<3>(2.0f, 4.0f, 6.0f));
 }
 

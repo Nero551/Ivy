@@ -99,6 +99,13 @@ template <> struct Fetch<World>
         return e.World;
     };
 };
+template <> struct Fetch<ResManager>
+{
+    static ResManager& Get(Engine& e)
+    {
+        return e.RM;
+    }
+};
 template <> struct Fetch<Platform::Window>
 {
     static Platform::Window& Get(Engine& e)

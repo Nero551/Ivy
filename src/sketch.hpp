@@ -65,7 +65,7 @@ namespace Sketch
 //? as for thread safety. i think that should be integrated into the engine/ecs itself.
 //? think about deferred structural changes. for example, AddEntity() checks if any threads are reading, if yes. defer the change till after.
 
-//TODO: cool names for my stuff. ex: "Flow" for physics library. "Bloom" for graphics library, etc.
+//TODO: cool names for my stuff. ex: "Flow" for physics library. "Bloom" for graphics library, "Curl" for math library, etc.
 
 using namespace Ivy;
 
@@ -86,9 +86,8 @@ template <unsigned int... Dimensions> struct Tensor
     {
     }
 
-    template <typename... Indices>
-    constexpr float& operator()(Indices... indices)
-        requires(sizeof...(Indices) == Order && (std::integral<Indices> && ...))
+    template <std::unsigned_integral... Indices>
+    constexpr float& operator()(Indices... indices) requires(sizeof...(Indices) == Order)
     {
         std::array<unsigned int, Order> indexArray{static_cast<unsigned int>(indices)...};
         unsigned int flatIndex = 0;
@@ -248,39 +247,26 @@ template <unsigned int Component, M::Scalar T> using Bivector = KVector<2, Compo
 static M::Set<unsigned int> N = [](unsigned int x) { return true; };
 static M::Set<int> Z = [](int x) { return true; };
 static M::Set<float> R = [](float x) { return true; };
+
+template <M::Scalar O, M::Scalar... Is>
+M::Function<M::Matrix<sizeof...(Is), sizeof...(Is), O>, Is...> Hessian(const M::Function<O, Is...>& f)
+{
+    return M::Jacobian(M::Gradient(f));
+}
+
+template <typename T> struct Compo : T
+{
+};
+
+template <typename T>
+concept IsCompo = U::IsTSpec<T, Compo>;
+
 inline void Test()
 {
-    //TODO: rework vectors to support future k-vectors (watch intro to geometric algebra)
+    //TODO: make components use templates instead of inheritance (ex: Component<Transform3D>) instead of Transform3D : Component
+    //TODO: rework vectors to support future k-vectors (watch zero to geo)
     //TODO: currently partial derivative only supports multi float inputs, no vector, quaternion, etc. do that.
-
-    // M::Function<float, float, float, float> f = [](float x, float y, float z) { return x * x * M::Ln(z); };
-    // D::Log::Info(M::PartialDerivative<0>(f)(-1, 0, M::E));
-    // D::Log::Info(M::Gradient(f)(-1, 0, M::E));
-    // D::Log::Info(M::DirectionalDerivative(f, M::Vector<3>{1, 0, 0})(-1, 0, M::E));
-
-    // M::Function<M::Vector<3>, float, float, float> h = [](float x, float y, float z)
-    // { return M::Vector<3>{std::sin(x), std::cos(z), std::tan(y)}; };s
-
-    // D::Log::Info(M::Divergence(h)(M::PI, 0, M::PI / 2.0f));
-    // D::Log::Info(AcquireScalar<5>(M::Vector<2>{5, 2}, M::Vector<3>{3, 6, 10}, M::Vector<2>{7, 9}));
-
-    // M::Function<M::Vector<3>, float> g = [](float t)
-    // { return M::Vector<3>{std::cos(t), std::sin(t), t / 5.0f}; };
-    // D::Log::Info(M::Curvature(g)(10));
-    //
-    // M::Function<M::Vector<3>, float, float, float> c = [](float x, float y, float z)
-    // { return M::Vector<3>{x * x * y + z * z * z, y * y * z + x * x * x, z * z * x + y * y * y}; };
-    // D::Log::Info(M::Curl(c)(1, 2, 3));
-    //
-    // M::Function<float, float, float, float> l = [](float x, float y, float z)
-    // { return x * x * y + 3 * y * y * z + 2 * z * z * z + std::sin(x * y); };
-    // D::Log::Info(Laplacian(l)(1.2, 0.7, -0.4));
-
-    // M::Function<M::Vector<3>, float, float, float> j = [](float x, float y, float z)
-    // { return M::Vector<3>{x * x * y + std::sin(z), M::Exp(x) + y * z * z, x * y * z + std::cos(y)}; };
-    // D::Log::Info(Jacobian(j)(1, 2, 0.5));
-
-    // D::Log::Info(N.Cartesian(Z, R).Belongs({5, -5, 0.5f}));
+    //TODO: find cat wallpapers/
 }
 
 } // namespace Sketch

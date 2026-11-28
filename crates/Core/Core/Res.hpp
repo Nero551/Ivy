@@ -1,5 +1,5 @@
 #pragma once
-#include <concepts>
+#include "Utilities/IsSpecialization.hpp"
 namespace Ivy::C
 {
 struct IRes
@@ -13,5 +13,5 @@ template <typename T> struct Res : T, IRes
 };
 
 template <typename T>
-concept IsRes = std::derived_from<T, C::IRes>;
+concept IsRes = U::IsTSpec<T, Res>;
 } // namespace Ivy::C

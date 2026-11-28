@@ -216,18 +216,6 @@ template <Scalar T> struct Vector<4, T>
         return *this = *this * vector;
     }
 
-    /** @brief Adds a scalar to every component. */
-    constexpr Vector operator+(const T scalar) const
-    {
-        return {x + scalar, y + scalar, z + scalar, w + scalar};
-    }
-
-    /** @brief Subtracts a scalar from every component. */
-    constexpr Vector operator-(const T scalar) const
-    {
-        return {x - scalar, y - scalar, z - scalar, w - scalar};
-    }
-
     /** @brief Multiplies every component by a scalar. */
     constexpr Vector operator*(const T scalar) const
     {
@@ -238,18 +226,6 @@ template <Scalar T> struct Vector<4, T>
     constexpr Vector operator/(const T scalar) const
     {
         return {x / scalar, y / scalar, z / scalar, w / scalar};
-    }
-
-    /** @brief Adds a scalar to every component in place. */
-    constexpr Vector& operator+=(const T scalar)
-    {
-        return *this = *this + scalar;
-    }
-
-    /** @brief Subtracts a scalar from every component in place. */
-    constexpr Vector& operator-=(const T scalar)
-    {
-        return *this = *this - scalar;
     }
 
     /** @brief Multiplies every component by a scalar in place. */
@@ -273,18 +249,6 @@ template <Scalar T> struct Vector<4, T>
     auto constexpr operator<=>(const Vector& v) const = default;
 
     /** @brief Adds a scalar to every component. */
-    friend constexpr Vector operator+(const T scalar, const Vector& vector)
-    {
-        return vector + scalar;
-    }
-
-    /** @brief Subtracts every vector component from a scalar. */
-    friend constexpr Vector operator-(const T scalar, const Vector& vector)
-    {
-        return {scalar - vector.x, scalar - vector.y, scalar - vector.z, scalar - vector.w};
-    }
-
-    /** @brief Multiplies every component by a scalar. */
     friend constexpr Vector operator*(const T scalar, const Vector& vector)
     {
         return vector * scalar;

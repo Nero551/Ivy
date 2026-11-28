@@ -214,28 +214,6 @@ template <unsigned int Components, Scalar T = float> struct Vector
         return *this = *this / vector;
     }
 
-    /** @brief Adds a scalar to every component. */
-    constexpr Vector operator+(const T scalar) const
-    {
-        Vector result;
-        for (int i = 0; i < Components; ++i)
-        {
-            result(i) = (*this)(i) + scalar;
-        }
-        return result;
-    }
-
-    /** @brief Subtracts a scalar from every component. */
-    constexpr Vector operator-(const T scalar) const
-    {
-        Vector result;
-        for (int i = 0; i < Components; ++i)
-        {
-            result(i) = (*this)(i)-scalar;
-        }
-        return result;
-    }
-
     /** @brief Multiplies every component by a scalar. */
     constexpr Vector operator*(const T scalar) const
     {
@@ -258,18 +236,6 @@ template <unsigned int Components, Scalar T = float> struct Vector
         return result;
     }
 
-    /** @brief Adds a scalar to every component in place. */
-    constexpr Vector& operator+=(const T scalar)
-    {
-        return *this = *this + scalar;
-    }
-
-    /** @brief Subtracts a scalar from every component in place. */
-    constexpr Vector& operator-=(const T scalar)
-    {
-        return *this = *this - scalar;
-    }
-
     /** @brief Multiplies every component by a scalar in place. */
     constexpr Vector& operator*=(const T scalar)
     {
@@ -289,23 +255,6 @@ template <unsigned int Components, Scalar T = float> struct Vector
     }
 
     auto constexpr operator<=>(const Vector& v) const = default;
-
-    /** @brief Adds a scalar to every component. */
-    friend constexpr Vector operator+(const T scalar, const Vector& vector)
-    {
-        return vector + scalar;
-    }
-
-    /** @brief Subtracts every vector component from a scalar. */
-    friend constexpr Vector operator-(const T scalar, const Vector& vector)
-    {
-        Vector result;
-        for (int i = 0; i < Components; ++i)
-        {
-            result(i) = scalar - vector(i);
-        }
-        return result;
-    }
 
     /** @brief Multiplies every component by a scalar. */
     friend constexpr Vector operator*(const T scalar, const Vector& vector)

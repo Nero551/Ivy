@@ -191,5 +191,4 @@ A chronological record of Ivy's weekly progress. Entries reflect what I worked o
 
 ### Week 21 · November 20–27
 
-- partial & directional derivatives
-- gradient, curvature
+- partial & directional derivatives, grad, div, curl, laplacian, jacobian, curvature.
